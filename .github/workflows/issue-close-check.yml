@@ -1,0 +1,37 @@
+name: Issue close SLA check
+
+on:
+  issues:
+    types: [closed]
+
+permissions:
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+
+            if (issue.milestone && issue.milestone.due_on) {
+              const dueOn = new Date(issue.milestone.due_on);
+              const closedAt = new Date(issue.closed_at);
+
+              if (closedAt > dueOn) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: `This issue was closed on ${closedAt.toISOString().slice(0, 10)}, after its milestone **${issue.milestone.title}**'s due date of ${dueOn.toISOString().slice(0, 10)}.`
+                });
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ["overdue"]
+                });
+              }
+            }

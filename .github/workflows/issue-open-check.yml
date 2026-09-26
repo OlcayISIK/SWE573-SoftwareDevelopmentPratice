@@ -1,0 +1,45 @@
+name: Issue open checklist
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const missing = [];
+
+            if (!issue.assignees || issue.assignees.length === 0) {
+              missing.push("an **assignee**");
+            }
+            if (!issue.milestone) {
+              missing.push("a **milestone**");
+            }
+            const slaLabels = ["SLA1", "SLA2", "SLA3", "SLA4"];
+            const hasSla = issue.labels.some(l => slaLabels.includes(l.name));
+            if (!hasSla) {
+              missing.push("an **SLA label** (SLA1-SLA4)");
+            }
+
+            if (missing.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `This issue is missing ${missing.join(", ")}. Please add ${missing.length > 1 ? "these" : "this"} before work begins.`
+              });
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ["needs-triage"]
+              });
+            }

@@ -1,0 +1,47 @@
+name: Task
+description: Standard task/issue template for tracking work on this project
+title: "[TASK]: "
+labels: []
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be done and why.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria / Requirements
+      description: What must be true for this issue to be considered done.
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+    validations:
+      required: true
+  - type: input
+    id: estimation
+    attributes:
+      label: Estimation Time
+      description: Estimated effort to complete this task (e.g. "2 days", "8 hours").
+      placeholder: e.g. 2 days
+    validations:
+      required: true
+  - type: dropdown
+    id: sla
+    attributes:
+      label: SLA Level
+      description: Resolution-time tier for this issue. After submitting, also apply the matching SLA label in the sidebar.
+      options:
+        - SLA1 (1 day)
+        - SLA2 (2 days)
+        - SLA3 (3 days)
+        - SLA4 (4 days)
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Reminder:** Before submitting, set an **Assignee** and a **Milestone** in the sidebar. Both are required for every issue.
