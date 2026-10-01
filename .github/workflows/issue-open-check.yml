@@ -23,10 +23,13 @@ jobs:
             if (!issue.milestone) {
               missing.push("a **milestone**");
             }
-            const slaLabels = ["SLA1", "SLA2", "SLA3", "SLA4"];
-            const hasSla = issue.labels.some(l => slaLabels.includes(l.name));
-            if (!hasSla) {
-              missing.push("an **SLA label** (SLA1-SLA4)");
+            const isDeliverable = issue.labels.some(l => l.name === "deliverable");
+            if (!isDeliverable) {
+              const slaLabels = ["SLA1", "SLA2", "SLA3", "SLA4"];
+              const hasSla = issue.labels.some(l => slaLabels.includes(l.name));
+              if (!hasSla) {
+                missing.push("an **SLA label** (SLA1-SLA4)");
+              }
             }
 
             if (missing.length > 0) {
