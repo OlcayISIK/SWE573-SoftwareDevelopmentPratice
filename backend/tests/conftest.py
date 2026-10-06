@@ -16,6 +16,16 @@ def api_client():
 
 
 @pytest.fixture
+def client_for():
+    def make(user):
+        client = APIClient()
+        client.force_authenticate(user=user)
+        return client
+
+    return make
+
+
+@pytest.fixture
 def user(db):
     from tests.factories import UserFactory
 
