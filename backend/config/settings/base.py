@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "accounts",
     "crafts",
     "moderation",
+    "social",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

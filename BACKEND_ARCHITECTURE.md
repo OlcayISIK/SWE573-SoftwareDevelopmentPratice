@@ -255,8 +255,10 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the sma
 | GET    | `/moderation/reports/`                 | Admin           | Review queue (`status=open` by default; also `resolved`, `dismissed`, `all`) |
 | GET    | `/moderation/reports/{id}/`            | Admin           | Report details with its review history |
 | POST   | `/moderation/reports/{id}/actions/`    | Admin           | Edit, hide, remove, or dismiss        |
+| GET    | `/crafts/{id}/favorite/`               | Public          | Favorite status and count             |
 | POST   | `/crafts/{id}/favorite/`               | Registered user | Favorite (DELETE to unfavorite)       |
 | GET    | `/me/favorites/`                       | Registered user | List own favorites                    |
+| GET    | `/users/{id}/follow/`                  | Public          | Follow status and follower counts     |
 | POST   | `/users/{id}/follow/`                  | Registered user | Follow (DELETE to unfollow)           |
 | GET    | `/users/{id}/`                         | Public          | Public profile                        |
 | GET    | `/users/{id}/crafts/`                  | Public          | Crafts added by a user                |
