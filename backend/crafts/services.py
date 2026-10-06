@@ -3,7 +3,9 @@ from django.db import transaction
 from core.exceptions import PermissionDeniedError, ValidationError
 
 from . import signals
-from .models import Craft
+from .models import Craft, CraftMedia
+
+MAX_MEDIA_PER_CRAFT = 20
 
 EDITABLE_FIELDS = {
     "name",
@@ -22,6 +24,8 @@ EDITABLE_FIELDS = {
 VERIFY_BEFORE_PUBLISHING = "Verify your email address before publishing crafts."
 NOT_ALLOWED_TO_EDIT = "Only the author or an admin can change this craft."
 ADMIN_ONLY = "Only admins can perform this action."
+AUTHOR_ONLY = "Only the author can add media to this craft."
+TOO_MANY_MEDIA = f"A craft can have at most {MAX_MEDIA_PER_CRAFT} media items."
 
 
 def _ensure_can_edit(craft, actor):
@@ -67,10 +71,15 @@ def update_craft(*, craft, actor, data):
     return craft
 
 
+def _soft_delete(craft):
+    craft.media.all().delete()
+    craft.delete()
+
+
 @transaction.atomic
 def delete_craft(*, craft, actor):
     _ensure_can_edit(craft, actor)
-    craft.delete()
+    _soft_delete(craft)
 
 
 @transaction.atomic
@@ -84,4 +93,21 @@ def hide_craft(*, craft, actor):
 @transaction.atomic
 def remove_craft(*, craft, actor):
     _ensure_admin(actor)
-    craft.delete()
+    _soft_delete(craft)
+
+
+@transaction.atomic
+def add_media(*, craft, actor, data):
+    if craft.author_id != actor.id:
+        raise PermissionDeniedError(AUTHOR_ONLY)
+    # Lock the craft row so concurrent uploads cannot push it past the limit.
+    Craft.objects.select_for_update().filter(pk=craft.pk).first()
+    if craft.media.count() >= MAX_MEDIA_PER_CRAFT:
+        raise ValidationError(TOO_MANY_MEDIA)
+    return CraftMedia.objects.create(craft=craft, **data)
+
+
+@transaction.atomic
+def remove_media(*, media, actor):
+    _ensure_can_edit(media.craft, actor)
+    media.delete()

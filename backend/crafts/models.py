@@ -1,3 +1,6 @@
+import uuid
+from pathlib import Path
+
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -80,3 +83,42 @@ class Craft(SoftDeleteModel):
 
     def __str__(self):
         return self.name
+
+
+def craft_media_path(instance, filename):
+    return f"crafts/{instance.craft_id}/{uuid.uuid4().hex}{Path(filename).suffix.lower()}"
+
+
+class CraftMedia(SoftDeleteModel):
+    class MediaType(models.TextChoices):
+        PHOTO = "photo", "Photo"
+        VIDEO = "video", "Video link"
+        DOCUMENT = "document", "Document"
+
+    craft = models.ForeignKey(Craft, on_delete=models.CASCADE, related_name="media")
+    media_type = models.CharField(max_length=10, choices=MediaType.choices)
+    file = models.FileField(upload_to=craft_media_path, blank=True)
+    url = models.URLField(blank=True)
+    caption = models.CharField(max_length=200, blank=True)
+    alt_text = models.CharField(max_length=250, blank=True)
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name_plural = "craft media"
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    (models.Q(media_type="video", file="") & ~models.Q(url=""))
+                    | (models.Q(media_type__in=["photo", "document"], url="") & ~models.Q(file=""))
+                ),
+                name="craft_media_has_file_or_link",
+            ),
+            models.CheckConstraint(
+                condition=~models.Q(media_type="photo") | ~models.Q(alt_text=""),
+                name="craft_photo_has_alt_text",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.get_media_type_display()} for {self.craft}"

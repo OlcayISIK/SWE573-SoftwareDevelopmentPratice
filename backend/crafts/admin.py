@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from .models import Category, Craft, Region
+from .models import Category, Craft, CraftMedia, Region
+
+
+class CraftMediaInline(admin.TabularInline):
+    model = CraftMedia
+    extra = 0
+    fields = ["media_type", "file", "url", "caption", "alt_text", "order", "is_deleted"]
+
+    def get_queryset(self, request):
+        return CraftMedia.all_objects.all()
 
 
 @admin.register(Category)
@@ -24,6 +33,7 @@ class CraftAdmin(admin.ModelAdmin):
     search_fields = ["name", "craft_type", "author__email"]
     raw_id_fields = ["author"]
     readonly_fields = ["created_at", "updated_at"]
+    inlines = [CraftMediaInline]
 
     def get_queryset(self, request):
         return Craft.all_objects.select_related("author", "category", "region")
