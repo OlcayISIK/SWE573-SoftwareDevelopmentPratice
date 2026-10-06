@@ -249,6 +249,7 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the sma
 | PATCH  | `/crafts/{id}/`                        | Author or admin | Edit a craft                          |
 | DELETE | `/crafts/{id}/`                        | Author or admin | Soft delete a craft                   |
 | POST   | `/crafts/{id}/media/`                  | Author          | Upload photo, video, or document      |
+| DELETE | `/crafts/{id}/media/{media_id}/`       | Author or admin | Remove a media item                   |
 | GET    | `/categories/`, `/regions/`            | Public          | Reference data for filters            |
 | POST   | `/crafts/{id}/report/`                 | Registered user | Report a craft                        |
 | GET    | `/moderation/reports/`                 | Admin           | Review queue                          |
@@ -354,6 +355,8 @@ Recipients are read through `social.selectors` (followers of the author, users w
 - Uploads are validated for file type and size in the serializer (photos: JPEG, PNG, WebP up to 5 MB; profile avatars: the same formats up to 2 MB; documents: PDF up to 10 MB).
 - Videos are stored as external links (e.g., YouTube) rather than uploaded files, to avoid large uploads and transcoding.
 - Every photo requires `alt_text` (NFR-05).
+- A craft can have at most 20 media items. Uploaded files are renamed to random names, so the original filename is never exposed.
+- The first photo (by `order`) is returned as `cover_photo` in craft lists.
 
 ---
 
