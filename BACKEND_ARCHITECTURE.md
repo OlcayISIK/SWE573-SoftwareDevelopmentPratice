@@ -203,7 +203,7 @@ All models inherit `core.BaseModel`, which adds `id`, `created_at`, and `updated
 
 ### notifications
 
-- **Notification**: `recipient` (FK User), `type` (`new_craft_from_followed`, `favorite_updated`, `report_resolved`), `craft` (FK, nullable), `actor` (FK User, nullable), `is_read`.
+- **Notification**: `recipient` (FK User), `type` (`new_craft_from_followed`, `favorite_updated`, `report_resolved`), `craft` (FK, nullable), `actor` (FK User, nullable), `data` (`JSONField` with extra context, for example the review action and report status for `report_resolved`), `is_read`.
 
 ### Indexes
 
@@ -264,8 +264,9 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the sma
 | GET    | `/users/{id}/crafts/`                  | Public          | Crafts added by a user                |
 | GET    | `/me/`                                 | Registered user | Own profile and settings              |
 | PATCH  | `/me/`                                 | Registered user | Update profile and privacy settings   |
-| GET    | `/me/notifications/`                   | Registered user | List notifications                    |
-| POST   | `/me/notifications/read/`              | Registered user | Mark notifications as read            |
+| GET    | `/me/notifications/`                   | Registered user | List notifications (`unread=true` for unread only) |
+| GET    | `/me/notifications/unread-count/`      | Registered user | Unread count for the notification bell |
+| POST   | `/me/notifications/read/`              | Registered user | Mark notifications as read (given `ids`, or all) |
 
 The OpenAPI schema is served at `/api/schema/` and Swagger UI at `/api/docs/`.
 
@@ -351,7 +352,7 @@ Notifications are created synchronously, within the same database transaction as
 | A favorited craft is updated | `craft_updated` (`crafts.services.update_craft`)          | Users who favorited it |
 | A report is resolved         | `report_resolved` (`moderation.services.review_report`)   | The reporter           |
 
-Recipients are read through `social.selectors` (followers of the author, users who favorited the craft). Notifications are created with `bulk_create`. The client polls `/me/notifications/` to show the unread count. If follower counts grow large enough to slow down publishing, this is the first place to introduce a background task queue.
+Recipients are read through `social.selectors` (followers of the author, users who favorited the craft). Notifications are created with `bulk_create`. The client polls `/me/notifications/unread-count/` to show the unread count, which is a single indexed count query. If follower counts grow large enough to slow down publishing, this is the first place to introduce a background task queue.
 
 ---
 
