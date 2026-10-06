@@ -1,16 +1,20 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from . import services
+from . import selectors, services
 from .serializers import (
     AccountSerializer,
     DetailSerializer,
     EmailSerializer,
     LoginSerializer,
+    OwnProfileSerializer,
     PasswordResetConfirmSerializer,
+    ProfileUpdateSerializer,
+    PublicProfileSerializer,
     RefreshTokenSerializer,
     RegisterSerializer,
     VerifyEmailSerializer,
@@ -96,3 +100,27 @@ class PasswordResetConfirmView(APIView):
         serializer.is_valid(raise_exception=True)
         services.reset_password(**serializer.validated_data)
         return Response({"detail": RESET_DONE_MESSAGE})
+
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(responses=OwnProfileSerializer, tags=["profiles"])
+    def get(self, request):
+        return Response(OwnProfileSerializer(request.user, context={"request": request}).data)
+
+    @extend_schema(
+        request=ProfileUpdateSerializer, responses=OwnProfileSerializer, tags=["profiles"]
+    )
+    def patch(self, request):
+        serializer = ProfileUpdateSerializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        user = services.update_profile(user=request.user, **serializer.validated_data)
+        return Response(OwnProfileSerializer(user, context={"request": request}).data)
+
+
+class PublicProfileView(APIView):
+    @extend_schema(responses=PublicProfileSerializer, tags=["profiles"])
+    def get(self, request, user_id):
+        user = selectors.get_public_user(user_id)
+        return Response(PublicProfileSerializer(user, context={"request": request}).data)

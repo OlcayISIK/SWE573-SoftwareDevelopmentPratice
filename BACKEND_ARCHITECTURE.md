@@ -351,7 +351,7 @@ Recipients are read through `social.selectors` (followers of the author, users w
 ## Media Storage
 
 - Files are saved through Django's storage API. Development uses local disk; production can switch to S3-compatible storage by changing the `STORAGES` setting, with no code changes.
-- Uploads are validated for file type and size in the serializer (photos: JPEG, PNG, WebP up to 5 MB; documents: PDF up to 10 MB).
+- Uploads are validated for file type and size in the serializer (photos: JPEG, PNG, WebP up to 5 MB; profile avatars: the same formats up to 2 MB; documents: PDF up to 10 MB).
 - Videos are stored as external links (e.g., YouTube) rather than uploaded files, to avoid large uploads and transcoding.
 - Every photo requires `alt_text` (NFR-05).
 
