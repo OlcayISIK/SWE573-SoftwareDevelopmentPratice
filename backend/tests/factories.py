@@ -2,6 +2,7 @@ import factory
 
 from accounts.models import User
 from crafts.models import Category, Craft, Region
+from moderation.models import Report
 
 DEFAULT_PASSWORD = "Str0ng-Passw0rd!"
 
@@ -58,3 +59,13 @@ class CraftFactory(factory.django.DjangoModelFactory):
     cultural_relevance = "Part of a centuries-old regional tradition."
     attributes = factory.LazyFunction(dict)
     author = factory.SubFactory(UserFactory)
+
+
+class ReportFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Report
+
+    craft = factory.SubFactory(CraftFactory)
+    reporter = factory.SubFactory(UserFactory)
+    reason = Report.Reason.INACCURATE
+    note = "The region looks wrong."
