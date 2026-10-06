@@ -12,6 +12,7 @@ urlpatterns = [
     path("api/v1/", include("crafts.urls")),
     path("api/v1/", include("moderation.urls")),
     path("api/v1/", include("social.urls")),
+    path("api/v1/", include("notifications.urls")),
 ]
 
 if settings.DEBUG or settings.SERVE_MEDIA:
