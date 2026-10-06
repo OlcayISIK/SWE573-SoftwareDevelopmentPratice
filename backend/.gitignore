@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+.env
+media/
+staticfiles/
+.pytest_cache/
+.ruff_cache/
+.import_linter_cache/
