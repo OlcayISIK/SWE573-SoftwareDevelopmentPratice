@@ -1,7 +1,7 @@
 import factory
 
 from accounts.models import User
-from crafts.models import Category, Region
+from crafts.models import Category, Craft, Region
 
 DEFAULT_PASSWORD = "Str0ng-Passw0rd!"
 
@@ -40,3 +40,21 @@ class RegionFactory(factory.django.DjangoModelFactory):
     name = factory.Sequence(lambda n: f"Test Region {n}")
     country = "Testland"
     description = "A region used in tests."
+
+
+class CraftFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Craft
+
+    name = factory.Sequence(lambda n: f"Craft {n}")
+    craft_type = "Tile"
+    category = factory.SubFactory(CategoryFactory)
+    region = factory.SubFactory(RegionFactory)
+    latitude = "39.419200"
+    longitude = "29.983300"
+    description = "Hand-painted glazed tile."
+    production_process = "Shaped, painted, glazed, and fired in a kiln."
+    how_to_understand = "Motifs reflect local flora."
+    cultural_relevance = "Part of a centuries-old regional tradition."
+    attributes = factory.LazyFunction(dict)
+    author = factory.SubFactory(UserFactory)
