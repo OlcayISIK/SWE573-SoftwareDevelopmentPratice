@@ -48,12 +48,13 @@ extend-exclude = ["*/migrations/*"]
 select = ["E", "F", "I", "B", "UP", "DJ"]
 
 [tool.importlinter]
-root_packages = ["config", "core"]
+root_packages = ["config", "core", "accounts"]
 
 [[tool.importlinter.contracts]]
 name = "Module boundaries"
 type = "layers"
 layers = [
     "config",
+    "accounts",
     "core",
 ]
