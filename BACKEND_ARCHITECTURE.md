@@ -242,8 +242,8 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the sma
 | POST   | `/auth/logout/`                        | Guest           | Blacklist the refresh token           |
 | POST   | `/auth/password-reset/`                | Guest           | Request a password reset email        |
 | POST   | `/auth/password-reset/confirm/`        | Guest           | Set a new password with the token     |
-| GET    | `/crafts/`                             | Public          | List crafts (filter by category, region, search) |
-| GET    | `/crafts/map/`                         | Public          | Lightweight pins for the map          |
+| GET    | `/crafts/`                             | Public          | List crafts (filter by category, region, country, search) |
+| GET    | `/crafts/map/`                         | Public          | Lightweight pins for the map (same filters, plus `bbox=west,south,east,north`) |
 | GET    | `/crafts/{id}/`                        | Public          | Craft details                         |
 | POST   | `/crafts/`                             | Registered user | Publish a craft                       |
 | PATCH  | `/crafts/{id}/`                        | Author or admin | Edit a craft                          |

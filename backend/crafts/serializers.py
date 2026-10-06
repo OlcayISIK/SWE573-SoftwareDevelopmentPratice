@@ -106,6 +106,61 @@ class AuthorSerializer(serializers.Serializer):
     display_name = serializers.CharField(source="profile.display_name", read_only=True)
 
 
+class CraftFilterSerializer(serializers.Serializer):
+    category = serializers.SlugField(required=False)
+    region = serializers.IntegerField(required=False, min_value=1)
+    country = serializers.CharField(required=False, max_length=100)
+    search = serializers.CharField(required=False, max_length=100)
+
+
+class MapFilterSerializer(CraftFilterSerializer):
+    bbox = serializers.CharField(
+        required=False,
+        help_text="Visible map area as west,south,east,north in degrees.",
+    )
+
+    def validate_bbox(self, value):
+        try:
+            west, south, east, north = (float(part) for part in value.split(","))
+        except ValueError as exc:
+            raise serializers.ValidationError("Use four numbers: west,south,east,north.") from exc
+        if not (-90 <= south <= north <= 90 and -180 <= west <= 180 and -180 <= east <= 180):
+            raise serializers.ValidationError("The bounding box is outside the map.")
+        return west, south, east, north
+
+
+class CraftListSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    region = RegionSerializer(read_only=True)
+    author = AuthorSerializer(read_only=True)
+    latitude = serializers.FloatField(read_only=True)
+    longitude = serializers.FloatField(read_only=True)
+
+    class Meta:
+        model = Craft
+        fields = [
+            "id",
+            "name",
+            "craft_type",
+            "category",
+            "region",
+            "latitude",
+            "longitude",
+            "status",
+            "author",
+            "created_at",
+        ]
+        read_only_fields = fields
+
+
+class CraftPinSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    category = serializers.CharField(source="category__slug")
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+
+
 class CraftDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     region = RegionSerializer(read_only=True)

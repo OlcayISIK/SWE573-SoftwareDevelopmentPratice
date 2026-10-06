@@ -28,6 +28,43 @@ def visible_crafts(viewer=None):
     return crafts.filter(status=Craft.Status.PUBLISHED)
 
 
+def _apply_filters(crafts, *, category=None, region=None, country=None, search=None):
+    if category:
+        crafts = crafts.filter(category__slug=category)
+    if region:
+        crafts = crafts.filter(region_id=region)
+    if country:
+        crafts = crafts.filter(region__country__iexact=country)
+    if search:
+        crafts = crafts.filter(
+            Q(name__icontains=search)
+            | Q(craft_type__icontains=search)
+            | Q(description__icontains=search)
+            | Q(category__name__icontains=search)
+            | Q(region__name__icontains=search)
+        )
+    return crafts
+
+
+def browse_crafts(viewer=None, *, author_id=None, **filters):
+    crafts = visible_crafts(viewer).select_related("category", "region", "author__profile")
+    if author_id is not None:
+        crafts = crafts.filter(author_id=author_id)
+    return _apply_filters(crafts, **filters)
+
+
+def map_pins(viewer=None, *, bbox=None, **filters):
+    crafts = _apply_filters(visible_crafts(viewer), **filters)
+    if bbox:
+        west, south, east, north = bbox
+        crafts = crafts.filter(latitude__gte=south, latitude__lte=north)
+        if west <= east:
+            crafts = crafts.filter(longitude__gte=west, longitude__lte=east)
+        else:
+            crafts = crafts.filter(Q(longitude__gte=west) | Q(longitude__lte=east))
+    return crafts.values("id", "name", "category__slug", "latitude", "longitude")
+
+
 def get_visible_craft(craft_id, viewer=None):
     craft = (
         visible_crafts(viewer)
