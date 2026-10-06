@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "core",
     "accounts",
     "crafts",
+    "moderation",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
@@ -133,6 +134,7 @@ REST_FRAMEWORK = {
         "login": "10/min",
         "token_refresh": "30/min",
         "password_reset": "5/hour",
+        "report": "20/hour",
     },
 }
 
@@ -165,6 +167,10 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_NAME_OVERRIDES": {
+        "CraftStatusEnum": "crafts.models.Craft.Status",
+        "ReportStatusEnum": "moderation.models.Report.Status",
+    },
 }
 
 LOGGING = {
