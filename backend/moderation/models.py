@@ -36,3 +36,24 @@ class Report(BaseModel):
 
     def __str__(self):
         return f"{self.get_reason_display()} report on {self.craft_id}"
+
+
+class ReviewAction(BaseModel):
+    class Action(models.TextChoices):
+        EDIT = "edit", "Edit"
+        HIDE = "hide", "Hide"
+        REMOVE = "remove", "Remove"
+        DISMISS = "dismiss", "Dismiss"
+
+    report = models.ForeignKey(Report, on_delete=models.PROTECT, related_name="actions")
+    admin = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="review_actions"
+    )
+    action = models.CharField(max_length=10, choices=Action.choices)
+    reason = models.TextField(max_length=1000)
+
+    class Meta:
+        ordering = ["created_at", "id"]
+
+    def __str__(self):
+        return f"{self.get_action_display()} on report {self.report_id}"
