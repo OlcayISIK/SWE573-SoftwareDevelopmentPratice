@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "core",
     "accounts",
+    "crafts",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

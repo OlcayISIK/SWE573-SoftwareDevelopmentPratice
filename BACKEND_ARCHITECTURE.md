@@ -230,7 +230,7 @@ Because of that limit, craft visibility is defined once and reused:
 
 ## API Design
 
-All endpoints are under `/api/v1/`. List endpoints are paginated.
+All endpoints are under `/api/v1/`. List endpoints are paginated, except the small reference lists (`/categories/` and `/regions/`), which return every row so the frontend can fill its filters in one request. `/regions/` accepts an optional `country` filter.
 
 | Method | Endpoint                               | Access          | Purpose                               |
 | ------ | -------------------------------------- | --------------- | ------------------------------------- |
