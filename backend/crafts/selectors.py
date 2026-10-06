@@ -1,10 +1,16 @@
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 
 from core.exceptions import NotFoundError
 
-from .models import Category, Craft, Region
+from .models import Category, Craft, CraftMedia, Region
 
 CRAFT_NOT_FOUND = "Craft not found."
+MEDIA_NOT_FOUND = "Media not found."
+
+
+def _with_photos(crafts):
+    photos = CraftMedia.objects.filter(media_type=CraftMedia.MediaType.PHOTO)
+    return crafts.prefetch_related(Prefetch("media", queryset=photos, to_attr="photos"))
 
 
 def list_categories():
@@ -50,7 +56,7 @@ def browse_crafts(viewer=None, *, author_id=None, **filters):
     crafts = visible_crafts(viewer).select_related("category", "region", "author__profile")
     if author_id is not None:
         crafts = crafts.filter(author_id=author_id)
-    return _apply_filters(crafts, **filters)
+    return _with_photos(_apply_filters(crafts, **filters))
 
 
 def map_pins(viewer=None, *, bbox=None, **filters):
@@ -69,9 +75,17 @@ def get_visible_craft(craft_id, viewer=None):
     craft = (
         visible_crafts(viewer)
         .select_related("category", "region", "author__profile")
+        .prefetch_related("media")
         .filter(pk=craft_id)
         .first()
     )
     if craft is None:
         raise NotFoundError(CRAFT_NOT_FOUND)
     return craft
+
+
+def get_media(craft, media_id):
+    media = craft.media.filter(pk=media_id).first()
+    if media is None:
+        raise NotFoundError(MEDIA_NOT_FOUND)
+    return media

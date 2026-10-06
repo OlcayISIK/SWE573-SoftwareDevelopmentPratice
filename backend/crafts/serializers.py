@@ -1,8 +1,17 @@
 from decimal import ROUND_HALF_UP, Decimal
+from pathlib import Path
 
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.validators import URLValidator
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from .models import Category, Craft, Region
+from core.validators import MB, validate_image_upload
+
+from .models import Category, Craft, CraftMedia, Region
+
+PHOTO_MAX_BYTES = 5 * MB
+DOCUMENT_MAX_BYTES = 10 * MB
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -101,6 +110,71 @@ class CraftWriteSerializer(serializers.ModelSerializer):
         ]
 
 
+class MediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CraftMedia
+        fields = ["id", "media_type", "file", "url", "caption", "alt_text", "order"]
+        read_only_fields = fields
+
+
+class MediaUploadSerializer(serializers.ModelSerializer):
+    file = serializers.FileField(required=False)
+    url = serializers.URLField(
+        required=False,
+        allow_blank=True,
+        validators=[URLValidator(schemes=["http", "https"])],
+    )
+
+    class Meta:
+        model = CraftMedia
+        fields = ["media_type", "file", "url", "caption", "alt_text", "order"]
+
+    def validate(self, attrs):
+        media_type = attrs["media_type"]
+        file, url = attrs.get("file"), attrs.get("url", "")
+        if media_type == CraftMedia.MediaType.VIDEO:
+            if file:
+                raise serializers.ValidationError({"file": ["Videos are added as links."]})
+            if not url:
+                raise serializers.ValidationError({"url": ["A video link is required."]})
+            return attrs
+
+        if url:
+            raise serializers.ValidationError({"url": ["Only videos are added as links."]})
+        if not file:
+            raise serializers.ValidationError({"file": ["A file is required."]})
+        if media_type == CraftMedia.MediaType.PHOTO:
+            self._validate_photo(file, attrs.get("alt_text", ""))
+        else:
+            self._validate_document(file)
+        return attrs
+
+    def _validate_photo(self, file, alt_text):
+        try:
+            validate_image_upload(file, PHOTO_MAX_BYTES)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"file": exc.messages}) from exc
+        if not alt_text.strip():
+            raise serializers.ValidationError(
+                {"alt_text": ["Describe the photo for people who cannot see it."]}
+            )
+
+    def _validate_document(self, file):
+        if file.size > DOCUMENT_MAX_BYTES:
+            raise serializers.ValidationError(
+                {"file": [f"Documents must be {DOCUMENT_MAX_BYTES // MB} MB or smaller."]}
+            )
+        header = file.read(5)
+        file.seek(0)
+        if Path(file.name).suffix.lower() != ".pdf" or header != b"%PDF-":
+            raise serializers.ValidationError({"file": ["Only PDF documents are allowed."]})
+
+
+class CoverPhotoSerializer(serializers.Serializer):
+    url = serializers.CharField()
+    alt_text = serializers.CharField()
+
+
 class AuthorSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     display_name = serializers.CharField(source="profile.display_name", read_only=True)
@@ -135,6 +209,7 @@ class CraftListSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     latitude = serializers.FloatField(read_only=True)
     longitude = serializers.FloatField(read_only=True)
+    cover_photo = serializers.SerializerMethodField()
 
     class Meta:
         model = Craft
@@ -146,11 +221,25 @@ class CraftListSerializer(serializers.ModelSerializer):
             "region",
             "latitude",
             "longitude",
+            "cover_photo",
             "status",
             "author",
             "created_at",
         ]
         read_only_fields = fields
+
+    @extend_schema_field(CoverPhotoSerializer(allow_null=True))
+    def get_cover_photo(self, craft):
+        photos = getattr(craft, "photos", None)
+        if not photos:
+            return None
+        photo = photos[0]
+        request = self.context.get("request")
+        url = photo.file.url
+        return {
+            "url": request.build_absolute_uri(url) if request else url,
+            "alt_text": photo.alt_text,
+        }
 
 
 class CraftPinSerializer(serializers.Serializer):
@@ -167,6 +256,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     latitude = serializers.FloatField(read_only=True)
     longitude = serializers.FloatField(read_only=True)
+    media = MediaSerializer(many=True, read_only=True)
 
     class Meta:
         model = Craft
@@ -178,6 +268,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
             "region",
             "latitude",
             "longitude",
+            "media",
             "description",
             "production_process",
             "how_to_understand",

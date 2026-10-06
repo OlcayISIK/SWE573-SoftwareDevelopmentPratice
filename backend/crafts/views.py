@@ -17,6 +17,8 @@ from .serializers import (
     CraftPinSerializer,
     CraftWriteSerializer,
     MapFilterSerializer,
+    MediaSerializer,
+    MediaUploadSerializer,
     RegionSerializer,
 )
 
@@ -61,7 +63,7 @@ class CraftViewSet(viewsets.GenericViewSet):
     serializer_class = CraftDetailSerializer
 
     def get_permissions(self):
-        if self.action == "create":
+        if self.action in ("create", "upload_media", "delete_media"):
             return [IsAuthenticated()]
         if self.action in ("partial_update", "destroy"):
             return [IsAuthenticated(), IsAuthorOrAdmin()]
@@ -117,6 +119,29 @@ class CraftViewSet(viewsets.GenericViewSet):
         craft = selectors.get_visible_craft(pk, request.user)
         self.check_object_permissions(request, craft)
         services.delete_craft(craft=craft, actor=request.user)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(
+        request={"multipart/form-data": MediaUploadSerializer},
+        responses={201: MediaSerializer},
+    )
+    @action(detail=True, methods=["post"], url_path="media")
+    def upload_media(self, request, pk):
+        craft = selectors.get_visible_craft(pk, request.user)
+        serializer = MediaUploadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        media = services.add_media(craft=craft, actor=request.user, data=serializer.validated_data)
+        return Response(
+            MediaSerializer(media, context={"request": request}).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+    @extend_schema(responses={204: None})
+    @action(detail=True, methods=["delete"], url_path=r"media/(?P<media_id>\d+)")
+    def delete_media(self, request, pk, media_id):
+        craft = selectors.get_visible_craft(pk, request.user)
+        media = selectors.get_media(craft, media_id)
+        services.remove_media(media=media, actor=request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
