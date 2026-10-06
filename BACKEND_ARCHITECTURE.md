@@ -252,7 +252,8 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the sma
 | DELETE | `/crafts/{id}/media/{media_id}/`       | Author or admin | Remove a media item                   |
 | GET    | `/categories/`, `/regions/`            | Public          | Reference data for filters            |
 | POST   | `/crafts/{id}/report/`                 | Registered user | Report a craft                        |
-| GET    | `/moderation/reports/`                 | Admin           | Review queue                          |
+| GET    | `/moderation/reports/`                 | Admin           | Review queue (`status=open` by default; also `resolved`, `dismissed`, `all`) |
+| GET    | `/moderation/reports/{id}/`            | Admin           | Report details with its review history |
 | POST   | `/moderation/reports/{id}/actions/`    | Admin           | Edit, hide, remove, or dismiss        |
 | POST   | `/crafts/{id}/favorite/`               | Registered user | Favorite (DELETE to unfavorite)       |
 | GET    | `/me/favorites/`                       | Registered user | List own favorites                    |
@@ -330,6 +331,9 @@ User reports craft ──▶ Report (open) ──▶ Admin review queue
 
 - `hide` sets `Craft.status = hidden`. Hidden crafts are excluded from public queries but remain visible to the author and admins (see [Soft Delete and Visibility](#soft-delete-and-visibility)).
 - `remove` soft deletes the craft.
+- `edit` takes a `changes` object, validated with the same rules as a normal craft edit.
+- `hide` and `remove` also close every other open report on the same craft, each with its own `ReviewAction`, because the reported content is no longer public. `edit` and `dismiss` close only the reviewed report.
+- A report can be reviewed once; reviewing a closed report returns `409 Conflict`.
 - Every action is stored as a `ReviewAction` with the admin and reason, which gives a full audit history.
 - Admins can work through the API or the Django admin; both call the same `moderation.services` functions.
 
