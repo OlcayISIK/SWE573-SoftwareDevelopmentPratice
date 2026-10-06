@@ -1,5 +1,16 @@
+from core.exceptions import NotFoundError
+
 from .models import User, normalize_email
 from .tokens import decode_uid
+
+PROFILE_UNAVAILABLE = "This profile is unavailable."
+
+
+def get_public_user(user_id):
+    user = User.objects.select_related("profile").filter(pk=user_id, is_active=True).first()
+    if user is None:
+        raise NotFoundError(PROFILE_UNAVAILABLE)
+    return user
 
 
 def get_active_user_by_email(email):

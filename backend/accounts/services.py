@@ -90,6 +90,23 @@ def resend_verification_email(*, email):
         send_verification_email(user)
 
 
+PROFILE_FIELDS = {"display_name", "bio", "city", "country", "avatar", "show_email"}
+
+
+def update_profile(*, user, **changes):
+    unknown = set(changes) - PROFILE_FIELDS
+    if unknown:
+        raise ValidationError(
+            errors={field: ["This field cannot be changed."] for field in unknown}
+        )
+
+    profile = user.profile
+    for field, value in changes.items():
+        setattr(profile, field, value if value is not None else "")
+    profile.save()
+    return user
+
+
 def logout(*, refresh):
     try:
         RefreshToken(refresh).blacklist()
