@@ -239,6 +239,7 @@ All endpoints are under `/api/v1/`. List endpoints are paginated.
 | POST   | `/auth/verify-email/resend/`           | Guest           | Send a new verification email         |
 | POST   | `/auth/token/`                         | Guest           | Log in, get access and refresh tokens |
 | POST   | `/auth/token/refresh/`                 | Guest           | Refresh access token                  |
+| POST   | `/auth/logout/`                        | Guest           | Blacklist the refresh token           |
 | POST   | `/auth/password-reset/`                | Guest           | Request a password reset email        |
 | POST   | `/auth/password-reset/confirm/`        | Guest           | Set a new password with the token     |
 | GET    | `/crafts/`                             | Public          | List crafts (filter by category, region, search) |
@@ -281,7 +282,8 @@ Throttle counters are stored in Django's database cache, so the limits hold acro
 - Login returns a short-lived access token (15 minutes) and a refresh token (7 days).
 - Refresh tokens are rotated and the used token is blacklisted (`ROTATE_REFRESH_TOKENS`, `BLACKLIST_AFTER_ROTATION`, and the `token_blacklist` app), so a refresh token stops working once it has been exchanged.
 - Token claims carry `user_id` and `role`. The role claim is for the frontend only (for example, to show admin screens). The backend loads the user from the database on every request, and permission classes and services read the role from that user, so a role change or deactivation takes effect on the next request.
-- Password reset uses a single-use, time-limited token sent by email. The response is the same whether or not the email is registered.
+- Logout blacklists the refresh token, so it cannot be used again.
+- Password reset uses a single-use, time-limited token sent by email. The response is the same whether or not the email is registered. A successful reset blacklists every outstanding refresh token for the user, and access tokens carry a password-hash claim (`CHECK_REVOKE_TOKEN`), so all existing sessions end.
 - Passwords are hashed with Argon2.
 
 ### Roles

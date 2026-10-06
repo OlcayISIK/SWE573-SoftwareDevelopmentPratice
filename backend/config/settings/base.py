@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -21,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",
     "drf_spectacular",
     "core",
     "accounts",
@@ -102,7 +104,9 @@ CACHES = {
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
     "DEFAULT_RENDERER_CLASSES": ["core.renderers.EnvelopeJSONRenderer"],
     "DEFAULT_PARSER_CLASSES": [
@@ -125,7 +129,22 @@ REST_FRAMEWORK = {
         "user": "240/min",
         "register": "5/hour",
         "verify_resend": "3/hour",
+        "login": "10/min",
+        "token_refresh": "30/min",
+        "password_reset": "5/hour",
     },
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "CHECK_REVOKE_TOKEN": True,
+    "SIGNING_KEY": env("JWT_SIGNING_KEY", default=SECRET_KEY),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
 }
 
 FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:5173").rstrip("/")
