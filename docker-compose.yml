@@ -17,7 +17,9 @@ services:
     build: ./backend
     environment:
       DJANGO_SECRET_KEY: local-compose-secret-key
+      JWT_SIGNING_KEY: local-compose-jwt-signing-key
       DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
       DJANGO_SECURE_COOKIES: "false"
       DATABASE_URL: postgres://ic:ic@db:5432/indigenous_crafts
       CORS_ALLOWED_ORIGINS: http://localhost:5173
