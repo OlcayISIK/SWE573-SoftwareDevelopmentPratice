@@ -7,6 +7,11 @@ import { toast } from "@/lib/toast";
 
 import { server } from "./server";
 
+vi.mock("@/features/crafts/components/map/MapView", () => import("./mocks/MapView"));
+
+// jsdom does not implement scrolling; Leaflet calls it when focusing markers.
+window.scrollTo = () => undefined;
+
 // React Router builds requests with jsdom's AbortSignal, which Node's Request rejects.
 // Navigation aborts do not matter in tests, so the signal is dropped.
 const NodeRequest = globalThis.Request;
