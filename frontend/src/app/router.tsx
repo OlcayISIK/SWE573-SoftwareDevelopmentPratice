@@ -19,6 +19,13 @@ export const routes: RouteObject[] = [
               import("@/features/crafts/pages/MapPage").then((m) => ({ Component: m.MapPage })),
           },
           {
+            path: "crafts",
+            lazy: () =>
+              import("@/features/crafts/pages/CraftListPage").then((m) => ({
+                Component: m.CraftListPage,
+              })),
+          },
+          {
             path: "login",
             lazy: () =>
               import("@/features/auth/pages/LoginPage").then((m) => ({ Component: m.LoginPage })),
