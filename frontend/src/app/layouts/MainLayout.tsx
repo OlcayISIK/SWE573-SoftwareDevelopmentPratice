@@ -34,6 +34,9 @@ export function MainLayout() {
             Crafts
           </NavLink>
           <div className="ml-auto flex items-center gap-2">
+            <NavLink to="/crafts/new" className={navLinkClass}>
+              Add a craft
+            </NavLink>
             <AccountMenu />
           </div>
         </nav>

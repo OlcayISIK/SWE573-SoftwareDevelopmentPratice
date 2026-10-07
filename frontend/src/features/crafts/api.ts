@@ -1,7 +1,32 @@
 import { api } from "@/api/client";
 import type { Paginated } from "@/api/types";
 
-import type { Category, CraftDetail, CraftFilters, CraftListItem, CraftPin, Region } from "./types";
+import type { CraftPayload } from "./form/schema";
+import type {
+  Category,
+  CraftDetail,
+  CraftFilters,
+  CraftListItem,
+  CraftMedia,
+  CraftPin,
+  Region,
+} from "./types";
+
+export type NewMedia =
+  | { media_type: "photo"; file: File; alt_text: string; caption: string }
+  | { media_type: "document"; file: File; caption: string }
+  | { media_type: "video"; url: string; caption: string };
+
+export function mediaBody(media: NewMedia, order: number) {
+  if (media.media_type === "video") {
+    return { ...media, order };
+  }
+  const form = new FormData();
+  for (const [key, value] of Object.entries({ ...media, order })) {
+    form.append(key, value instanceof File ? value : String(value));
+  }
+  return form;
+}
 
 export const craftsApi = {
   list: (filters: CraftFilters) =>
@@ -9,7 +34,22 @@ export const craftsApi = {
   pins: ({ page: _page, ...filters }: CraftFilters) =>
     api.get<CraftPin[]>("/crafts/map/", { params: filters }),
   detail: (id: number) => api.get<CraftDetail>(`/crafts/${id}/`),
+  create: (payload: CraftPayload) => api.post<CraftDetail>("/crafts/", payload),
+  update: (id: number, payload: Partial<CraftPayload>) =>
+    api.patch<CraftDetail>(`/crafts/${id}/`, payload),
   remove: (id: number) => api.delete(`/crafts/${id}/`),
+  addMedia: (
+    craftId: number,
+    media: NewMedia,
+    order: number,
+    onProgress?: (percent: number) => void,
+  ) =>
+    api.post<CraftMedia>(`/crafts/${craftId}/media/`, mediaBody(media, order), {
+      onUploadProgress: (event) =>
+        event.total && onProgress?.(Math.round((event.loaded / event.total) * 100)),
+    }),
+  removeMedia: (craftId: number, mediaId: number) =>
+    api.delete(`/crafts/${craftId}/media/${mediaId}/`),
   byUser: (userId: number, page = 1) =>
     api.get<Paginated<CraftListItem>>(`/users/${userId}/crafts/`, { params: { page } }),
   categories: () => api.get<Category[]>("/categories/"),

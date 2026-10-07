@@ -12,17 +12,12 @@ import { config } from "@/lib/config";
 
 import type { CraftPin } from "../../types";
 
+import { pinIcon } from "./pinIcon";
+
 export interface MapViewProps {
   pins: CraftPin[];
   onSelect: (id: number) => void;
 }
-
-const pinIcon = L.divIcon({
-  className: "",
-  html: '<span class="block h-4 w-4 rounded-full border-2 border-white bg-brand-700 shadow"></span>',
-  iconSize: [16, 16],
-  iconAnchor: [8, 8],
-});
 
 function ClusteredPins({ pins, onSelect }: MapViewProps) {
   const map = useMap();

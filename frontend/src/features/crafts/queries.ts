@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { craftsApi } from "./api";
+import { craftsApi, type NewMedia } from "./api";
 import type { CraftFilters } from "./types";
 
 export const craftKeys = {
@@ -47,6 +47,33 @@ export function useDeleteCraft() {
       return queryClient.invalidateQueries({ queryKey: craftKeys.all });
     },
   });
+}
+
+export function useUpdateCraft(id: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: Parameters<typeof craftsApi.update>[1]) => craftsApi.update(id, payload),
+    onSuccess: (craft) => {
+      queryClient.setQueryData(craftKeys.detail(id), craft);
+      return queryClient.invalidateQueries({ queryKey: craftKeys.all });
+    },
+  });
+}
+
+export function useMediaMutations(craftId: number) {
+  const queryClient = useQueryClient();
+  const refresh = () => queryClient.invalidateQueries({ queryKey: craftKeys.all });
+  return {
+    add: useMutation({
+      mutationFn: ({ media, order }: { media: NewMedia; order: number }) =>
+        craftsApi.addMedia(craftId, media, order),
+      onSuccess: refresh,
+    }),
+    remove: useMutation({
+      mutationFn: (mediaId: number) => craftsApi.removeMedia(craftId, mediaId),
+      onSuccess: refresh,
+    }),
+  };
 }
 
 export function useUserCrafts(userId: number, page: number) {
