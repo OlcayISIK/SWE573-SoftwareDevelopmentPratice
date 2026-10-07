@@ -9,3 +9,5 @@ CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"
 MEDIA_ROOT = tempfile.mkdtemp(prefix="ic-test-media-")
 STATIC_ROOT = tempfile.mkdtemp(prefix="ic-test-static-")
 AUTO_VERIFY_EMAIL = False
+# Tests never call the real address lookup service.
+GEOCODER_URL = "http://geocoder.invalid"

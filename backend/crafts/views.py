@@ -4,11 +4,12 @@ from rest_framework import generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from accounts.selectors import get_public_user
 from core.permissions import IsAuthorOrAdmin
 
-from . import selectors, services
+from . import geocoding, selectors, services
 from .serializers import (
     AddCraftTypeSerializer,
     AddCultureSerializer,
@@ -23,11 +24,14 @@ from .serializers import (
     CraftTypeSerializer,
     CraftWriteSerializer,
     CultureSerializer,
+    GeocodeReverseSerializer,
+    GeocodeSearchSerializer,
     LinkedItemFilterSerializer,
     MapFilterSerializer,
     MaterialSerializer,
     MediaSerializer,
     MediaUploadSerializer,
+    PlaceSerializer,
     ToolSerializer,
 )
 
@@ -248,3 +252,26 @@ class UserCraftsView(generics.ListAPIView):
         return selectors.browse_crafts(
             self.request.user, author_id=author.id, **_filters(self.request)
         )
+
+
+class GeocodeView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_scope = "geocode"
+
+
+@extend_schema(tags=["address lookup"])
+class GeocodeSearchView(GeocodeView):
+    @extend_schema(parameters=[GeocodeSearchSerializer], responses=PlaceSerializer)
+    def get(self, request):
+        """Finds the coordinates of an address. Returns 404 when nothing matches."""
+        params = _filters(request, GeocodeSearchSerializer)
+        return Response(PlaceSerializer(geocoding.search(params["q"])).data)
+
+
+@extend_schema(tags=["address lookup"])
+class GeocodeReverseView(GeocodeView):
+    @extend_schema(parameters=[GeocodeReverseSerializer], responses=PlaceSerializer)
+    def get(self, request):
+        """Finds the address at a point. Returns 404 when there is none, for example at sea."""
+        params = _filters(request, GeocodeReverseSerializer)
+        return Response(PlaceSerializer(geocoding.reverse(params["lat"], params["lng"])).data)

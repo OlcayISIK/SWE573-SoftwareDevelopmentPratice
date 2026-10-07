@@ -38,6 +38,11 @@ class ConflictError(DomainError):
     default_message = "The request conflicts with the current state."
 
 
+class ServiceUnavailableError(DomainError):
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    default_message = "An outside service is not available right now."
+
+
 def _message_and_errors(data):
     if isinstance(data, dict) and "detail" in data:
         return str(data["detail"]), {}
