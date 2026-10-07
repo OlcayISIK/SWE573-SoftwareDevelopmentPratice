@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 
@@ -73,6 +73,7 @@ test("unverified users are asked to verify their email", async () => {
   expect(screen.getByRole("button", { name: "Send a new verification email" })).toBeVisible();
 });
 
+// The full flow fills in most of the form, so it needs more than the default time.
 test("publishing a craft with tools, materials, a dimension, a photo and a video", async () => {
   server.use(...signedIn());
   const { created, uploads } = publishHandlers();
@@ -90,7 +91,12 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
   await userEvent.click(screen.getByRole("button", { name: "Add a dimension" }));
   const dimension = screen.getByRole("group", { name: "Dimension 1" });
   await userEvent.type(within(dimension).getByLabelText("Size"), "20");
-  await userEvent.type(screen.getByLabelText("Colors"), "cobalt blue, turquoise,");
+  await userEvent.click(screen.getByRole("button", { name: "Add a color" }));
+  const firstColor = screen.getByRole("group", { name: "Color 1" });
+  await userEvent.type(within(firstColor).getByLabelText("Color code"), "rgb(30, 64, 175)");
+  await userEvent.click(screen.getByRole("button", { name: "Add a color" }));
+  const secondColor = screen.getByRole("group", { name: "Color 2" });
+  await userEvent.type(within(secondColor).getByLabelText("Color code"), "turquoise");
   await userEvent.upload(screen.getByLabelText("Photo file"), png());
   await userEvent.type(screen.getByLabelText("Alt text"), "Blue tile");
   await userEvent.click(screen.getByRole("button", { name: "Add to craft" }));
@@ -114,9 +120,9 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
     latitude: 39.419923,
     longitude: 29.985743,
     description: "Glazed tiles.",
+    colors: ["#1e40af", "#40e0d0"],
     attributes: {
       dimensions: [{ type: "height", value: 20, unit: "cm" }],
-      colors: ["cobalt blue", "turquoise"],
     },
   });
   expect(uploads).toHaveBeenCalledTimes(2);
@@ -132,7 +138,7 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
   ]);
   expect(toastMessages()).toContain("Your craft is published.");
   expect(localStorage.getItem("ic.craft-draft.v2")).toBeNull();
-});
+}, 15_000);
 
 test("an address that cannot be found is reported and nothing is pinned", async () => {
   server.use(...signedIn());
@@ -281,6 +287,62 @@ test("each dimension can be entered once", async () => {
   expect(within(first).getByText("Enter the size.")).toBeVisible();
 });
 
+describe("colors", () => {
+  test("the picker, the code, and the opacity stay in step", async () => {
+    server.use(...signedIn());
+    renderRoute("/crafts/new");
+
+    await userEvent.click(await screen.findByRole("button", { name: "Add a color" }));
+    const row = screen.getByRole("group", { name: "Color 1" });
+    const code = within(row).getByLabelText("Color code");
+    const picker = within(row).getByLabelText("Picker");
+    const opacity = within(row).getByLabelText(/Opacity/);
+    expect(opacity).toBeDisabled();
+
+    await userEvent.type(code, "hsl(0 100% 50%)");
+    expect(picker).toHaveValue("#ff0000");
+    expect(opacity).toHaveValue("100");
+
+    fireEvent.change(opacity, { target: { value: "50" } });
+    expect(code).toHaveValue("#ff000080");
+
+    fireEvent.input(picker, { target: { value: "#00ff00" } });
+    expect(code).toHaveValue("#00ff0080");
+  });
+
+  test("codes that are not colors, and the same color twice, are flagged", async () => {
+    server.use(...signedIn());
+    renderRoute("/crafts/new");
+
+    await userEvent.click(await screen.findByRole("button", { name: "Add a color" }));
+    await userEvent.click(screen.getByRole("button", { name: "Add a color" }));
+    await userEvent.click(screen.getByRole("button", { name: "Add a color" }));
+    const [first, second, third] = [1, 2, 3].map((n) =>
+      screen.getByRole("group", { name: `Color ${n}` }),
+    );
+    await userEvent.type(within(first).getByLabelText("Color code"), "navy");
+    await userEvent.type(within(second).getByLabelText("Color code"), "#000080cc");
+    await userEvent.type(within(third).getByLabelText("Color code"), "bluish");
+    await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
+
+    expect(await within(second).findByText("This color is already listed.")).toBeVisible();
+    expect(
+      within(third).getByText("Use a hex code (#1e40af), rgb(), hsl(), or a color name."),
+    ).toBeVisible();
+  });
+
+  test("up to 10 colors can be added", async () => {
+    server.use(...signedIn());
+    renderRoute("/crafts/new");
+
+    const add = await screen.findByRole("button", { name: "Add a color" });
+    for (let n = 0; n < 10; n += 1) await userEvent.click(add);
+
+    expect(screen.getAllByRole("group", { name: /^Color \d+$/ })).toHaveLength(10);
+    expect(screen.queryByRole("button", { name: "Add a color" })).not.toBeInTheDocument();
+  });
+});
+
 test("server errors on dimensions appear with the dimensions", async () => {
   server.use(
     ...signedIn(),
@@ -373,8 +435,8 @@ test("the new craft page has no accessibility violations", async () => {
 
 describe("editing", () => {
   const craft = makeCraftDetail({
+    colors: ["#1e40af80"],
     attributes: {
-      colors: ["cobalt blue"],
       dimensions: [{ type: "height", value: 20, unit: "cm" }],
     },
   });
@@ -396,7 +458,7 @@ describe("editing", () => {
     await waitFor(() => expect(screen.getByLabelText("Craft type")).toHaveValue("21"));
     expect(screen.getByLabelText("Address")).toHaveValue("Cumhuriyet Caddesi, Kütahya");
     expect(screen.getByRole("button", { name: "Remove Kiln" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Colors")).toHaveValue("cobalt blue");
+    expect(screen.getByLabelText("Color code")).toHaveValue("#1e40af80");
     expect(screen.getByLabelText("Size")).toHaveValue("20");
     await userEvent.clear(name);
     await userEvent.type(name, "Kütahya Tiles");
@@ -410,8 +472,8 @@ describe("editing", () => {
       culture: 51,
       tools: [32],
       materials: [41],
+      colors: ["#1e40af80"],
       attributes: {
-        colors: ["cobalt blue"],
         dimensions: [{ type: "height", value: 20, unit: "cm" }],
       },
     });

@@ -51,6 +51,7 @@ export function makeCraftDetail(overrides: Partial<CraftDetail> = {}): CraftDeta
       },
     ],
     description: "Hand-painted glazed tiles.",
+    colors: [],
     attributes: {},
     status: "published",
     author: { id: 7, display_name: "Ayşe" },

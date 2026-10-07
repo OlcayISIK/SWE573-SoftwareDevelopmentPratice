@@ -6,10 +6,12 @@ import {
   type CraftAttributes,
   type DimensionType,
 } from "../attributes";
+import { parseColor, toStoredColor } from "../colors";
 import type { CraftDetail } from "../types";
 
 export const MAX_TOOLS = 20;
 export const MAX_MATERIALS = 20;
+export const MAX_COLORS = 10;
 
 const required = (message: string) => z.string().trim().min(1, message);
 
@@ -37,16 +39,18 @@ const coordinate = (limit: number) =>
       PIN_MESSAGE,
     );
 
-const commaList = (itemMax: number) =>
-  z
-    .string()
-    .refine((value) => splitList(value).length <= 10, "List at most 10 items.")
-    .refine(
-      (value) => splitList(value).every((item) => item.length <= itemMax),
-      `Keep each item under ${itemMax} characters.`,
-    );
-
 const chosenItem = z.object({ id: z.number(), name: z.string() });
+
+const color = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(1, "Pick a color or type its code.")
+    .refine(
+      (value) => parseColor(value) !== null,
+      "Use a hex code (#1e40af), rgb(), hsl(), or a color name.",
+    ),
+});
 
 const dimension = z.object({
   type: z.enum(DIMENSION_TYPES),
@@ -67,6 +71,24 @@ export const craftFormSchema = z.object({
   latitude: coordinate(90),
   longitude: coordinate(180),
   description: required("Describe the craft."),
+  colors: z
+    .array(color)
+    .max(MAX_COLORS, `Add at most ${MAX_COLORS} colors.`)
+    .superRefine((rows, context) => {
+      const seen = new Set<string>();
+      rows.forEach((row, index) => {
+        const hex = parseColor(row.code)?.hex;
+        if (!hex) return;
+        if (seen.has(hex)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [index, "code"],
+            message: "This color is already listed.",
+          });
+        }
+        seen.add(hex);
+      });
+    }),
   attributes: z.object({
     dimensions: z.array(dimension).superRefine((rows, context) => {
       const seen = new Set<DimensionType>();
@@ -82,7 +104,6 @@ export const craftFormSchema = z.object({
       });
     }),
     weight_g: optionalPositive,
-    colors: commaList(40),
     distinguishing_features: z.string().max(1000),
   }),
 });
@@ -90,6 +111,7 @@ export const craftFormSchema = z.object({
 export type CraftFormValues = z.infer<typeof craftFormSchema>;
 export type DimensionRow = CraftFormValues["attributes"]["dimensions"][number];
 export type ChosenItem = z.infer<typeof chosenItem>;
+export type ColorRow = CraftFormValues["colors"][number];
 
 /** Every field the form renders, used to place server errors next to the right input. */
 export const CRAFT_FORM_FIELDS = [
@@ -103,9 +125,9 @@ export const CRAFT_FORM_FIELDS = [
   "latitude",
   "longitude",
   "description",
+  "colors",
   "attributes.dimensions",
   "attributes.weight_g",
-  "attributes.colors",
   "attributes.distinguishing_features",
 ] as const;
 
@@ -122,22 +144,15 @@ export const emptyCraftForm: CraftFormValues = {
   latitude: "",
   longitude: "",
   description: "",
+  colors: [],
   attributes: {
     dimensions: [],
     weight_g: "",
-    colors: "",
     distinguishing_features: "",
   },
 };
 
 export const newDimension: DimensionRow = { type: "height", value: "", unit: "cm" };
-
-function splitList(value: string) {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
 
 export interface CraftPayload {
   name: string;
@@ -152,6 +167,7 @@ export interface CraftPayload {
   latitude: number;
   longitude: number;
   description: string;
+  colors: string[];
   attributes: CraftAttributes;
 }
 
@@ -165,7 +181,6 @@ export function toPayload(values: CraftFormValues): CraftPayload {
     }));
   }
   if (attributes.weight_g) payloadAttributes.weight_g = Number(attributes.weight_g);
-  if (splitList(attributes.colors).length) payloadAttributes.colors = splitList(attributes.colors);
   if (attributes.distinguishing_features.trim()) {
     payloadAttributes.distinguishing_features = attributes.distinguishing_features.trim();
   }
@@ -183,6 +198,7 @@ export function toPayload(values: CraftFormValues): CraftPayload {
     latitude: Number(values.latitude),
     longitude: Number(values.longitude),
     description: values.description.trim(),
+    colors: values.colors.map((row) => toStoredColor(parseColor(row.code)!)),
     attributes: payloadAttributes,
   };
 }
@@ -203,13 +219,13 @@ export function fromCraft(craft: CraftDetail): CraftFormValues {
     latitude: String(craft.latitude),
     longitude: String(craft.longitude),
     description: craft.description,
+    colors: craft.colors.map((code) => ({ code })),
     attributes: {
       dimensions: (attributes.dimensions ?? []).map((row) => ({
         ...row,
         value: String(row.value),
       })),
       weight_g: attributes.weight_g?.toString() ?? "",
-      colors: attributes.colors?.join(", ") ?? "",
       distinguishing_features: attributes.distinguishing_features ?? "",
     },
   };

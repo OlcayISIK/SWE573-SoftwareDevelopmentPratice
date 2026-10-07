@@ -750,7 +750,6 @@ export interface components {
             dimensions?: components["schemas"]["DimensionRequest"][];
             /** Format: double */
             weight_g?: number;
-            colors?: string[];
             distinguishing_features?: string;
         };
         CraftDetail: {
@@ -770,6 +769,7 @@ export interface components {
             readonly longitude: number;
             readonly media: components["schemas"]["Media"][];
             readonly description: string;
+            readonly colors: string[];
             readonly attributes: unknown;
             readonly status: components["schemas"]["CraftStatusEnum"];
             readonly author: components["schemas"]["Author"];
@@ -832,6 +832,8 @@ export interface components {
             /** Format: double */
             longitude: number;
             description: string;
+            /** @description Colors as "#rrggbb", or "#rrggbbaa" when see-through. */
+            colors?: string[];
             attributes?: components["schemas"]["CraftAttributesRequest"];
         };
         Culture: {
@@ -1109,6 +1111,8 @@ export interface components {
             /** Format: double */
             longitude?: number;
             description?: string;
+            /** @description Colors as "#rrggbb", or "#rrggbbaa" when see-through. */
+            colors?: string[];
             attributes?: components["schemas"]["CraftAttributesRequest"];
         };
         PatchedProfileUpdateRequest: {
@@ -1664,6 +1668,8 @@ export interface operations {
             query?: {
                 /** @description Category slug */
                 category?: string;
+                /** @description Crafts with a similar color, as rrggbb */
+                color?: string;
                 /** @description Country of the craft */
                 country?: string;
                 /** @description Craft type id */
@@ -1995,6 +2001,8 @@ export interface operations {
                 bbox?: string;
                 /** @description Category slug */
                 category?: string;
+                /** @description Crafts with a similar color, as rrggbb */
+                color?: string;
                 /** @description Country of the craft */
                 country?: string;
                 /** @description Craft type id */
@@ -2694,6 +2702,8 @@ export interface operations {
             query?: {
                 /** @description Category slug */
                 category?: string;
+                /** @description Crafts with a similar color, as rrggbb */
+                color?: string;
                 /** @description Country of the craft */
                 country?: string;
                 /** @description Craft type id */
