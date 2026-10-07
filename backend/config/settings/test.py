@@ -8,3 +8,4 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
 MEDIA_ROOT = tempfile.mkdtemp(prefix="ic-test-media-")
 STATIC_ROOT = tempfile.mkdtemp(prefix="ic-test-static-")
+AUTO_VERIFY_EMAIL = False

@@ -283,6 +283,7 @@ Throttle counters are stored in Django's database cache, so the limits hold acro
 ### Authentication
 
 - Users register with email and password. A verification email is sent, and the account can publish only after verification.
+- While no mail provider is configured, `AUTO_VERIFY_EMAIL=true` marks new accounts as verified on registration and skips the verification email. It is on in local Docker Compose and development settings, off by default in production, and should be turned off once email delivery works.
 - The verification email is sent with `transaction.on_commit()`, after the account is saved. A failed send is logged and does not fail the registration; the user can request a new email from `/auth/verify-email/resend/`.
 - Login returns a short-lived access token (15 minutes) and a refresh token (7 days).
 - Refresh tokens are rotated and the used token is blacklisted (`ROTATE_REFRESH_TOKENS`, `BLACKLIST_AFTER_ROTATION`, and the `token_blacklist` app), so a refresh token stops working once it has been exchanged.
@@ -429,6 +430,8 @@ DJANGO_ALLOWED_HOSTS=api.example.com
 DATABASE_URL=postgres://user:password@db:5432/indigenous_crafts
 JWT_SIGNING_KEY=change-me
 CORS_ALLOWED_ORIGINS=https://example.com
+FRONTEND_URL=https://example.com
+AUTO_VERIFY_EMAIL=false
 EMAIL_HOST=smtp.example.com
 EMAIL_PORT=587
 EMAIL_HOST_USER=change-me

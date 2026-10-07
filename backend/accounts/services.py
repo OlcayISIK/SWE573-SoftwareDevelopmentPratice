@@ -59,13 +59,17 @@ def register_user(*, email, password, display_name=""):
         raise ConflictError(DUPLICATE_EMAIL, errors={"email": [DUPLICATE_EMAIL]})
     _check_password_strength(password, User(email=email))
 
+    auto_verify = settings.AUTO_VERIFY_EMAIL
     try:
         with transaction.atomic():
-            user = User.objects.create_user(email=email, password=password)
+            user = User.objects.create_user(
+                email=email, password=password, is_email_verified=auto_verify
+            )
             if display_name:
                 user.profile.display_name = display_name
                 user.profile.save(update_fields=["display_name", "updated_at"])
-            transaction.on_commit(lambda: send_verification_email(user))
+            if not auto_verify:
+                transaction.on_commit(lambda: send_verification_email(user))
     except IntegrityError as exc:
         raise ConflictError(DUPLICATE_EMAIL, errors={"email": [DUPLICATE_EMAIL]}) from exc
     return user

@@ -141,3 +141,34 @@ test("a verification page without a token explains what to do", async () => {
     await screen.findByRole("heading", { name: "This link does not work" }),
   ).toBeInTheDocument();
 });
+
+test("when the server verifies new accounts, the user is signed straight in", async () => {
+  server.use(
+    http.post(`${API}/auth/register/`, () =>
+      ok({ id: 9, email: "new@example.com", is_email_verified: true }, { status: 201 }),
+    ),
+    http.post(`${API}/auth/token/`, () => ok({ access: "access-1", refresh: "refresh-1" })),
+    http.get(`${API}/me/`, () => ok(makeUser({ id: 9, display_name: "Mehmet" }))),
+  );
+  const { router } = renderRoute("/register");
+
+  await fillRegistration();
+
+  expect(await screen.findByRole("link", { name: "Mehmet" })).toHaveAttribute("href", "/me");
+  expect(router.state.location.pathname).toBe("/");
+  expect(screen.queryByRole("heading", { name: "Check your email" })).not.toBeInTheDocument();
+});
+
+test("if signing in after registration fails, the user is sent to log in", async () => {
+  server.use(
+    http.post(`${API}/auth/register/`, () =>
+      ok({ id: 9, email: "new@example.com", is_email_verified: true }, { status: 201 }),
+    ),
+    http.post(`${API}/auth/token/`, () => fail(429, "Request was throttled.")),
+  );
+  renderRoute("/register");
+
+  await fillRegistration();
+
+  expect(await screen.findByRole("heading", { name: "Your account is ready" })).toBeInTheDocument();
+});
