@@ -2,6 +2,8 @@ import { lazy, Suspense, useCallback, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 
 import { PageLoader } from "@/components/PageLoader";
+import { FavoritesPanel } from "@/features/social/components/FavoritesPanel";
+import { PeoplePanel } from "@/features/social/components/PeoplePanel";
 
 import { FilterBar } from "../components/FilterBar";
 import { PinPreview } from "../components/PinPreview";
@@ -61,36 +63,52 @@ export function MapPage() {
         onClear={clearFilters}
         hasFilters={hasFilters}
       />
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2">
-        <p className="text-sm text-stone-700" aria-live="polite">
-          {pins.data ? `${pins.data.length} ${pins.data.length === 1 ? "craft" : "crafts"}` : ""}
-        </p>
-        <button
-          type="button"
-          className="rounded border border-stone-300 bg-white px-3 py-2 text-sm font-medium hover:bg-brand-100"
-          onClick={toggleView}
-        >
-          {showList ? "View on map" : "View as list"}
-        </button>
-      </div>
-      {pins.isPending ? (
-        <PageLoader label="Loading the map" />
-      ) : pins.isError ? (
-        <p role="alert" className="mx-auto max-w-6xl px-4 text-stone-700">
-          The map could not be loaded.
-        </p>
-      ) : showList ? (
-        <section aria-label="Crafts as a list" className="mx-auto max-w-6xl px-4 pb-10">
-          <PinList pins={pins.data} />
-        </section>
-      ) : (
-        <div className="relative h-[70vh] min-h-[420px]">
-          <Suspense fallback={<PageLoader label="Loading the map" />}>
-            <MapView pins={pins.data} onSelect={select} />
-          </Suspense>
-          {selected !== null && <PinPreview craftId={selected} onClose={() => setSelected(null)} />}
+      <div className="mx-auto grid max-w-[120rem] gap-4 px-4 py-4 lg:grid-cols-[13rem_minmax(0,1fr)_15rem] xl:grid-cols-[15rem_minmax(0,1fr)_17rem]">
+        <aside aria-label="People" className="order-2 lg:order-1">
+          <PeoplePanel />
+        </aside>
+
+        <div className="order-1 min-w-0 lg:order-2">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-sm text-stone-700" aria-live="polite">
+              {pins.data
+                ? `${pins.data.length} ${pins.data.length === 1 ? "craft" : "crafts"}`
+                : ""}
+            </p>
+            <button
+              type="button"
+              className="rounded border border-stone-300 bg-white px-3 py-2 text-sm font-medium hover:bg-brand-100"
+              onClick={toggleView}
+            >
+              {showList ? "View on map" : "View as list"}
+            </button>
+          </div>
+          {pins.isPending ? (
+            <PageLoader label="Loading the map" />
+          ) : pins.isError ? (
+            <p role="alert" className="text-stone-700">
+              The map could not be loaded.
+            </p>
+          ) : showList ? (
+            <section aria-label="Crafts as a list">
+              <PinList pins={pins.data} />
+            </section>
+          ) : (
+            <div className="relative aspect-[3/2] max-h-[80vh] min-h-[300px] w-full overflow-hidden rounded-lg border border-brand-100">
+              <Suspense fallback={<PageLoader label="Loading the map" />}>
+                <MapView pins={pins.data} onSelect={select} />
+              </Suspense>
+              {selected !== null && (
+                <PinPreview craftId={selected} onClose={() => setSelected(null)} />
+              )}
+            </div>
+          )}
         </div>
-      )}
+
+        <aside aria-label="Favorites" className="order-3">
+          <FavoritesPanel />
+        </aside>
+      </div>
     </>
   );
 }

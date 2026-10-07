@@ -16,6 +16,8 @@ export const socialKeys = {
   myFavorites: (page: number) => ["social", "my-favorites", page] as const,
   allMyFavorites: ["social", "my-favorites"] as const,
   follow: (userId: number) => ["social", "follow", userId] as const,
+  myFollowing: ["social", "my-following"] as const,
+  myFollowers: ["social", "my-followers"] as const,
 };
 
 /**
@@ -80,11 +82,28 @@ export function useToggleFavorite(craftId: number) {
   });
 }
 
-export function useMyFavorites(page: number) {
+export function useMyFavorites(page: number, enabled = true) {
   return useQuery({
     queryKey: socialKeys.myFavorites(page),
     queryFn: () => socialApi.myFavorites(page),
     placeholderData: keepPreviousData,
+    enabled,
+  });
+}
+
+export function useMyFollowing(enabled = true) {
+  return useQuery({
+    queryKey: socialKeys.myFollowing,
+    queryFn: () => socialApi.myFollowing(),
+    enabled,
+  });
+}
+
+export function useMyFollowers(enabled = true) {
+  return useQuery({
+    queryKey: socialKeys.myFollowers,
+    queryFn: () => socialApi.myFollowers(),
+    enabled,
   });
 }
 
@@ -104,5 +123,6 @@ export function useToggleFollow(userId: number) {
       following: next,
       followers_count: Math.max(0, current.followers_count + (next ? 1 : -1)),
     }),
+    invalidate: [socialKeys.myFollowing],
   });
 }
