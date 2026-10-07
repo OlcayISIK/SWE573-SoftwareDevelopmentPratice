@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { craftsApi } from "./api";
 import type { CraftFilters } from "./types";
@@ -35,6 +35,17 @@ export function useCraft(id: number | null) {
     queryKey: craftKeys.detail(id ?? 0),
     queryFn: () => craftsApi.detail(id as number),
     enabled: id !== null,
+  });
+}
+
+export function useDeleteCraft() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => craftsApi.remove(id),
+    onSuccess: (_data, id) => {
+      queryClient.removeQueries({ queryKey: craftKeys.detail(id) });
+      return queryClient.invalidateQueries({ queryKey: craftKeys.all });
+    },
   });
 }
 
