@@ -109,6 +109,20 @@ export const routes: RouteObject[] = [
                         Component: m.ReviewReportPage,
                       })),
                   },
+                  {
+                    path: "item-reports",
+                    lazy: () =>
+                      import("@/features/moderation/pages/ItemReviewQueuePage").then((m) => ({
+                        Component: m.ItemReviewQueuePage,
+                      })),
+                  },
+                  {
+                    path: "item-reports/:id",
+                    lazy: () =>
+                      import("@/features/moderation/pages/ItemReviewPage").then((m) => ({
+                        Component: m.ItemReviewPage,
+                      })),
+                  },
                 ],
               },
             ],

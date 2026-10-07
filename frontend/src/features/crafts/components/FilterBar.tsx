@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from "react";
 
-import { useCategories } from "../queries";
+import { useCategories, useCountries, useCraftTypes, useCultures } from "../queries";
 import type { CraftFilters } from "../types";
 
 interface FilterBarProps {
@@ -15,6 +15,10 @@ const fieldClass = "mt-1 block w-full rounded border border-stone-300 bg-white p
 export function FilterBar({ filters, onChange, onClear, hasFilters }: FilterBarProps) {
   const id = useId();
   const categories = useCategories();
+  const categoryId = categories.data?.find((item) => item.slug === filters.category)?.id ?? null;
+  const craftTypes = useCraftTypes(categoryId);
+  const cultures = useCultures();
+  const countries = useCountries();
   const [search, setSearch] = useState(filters.search ?? "");
   const [open, setOpen] = useState(false);
 
@@ -36,7 +40,7 @@ export function FilterBar({ filters, onChange, onClear, hasFilters }: FilterBarP
           id={`${id}-filters`}
           role="search"
           aria-label="Filter crafts"
-          className={`${open ? "grid" : "hidden"} mt-3 gap-3 md:mt-0 md:grid md:grid-cols-[1fr_2fr_auto] md:items-end`}
+          className={`${open ? "grid" : "hidden"} mt-3 gap-3 md:mt-0 md:grid md:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_minmax(0,2fr)_auto] md:items-end`}
           onSubmit={(event) => {
             event.preventDefault();
             onChange({ search: search.trim() || undefined });
@@ -50,12 +54,72 @@ export function FilterBar({ filters, onChange, onClear, hasFilters }: FilterBarP
               id={`${id}-category`}
               className={fieldClass}
               value={filters.category ?? ""}
-              onChange={(event) => onChange({ category: event.target.value || undefined })}
+              onChange={(event) =>
+                // A craft type belongs to one category, so a new category clears it.
+                onChange({ category: event.target.value || undefined, craft_type: undefined })
+              }
             >
               <option value="">All categories</option>
               {categories.data?.map((category) => (
                 <option key={category.id} value={category.slug}>
                   {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor={`${id}-craft-type`} className="text-sm font-medium">
+              Craft type
+            </label>
+            <select
+              id={`${id}-craft-type`}
+              className={fieldClass}
+              disabled={!categoryId}
+              value={filters.craft_type ?? ""}
+              onChange={(event) =>
+                onChange({ craft_type: Number(event.target.value) || undefined })
+              }
+            >
+              <option value="">{categoryId ? "All craft types" : "Choose a category first"}</option>
+              {craftTypes.data?.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor={`${id}-culture`} className="text-sm font-medium">
+              Culture
+            </label>
+            <select
+              id={`${id}-culture`}
+              className={fieldClass}
+              value={filters.culture ?? ""}
+              onChange={(event) => onChange({ culture: Number(event.target.value) || undefined })}
+            >
+              <option value="">All cultures</option>
+              {cultures.data?.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor={`${id}-country`} className="text-sm font-medium">
+              Country
+            </label>
+            <select
+              id={`${id}-country`}
+              className={fieldClass}
+              value={filters.country ?? ""}
+              onChange={(event) => onChange({ country: event.target.value || undefined })}
+            >
+              <option value="">All countries</option>
+              {countries.data?.map((country) => (
+                <option key={country} value={country}>
+                  {country}
                 </option>
               ))}
             </select>

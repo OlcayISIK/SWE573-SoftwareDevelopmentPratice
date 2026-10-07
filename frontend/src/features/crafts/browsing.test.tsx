@@ -59,6 +59,45 @@ describe("craft list", () => {
     expect([last.get("category"), last.get("search")]).toEqual(["ceramics", "çini"]);
   });
 
+  test("craft type, culture, and country filters are sent to the API", async () => {
+    const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
+    const { router } = renderRoute("/crafts");
+
+    await screen.findByRole("option", { name: "Ceramics" });
+    expect(screen.getByLabelText("Craft type")).toBeDisabled();
+    await userEvent.selectOptions(screen.getByLabelText("Category"), "ceramics");
+    await userEvent.selectOptions(
+      screen.getByLabelText("Craft type"),
+      await screen.findByRole("option", { name: "Tile" }),
+    );
+    await userEvent.selectOptions(screen.getByLabelText("Culture"), "51");
+    await userEvent.selectOptions(
+      screen.getByLabelText("Country"),
+      await screen.findByRole("option", { name: "Türkiye" }),
+    );
+
+    await waitFor(() =>
+      expect(router.state.location.search).toBe(
+        "?category=ceramics&craft_type=21&culture=51&country=T%C3%BCrkiye",
+      ),
+    );
+    const last = calls.at(-1)!;
+    expect([last.get("craft_type"), last.get("culture"), last.get("country")]).toEqual([
+      "21",
+      "51",
+      "Türkiye",
+    ]);
+  });
+
+  test("a new category clears the craft type filter", async () => {
+    const { router } = renderRoute("/crafts?category=ceramics&craft_type=21");
+
+    await waitFor(() => expect(screen.getByLabelText("Craft type")).toHaveValue("21"));
+    await userEvent.selectOptions(screen.getByLabelText("Category"), "textiles");
+
+    await waitFor(() => expect(router.state.location.search).toBe("?category=textiles"));
+  });
+
   test("filters from a shared link are applied on load", async () => {
     const calls = recordRequests("/crafts/", () => page([]));
     renderRoute("/crafts?category=textiles&page=2");

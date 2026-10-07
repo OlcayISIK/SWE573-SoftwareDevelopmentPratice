@@ -62,8 +62,10 @@ export function emptyPage() {
 export const defaultHandlers = [
   http.get(`${API}/categories/`, () => ok(categories)),
   http.get(`${API}/craft-types/`, ({ request }) => {
-    const category = Number(new URL(request.url).searchParams.get("category"));
-    return ok(craftTypes.filter((item) => item.category === category));
+    const category = new URL(request.url).searchParams.get("category");
+    return ok(
+      category ? craftTypes.filter((item) => item.category === Number(category)) : craftTypes,
+    );
   }),
   http.get(`${API}/tools/`, ({ request }) =>
     ok(linkedList(tools, new URL(request.url).searchParams.get("craft_type"))),
@@ -78,6 +80,7 @@ export const defaultHandlers = [
       : ok(kutahya),
   ),
   http.get(`${API}/geocode/reverse/`, () => ok(kutahya)),
+  http.get(`${API}/crafts/countries/`, () => ok(["Mexico", "Türkiye"])),
   http.get(`${API}/crafts/map/`, () => ok([])),
   http.get(`${API}/crafts/`, () => ok(emptyPage())),
   http.get(`${API}/crafts/:id/favorite/`, () => ok({ favorited: false, favorites_count: 0 })),

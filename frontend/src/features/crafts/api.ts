@@ -57,11 +57,13 @@ export const craftsApi = {
   byUser: (userId: number, page = 1) =>
     api.get<Paginated<CraftListItem>>(`/users/${userId}/crafts/`, { params: { page } }),
   categories: () => api.get<Category[]>("/categories/"),
+  countries: () => api.get<string[]>("/crafts/countries/"),
 };
 
 /** The lists the craft form picks from. Adding a name that exists returns the existing item. */
 export const lookupsApi = {
-  craftTypes: (category: number) => api.get<CraftType[]>("/craft-types/", { params: { category } }),
+  craftTypes: (category?: number) =>
+    api.get<CraftType[]>("/craft-types/", { params: { category } }),
   tools: (craftType?: number) => api.get<Tool[]>("/tools/", { params: { craft_type: craftType } }),
   materials: (craftType?: number) =>
     api.get<Material[]>("/materials/", { params: { craft_type: craftType } }),

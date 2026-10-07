@@ -3,7 +3,12 @@ import { useSearchParams } from "react-router";
 
 import type { CraftFilters } from "../types";
 
-const FILTER_KEYS = ["category", "search", "page"] as const;
+const FILTER_KEYS = ["category", "craft_type", "culture", "country", "search", "page"] as const;
+
+function positiveId(value: string | null) {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 ? id : undefined;
+}
 
 /** Filters live in the URL so filtered views can be shared and the back button works. */
 export function useCraftFilters() {
@@ -13,6 +18,9 @@ export function useCraftFilters() {
     const page = Number(params.get("page"));
     return {
       category: params.get("category") || undefined,
+      craft_type: positiveId(params.get("craft_type")),
+      culture: positiveId(params.get("culture")),
+      country: params.get("country") || undefined,
       search: params.get("search") || undefined,
       page: Number.isInteger(page) && page > 1 ? page : undefined,
     };
@@ -46,7 +54,9 @@ export function useCraftFilters() {
     });
   }, [setParams]);
 
-  const hasFilters = Boolean(filters.category || filters.search);
+  const hasFilters = Boolean(
+    filters.category || filters.craft_type || filters.culture || filters.country || filters.search,
+  );
 
   return { filters, setFilters, clearFilters, hasFilters };
 }

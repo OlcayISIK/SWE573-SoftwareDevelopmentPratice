@@ -70,7 +70,7 @@ test("shows the description, characteristics, culture, and location", async () =
   expect(within(characteristics).getByText("850 g")).toBeInTheDocument();
   expect(within(characteristics).getByText("cobalt blue, turquoise")).toBeInTheDocument();
 
-  const aside = screen.getByRole("complementary", { name: "Location" });
+  const aside = screen.getByRole("complementary", { name: "Facts and location" });
   expect(within(aside).getByText("Cumhuriyet Caddesi, Kütahya")).toBeInTheDocument();
   expect(await within(aside).findByRole("region", { name: "Map of crafts" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Ayşe" })).toHaveAttribute("href", "/users/7");
@@ -177,4 +177,97 @@ test("the detail page has no accessibility violations", async () => {
   await screen.findByRole("heading", { level: 1, name: "Kütahya Çinisi" });
 
   await expectNoA11yViolations(container);
+});
+
+test("the facts link to crafts that share them", async () => {
+  serveCraft(
+    makeCraftDetail({
+      tools: [
+        { id: 32, name: "Kiln", user_added: false },
+        { id: 31, name: "Brush", user_added: false },
+      ],
+    }),
+  );
+  renderRoute("/crafts/1");
+
+  const facts = (await screen.findByRole("heading", { name: "Craft facts" })).parentElement!;
+  expect(within(facts).getByRole("link", { name: "Ceramics" })).toHaveAttribute(
+    "href",
+    "/crafts?category=ceramics",
+  );
+  expect(within(facts).getByRole("link", { name: "Tile" })).toHaveAttribute(
+    "href",
+    "/crafts?category=ceramics&craft_type=21",
+  );
+  expect(within(facts).getByRole("link", { name: "Turkish" })).toHaveAttribute(
+    "href",
+    "/crafts?culture=51",
+  );
+  expect(within(facts).getByText("Anatolia, Türkiye")).toBeInTheDocument();
+  expect(within(facts).getByRole("link", { name: "Türkiye" })).toHaveAttribute(
+    "href",
+    "/crafts?country=T%C3%BCrkiye",
+  );
+  expect(within(facts).getByText("Kiln")).toBeInTheDocument();
+  expect(within(facts).getByText("Brush")).toBeInTheDocument();
+  expect(within(facts).getByText("Clay")).toBeInTheDocument();
+});
+
+describe("reporting items users added", () => {
+  const craft = makeCraftDetail({
+    author: { id: 50, display_name: "Mehmet" },
+    tools: [
+      { id: 32, name: "Kiln", user_added: false },
+      { id: 98, name: "Spinning wheel", user_added: true },
+    ],
+  });
+
+  test("a signed-in user reports a tool another user added", async () => {
+    serveCraft(craft);
+    const reports: unknown[] = [];
+    server.use(
+      ...signedIn(),
+      http.post(`${API}/tools/98/report/`, async ({ request }) => {
+        reports.push(await request.json());
+        return ok({ id: 3, status: "open" }, { status: 201 });
+      }),
+    );
+    renderRoute("/crafts/1");
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Report tool Spinning wheel" }),
+    );
+    const dialog = screen.getByRole("dialog", { name: "Report the tool “Spinning wheel”" });
+    await userEvent.click(within(dialog).getByRole("radio", { name: /Duplicate/ }));
+    await userEvent.type(within(dialog).getByLabelText("Details (optional)"), "Same as loom.");
+    await userEvent.click(within(dialog).getByRole("button", { name: "Send report" }));
+
+    expect(await within(dialog).findByRole("status")).toHaveTextContent("An admin will review it.");
+    expect(reports).toEqual([{ reason: "duplicate", note: "Same as loom." }]);
+  });
+
+  test("seeded items have no report button, and guests see none", async () => {
+    serveCraft(craft);
+    renderRoute("/crafts/1");
+
+    await screen.findByRole("heading", { name: "Craft facts" });
+    expect(screen.queryByRole("button", { name: /Report tool/ })).not.toBeInTheDocument();
+  });
+
+  test("the reason a report is refused is shown", async () => {
+    serveCraft(craft);
+    server.use(
+      ...signedIn(),
+      http.post(`${API}/tools/98/report/`, () => fail(400, "You cannot report an item you added.")),
+    );
+    renderRoute("/crafts/1");
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Report tool Spinning wheel" }),
+    );
+    await userEvent.click(screen.getByRole("radio", { name: /Inaccurate/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Send report" }));
+
+    expect(await screen.findByText("You cannot report an item you added.")).toBeInTheDocument();
+  });
 });

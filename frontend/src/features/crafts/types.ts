@@ -14,6 +14,9 @@ export type CraftMedia = Schemas["Media"];
 
 export interface CraftFilters {
   category?: string;
+  craft_type?: number;
+  culture?: number;
+  country?: string;
   search?: string;
   page?: number;
 }

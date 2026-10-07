@@ -11,11 +11,13 @@ export const craftKeys = {
   detail: (id: number) => [...craftKeys.all, "detail", id] as const,
   byUser: (userId: number, page: number) => [...craftKeys.all, "user", userId, page] as const,
   categories: ["reference", "categories"] as const,
+  countries: ["reference", "countries"] as const,
 };
 
 export const lookupKeys = {
   all: ["reference"] as const,
   craftTypes: (category: number) => ["reference", "craft-types", category] as const,
+  allCraftTypes: ["reference", "craft-types", "all"] as const,
   tools: (craftType: number | null) => ["reference", "tools", craftType] as const,
   materials: (craftType: number | null) => ["reference", "materials", craftType] as const,
   cultures: ["reference", "cultures"] as const,
@@ -104,6 +106,24 @@ export function useCraftTypes(category: number | null) {
     queryKey: lookupKeys.craftTypes(category ?? 0),
     queryFn: () => lookupsApi.craftTypes(category as number),
     enabled: category !== null,
+    staleTime: 5 * 60_000,
+  });
+}
+
+/** Every craft type, for picking one regardless of category. */
+export function useAllCraftTypes(enabled = true) {
+  return useQuery({
+    queryKey: lookupKeys.allCraftTypes,
+    queryFn: () => lookupsApi.craftTypes(),
+    enabled,
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useCountries() {
+  return useQuery({
+    queryKey: craftKeys.countries,
+    queryFn: craftsApi.countries,
     staleTime: 5 * 60_000,
   });
 }
