@@ -169,3 +169,49 @@ def test_registration_is_rate_limited(api_client):
 
     assert codes[:5] == [201] * 5
     assert codes[5] == 429
+
+
+def test_auto_verify_skips_the_verification_email(
+    api_client, settings, django_capture_on_commit_callbacks
+):
+    settings.AUTO_VERIFY_EMAIL = True
+
+    with django_capture_on_commit_callbacks(execute=True):
+        response = register(api_client)
+
+    assert response.status_code == 201
+    assert response.json()["data"]["is_email_verified"] is True
+    assert User.objects.get(email="ayse@example.com").is_email_verified is True
+    assert mail.outbox == []
+
+
+def test_auto_verified_users_can_publish_right_away(api_client, settings):
+    from crafts.models import Category, Region
+
+    settings.AUTO_VERIFY_EMAIL = True
+    register(api_client)
+    tokens = api_client.post(
+        "/api/v1/auth/token/",
+        {"email": "ayse@example.com", "password": DEFAULT_PASSWORD},
+        format="json",
+    ).json()["data"]
+    api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+
+    response = api_client.post(
+        "/api/v1/crafts/",
+        {
+            "name": "Kilim",
+            "craft_type": "Rug",
+            "category": Category.objects.get(slug="textiles").id,
+            "region": Region.objects.get(name="Uşak").id,
+            "latitude": 38.68,
+            "longitude": 29.41,
+            "description": "Flat-woven rug.",
+            "production_process": "Woven on a loom.",
+            "how_to_understand": "Geometric motifs.",
+            "cultural_relevance": "Anatolian tradition.",
+        },
+        format="json",
+    )
+
+    assert response.status_code == 201

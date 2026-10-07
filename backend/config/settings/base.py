@@ -154,6 +154,10 @@ SIMPLE_JWT = {
 
 FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:5173").rstrip("/")
 
+# Until a real mail provider is configured, new accounts can be verified on registration
+# instead of through an emailed link. Turn this off once email delivery works.
+AUTO_VERIFY_EMAIL = env.bool("AUTO_VERIFY_EMAIL", default=False)
+
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = env("EMAIL_HOST", default="localhost")
 EMAIL_PORT = env.int("EMAIL_PORT", default=587)
