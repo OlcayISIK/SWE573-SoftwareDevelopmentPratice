@@ -250,6 +250,33 @@ test("a tool that is not listed is added as a new tool for the craft type", asyn
   expect(bodies).toEqual([{ name: "Spinning wheel", craft_type: 21 }]);
 });
 
+test("tools and materials have an add link like the other lists", async () => {
+  server.use(...signedIn());
+  const bodies: unknown[] = [];
+  server.use(
+    http.post(`${API}/materials/`, async ({ request }) => {
+      bodies.push(await request.json());
+      return ok({ id: 97, name: "Kermes dye", typical: true, user_added: true }, { status: 201 });
+    }),
+  );
+  renderRoute("/crafts/new");
+  await screen.findByRole("option", { name: "Ceramics" });
+  await chooseCraftType();
+
+  const tools = screen.getByRole("group", { name: "Tools (optional)" });
+  expect(within(tools).getByRole("button", { name: "Add a new tool" })).toBeVisible();
+  const materials = screen.getByRole("group", { name: "Materials (optional)" });
+  await userEvent.click(within(materials).getByRole("button", { name: "Add a new material" }));
+  await userEvent.type(within(materials).getByLabelText("New material"), "Kermes dye");
+  await userEvent.click(within(materials).getByRole("button", { name: "Add material" }));
+
+  // The new material is chosen for the craft at once.
+  expect(
+    await within(materials).findByRole("button", { name: "Remove Kermes dye" }),
+  ).toBeInTheDocument();
+  expect(bodies).toEqual([{ name: "Kermes dye", craft_type: 21 }]);
+});
+
 test("the form validates required fields in the browser", async () => {
   server.use(...signedIn());
   const create = vi.fn();

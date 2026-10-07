@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 
 import { toApiError } from "@/api/envelope";
 
+import { AddItemInline } from "./AddItemInline";
 import type { ChosenItem } from "./schema";
 
 interface PickableItem {
@@ -179,6 +180,12 @@ export function ItemPicker({
           </p>
         )}
       </div>
+
+      <AddItemInline
+        noun={noun}
+        disabled={full}
+        onAdd={async (name) => add(await onCreate(name))}
+      />
 
       {error && (
         <p id={`${id}-error`} className="text-sm text-red-700">
