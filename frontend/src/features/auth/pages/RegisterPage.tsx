@@ -1,12 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, Navigate } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 
 import { FormAlert } from "@/components/form/FormAlert";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { TextField } from "@/components/form/TextField";
 import { applyServerErrors } from "@/lib/forms";
+import { toast } from "@/lib/toast";
 
 import { authApi } from "../api";
 import { ResendVerification } from "../components/ResendVerification";
@@ -15,7 +16,9 @@ import { registerSchema, type RegisterValues } from "../schemas";
 
 export function RegisterPage() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
+  const [readyToLogIn, setReadyToLogIn] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const {
     register,
@@ -26,6 +29,20 @@ export function RegisterPage() {
 
   if (auth.status === "authenticated") {
     return <Navigate to="/" replace />;
+  }
+
+  if (registeredEmail && readyToLogIn) {
+    return (
+      <section className="mx-auto max-w-md px-4 py-12">
+        <h1 className="text-2xl font-semibold">Your account is ready</h1>
+        <p className="mt-3 text-stone-700">
+          Log in with <strong>{registeredEmail}</strong> to start adding crafts.
+        </p>
+        <Link to="/login" className="mt-6 inline-block font-medium text-brand-700 underline">
+          Log in
+        </Link>
+      </section>
+    );
   }
 
   if (registeredEmail) {
@@ -49,6 +66,17 @@ export function RegisterPage() {
     setFormError(null);
     try {
       const account = await authApi.register({ email, password, display_name });
+      if (account.is_email_verified) {
+        // No verification email is needed, so sign the new user straight in.
+        try {
+          await auth.login({ email, password });
+          toast.success("Welcome! Your account is ready.");
+          navigate("/", { replace: true });
+          return;
+        } catch {
+          setReadyToLogIn(true);
+        }
+      }
       setRegisteredEmail(account.email);
     } catch (error) {
       setFormError(applyServerErrors(error, setError, ["email", "password", "display_name"]));
