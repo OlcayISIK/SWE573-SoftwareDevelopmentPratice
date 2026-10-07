@@ -300,6 +300,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/followers/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_me_followers_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/following/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_me_following_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/notifications/": {
         parameters: {
             query?: never;
@@ -598,6 +630,16 @@ export interface components {
             followers_count: number;
             following_count: number;
         };
+        FollowerEntry: {
+            readonly user: components["schemas"]["PersonSummary"];
+            /** Format: date-time */
+            readonly since: string;
+        };
+        FollowingEntry: {
+            readonly user: components["schemas"]["PersonSummary"];
+            /** Format: date-time */
+            readonly since: string;
+        };
         LoginRequest: {
             email: string;
             password: string;
@@ -677,6 +719,20 @@ export interface components {
             pageSize: number;
             totalPages: number;
         };
+        PaginatedFollowerEntryList: {
+            items: components["schemas"]["FollowerEntry"][];
+            total: number;
+            page: number;
+            pageSize: number;
+            totalPages: number;
+        };
+        PaginatedFollowingEntryList: {
+            items: components["schemas"]["FollowingEntry"][];
+            total: number;
+            page: number;
+            pageSize: number;
+            totalPages: number;
+        };
         PaginatedNotificationList: {
             items: components["schemas"]["Notification"][];
             total: number;
@@ -723,6 +779,14 @@ export interface components {
         Person: {
             readonly id: number;
             readonly display_name: string;
+        };
+        PersonSummary: {
+            readonly id: number;
+            readonly display_name: string;
+            /** Format: uri */
+            readonly avatar: string | null;
+            readonly city: string;
+            readonly country: string;
         };
         PublicProfile: {
             readonly id: number;
@@ -1506,6 +1570,62 @@ export interface operations {
                     "application/json": {
                         success: boolean;
                         data: components["schemas"]["PaginatedCraftListList"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_me_followers_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["PaginatedFollowerEntryList"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_me_following_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["PaginatedFollowingEntryList"];
                         message: string;
                     };
                 };

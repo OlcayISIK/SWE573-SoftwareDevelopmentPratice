@@ -136,3 +136,57 @@ def test_follow_counts_are_public(api_client, client_for):
 
 def test_guest_cannot_follow(api_client):
     assert api_client.post(follow_url(UserFactory())).status_code == 401
+
+
+MY_FOLLOWING_URL = "/api/v1/me/following/"
+MY_FOLLOWERS_URL = "/api/v1/me/followers/"
+
+
+def test_my_following_lists_people_most_recent_first(client_for, user):
+    first, second = UserFactory(), UserFactory()
+    first.profile.display_name, first.profile.city = "Mehmet", "Uşak"
+    first.profile.save()
+    client = client_for(user)
+    client.post(follow_url(first))
+    client.post(follow_url(second))
+
+    data = client.get(MY_FOLLOWING_URL).json()["data"]
+
+    assert data["total"] == 2
+    assert [item["user"]["id"] for item in data["items"]] == [second.id, first.id]
+    assert data["items"][1]["user"]["display_name"] == "Mehmet"
+    assert data["items"][1]["user"]["city"] == "Uşak"
+    assert set(data["items"][0]["user"]) == {"id", "display_name", "avatar", "city", "country"}
+    assert data["items"][0]["since"]
+
+
+def test_my_followers_lists_people_following_me(client_for, user):
+    fan = UserFactory()
+    client_for(fan).post(follow_url(user))
+
+    data = client_for(user).get(MY_FOLLOWERS_URL).json()["data"]
+
+    assert [item["user"]["id"] for item in data["items"]] == [fan.id]
+
+
+def test_follow_lists_never_expose_email(client_for, user):
+    other = UserFactory()
+    client_for(user).post(follow_url(other))
+
+    body = client_for(user).get(MY_FOLLOWING_URL).content.decode()
+
+    assert other.email not in body
+
+
+def test_follow_lists_leave_out_deactivated_accounts(client_for, user):
+    gone = UserFactory()
+    client_for(user).post(follow_url(gone))
+    gone.is_active = False
+    gone.save()
+
+    assert client_for(user).get(MY_FOLLOWING_URL).json()["data"]["total"] == 0
+
+
+def test_follow_lists_require_login(api_client):
+    assert api_client.get(MY_FOLLOWING_URL).status_code == 401
+    assert api_client.get(MY_FOLLOWERS_URL).status_code == 401

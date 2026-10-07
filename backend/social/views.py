@@ -9,7 +9,12 @@ from crafts.selectors import get_visible_craft
 from crafts.serializers import CraftListSerializer
 
 from . import selectors, services
-from .serializers import FavoriteStatusSerializer, FollowStatusSerializer
+from .serializers import (
+    FavoriteStatusSerializer,
+    FollowerEntrySerializer,
+    FollowingEntrySerializer,
+    FollowStatusSerializer,
+)
 
 
 class AuthenticatedWritesMixin:
@@ -50,6 +55,24 @@ class MyFavoritesView(generics.ListAPIView):
 
     def get_queryset(self):
         return selectors.favorite_crafts(self.request.user)
+
+
+@extend_schema(tags=["social"])
+class MyFollowingView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FollowingEntrySerializer
+
+    def get_queryset(self):
+        return selectors.following_of(self.request.user)
+
+
+@extend_schema(tags=["social"])
+class MyFollowersView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FollowerEntrySerializer
+
+    def get_queryset(self):
+        return selectors.followers_of(self.request.user)
 
 
 class FollowView(AuthenticatedWritesMixin, APIView):
