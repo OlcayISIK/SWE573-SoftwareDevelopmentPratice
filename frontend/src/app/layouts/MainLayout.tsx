@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet, useNavigation } from "react-router";
 
 import { PageLoader } from "@/components/PageLoader";
+import { AccountMenu } from "@/features/auth/components/AccountMenu";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `rounded px-3 py-2 text-sm font-medium ${
@@ -32,6 +33,9 @@ export function MainLayout() {
           <NavLink to="/crafts" className={navLinkClass}>
             Crafts
           </NavLink>
+          <div className="ml-auto flex items-center gap-2">
+            <AccountMenu />
+          </div>
         </nav>
       </header>
       <main id="main" className="flex-1">
