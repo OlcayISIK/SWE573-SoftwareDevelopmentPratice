@@ -209,6 +209,8 @@ Dimensions are optional rows. The type is one of `height`, `width`, `depth`, `le
 
 - **Report**: `craft` (FK), `reporter` (FK User), `reason` (`inaccurate`, `inappropriate`, `disrespectful`), `note`, `status` (`open`, `resolved`, `dismissed`). One open report per user per craft, enforced by a partial unique constraint on (`craft`, `reporter`) where `status = open`, so a user can report the same craft again after the earlier report is closed.
 - **ReviewAction**: `report` (FK), `admin` (FK User), `action` (`edit`, `hide`, `remove`, `dismiss`), `reason`.
+- **ItemReport**: a report on a lookup item added by a user. `item_type` (`category`, `craft_type`, `tool`, `material`, `culture`), `item_id`, `item_name` (kept so the report still reads well after a rename or merge), `reporter` (FK User), `reason` (`duplicate`, `inaccurate`, `inappropriate`), `note`, `status`. One open report per user per item, enforced the same way as for crafts.
+- **ItemReviewAction**: `report` (FK ItemReport), `admin` (FK User), `action` (`rename`, `hide`, `merge`, `dismiss`), `reason`, `details` (the new name, or the item merged into).
 
 ### social
 
@@ -273,6 +275,10 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 | GET    | `/moderation/reports/`                 | Admin           | Review queue (`status=open` by default; also `resolved`, `dismissed`, `all`) |
 | GET    | `/moderation/reports/{id}/`            | Admin           | Report details with its review history |
 | POST   | `/moderation/reports/{id}/actions/`    | Admin           | Edit, hide, remove, or dismiss        |
+| POST   | `/{categories,craft-types,tools,materials,cultures}/{id}/report/` | Registered user | Report a lookup item added by another user |
+| GET    | `/moderation/item-reports/`            | Admin           | Item review queue, with the item, who added it, and how many crafts use it |
+| GET    | `/moderation/item-reports/{id}/`       | Admin           | Item report details with its review history |
+| POST   | `/moderation/item-reports/{id}/actions/` | Admin         | Rename, hide, merge, or dismiss       |
 | GET    | `/crafts/{id}/favorite/`               | Public          | Favorite status and count             |
 | POST   | `/crafts/{id}/favorite/`               | Registered user | Favorite (DELETE to unfavorite)       |
 | GET    | `/me/favorites/`                       | Registered user | List own favorites                    |
@@ -367,6 +373,16 @@ User reports craft ──▶ Report (open) ──▶ Admin review queue
 - A report can be reviewed once; reviewing a closed report returns `409 Conflict`.
 - Every action is stored as a `ReviewAction` with the admin and reason, which gives a full audit history.
 - Admins can work through the API or the Django admin; both call the same `moderation.services` functions.
+
+### Reports on Lookup Items
+
+Users can add categories, craft types, tools, materials, and cultures that everyone can use right away, so these items can be reported too. Only items added by users can be reported, and not by the user who added them.
+
+- `rename` fixes the name, with the same rules as adding an item. A name that already exists returns `409 Conflict`, pointing the admin to merge instead.
+- `hide` removes the item from the lists. Crafts that already use it keep showing it.
+- `merge` takes `merge_into`, another visible item of the same kind (for craft types, of the same category). Every craft that used the item uses the target instead, a tool or material's typical craft types move over, and the item is deleted. Merging a category moves its craft types, and merges any with the same name in the target category.
+- `dismiss` leaves the item unchanged.
+- As with crafts, `hide` and `merge` close every other open report on the item, a report can be reviewed once, and every action is stored with the admin, reason, and what changed. The lookup changes themselves are done by `crafts.services`, which checks the admin role again.
 
 ---
 
