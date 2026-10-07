@@ -12,12 +12,20 @@ export function AccountMenu() {
 
   if (auth.status === "guest") {
     return (
-      <Link
-        to="/login"
-        className="rounded bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-900"
-      >
-        Log in
-      </Link>
+      <>
+        <Link
+          to="/register"
+          className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
+        >
+          Register
+        </Link>
+        <Link
+          to="/login"
+          className="rounded bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-900"
+        >
+          Log in
+        </Link>
+      </>
     );
   }
 

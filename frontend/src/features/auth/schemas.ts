@@ -27,6 +27,23 @@ export const newPasswordSchema = z
     path: ["confirm_password"],
   });
 
+export const registerSchema = z
+  .object({
+    display_name: z.string().trim().max(80, "Use at most 80 characters.").optional(),
+    email: z
+      .string()
+      .trim()
+      .min(1, "Enter your email address.")
+      .email("Enter a valid email address."),
+    password: z.string().min(8, "Use at least 8 characters."),
+    confirm_password: z.string(),
+  })
+  .refine((values) => values.password === values.confirm_password, {
+    message: "The passwords do not match.",
+    path: ["confirm_password"],
+  });
+
 export type LoginValues = z.infer<typeof loginSchema>;
+export type RegisterValues = z.infer<typeof registerSchema>;
 export type PasswordResetRequestValues = z.infer<typeof passwordResetRequestSchema>;
 export type NewPasswordValues = z.infer<typeof newPasswordSchema>;
