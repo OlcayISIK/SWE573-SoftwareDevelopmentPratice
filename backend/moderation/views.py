@@ -12,6 +12,10 @@ from crafts.serializers import CraftWriteSerializer
 from . import selectors, services
 from .models import ReviewAction
 from .serializers import (
+    ItemReportCreateSerializer,
+    ItemReportReviewSerializer,
+    ItemReportSerializer,
+    ItemReviewActionCreateSerializer,
     ReportCreateSerializer,
     ReportReviewSerializer,
     ReportSerializer,
@@ -91,3 +95,86 @@ class ReviewActionView(APIView):
             changes=changes,
         )
         return Response(ReportReviewSerializer(selectors.get_report(report_id)).data)
+
+
+# The lookup lists by their URL name.
+ITEM_LISTS = {
+    "categories": "category",
+    "craft-types": "craft_type",
+    "tools": "tool",
+    "materials": "material",
+    "cultures": "culture",
+}
+
+
+class ReportItemView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_scope = "report"
+
+    @extend_schema(
+        request=ItemReportCreateSerializer,
+        responses={201: ItemReportSerializer},
+        tags=["moderation"],
+    )
+    def post(self, request, items, item_id):
+        """Reports a category, craft type, tool, material, or culture added by another user."""
+        serializer = ItemReportCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        report = services.report_item(
+            reporter=request.user,
+            item_type=ITEM_LISTS[items],
+            item_id=item_id,
+            **serializer.validated_data,
+        )
+        return Response(ItemReportSerializer(report).data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(
+    tags=["moderation"],
+    parameters=[
+        OpenApiParameter(
+            "status",
+            OpenApiTypes.STR,
+            enum=["open", "resolved", "dismissed", "all"],
+            description="Defaults to open",
+        )
+    ],
+)
+class ItemReviewQueueView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+    serializer_class = ItemReportReviewSerializer
+
+    def get_queryset(self):
+        filters = ReviewQueueFilterSerializer(data=self.request.query_params)
+        filters.is_valid(raise_exception=True)
+        return selectors.item_review_queue(**filters.validated_data)
+
+    def paginate_queryset(self, queryset):
+        page = super().paginate_queryset(queryset)
+        return selectors.attach_items(page) if page is not None else None
+
+
+class ItemReportDetailView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    @extend_schema(responses=ItemReportReviewSerializer, tags=["moderation"])
+    def get(self, request, report_id):
+        return Response(ItemReportReviewSerializer(selectors.get_item_report(report_id)).data)
+
+
+class ItemReviewActionView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    @extend_schema(
+        request=ItemReviewActionCreateSerializer,
+        responses=ItemReportReviewSerializer,
+        tags=["moderation"],
+    )
+    def post(self, request, report_id):
+        """Renames, hides, or merges the reported item, or dismisses the report."""
+        serializer = ItemReviewActionCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        services.review_item_report(
+            admin=request.user, report_id=report_id, **serializer.validated_data
+        )
+        return Response(ItemReportReviewSerializer(selectors.get_item_report(report_id)).data)

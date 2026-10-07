@@ -185,6 +185,11 @@ SPECTACULAR_SETTINGS = {
     "ENUM_NAME_OVERRIDES": {
         "CraftStatusEnum": "crafts.models.Craft.Status",
         "ReportStatusEnum": "moderation.models.Report.Status",
+        # Craft reports and item reports both have a reason and review actions.
+        "ReasonEnum": "moderation.models.Report.Reason",
+        "ItemReportReasonEnum": "moderation.models.ItemReport.Reason",
+        "ActionEnum": "moderation.models.ReviewAction.Action",
+        "ItemReviewActionEnum": "moderation.models.ItemReviewAction.Action",
     },
 }
 
