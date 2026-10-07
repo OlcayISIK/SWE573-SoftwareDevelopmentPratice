@@ -24,6 +24,20 @@ export const routes: RouteObject[] = [
               import("@/features/auth/pages/LoginPage").then((m) => ({ Component: m.LoginPage })),
           },
           {
+            path: "register",
+            lazy: () =>
+              import("@/features/auth/pages/RegisterPage").then((m) => ({
+                Component: m.RegisterPage,
+              })),
+          },
+          {
+            path: "verify-email",
+            lazy: () =>
+              import("@/features/auth/pages/VerifyEmailPage").then((m) => ({
+                Component: m.VerifyEmailPage,
+              })),
+          },
+          {
             path: "password-reset",
             lazy: () =>
               import("@/features/auth/pages/PasswordResetPage").then((m) => ({
