@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router";
 
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
+
 import { useAuth } from "../context";
 
 export function AccountMenu() {
@@ -39,6 +41,7 @@ export function AccountMenu() {
           Review reports
         </Link>
       )}
+      <NotificationBell />
       <Link
         to="/me/favorites"
         className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"

@@ -59,6 +59,13 @@ export const routes: RouteObject[] = [
                   })),
               },
               {
+                path: "me/notifications",
+                lazy: () =>
+                  import("@/features/notifications/pages/NotificationsPage").then((m) => ({
+                    Component: m.NotificationsPage,
+                  })),
+              },
+              {
                 path: "me/settings",
                 lazy: () =>
                   import("@/features/profiles/pages/SettingsPage").then((m) => ({
