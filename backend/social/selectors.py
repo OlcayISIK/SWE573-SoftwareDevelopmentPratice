@@ -35,6 +35,24 @@ def follow_status(viewer, user):
     }
 
 
+def following_of(user):
+    """People the user follows, most recent first. Deactivated accounts are left out."""
+    return (
+        Follow.objects.filter(follower=user, following__is_active=True)
+        .select_related("following__profile")
+        .order_by("-created_at", "-id")
+    )
+
+
+def followers_of(user):
+    """People who follow the user, most recent first. Deactivated accounts are left out."""
+    return (
+        Follow.objects.filter(following=user, follower__is_active=True)
+        .select_related("follower__profile")
+        .order_by("-created_at", "-id")
+    )
+
+
 def follower_ids(user_id):
     return list(Follow.objects.filter(following_id=user_id).values_list("follower_id", flat=True))
 

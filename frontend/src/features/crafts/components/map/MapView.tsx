@@ -6,20 +6,22 @@ import L from "./leafletSetup";
 import "leaflet.markercluster";
 
 import { useEffect } from "react";
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
-
-import { config } from "@/lib/config";
+import { MapContainer, useMap } from "react-leaflet";
 
 import type { CraftPin } from "../../types";
 
 import { pinIcon } from "./pinIcon";
+import { FitWorld, WorldTiles } from "./world";
+import { singleWorldOptions } from "./worldOptions";
 
 export interface MapViewProps {
   pins: CraftPin[];
   onSelect: (id: number) => void;
+  /** Open on this point instead of the whole world, for example on a craft's page. */
+  focus?: [number, number];
 }
 
-function ClusteredPins({ pins, onSelect }: MapViewProps) {
+function ClusteredPins({ pins, onSelect }: Omit<MapViewProps, "focus">) {
   const map = useMap();
 
   useEffect(() => {
@@ -43,14 +45,12 @@ function ClusteredPins({ pins, onSelect }: MapViewProps) {
   return null;
 }
 
-export default function MapView({ pins, onSelect }: MapViewProps) {
+export default function MapView({ pins, onSelect, focus }: MapViewProps) {
   return (
     <div role="region" aria-label="Map of crafts" className="h-full w-full">
-      <MapContainer center={[25, 15]} zoom={2} minZoom={2} worldCopyJump className="h-full w-full">
-        <TileLayer
-          url={config.mapTileUrl}
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
+      <MapContainer center={[20, 0]} zoom={2} {...singleWorldOptions} className="h-full w-full">
+        <WorldTiles />
+        <FitWorld focus={focus} />
         <ClusteredPins pins={pins} onSelect={onSelect} />
       </MapContainer>
     </div>

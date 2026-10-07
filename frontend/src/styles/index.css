@@ -20,3 +20,20 @@
     @apply outline-2 outline-offset-2 outline-brand-700;
   }
 }
+
+/* Leaflet's own stylesheet loads later with the map, so these selectors are more specific. */
+
+/* Any space around the world reads as ocean (OpenStreetMap's water color). */
+div.leaflet-container {
+  background: #aad3df;
+}
+
+/*
+ * At fractional zoom, tiles can leave hairline gaps. Leaflet blends tiles with plus-lighter, which
+ * turns any overlap white, so tiles overlap by half a pixel with normal blending instead.
+ */
+.leaflet-container .leaflet-tile-container img.leaflet-tile {
+  width: 256.5px !important;
+  height: 256.5px !important;
+  mix-blend-mode: normal;
+}

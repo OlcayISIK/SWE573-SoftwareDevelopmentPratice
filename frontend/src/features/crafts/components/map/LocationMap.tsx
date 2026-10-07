@@ -1,10 +1,10 @@
 import "leaflet/dist/leaflet.css";
 
-import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
-
-import { config } from "@/lib/config";
+import { MapContainer, Marker, useMapEvents } from "react-leaflet";
 
 import { pinIcon } from "./pinIcon";
+import { FitWorld, WorldTiles } from "./world";
+import { singleWorldOptions } from "./worldOptions";
 
 export interface LocationMapProps {
   position: [number, number] | null;
@@ -24,15 +24,13 @@ export default function LocationMap({ position, onPick }: LocationMapProps) {
       className="h-72 overflow-hidden rounded border border-stone-300"
     >
       <MapContainer
-        center={position ?? [25, 15]}
+        center={position ?? [20, 0]}
         zoom={position ? 6 : 2}
-        minZoom={2}
+        {...singleWorldOptions}
         className="h-full w-full"
       >
-        <TileLayer
-          url={config.mapTileUrl}
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
+        <WorldTiles />
+        <FitWorld focus={position ?? undefined} focusZoom={6} />
         <ClickToPick onPick={onPick} />
         {position && (
           <Marker
