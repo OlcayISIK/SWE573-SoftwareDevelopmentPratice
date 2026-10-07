@@ -9,6 +9,7 @@ export const craftsApi = {
   pins: ({ page: _page, ...filters }: CraftFilters) =>
     api.get<CraftPin[]>("/crafts/map/", { params: filters }),
   detail: (id: number) => api.get<CraftDetail>(`/crafts/${id}/`),
+  remove: (id: number) => api.delete(`/crafts/${id}/`),
   byUser: (userId: number, page = 1) =>
     api.get<Paginated<CraftListItem>>(`/users/${userId}/crafts/`, { params: { page } }),
   categories: () => api.get<Category[]>("/categories/"),

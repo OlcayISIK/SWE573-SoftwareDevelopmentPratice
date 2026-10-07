@@ -26,6 +26,13 @@ export const routes: RouteObject[] = [
               })),
           },
           {
+            path: "crafts/:id",
+            lazy: () =>
+              import("@/features/crafts/pages/CraftDetailPage").then((m) => ({
+                Component: m.CraftDetailPage,
+              })),
+          },
+          {
             path: "login",
             lazy: () =>
               import("@/features/auth/pages/LoginPage").then((m) => ({ Component: m.LoginPage })),
