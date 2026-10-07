@@ -168,7 +168,7 @@ Protected routes are wrapped in route guards:
 - `RequireAuth` redirects guests to `/login` and returns them to the original page after login.
 - `RequireAdmin` shows a "not authorized" page to non-admin users.
 
-Map filters and list filters (category, region, search, page) are kept in the URL query string, so filtered views can be shared and the back button works.
+Map filters and list filters (category, search, page) are kept in the URL query string, so filtered views can be shared and the back button works.
 
 ---
 
@@ -268,9 +268,9 @@ Users must verify their email before publishing. If an unverified user opens `/c
 - **Library:** Leaflet with react-leaflet and OpenStreetMap tiles. Leaflet is free, has no API key, and is enough for pins, zoom, and pan. The OpenStreetMap attribution is shown on the map, as its license requires.
 - **Data:** the map loads lightweight pins from `/crafts/map/` (id, name, category, latitude, longitude). Full craft data is loaded only when a pin is opened.
 - **Clustering:** nearby pins are grouped with Leaflet.markercluster, so the map stays readable and fast as the number of crafts grows (NFR-02).
-- **Filters:** category and region filters update the URL and refetch the pins.
-- **Pin details:** clicking a pin opens a preview card (photo, name, region) with a link to the craft details page. On mobile the preview opens as a bottom sheet.
-- **Picking a location:** the craft form includes a small map where the author clicks or drags a pin to set the craft's location.
+- **Filters:** the category filter and search update the URL and refetch the pins.
+- **Pin details:** clicking a pin opens a preview card (photo, name, craft type, culture, and place) with a link to the craft details page. On mobile the preview opens as a bottom sheet.
+- **Picking a location:** the craft form includes a small map. The author types an address and pins it (the map moves to the found point), or clicks or drags the pin and the address is filled in from the point.
 - **Performance:** the map component is lazy-loaded, and pin data is cached by TanStack Query so returning to the map does not refetch immediately.
 
 ---
@@ -284,10 +284,12 @@ Forms use React Hook Form with Zod schemas.
 
 The craft form follows the craft data model:
 
-- **Basics:** name, craft type, category, region.
-- **Location:** map pin.
-- **Description:** what it is, how it is made, how to understand it, cultural relevance (FR-05).
-- **Attributes:** dimensions, colors, and distinguishing features, stored in the backend `attributes` field (FR-07). Fields are optional, so authors fill in only what applies to their craft.
+- **Basics:** name, category, craft type, and culture, each picked from a lookup list. The craft types follow the chosen category, and cultures show their homeland.
+- **Adding to the lists:** each list has an "Add a new …" control that adds the item for everyone and picks it. Adding a name that already exists picks the existing item.
+- **Location:** the address with a "Pin address" button, which looks up the coordinates through the backend (`/geocode/search/`) and shows "Address not found." when nothing matches. Placing the pin on the map fills in the address (`/geocode/reverse/`). City and country come from the lookup.
+- **Tools and materials:** the items typical for the chosen craft type are offered as checkboxes, and any other item is found by typing its name, or added as a new one.
+- **Description:** one text covering what it is, how it is made, how to understand it, and its cultural relevance (FR-05).
+- **Attributes:** optional dimension rows (measure, size, and unit, each measure once), weight, colors, and distinguishing features, stored in the backend `attributes` field (FR-07).
 - **Media:** photos, video links, and documents (FR-06).
 
 Long forms save a draft in `localStorage`, so an author does not lose their work if the page reloads.
