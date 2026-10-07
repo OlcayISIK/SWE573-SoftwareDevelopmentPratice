@@ -1,0 +1,59 @@
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+
+import { craftsApi } from "./api";
+import type { CraftFilters } from "./types";
+
+export const craftKeys = {
+  all: ["crafts"] as const,
+  lists: () => [...craftKeys.all, "list"] as const,
+  list: (filters: CraftFilters) => [...craftKeys.lists(), filters] as const,
+  pins: (filters: CraftFilters) => [...craftKeys.all, "pins", filters] as const,
+  detail: (id: number) => [...craftKeys.all, "detail", id] as const,
+  byUser: (userId: number, page: number) => [...craftKeys.all, "user", userId, page] as const,
+  categories: ["reference", "categories"] as const,
+  regions: ["reference", "regions"] as const,
+};
+
+export function useCraftList(filters: CraftFilters) {
+  return useQuery({
+    queryKey: craftKeys.list(filters),
+    queryFn: () => craftsApi.list(filters),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useMapPins(filters: CraftFilters) {
+  return useQuery({
+    queryKey: craftKeys.pins(filters),
+    queryFn: () => craftsApi.pins(filters),
+    staleTime: 60_000,
+  });
+}
+
+export function useCraft(id: number | null) {
+  return useQuery({
+    queryKey: craftKeys.detail(id ?? 0),
+    queryFn: () => craftsApi.detail(id as number),
+    enabled: id !== null,
+  });
+}
+
+export function useUserCrafts(userId: number, page: number) {
+  return useQuery({
+    queryKey: craftKeys.byUser(userId, page),
+    queryFn: () => craftsApi.byUser(userId, page),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useCategories() {
+  return useQuery({
+    queryKey: craftKeys.categories,
+    queryFn: craftsApi.categories,
+    staleTime: Infinity,
+  });
+}
+
+export function useRegions() {
+  return useQuery({ queryKey: craftKeys.regions, queryFn: craftsApi.regions, staleTime: Infinity });
+}
