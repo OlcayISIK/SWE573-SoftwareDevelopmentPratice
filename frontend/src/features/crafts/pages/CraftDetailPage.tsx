@@ -6,6 +6,7 @@ import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { PageLoader } from "@/components/PageLoader";
 import { useAuth } from "@/features/auth/context";
+import { ReportButton } from "@/features/moderation/components/ReportDialog";
 import { FavoriteButton } from "@/features/social/components/FavoriteButton";
 import { toast } from "@/lib/toast";
 
@@ -130,6 +131,7 @@ export function CraftDetailPage() {
         </div>
         <div className="flex flex-wrap gap-3">
           <FavoriteButton craftId={data.id} />
+          <ReportButton craftId={data.id} authorId={data.author.id} />
           {canManage && <OwnerActions craft={data} />}
         </div>
       </header>
