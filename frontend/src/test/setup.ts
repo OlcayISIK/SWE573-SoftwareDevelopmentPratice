@@ -8,6 +8,7 @@ import { toast } from "@/lib/toast";
 import { server } from "./server";
 
 vi.mock("@/features/crafts/components/map/MapView", () => import("./mocks/MapView"));
+vi.mock("@/features/crafts/components/map/LocationMap", () => import("./mocks/LocationMap"));
 
 // jsdom does not implement scrolling; Leaflet calls it when focusing markers.
 window.scrollTo = () => undefined;
