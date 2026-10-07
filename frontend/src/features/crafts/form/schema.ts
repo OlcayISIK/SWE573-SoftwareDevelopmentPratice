@@ -1,23 +1,40 @@
 import { z } from "zod";
 
-import { DIMENSION_KEYS, type CraftAttributes } from "../attributes";
+import {
+  DIMENSION_TYPES,
+  DIMENSION_UNITS,
+  type CraftAttributes,
+  type DimensionType,
+} from "../attributes";
 import type { CraftDetail } from "../types";
 
+export const MAX_TOOLS = 20;
+export const MAX_MATERIALS = 20;
+
 const required = (message: string) => z.string().trim().min(1, message);
+
+const positive = (message: string) =>
+  z
+    .string()
+    .trim()
+    .min(1, message)
+    .refine((value) => Number(value) > 0, "Enter a number greater than 0.");
 
 const optionalPositive = z
   .string()
   .trim()
   .refine((value) => value === "" || Number(value) > 0, "Enter a number greater than 0.");
 
-const coordinate = (label: string, limit: number) =>
+const PIN_MESSAGE = "Pin the location: use Pin address or click the map.";
+
+const coordinate = (limit: number) =>
   z
     .string()
     .trim()
-    .min(1, `Enter the ${label} or pick the location on the map.`)
+    .min(1, PIN_MESSAGE)
     .refine(
       (value) => Number.isFinite(Number(value)) && Math.abs(Number(value)) <= limit,
-      `The ${label} must be between -${limit} and ${limit}.`,
+      PIN_MESSAGE,
     );
 
 const commaList = (itemMax: number) =>
@@ -29,72 +46,91 @@ const commaList = (itemMax: number) =>
       `Keep each item under ${itemMax} characters.`,
     );
 
+const chosenItem = z.object({ id: z.number(), name: z.string() });
+
+const dimension = z.object({
+  type: z.enum(DIMENSION_TYPES),
+  value: positive("Enter the size."),
+  unit: z.enum(DIMENSION_UNITS),
+});
+
 export const craftFormSchema = z.object({
   name: required("Enter the name of the craft.").max(150),
-  craft_type: required("Enter the type of craft, for example Tile or Carpet.").max(100),
   category: required("Choose a category."),
-  region: required("Choose a region."),
-  latitude: coordinate("latitude", 90),
-  longitude: coordinate("longitude", 180),
-  description: required("Describe what the craft is."),
-  production_process: required("Describe how it is made."),
-  how_to_understand: required("Explain how to understand it."),
-  cultural_relevance: required("Explain its cultural relevance."),
+  craft_type: required("Choose a craft type."),
+  culture: required("Choose the culture the craft belongs to."),
+  tools: z.array(chosenItem).max(MAX_TOOLS, `Choose at most ${MAX_TOOLS} tools.`),
+  materials: z.array(chosenItem).max(MAX_MATERIALS, `Choose at most ${MAX_MATERIALS} materials.`),
+  address: required("Enter the address the craft comes from.").max(255),
+  city: z.string(),
+  country: z.string(),
+  latitude: coordinate(90),
+  longitude: coordinate(180),
+  description: required("Describe the craft."),
   attributes: z.object({
-    dimensions_cm: z.object({
-      height: optionalPositive,
-      width: optionalPositive,
-      depth: optionalPositive,
-      length: optionalPositive,
-      diameter: optionalPositive,
+    dimensions: z.array(dimension).superRefine((rows, context) => {
+      const seen = new Set<DimensionType>();
+      rows.forEach((row, index) => {
+        if (seen.has(row.type)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [index, "type"],
+            message: "This dimension is already entered.",
+          });
+        }
+        seen.add(row.type);
+      });
     }),
     weight_g: optionalPositive,
     colors: commaList(40),
-    materials: commaList(60),
     distinguishing_features: z.string().max(1000),
   }),
 });
 
 export type CraftFormValues = z.infer<typeof craftFormSchema>;
+export type DimensionRow = CraftFormValues["attributes"]["dimensions"][number];
+export type ChosenItem = z.infer<typeof chosenItem>;
 
 /** Every field the form renders, used to place server errors next to the right input. */
 export const CRAFT_FORM_FIELDS = [
   "name",
-  "craft_type",
   "category",
-  "region",
+  "craft_type",
+  "culture",
+  "tools",
+  "materials",
+  "address",
   "latitude",
   "longitude",
   "description",
-  "production_process",
-  "how_to_understand",
-  "cultural_relevance",
-  ...DIMENSION_KEYS.map((key) => `attributes.dimensions_cm.${key}` as const),
+  "attributes.dimensions",
   "attributes.weight_g",
   "attributes.colors",
-  "attributes.materials",
   "attributes.distinguishing_features",
 ] as const;
 
 export const emptyCraftForm: CraftFormValues = {
   name: "",
-  craft_type: "",
   category: "",
-  region: "",
+  craft_type: "",
+  culture: "",
+  tools: [],
+  materials: [],
+  address: "",
+  city: "",
+  country: "",
   latitude: "",
   longitude: "",
   description: "",
-  production_process: "",
-  how_to_understand: "",
-  cultural_relevance: "",
   attributes: {
-    dimensions_cm: { height: "", width: "", depth: "", length: "", diameter: "" },
+    dimensions: [],
     weight_g: "",
     colors: "",
-    materials: "",
     distinguishing_features: "",
   },
 };
+
+export const newDimension: DimensionRow = { type: "height", value: "", unit: "cm" };
 
 function splitList(value: string) {
   return value
@@ -105,78 +141,75 @@ function splitList(value: string) {
 
 export interface CraftPayload {
   name: string;
-  craft_type: string;
   category: number;
-  region: number;
+  craft_type: number;
+  culture: number;
+  tools: number[];
+  materials: number[];
+  address: string;
+  city: string;
+  country: string;
   latitude: number;
   longitude: number;
   description: string;
-  production_process: string;
-  how_to_understand: string;
-  cultural_relevance: string;
   attributes: CraftAttributes;
 }
 
 export function toPayload(values: CraftFormValues): CraftPayload {
   const { attributes } = values;
-  const dimensions = Object.fromEntries(
-    DIMENSION_KEYS.filter((key) => attributes.dimensions_cm[key] !== "").map((key) => [
-      key,
-      Number(attributes.dimensions_cm[key]),
-    ]),
-  );
   const payloadAttributes: CraftAttributes = {};
-  if (Object.keys(dimensions).length) payloadAttributes.dimensions_cm = dimensions;
+  if (attributes.dimensions.length) {
+    payloadAttributes.dimensions = attributes.dimensions.map((row) => ({
+      ...row,
+      value: Number(row.value),
+    }));
+  }
   if (attributes.weight_g) payloadAttributes.weight_g = Number(attributes.weight_g);
   if (splitList(attributes.colors).length) payloadAttributes.colors = splitList(attributes.colors);
-  if (splitList(attributes.materials).length) {
-    payloadAttributes.materials = splitList(attributes.materials);
-  }
   if (attributes.distinguishing_features.trim()) {
     payloadAttributes.distinguishing_features = attributes.distinguishing_features.trim();
   }
 
   return {
     name: values.name.trim(),
-    craft_type: values.craft_type.trim(),
     category: Number(values.category),
-    region: Number(values.region),
+    craft_type: Number(values.craft_type),
+    culture: Number(values.culture),
+    tools: values.tools.map((item) => item.id),
+    materials: values.materials.map((item) => item.id),
+    address: values.address.trim(),
+    city: values.city,
+    country: values.country,
     latitude: Number(values.latitude),
     longitude: Number(values.longitude),
     description: values.description.trim(),
-    production_process: values.production_process.trim(),
-    how_to_understand: values.how_to_understand.trim(),
-    cultural_relevance: values.cultural_relevance.trim(),
     attributes: payloadAttributes,
   };
 }
 
 export function fromCraft(craft: CraftDetail): CraftFormValues {
   const attributes = craft.attributes as CraftAttributes;
-  const dimension = (key: (typeof DIMENSION_KEYS)[number]) =>
-    attributes.dimensions_cm?.[key]?.toString() ?? "";
+  const chosen = ({ id, name }: { id: number; name: string }) => ({ id, name });
   return {
     name: craft.name,
-    craft_type: craft.craft_type,
     category: String(craft.category.id),
-    region: String(craft.region.id),
+    craft_type: String(craft.craft_type.id),
+    culture: craft.culture ? String(craft.culture.id) : "",
+    tools: craft.tools.map(chosen),
+    materials: craft.materials.map(chosen),
+    address: craft.address,
+    city: craft.city,
+    country: craft.country,
     latitude: String(craft.latitude),
     longitude: String(craft.longitude),
     description: craft.description,
-    production_process: craft.production_process,
-    how_to_understand: craft.how_to_understand,
-    cultural_relevance: craft.cultural_relevance,
     attributes: {
-      dimensions_cm: {
-        height: dimension("height"),
-        width: dimension("width"),
-        depth: dimension("depth"),
-        length: dimension("length"),
-        diameter: dimension("diameter"),
-      },
+      dimensions: (attributes.dimensions ?? []).map((row) => ({
+        ...row,
+        value: String(row.value),
+      })),
       weight_g: attributes.weight_g?.toString() ?? "",
       colors: attributes.colors?.join(", ") ?? "",
-      materials: attributes.materials?.join(", ") ?? "",
       distinguishing_features: attributes.distinguishing_features ?? "",
     },
   };

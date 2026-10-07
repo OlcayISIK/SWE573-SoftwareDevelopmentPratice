@@ -127,7 +127,7 @@ function EditCraftForm({ craft }: { craft: CraftDetail }) {
   return (
     <form noValidate onSubmit={onSubmit} className="mt-8 space-y-10">
       <FormAlert>{formError}</FormAlert>
-      <CraftFields form={form} />
+      <CraftFields form={form} craft={craft} />
       <div className="flex gap-4">
         <SubmitButton pending={form.formState.isSubmitting}>Save changes</SubmitButton>
         <Link to={`/crafts/${craft.id}`} className="px-4 py-2 font-medium text-brand-700 underline">

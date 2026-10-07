@@ -4,8 +4,10 @@ import { http, HttpResponse } from "msw";
 
 import { toast } from "@/lib/toast";
 import { craftsApi, mediaBody } from "@/features/crafts/api";
+import type { CraftType } from "@/features/crafts/types";
 import { expectNoA11yViolations } from "@/test/axe";
 import { makeCraftDetail, makeUser, signedIn } from "@/test/fixtures";
+import { craftTypes } from "@/test/handlers";
 import { API, fail, ok } from "@/test/http";
 import { renderRoute } from "@/test/render";
 import { server } from "@/test/server";
@@ -14,17 +16,30 @@ function png(name = "tile.png") {
   return new File([new Uint8Array([137, 80, 78, 71])], name, { type: "image/png" });
 }
 
+function toastMessages() {
+  return toast.getSnapshot().map((item) => item.message);
+}
+
+async function chooseCraftType(category = "1", craftType = "Tile") {
+  await userEvent.selectOptions(screen.getByLabelText("Category"), category);
+  const option = await screen.findByRole("option", { name: craftType });
+  await userEvent.selectOptions(screen.getByLabelText("Craft type"), option);
+}
+
+async function pinAddress(address = "Ulu Cami, Kütahya") {
+  await userEvent.type(screen.getByLabelText("Address"), address);
+  await userEvent.click(screen.getByRole("button", { name: "Pin address" }));
+}
+
 async function fillRequiredFields() {
-  await screen.findByRole("option", { name: "Kütahya" });
+  await screen.findByRole("option", { name: "Ceramics" });
   await userEvent.type(screen.getByLabelText("Name"), "Kütahya Çinisi");
-  await userEvent.type(screen.getByLabelText("Type of craft"), "Tile");
-  await userEvent.selectOptions(screen.getByLabelText("Category"), "1");
-  await userEvent.selectOptions(screen.getByLabelText("Region"), "10");
-  await userEvent.click(await screen.findByRole("button", { name: "Pick Kütahya on the map" }));
-  await userEvent.type(screen.getByLabelText("What it is"), "Glazed tiles.");
-  await userEvent.type(screen.getByLabelText("How it is made"), "Painted and fired.");
-  await userEvent.type(screen.getByLabelText("How to understand it"), "Floral motifs.");
-  await userEvent.type(screen.getByLabelText("Cultural relevance"), "Anatolian tradition.");
+  await chooseCraftType();
+  await screen.findByRole("option", { name: "Turkish (Anatolia, Türkiye)" });
+  await userEvent.selectOptions(screen.getByLabelText("Culture"), "51");
+  await pinAddress();
+  await screen.findByText("Pinned at 39.41992, 29.98574.");
+  await userEvent.type(screen.getByLabelText("About this craft"), "Glazed tiles.");
 }
 
 function publishHandlers() {
@@ -58,13 +73,23 @@ test("unverified users are asked to verify their email", async () => {
   expect(screen.getByRole("button", { name: "Send a new verification email" })).toBeVisible();
 });
 
-test("publishing a craft with a photo and a video", async () => {
+test("publishing a craft with tools, materials, a dimension, a photo and a video", async () => {
   server.use(...signedIn());
   const { created, uploads } = publishHandlers();
   const { router } = renderRoute("/crafts/new");
 
   await fillRequiredFields();
-  await userEvent.type(screen.getByLabelText("Height (cm)"), "20");
+  expect(screen.getByText("Map moved to 39.419923, 29.985743")).toBeInTheDocument();
+  const tools = screen.getByRole("group", { name: "Tools (optional)" });
+  await userEvent.click(within(tools).getByRole("checkbox", { name: "Kiln" }));
+  await userEvent.type(within(tools).getByLabelText("Other tools"), "loom");
+  await userEvent.click(within(tools).getByRole("button", { name: "Add Loom" }));
+  expect(within(tools).getByRole("list", { name: "Chosen tools" })).toHaveTextContent(/Kiln.*Loom/);
+  const materials = screen.getByRole("group", { name: "Materials (optional)" });
+  await userEvent.click(within(materials).getByRole("checkbox", { name: "Clay" }));
+  await userEvent.click(screen.getByRole("button", { name: "Add a dimension" }));
+  const dimension = screen.getByRole("group", { name: "Dimension 1" });
+  await userEvent.type(within(dimension).getByLabelText("Size"), "20");
   await userEvent.type(screen.getByLabelText("Colors"), "cobalt blue, turquoise,");
   await userEvent.upload(screen.getByLabelText("Photo file"), png());
   await userEvent.type(screen.getByLabelText("Alt text"), "Blue tile");
@@ -72,22 +97,28 @@ test("publishing a craft with a photo and a video", async () => {
   await userEvent.click(screen.getByRole("radio", { name: "Video link" }));
   await userEvent.type(screen.getByLabelText("Video URL"), "https://youtu.be/abc123");
   await userEvent.click(screen.getByRole("button", { name: "Add to craft" }));
-  expect(screen.getByRole("button", { name: "Remove Photo: Blue tile" })).toBeVisible();
-  expect(
-    screen.getByRole("button", { name: "Remove Video: https://youtu.be/abc123" }),
-  ).toBeVisible();
 
   await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
 
   await waitFor(() => expect(router.state.location.pathname).toBe("/crafts/42"));
-  expect(created[0]).toMatchObject({
+  expect(created[0]).toEqual({
     name: "Kütahya Çinisi",
-    craft_type: "Tile",
     category: 1,
-    region: 10,
-    attributes: { dimensions_cm: { height: 20 }, colors: ["cobalt blue", "turquoise"] },
+    craft_type: 21,
+    culture: 51,
+    tools: [32, 33],
+    materials: [41],
+    address: "Ulu Cami, Kütahya",
+    city: "Kütahya",
+    country: "Türkiye",
+    latitude: 39.419923,
+    longitude: 29.985743,
+    description: "Glazed tiles.",
+    attributes: {
+      dimensions: [{ type: "height", value: 20, unit: "cm" }],
+      colors: ["cobalt blue", "turquoise"],
+    },
   });
-  expect(created[0].latitude as number).toBeCloseTo(39.4192, 3);
   expect(uploads).toHaveBeenCalledTimes(2);
   expect(uploads.mock.calls[0].slice(0, 3)).toEqual([
     42,
@@ -99,8 +130,118 @@ test("publishing a craft with a photo and a video", async () => {
     { media_type: "video", url: "https://youtu.be/abc123", caption: "" },
     1,
   ]);
-  expect(toast.getSnapshot()[0].message).toBe("Your craft is published.");
-  expect(localStorage.getItem("ic.craft-draft")).toBeNull();
+  expect(toastMessages()).toContain("Your craft is published.");
+  expect(localStorage.getItem("ic.craft-draft.v2")).toBeNull();
+});
+
+test("an address that cannot be found is reported and nothing is pinned", async () => {
+  server.use(...signedIn());
+  renderRoute("/crafts/new");
+  await screen.findByRole("option", { name: "Ceramics" });
+
+  await pinAddress("nowhere at all");
+
+  await waitFor(() => expect(toastMessages()).toContain("Address not found."));
+  expect(screen.getByText("No pin yet.")).toBeInTheDocument();
+});
+
+test("placing the pin on the map fills in the address", async () => {
+  server.use(...signedIn());
+  const reversed: URLSearchParams[] = [];
+  server.use(
+    http.get(`${API}/geocode/reverse/`, ({ request }) => {
+      reversed.push(new URL(request.url).searchParams);
+      return ok({
+        latitude: 39.4192,
+        longitude: 29.9833,
+        address: "Cumhuriyet Caddesi, Kütahya Merkez, Türkiye",
+        city: "Kütahya Merkez",
+        country: "Türkiye",
+      });
+    }),
+  );
+  renderRoute("/crafts/new");
+
+  await userEvent.click(await screen.findByRole("button", { name: "Pick Kütahya on the map" }));
+
+  await waitFor(() =>
+    expect(screen.getByLabelText("Address")).toHaveValue(
+      "Cumhuriyet Caddesi, Kütahya Merkez, Türkiye",
+    ),
+  );
+  // The pin stays where the user put it.
+  expect(screen.getByText(/^Pinned at 39\.4192\d, 29\.9833\d\.$/)).toBeInTheDocument();
+  expect([reversed[0].get("lat"), reversed[0].get("lng")]).toEqual(["39.4192345", "29.9833471"]);
+});
+
+test("changing the category clears the craft type and lists the types of the new one", async () => {
+  server.use(...signedIn());
+  renderRoute("/crafts/new");
+  await screen.findByRole("option", { name: "Ceramics" });
+  expect(screen.getByLabelText("Craft type")).toBeDisabled();
+
+  await chooseCraftType("1", "Tile");
+  await userEvent.selectOptions(screen.getByLabelText("Category"), "2");
+
+  expect(screen.getByLabelText("Craft type")).toHaveValue("");
+  expect(await screen.findByRole("option", { name: "Carpet" })).toBeInTheDocument();
+  expect(screen.queryByRole("option", { name: "Tile" })).not.toBeInTheDocument();
+});
+
+test("a missing craft type is added and chosen", async () => {
+  server.use(...signedIn());
+  const added: CraftType[] = [];
+  server.use(
+    http.get(`${API}/craft-types/`, ({ request }) => {
+      const category = Number(new URL(request.url).searchParams.get("category"));
+      return ok([...craftTypes, ...added].filter((item) => item.category === category));
+    }),
+    http.post(`${API}/craft-types/`, async ({ request }) => {
+      const body = (await request.json()) as { name: string; category: number };
+      const item = { id: 99, name: body.name, category: body.category, user_added: true };
+      added.push(item);
+      return ok(item, { status: 201 });
+    }),
+  );
+  renderRoute("/crafts/new");
+  await screen.findByRole("option", { name: "Ceramics" });
+  await userEvent.selectOptions(screen.getByLabelText("Category"), "1");
+
+  await userEvent.click(screen.getByRole("button", { name: "Add a new craft type" }));
+  await userEvent.type(screen.getByLabelText("New craft type"), "Lustreware");
+  await userEvent.click(screen.getByRole("button", { name: "Add craft type" }));
+
+  await waitFor(() => expect(screen.getByLabelText("Craft type")).toHaveValue("99"));
+  expect(screen.getByRole("option", { name: "Lustreware" })).toBeInTheDocument();
+  expect(added[0]).toMatchObject({ name: "Lustreware", category: 1 });
+});
+
+test("a tool that is not listed is added as a new tool for the craft type", async () => {
+  server.use(...signedIn());
+  const bodies: unknown[] = [];
+  server.use(
+    http.post(`${API}/tools/`, async ({ request }) => {
+      bodies.push(await request.json());
+      return ok(
+        { id: 98, name: "Spinning wheel", typical: true, user_added: true },
+        { status: 201 },
+      );
+    }),
+  );
+  renderRoute("/crafts/new");
+  await screen.findByRole("option", { name: "Ceramics" });
+  await chooseCraftType();
+
+  const tools = screen.getByRole("group", { name: "Tools (optional)" });
+  await userEvent.type(within(tools).getByLabelText("Other tools"), "Spinning wheel");
+  await userEvent.click(
+    within(tools).getByRole("button", { name: "Add “Spinning wheel” as a new tool" }),
+  );
+
+  expect(
+    await within(tools).findByRole("button", { name: "Remove Spinning wheel" }),
+  ).toBeInTheDocument();
+  expect(bodies).toEqual([{ name: "Spinning wheel", craft_type: 21 }]);
 });
 
 test("the form validates required fields in the browser", async () => {
@@ -113,34 +254,50 @@ test("the form validates required fields in the browser", async () => {
 
   expect(await screen.findByText("Enter the name of the craft.")).toBeInTheDocument();
   expect(screen.getByText("Choose a category.")).toBeInTheDocument();
+  expect(screen.getByText("Choose a craft type.")).toBeInTheDocument();
+  expect(screen.getByText("Choose the culture the craft belongs to.")).toBeInTheDocument();
+  expect(screen.getByText("Enter the address the craft comes from.")).toBeInTheDocument();
   expect(
-    screen.getByText("Enter the latitude or pick the location on the map."),
+    screen.getByText("Pin the location: use Pin address or click the map."),
   ).toBeInTheDocument();
-  expect(screen.getByText("Explain its cultural relevance.")).toBeInTheDocument();
+  expect(screen.getByText("Describe the craft.")).toBeInTheDocument();
   expect(screen.getByLabelText("Name")).toHaveFocus();
   expect(create).not.toHaveBeenCalled();
 });
 
-test("server errors on attributes appear next to the field", async () => {
+test("each dimension can be entered once", async () => {
+  server.use(...signedIn());
+  renderRoute("/crafts/new");
+
+  await userEvent.click(await screen.findByRole("button", { name: "Add a dimension" }));
+  await userEvent.click(screen.getByRole("button", { name: "Add a dimension" }));
+  const second = screen.getByRole("group", { name: "Dimension 2" });
+  expect(within(second).getByLabelText("Measure")).toHaveValue("width");
+  await userEvent.selectOptions(within(second).getByLabelText("Measure"), "height");
+  await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
+
+  expect(await within(second).findByText("This dimension is already entered.")).toBeVisible();
+  const first = screen.getByRole("group", { name: "Dimension 1" });
+  expect(within(first).getByText("Enter the size.")).toBeVisible();
+});
+
+test("server errors on dimensions appear with the dimensions", async () => {
   server.use(
     ...signedIn(),
     http.post(`${API}/crafts/`, () =>
       fail(400, "Validation failed.", {
-        attributes: {
-          dimensions_cm: { height: ["Ensure this value is greater than or equal to 0.01."] },
-        },
+        attributes: { dimensions: { 0: { value: ["Ensure this value is less than 100000."] } } },
       }),
     ),
   );
   renderRoute("/crafts/new");
 
   await fillRequiredFields();
+  await userEvent.click(screen.getByRole("button", { name: "Add a dimension" }));
+  await userEvent.type(screen.getByLabelText("Size"), "1");
   await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
 
-  expect(
-    await screen.findByText("Ensure this value is greater than or equal to 0.01."),
-  ).toBeInTheDocument();
-  expect(screen.getByLabelText("Height (cm)")).toHaveAttribute("aria-invalid", "true");
+  expect(await screen.findByText("Ensure this value is less than 100000.")).toBeInTheDocument();
 });
 
 test("photos need alt text and an allowed format", async () => {
@@ -177,19 +334,14 @@ test("failed uploads send the author to the edit page", async () => {
   await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
 
   await waitFor(() => expect(router.state.location.pathname).toBe("/crafts/42/edit"));
-  expect(
-    toast
-      .getSnapshot()
-      .map((t) => t.message)
-      .join(" "),
-  ).toContain("1 media item could not be uploaded");
+  expect(toastMessages().join(" ")).toContain("1 media item could not be uploaded");
 });
 
 test("a draft survives a reload and can be discarded", async () => {
   server.use(...signedIn());
   const first = renderRoute("/crafts/new");
   await userEvent.type(await screen.findByLabelText("Name"), "Half-written craft");
-  await waitFor(() => expect(localStorage.getItem("ic.craft-draft")).toContain("Half-written"));
+  await waitFor(() => expect(localStorage.getItem("ic.craft-draft.v2")).toContain("Half-written"));
   first.unmount();
 
   server.use(...signedIn());
@@ -202,17 +354,29 @@ test("a draft survives a reload and can be discarded", async () => {
   expect(screen.getByLabelText("Name")).toHaveValue("");
 });
 
+test("drafts from the old form are dropped", async () => {
+  localStorage.setItem("ic.craft-draft", JSON.stringify({ name: "Old", region: "10" }));
+  server.use(...signedIn());
+  renderRoute("/crafts/new");
+
+  expect(await screen.findByLabelText("Name")).toHaveValue("");
+  expect(localStorage.getItem("ic.craft-draft")).toBeNull();
+});
+
 test("the new craft page has no accessibility violations", async () => {
   server.use(...signedIn());
   const { container } = renderRoute("/crafts/new");
-  await screen.findByRole("option", { name: "Kütahya" });
+  await screen.findByRole("option", { name: "Ceramics" });
 
   await expectNoA11yViolations(container);
 });
 
 describe("editing", () => {
   const craft = makeCraftDetail({
-    attributes: { colors: ["cobalt blue"], dimensions_cm: { height: 20 } },
+    attributes: {
+      colors: ["cobalt blue"],
+      dimensions: [{ type: "height", value: 20, unit: "cm" }],
+    },
   });
 
   test("the author edits a craft", async () => {
@@ -229,8 +393,11 @@ describe("editing", () => {
 
     const name = await screen.findByLabelText("Name");
     expect(name).toHaveValue("Kütahya Çinisi");
+    await waitFor(() => expect(screen.getByLabelText("Craft type")).toHaveValue("21"));
+    expect(screen.getByLabelText("Address")).toHaveValue("Cumhuriyet Caddesi, Kütahya");
+    expect(screen.getByRole("button", { name: "Remove Kiln" })).toBeInTheDocument();
     expect(screen.getByLabelText("Colors")).toHaveValue("cobalt blue");
-    expect(screen.getByLabelText("Height (cm)")).toHaveValue("20");
+    expect(screen.getByLabelText("Size")).toHaveValue("20");
     await userEvent.clear(name);
     await userEvent.type(name, "Kütahya Tiles");
     await userEvent.click(screen.getByRole("button", { name: "Save changes" }));
@@ -239,9 +406,30 @@ describe("editing", () => {
     expect(patches[0]).toMatchObject({
       name: "Kütahya Tiles",
       category: 1,
-      region: 10,
-      attributes: { colors: ["cobalt blue"], dimensions_cm: { height: 20 } },
+      craft_type: 21,
+      culture: 51,
+      tools: [32],
+      materials: [41],
+      attributes: {
+        colors: ["cobalt blue"],
+        dimensions: [{ type: "height", value: 20, unit: "cm" }],
+      },
     });
+  });
+
+  test("a craft type or culture an admin hid stays chosen when editing", async () => {
+    const hidden = makeCraftDetail({
+      craft_type: { id: 77, name: "Old tile", user_added: true },
+      culture: { id: 78, name: "Old culture", homeland: "", user_added: true },
+    });
+    server.use(
+      ...signedIn(makeUser({ id: 7 })),
+      http.get(`${API}/crafts/1/`, () => ok(hidden)),
+    );
+    renderRoute("/crafts/1/edit");
+
+    await waitFor(() => expect(screen.getByLabelText("Craft type")).toHaveValue("77"));
+    expect(screen.getByLabelText("Culture")).toHaveValue("78");
   });
 
   test("other users cannot edit", async () => {

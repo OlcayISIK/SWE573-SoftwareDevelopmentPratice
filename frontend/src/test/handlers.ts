@@ -1,33 +1,83 @@
 import { http } from "msw";
 
-import type { Category, Region } from "@/features/crafts/types";
+import type { Category, CraftType, Culture, Place, Tool } from "@/features/crafts/types";
 
-import { API, ok } from "./http";
+import { API, fail, ok } from "./http";
 
 export const categories: Category[] = [
-  { id: 1, name: "Ceramics", slug: "ceramics" },
-  { id: 2, name: "Textiles", slug: "textiles" },
+  { id: 1, name: "Ceramics", slug: "ceramics", user_added: false },
+  { id: 2, name: "Textiles", slug: "textiles", user_added: false },
 ];
 
-export const regions: Region[] = [
-  {
-    id: 10,
-    name: "Kütahya",
-    country: "Türkiye",
-    description: "Western Anatolian province known for glazed tiles.",
-  },
-  { id: 11, name: "Uşak", country: "Türkiye", description: "Known for hand-knotted carpets." },
-  { id: 12, name: "Oaxaca", country: "Mexico", description: "Known for black pottery." },
+export const craftTypes: CraftType[] = [
+  { id: 21, name: "Tile", category: 1, user_added: false },
+  { id: 22, name: "Pottery", category: 1, user_added: false },
+  { id: 23, name: "Carpet", category: 2, user_added: false },
+  { id: 24, name: "Kilim", category: 2, user_added: false },
 ];
+
+export const cultures: Culture[] = [
+  { id: 51, name: "Turkish", homeland: "Anatolia, Türkiye", user_added: false },
+  { id: 52, name: "Zapotec", homeland: "Oaxaca, Mexico", user_added: false },
+];
+
+type Linked = Omit<Tool, "typical">;
+
+export const tools: Linked[] = [
+  { id: 31, name: "Brush", user_added: false },
+  { id: 32, name: "Kiln", user_added: false },
+  { id: 33, name: "Loom", user_added: false },
+];
+
+export const materials: Linked[] = [
+  { id: 41, name: "Clay", user_added: false },
+  { id: 42, name: "Glaze", user_added: false },
+  { id: 43, name: "Wool", user_added: false },
+];
+
+/** Which tools and materials are typical for each craft type. */
+const TYPICAL: Record<number, number[]> = { 21: [31, 32, 41, 42], 23: [33, 43] };
+
+export const kutahya: Place = {
+  latitude: 39.419923,
+  longitude: 29.985743,
+  address: "Kütahya, Kütahya Merkez, Aegean Region, Türkiye",
+  city: "Kütahya",
+  country: "Türkiye",
+};
+
+/** The list as the API returns it: typical items for the craft type first. */
+export function linkedList(items: Linked[], craftType: string | null) {
+  const typical = new Set(TYPICAL[Number(craftType)] ?? []);
+  return items
+    .map((item) => ({ ...item, typical: typical.has(item.id) }))
+    .sort((a, b) => Number(b.typical) - Number(a.typical) || a.name.localeCompare(b.name));
+}
 
 export function emptyPage() {
   return { items: [], total: 0, page: 1, pageSize: 20, totalPages: 1 };
 }
 
-/** Defaults every test gets: reference data and an empty map. Tests override with server.use. */
+/** Defaults every test gets: lookup lists, address lookup, and an empty map. */
 export const defaultHandlers = [
   http.get(`${API}/categories/`, () => ok(categories)),
-  http.get(`${API}/regions/`, () => ok(regions)),
+  http.get(`${API}/craft-types/`, ({ request }) => {
+    const category = Number(new URL(request.url).searchParams.get("category"));
+    return ok(craftTypes.filter((item) => item.category === category));
+  }),
+  http.get(`${API}/tools/`, ({ request }) =>
+    ok(linkedList(tools, new URL(request.url).searchParams.get("craft_type"))),
+  ),
+  http.get(`${API}/materials/`, ({ request }) =>
+    ok(linkedList(materials, new URL(request.url).searchParams.get("craft_type"))),
+  ),
+  http.get(`${API}/cultures/`, () => ok(cultures)),
+  http.get(`${API}/geocode/search/`, ({ request }) =>
+    new URL(request.url).searchParams.get("q")?.includes("nowhere")
+      ? fail(404, "Address not found.")
+      : ok(kutahya),
+  ),
+  http.get(`${API}/geocode/reverse/`, () => ok(kutahya)),
   http.get(`${API}/crafts/map/`, () => ok([])),
   http.get(`${API}/crafts/`, () => ok(emptyPage())),
   http.get(`${API}/crafts/:id/favorite/`, () => ok({ favorited: false, favorites_count: 0 })),
