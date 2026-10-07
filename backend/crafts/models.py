@@ -77,30 +77,23 @@ class Culture(LookupItem):
         constraints = [_unique_name("culture")]
 
 
-class Region(BaseModel):
-    name = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-
-    class Meta:
-        ordering = ["country", "name"]
-        constraints = [
-            models.UniqueConstraint(fields=["name", "country"], name="unique_region_per_country"),
-        ]
-
-    def __str__(self):
-        return f"{self.name}, {self.country}"
-
-
 class Craft(SoftDeleteModel):
     class Status(models.TextChoices):
         PUBLISHED = "published", "Published"
         HIDDEN = "hidden", "Hidden"
 
     name = models.CharField(max_length=150)
-    craft_type = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="crafts")
-    region = models.ForeignKey(Region, on_delete=models.PROTECT, related_name="crafts")
+    craft_type = models.ForeignKey(CraftType, on_delete=models.PROTECT, related_name="crafts")
+    tools = models.ManyToManyField(Tool, related_name="crafts", blank=True)
+    materials = models.ManyToManyField(Material, related_name="crafts", blank=True)
+    # Required for new crafts; crafts added before cultures existed may have none.
+    culture = models.ForeignKey(
+        Culture, on_delete=models.PROTECT, related_name="crafts", null=True, blank=True
+    )
+    address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, blank=True)
     latitude = models.DecimalField(
         max_digits=9,
         decimal_places=6,
@@ -112,9 +105,6 @@ class Craft(SoftDeleteModel):
         validators=[MinValueValidator(-180), MaxValueValidator(180)],
     )
     description = models.TextField()
-    production_process = models.TextField()
-    how_to_understand = models.TextField()
-    cultural_relevance = models.TextField()
     attributes = models.JSONField(default=dict, blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PUBLISHED)
     author = models.ForeignKey(
