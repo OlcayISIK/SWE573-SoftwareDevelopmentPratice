@@ -9,7 +9,11 @@ import type {
   CraftListItem,
   CraftMedia,
   CraftPin,
-  Region,
+  CraftType,
+  Culture,
+  Material,
+  Place,
+  Tool,
 } from "./types";
 
 export type NewMedia =
@@ -53,5 +57,28 @@ export const craftsApi = {
   byUser: (userId: number, page = 1) =>
     api.get<Paginated<CraftListItem>>(`/users/${userId}/crafts/`, { params: { page } }),
   categories: () => api.get<Category[]>("/categories/"),
-  regions: () => api.get<Region[]>("/regions/"),
+};
+
+/** The lists the craft form picks from. Adding a name that exists returns the existing item. */
+export const lookupsApi = {
+  craftTypes: (category: number) => api.get<CraftType[]>("/craft-types/", { params: { category } }),
+  tools: (craftType?: number) => api.get<Tool[]>("/tools/", { params: { craft_type: craftType } }),
+  materials: (craftType?: number) =>
+    api.get<Material[]>("/materials/", { params: { craft_type: craftType } }),
+  cultures: () => api.get<Culture[]>("/cultures/"),
+  addCategory: (name: string) => api.post<Category>("/categories/", { name }),
+  addCraftType: (name: string, category: number) =>
+    api.post<CraftType>("/craft-types/", { name, category }),
+  addTool: (name: string, craftType?: number) =>
+    api.post<Tool>("/tools/", { name, craft_type: craftType }),
+  addMaterial: (name: string, craftType?: number) =>
+    api.post<Material>("/materials/", { name, craft_type: craftType }),
+  addCulture: (name: string, homeland: string) =>
+    api.post<Culture>("/cultures/", { name, homeland }),
+};
+
+export const geocodeApi = {
+  search: (address: string) => api.get<Place>("/geocode/search/", { params: { q: address } }),
+  reverse: (latitude: number, longitude: number) =>
+    api.get<Place>("/geocode/reverse/", { params: { lat: latitude, lng: longitude } }),
 };

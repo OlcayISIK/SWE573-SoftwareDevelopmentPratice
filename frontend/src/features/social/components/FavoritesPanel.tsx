@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 
 import { useAuth } from "@/features/auth/context";
+import { placeName } from "@/features/crafts/place";
 
 import { useMyFavorites } from "../queries";
 
@@ -75,9 +76,7 @@ export function FavoritesPanel() {
                 )}
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-medium">{craft.name}</span>
-                  <span className="block truncate text-xs text-stone-600">
-                    {craft.region.name}, {craft.region.country}
-                  </span>
+                  <span className="block truncate text-xs text-stone-600">{placeName(craft)}</span>
                 </span>
               </Link>
             </li>

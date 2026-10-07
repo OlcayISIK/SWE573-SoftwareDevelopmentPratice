@@ -3,16 +3,18 @@ import { http } from "msw";
 import type { CurrentUser } from "@/features/auth/types";
 import type { CraftDetail, CraftListItem } from "@/features/crafts/types";
 
-import { categories, regions } from "./handlers";
+import { categories, cultures } from "./handlers";
 import { API, ok } from "./http";
 
 export function makeCraftListItem(overrides: Partial<CraftListItem> = {}): CraftListItem {
   return {
     id: 1,
     name: "Kütahya Çinisi",
-    craft_type: "Tile",
     category: categories[0],
-    region: regions[0],
+    craft_type: { id: 21, name: "Tile", user_added: false },
+    culture: cultures[0],
+    city: "Kütahya",
+    country: "Türkiye",
     latitude: 39.42,
     longitude: 29.98,
     cover_photo: { url: "http://localhost:8000/media/crafts/1/a.png", alt_text: "Blue tile" },
@@ -27,9 +29,14 @@ export function makeCraftDetail(overrides: Partial<CraftDetail> = {}): CraftDeta
   return {
     id: 1,
     name: "Kütahya Çinisi",
-    craft_type: "Tile",
     category: categories[0],
-    region: regions[0],
+    craft_type: { id: 21, name: "Tile", user_added: false },
+    tools: [{ id: 32, name: "Kiln", user_added: false }],
+    materials: [{ id: 41, name: "Clay", user_added: false }],
+    culture: cultures[0],
+    address: "Cumhuriyet Caddesi, Kütahya",
+    city: "Kütahya",
+    country: "Türkiye",
     latitude: 39.42,
     longitude: 29.98,
     media: [
@@ -44,9 +51,6 @@ export function makeCraftDetail(overrides: Partial<CraftDetail> = {}): CraftDeta
       },
     ],
     description: "Hand-painted glazed tiles.",
-    production_process: "Shaped, painted, glazed, and fired.",
-    how_to_understand: "Floral motifs and cobalt blue are typical.",
-    cultural_relevance: "A living Anatolian tradition.",
     attributes: {},
     status: "published",
     author: { id: 7, display_name: "Ayşe" },

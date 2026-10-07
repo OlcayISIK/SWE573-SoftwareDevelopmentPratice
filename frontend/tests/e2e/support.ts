@@ -32,6 +32,10 @@ export function createUser(email: string, { admin = false, name = "E2E User" } =
   );
 }
 
+async function apiGet<T>(path: string): Promise<T> {
+  return (await (await fetch(`${API_URL}${path}`)).json()).data as T;
+}
+
 async function apiPost<T>(path: string, body: unknown, token?: string): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
     method: "POST",
@@ -58,27 +62,28 @@ export function apiLogin(email: string) {
 /** Publishes a craft through the API and returns its id. */
 export async function apiCreateCraft(email: string, name: string) {
   const { access } = await apiLogin(email);
-  const categories = (await (await fetch(`${API_URL}/categories/`)).json()).data as {
-    id: number;
-    slug: string;
-  }[];
-  const regions = (await (await fetch(`${API_URL}/regions/`)).json()).data as {
-    id: number;
-    name: string;
-  }[];
+  const textiles = (await apiGet<{ id: number; slug: string }[]>("/categories/")).find(
+    (category) => category.slug === "textiles",
+  )!;
+  const carpet = (
+    await apiGet<{ id: number; name: string }[]>(`/craft-types/?category=${textiles.id}`)
+  ).find((craftType) => craftType.name === "Carpet")!;
+  const turkish = (await apiGet<{ id: number; name: string }[]>("/cultures/")).find(
+    (culture) => culture.name === "Turkish",
+  )!;
   const craft = await apiPost<{ id: number }>(
     "/crafts/",
     {
       name,
-      craft_type: "Carpet",
-      category: categories.find((c) => c.slug === "textiles")!.id,
-      region: regions.find((r) => r.name === "Uşak")!.id,
+      category: textiles.id,
+      craft_type: carpet.id,
+      culture: turkish.id,
+      address: "Uşak, Türkiye",
+      city: "Uşak",
+      country: "Türkiye",
       latitude: 38.68,
       longitude: 29.41,
-      description: "Hand-knotted wool carpet.",
-      production_process: "Knotted by hand on a loom.",
-      how_to_understand: "Medallion layouts are typical.",
-      cultural_relevance: "Exported widely since the 16th century.",
+      description: "Hand-knotted wool carpet with medallion layouts.",
     },
     access,
   );

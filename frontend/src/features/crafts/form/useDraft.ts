@@ -3,10 +3,13 @@ import type { UseFormReturn } from "react-hook-form";
 
 import type { CraftFormValues } from "./schema";
 
-const DRAFT_KEY = "ic.craft-draft";
+// The key changes with the shape of the form, so a draft from an older form is not restored.
+const DRAFT_KEY = "ic.craft-draft.v2";
+const OLD_DRAFT_KEYS = ["ic.craft-draft"];
 
 export function loadDraft(): CraftFormValues | null {
   try {
+    OLD_DRAFT_KEYS.forEach((key) => localStorage.removeItem(key));
     const raw = localStorage.getItem(DRAFT_KEY);
     return raw ? (JSON.parse(raw) as CraftFormValues) : null;
   } catch {

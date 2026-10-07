@@ -13,9 +13,14 @@ test.each([
   expect(toEmbedUrl(link)).toBe(expected);
 });
 
-test("dimensions are listed in a fixed order", () => {
-  expect(formatDimensions({ width: 20, height: 25.5 })).toBe("height 25.5 cm, width 20 cm");
-  expect(formatDimensions({})).toBeNull();
+test("dimensions are listed in the order they were entered, each with its unit", () => {
+  expect(
+    formatDimensions([
+      { type: "height", value: 25.5, unit: "cm" },
+      { type: "length", value: 2, unit: "m" },
+    ]),
+  ).toBe("height 25.5 cm, length 2 m");
+  expect(formatDimensions([])).toBeNull();
   expect(formatDimensions(undefined)).toBeNull();
 });
 

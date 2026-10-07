@@ -14,17 +14,11 @@ import type { CraftAttributes } from "../attributes";
 import { AttributeList } from "../components/detail/AttributeList";
 import { PhotoGallery } from "../components/detail/PhotoGallery";
 import { Documents, Videos } from "../components/detail/VideosAndDocuments";
+import { placeName } from "../place";
 import { useCraft, useDeleteCraft } from "../queries";
 import type { CraftDetail } from "../types";
 
 const MapView = lazy(() => import("../components/map/MapView"));
-
-const SECTIONS = [
-  ["What it is", "description"],
-  ["How it is made", "production_process"],
-  ["How to understand it", "how_to_understand"],
-  ["Cultural relevance", "cultural_relevance"],
-] as const;
 
 function OwnerActions({ craft }: { craft: CraftDetail }) {
   const navigate = useNavigate();
@@ -110,15 +104,13 @@ export function CraftDetailPage() {
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-sm font-medium uppercase tracking-wide text-brand-700">
-            {data.category.name} · {data.craft_type}
+            {data.category.name} · {data.craft_type.name}
           </p>
           <h1 className="mt-1 text-3xl font-semibold">{data.name}</h1>
           <p className="mt-2 text-stone-700">
-            From{" "}
-            <Link to={`/crafts?region=${data.region.id}`} className="underline">
-              {data.region.name}, {data.region.country}
-            </Link>{" "}
-            · Added by{" "}
+            {data.culture && <>{data.culture.name} · </>}
+            {placeName(data) && <>From {placeName(data)} · </>}
+            Added by{" "}
             <Link to={`/users/${data.author.id}`} className="underline">
               {data.author.display_name}
             </Link>
@@ -139,26 +131,19 @@ export function CraftDetailPage() {
       <div className="mt-8 grid gap-10 lg:grid-cols-[3fr_2fr]">
         <div>
           <PhotoGallery photos={photos} />
-          {SECTIONS.map(([title, field]) => (
-            <section key={field} className="mt-10">
-              <h2 className="text-xl font-semibold">{title}</h2>
-              <p className="mt-3 whitespace-pre-line text-stone-800">{data[field]}</p>
-            </section>
-          ))}
+          <section className="mt-10">
+            <h2 className="text-xl font-semibold">About this craft</h2>
+            <p className="mt-3 whitespace-pre-line text-stone-800">{data.description}</p>
+          </section>
           <AttributeList attributes={data.attributes as CraftAttributes} />
           <Videos videos={videos} craftName={data.name} />
           <Documents documents={documents} />
         </div>
 
-        <aside aria-label="Region and location" className="space-y-6">
-          <section className="rounded-lg border border-brand-100 bg-white p-5">
-            <h2 className="text-lg font-semibold">
-              {data.region.name}, {data.region.country}
-            </h2>
-            <p className="mt-2 text-stone-700">{data.region.description}</p>
-          </section>
+        <aside aria-label="Location" className="space-y-6">
           <section className="overflow-hidden rounded-lg border border-brand-100 bg-white">
             <h2 className="px-5 pt-4 text-lg font-semibold">Location</h2>
+            <p className="px-5 pt-1 text-stone-700">{data.address}</p>
             <div className="mt-3 h-64">
               <Suspense fallback={<PageLoader label="Loading the map" />}>
                 <MapView

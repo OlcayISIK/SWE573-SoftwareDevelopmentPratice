@@ -1,6 +1,7 @@
 import "leaflet/dist/leaflet.css";
 
-import { MapContainer, Marker, useMapEvents } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, Marker, useMap, useMapEvents } from "react-leaflet";
 
 import { pinIcon } from "./pinIcon";
 import { FitWorld, WorldTiles } from "./world";
@@ -8,7 +9,19 @@ import { singleWorldOptions } from "./worldOptions";
 
 export interface LocationMapProps {
   position: [number, number] | null;
+  /** A point found for the typed address; the map moves there when it changes. */
+  target?: [number, number] | null;
   onPick: (latitude: number, longitude: number) => void;
+}
+
+const STREET_ZOOM = 15;
+
+function MoveTo({ target }: { target: [number, number] | null | undefined }) {
+  const map = useMap();
+  useEffect(() => {
+    if (target) map.setView(target, Math.max(map.getZoom(), STREET_ZOOM));
+  }, [map, target]);
+  return null;
 }
 
 function ClickToPick({ onPick }: Pick<LocationMapProps, "onPick">) {
@@ -16,7 +29,7 @@ function ClickToPick({ onPick }: Pick<LocationMapProps, "onPick">) {
   return null;
 }
 
-export default function LocationMap({ position, onPick }: LocationMapProps) {
+export default function LocationMap({ position, target, onPick }: LocationMapProps) {
   return (
     <div
       role="region"
@@ -31,6 +44,7 @@ export default function LocationMap({ position, onPick }: LocationMapProps) {
       >
         <WorldTiles />
         <FitWorld focus={position ?? undefined} focusZoom={6} />
+        <MoveTo target={target} />
         <ClickToPick onPick={onPick} />
         {position && (
           <Marker

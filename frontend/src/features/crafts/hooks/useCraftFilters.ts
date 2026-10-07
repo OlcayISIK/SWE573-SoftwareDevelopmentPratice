@@ -3,18 +3,16 @@ import { useSearchParams } from "react-router";
 
 import type { CraftFilters } from "../types";
 
-const FILTER_KEYS = ["category", "region", "search", "page"] as const;
+const FILTER_KEYS = ["category", "search", "page"] as const;
 
 /** Filters live in the URL so filtered views can be shared and the back button works. */
 export function useCraftFilters() {
   const [params, setParams] = useSearchParams();
 
   const filters = useMemo<CraftFilters>(() => {
-    const region = Number(params.get("region"));
     const page = Number(params.get("page"));
     return {
       category: params.get("category") || undefined,
-      region: Number.isInteger(region) && region > 0 ? region : undefined,
       search: params.get("search") || undefined,
       page: Number.isInteger(page) && page > 1 ? page : undefined,
     };
@@ -48,7 +46,7 @@ export function useCraftFilters() {
     });
   }, [setParams]);
 
-  const hasFilters = Boolean(filters.category || filters.region || filters.search);
+  const hasFilters = Boolean(filters.category || filters.search);
 
   return { filters, setFilters, clearFilters, hasFilters };
 }

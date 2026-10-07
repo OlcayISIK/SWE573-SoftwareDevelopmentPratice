@@ -2,10 +2,9 @@ import { formatDimensions, formatWeight, type CraftAttributes } from "../../attr
 
 export function AttributeList({ attributes }: { attributes: CraftAttributes }) {
   const rows = [
-    ["Dimensions", formatDimensions(attributes.dimensions_cm)],
+    ["Dimensions", formatDimensions(attributes.dimensions)],
     ["Weight", formatWeight(attributes.weight_g)],
     ["Colors", attributes.colors?.length ? attributes.colors.join(", ") : null],
-    ["Materials", attributes.materials?.length ? attributes.materials.join(", ") : null],
     ["Distinguishing features", attributes.distinguishing_features || null],
   ].filter((row): row is [string, string] => Boolean(row[1]));
 
