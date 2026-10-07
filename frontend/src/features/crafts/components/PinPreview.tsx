@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router";
 
+import { placeName } from "../place";
 import { useCraft } from "../queries";
 
 export function PinPreview({ craftId, onClose }: { craftId: number; onClose: () => void }) {
@@ -51,10 +52,10 @@ export function PinPreview({ craftId, onClose }: { craftId: number; onClose: () 
           )}
           <h2 className="text-lg font-semibold">{craft.data.name}</h2>
           <p className="text-sm text-stone-700">
-            {craft.data.craft_type} · {craft.data.category.name}
+            {craft.data.craft_type.name} · {craft.data.category.name}
           </p>
           <p className="text-sm text-stone-600">
-            {craft.data.region.name}, {craft.data.region.country}
+            {[craft.data.culture?.name, placeName(craft.data)].filter(Boolean).join(" · ")}
           </p>
           <Link
             to={`/crafts/${craft.data.id}`}

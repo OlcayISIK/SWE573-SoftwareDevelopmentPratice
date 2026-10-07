@@ -47,21 +47,16 @@ describe("craft list", () => {
     const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
     const { router } = renderRoute("/crafts");
 
-    await screen.findByRole("option", { name: "Kütahya" });
+    await screen.findByRole("option", { name: "Ceramics" });
     await userEvent.selectOptions(screen.getByLabelText("Category"), "ceramics");
-    await userEvent.selectOptions(screen.getByLabelText("Region"), "10");
     await userEvent.type(screen.getByLabelText("Search"), "çini");
     await userEvent.click(screen.getByRole("button", { name: "Search" }));
 
     await waitFor(() =>
-      expect(router.state.location.search).toBe("?category=ceramics&region=10&search=%C3%A7ini"),
+      expect(router.state.location.search).toBe("?category=ceramics&search=%C3%A7ini"),
     );
     const last = calls.at(-1)!;
-    expect([last.get("category"), last.get("region"), last.get("search")]).toEqual([
-      "ceramics",
-      "10",
-      "çini",
-    ]);
+    expect([last.get("category"), last.get("search")]).toEqual(["ceramics", "çini"]);
   });
 
   test("filters from a shared link are applied on load", async () => {

@@ -192,7 +192,7 @@ describe("admin review", () => {
     renderRoute("/admin/reports/5");
 
     await userEvent.click(await screen.findByRole("radio", { name: "Edit the craft" }));
-    const description = await screen.findByLabelText("What it is");
+    const description = await screen.findByLabelText("Description");
     expect(description).toHaveValue("Hand-painted glazed tiles.");
     await userEvent.clear(description);
     await userEvent.type(description, "Corrected description.");

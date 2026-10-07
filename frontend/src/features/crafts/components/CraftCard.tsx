@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 
+import { placeName } from "../place";
 import type { CraftListItem } from "../types";
 
 export function CraftCard({ craft }: { craft: CraftListItem }) {
@@ -28,10 +29,10 @@ export function CraftCard({ craft }: { craft: CraftListItem }) {
           </Link>
         </h2>
         <p className="mt-1 text-sm text-stone-700">
-          {craft.craft_type} · {craft.category.name}
+          {craft.craft_type.name} · {craft.category.name}
         </p>
         <p className="text-sm text-stone-600">
-          {craft.region.name}, {craft.region.country}
+          {[craft.culture?.name, placeName(craft)].filter(Boolean).join(" · ")}
         </p>
         {craft.status === "hidden" && (
           <p className="mt-2 inline-block rounded bg-stone-200 px-2 py-0.5 text-xs font-medium">

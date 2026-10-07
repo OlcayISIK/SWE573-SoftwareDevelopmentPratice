@@ -11,7 +11,10 @@ import { server } from "@/test/server";
 
 const richCraft = makeCraftDetail({
   attributes: {
-    dimensions_cm: { height: 20, width: 20 },
+    dimensions: [
+      { type: "height", value: 20, unit: "cm" },
+      { type: "width", value: 20, unit: "cm" },
+    ],
     weight_g: 850,
     colors: ["cobalt blue", "turquoise"],
     distinguishing_features: "Hand-painted floral motifs under a clear glaze",
@@ -52,34 +55,25 @@ function serveCraft(craft: CraftDetail) {
   server.use(http.get(`${API}/crafts/${craft.id}/`, () => ok(craft)));
 }
 
-test("shows every description section, attributes, and the region", async () => {
+test("shows the description, characteristics, culture, and location", async () => {
   serveCraft(richCraft);
   renderRoute("/crafts/1");
 
   expect(await screen.findByRole("heading", { level: 1, name: "Kütahya Çinisi" })).toBeVisible();
-  for (const heading of [
-    "What it is",
-    "How it is made",
-    "How to understand it",
-    "Cultural relevance",
-  ]) {
-    expect(screen.getByRole("heading", { name: heading })).toBeInTheDocument();
-  }
-  expect(screen.getByText("A living Anatolian tradition.")).toBeInTheDocument();
+  expect(screen.getByText("Ceramics · Tile")).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "About this craft" })).toBeInTheDocument();
+  expect(screen.getByText("Hand-painted glazed tiles.")).toBeInTheDocument();
+  expect(screen.getByText(/Turkish · From Kütahya, Türkiye/)).toBeInTheDocument();
 
   const characteristics = screen.getByRole("heading", { name: "Characteristics" }).parentElement!;
   expect(within(characteristics).getByText("height 20 cm, width 20 cm")).toBeInTheDocument();
   expect(within(characteristics).getByText("850 g")).toBeInTheDocument();
   expect(within(characteristics).getByText("cobalt blue, turquoise")).toBeInTheDocument();
 
-  const aside = screen.getByRole("complementary", { name: "Region and location" });
-  expect(within(aside).getByText(/glazed tiles/)).toBeInTheDocument();
+  const aside = screen.getByRole("complementary", { name: "Location" });
+  expect(within(aside).getByText("Cumhuriyet Caddesi, Kütahya")).toBeInTheDocument();
   expect(await within(aside).findByRole("region", { name: "Map of crafts" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Ayşe" })).toHaveAttribute("href", "/users/7");
-  expect(screen.getByRole("link", { name: "Kütahya, Türkiye" })).toHaveAttribute(
-    "href",
-    "/crafts?region=10",
-  );
 });
 
 test("the gallery switches photos", async () => {
