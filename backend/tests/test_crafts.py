@@ -24,7 +24,6 @@ def payload():
                 {"type": "length", "value": 300, "unit": "cm"},
                 {"type": "width", "value": 2, "unit": "m"},
             ],
-            "colors": ["madder red", "indigo"],
             "distinguishing_features": "Central medallion with a floral border",
         },
     )
@@ -169,13 +168,15 @@ def test_author_edits_own_craft(client_for):
     craft = CraftFactory()
 
     response = client_for(craft.author).patch(
-        craft_url(craft), {"name": "New name", "attributes": {"colors": ["red"]}}, format="json"
+        craft_url(craft),
+        {"name": "New name", "attributes": {"distinguishing_features": "Red border"}},
+        format="json",
     )
 
     assert response.status_code == 200
     craft.refresh_from_db()
     assert craft.name == "New name"
-    assert craft.attributes == {"colors": ["red"]}
+    assert craft.attributes == {"distinguishing_features": "Red border"}
 
 
 def test_other_user_cannot_edit(client_for, user):

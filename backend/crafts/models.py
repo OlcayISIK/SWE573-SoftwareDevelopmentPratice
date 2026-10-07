@@ -142,6 +142,31 @@ class Craft(SoftDeleteModel):
         return self.name
 
 
+class CraftColor(BaseModel):
+    """A color of a craft, in the order the author listed them."""
+
+    craft = models.ForeignKey(Craft, on_delete=models.CASCADE, related_name="colors")
+    # "#rrggbb", or "#rrggbbaa" when the color is see-through.
+    value = models.CharField(max_length=9)
+    order = models.PositiveSmallIntegerField(default=0)
+    # CIELAB values, for finding crafts with a similar color.
+    lab_l = models.FloatField()
+    lab_a = models.FloatField()
+    lab_b = models.FloatField()
+
+    class Meta:
+        ordering = ["order", "id"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(value__regex=r"^#[0-9a-f]{6}([0-9a-f]{2})?$"),
+                name="craft_color_hex_value",
+            ),
+        ]
+
+    def __str__(self):
+        return self.value
+
+
 def craft_media_path(instance, filename):
     return f"crafts/{instance.craft_id}/{uuid.uuid4().hex}{Path(filename).suffix.lower()}"
 

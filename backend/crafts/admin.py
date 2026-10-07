@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Tool
+from .models import Category, Craft, CraftColor, CraftMedia, CraftType, Culture, Material, Tool
 
 
 class CraftMediaInline(admin.TabularInline):
@@ -10,6 +10,16 @@ class CraftMediaInline(admin.TabularInline):
 
     def get_queryset(self, request):
         return CraftMedia.all_objects.all()
+
+
+class CraftColorInline(admin.TabularInline):
+    model = CraftColor
+    extra = 0
+    fields = ["value", "order"]
+
+    def has_add_permission(self, request, obj=None):
+        # The CIELAB values are computed when crafts are saved through the API.
+        return False
 
 
 class LookupItemAdmin(admin.ModelAdmin):
@@ -50,7 +60,7 @@ class CraftAdmin(admin.ModelAdmin):
     raw_id_fields = ["author"]
     filter_horizontal = ["tools", "materials"]
     readonly_fields = ["created_at", "updated_at"]
-    inlines = [CraftMediaInline]
+    inlines = [CraftColorInline, CraftMediaInline]
 
     def get_queryset(self, request):
         return Craft.all_objects.select_related("author", "category", "craft_type", "culture")

@@ -4,7 +4,8 @@ from django.utils.text import slugify
 from core.exceptions import ConflictError, PermissionDeniedError, ValidationError
 
 from . import signals
-from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Tool
+from .colors import to_lab
+from .models import Category, Craft, CraftColor, CraftMedia, CraftType, Culture, Material, Tool
 
 MAX_MEDIA_PER_CRAFT = 20
 
@@ -21,6 +22,7 @@ EDITABLE_FIELDS = {
     "latitude",
     "longitude",
     "description",
+    "colors",
     "attributes",
 }
 MANY_TO_MANY_FIELDS = ("tools", "materials")
@@ -56,6 +58,20 @@ def _ensure_editable(data):
         )
 
 
+def _set_colors(craft, colors):
+    """Replaces the craft's colors, keeping the order they were given in."""
+    craft.colors.all().delete()
+    CraftColor.objects.bulk_create(
+        CraftColor(
+            craft=craft,
+            value=color,
+            order=index,
+            **dict(zip(("lab_l", "lab_a", "lab_b"), to_lab(color), strict=True)),
+        )
+        for index, color in enumerate(colors)
+    )
+
+
 @transaction.atomic
 def publish_craft(*, author, data):
     if not author.is_email_verified:
@@ -64,9 +80,11 @@ def publish_craft(*, author, data):
 
     fields = dict(data)
     related = {field: fields.pop(field, []) for field in MANY_TO_MANY_FIELDS}
+    colors = fields.pop("colors", [])
     craft = Craft.objects.create(author=author, **fields)
     for field, items in related.items():
         getattr(craft, field).set(items)
+    _set_colors(craft, colors)
     signals.craft_published.send(sender=Craft, craft=craft)
     return craft
 
@@ -81,6 +99,8 @@ def update_craft(*, craft, actor, data):
     for field, value in data.items():
         if field in MANY_TO_MANY_FIELDS:
             getattr(craft, field).set(value)
+        elif field == "colors":
+            _set_colors(craft, value)
         else:
             setattr(craft, field, value)
     craft.save()
