@@ -1,44 +1,23 @@
-import { Link, useSearchParams } from "react-router";
+import { Link } from "react-router";
 
 import { Pagination } from "@/components/Pagination";
 import { PageLoader } from "@/components/PageLoader";
 
-import { REASON_LABELS, type QueueStatus, type ReportReason } from "../api";
+import { REASON_LABELS, type ReportReason } from "../api";
+import { StatusTabs } from "../components/StatusTabs";
+import { useQueueParams } from "../hooks/useQueueParams";
 import { useReviewQueue } from "../queries";
-
-const TABS: [QueueStatus, string][] = [
-  ["open", "Open"],
-  ["resolved", "Resolved"],
-  ["dismissed", "Dismissed"],
-  ["all", "All"],
-];
 
 const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" });
 
 export function ReviewQueuePage() {
-  const [params, setParams] = useSearchParams();
-  const status = (TABS.find(([value]) => value === params.get("status"))?.[0] ??
-    "open") as QueueStatus;
-  const page = Math.max(1, Number(params.get("page")) || 1);
+  const { status, page, setPage } = useQueueParams();
   const queue = useReviewQueue(status, page);
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-3xl font-semibold">Review queue</h1>
-      <nav aria-label="Report status" className="mt-6 flex flex-wrap gap-2">
-        {TABS.map(([value, label]) => (
-          <Link
-            key={value}
-            to={value === "open" ? "/admin/reports" : `/admin/reports?status=${value}`}
-            aria-current={status === value ? "page" : undefined}
-            className={`rounded px-3 py-2 text-sm font-medium ${
-              status === value ? "bg-brand-700 text-white" : "bg-white hover:bg-brand-100"
-            }`}
-          >
-            {label}
-          </Link>
-        ))}
-      </nav>
+      <h1 className="text-3xl font-semibold">Reported crafts</h1>
+      <StatusTabs basePath="/admin/reports" status={status} />
 
       {queue.isPending ? (
         <PageLoader label="Loading reports" />
@@ -92,13 +71,7 @@ export function ReviewQueuePage() {
           <Pagination
             page={queue.data.page}
             totalPages={queue.data.totalPages}
-            onChange={(next) =>
-              setParams((current) => {
-                const updated = new URLSearchParams(current);
-                updated.set("page", String(next));
-                return updated;
-              })
-            }
+            onChange={setPage}
           />
         </>
       )}

@@ -182,7 +182,7 @@ export function ReviewReportPage() {
   return (
     <section className="mx-auto max-w-4xl px-4 py-8">
       <Link to="/admin/reports" className="text-sm font-medium text-brand-700 underline">
-        Back to the review queue
+        Back to reported crafts
       </Link>
       <h1 className="mt-3 text-3xl font-semibold">Report on “{data.craft.name}”</h1>
       <dl className="mt-6 grid gap-x-6 gap-y-2 rounded-lg border border-brand-100 bg-white p-5 sm:grid-cols-[10rem_1fr]">

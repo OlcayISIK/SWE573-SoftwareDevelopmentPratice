@@ -2,7 +2,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http } from "msw";
 
-import type { ReportReview } from "@/features/moderation/api";
+import type { ItemReportReview, ReportReview } from "@/features/moderation/api";
 import { toast } from "@/lib/toast";
 import { expectNoA11yViolations } from "@/test/axe";
 import { makeCraftDetail, makeUser, signedIn } from "@/test/fixtures";
@@ -253,6 +253,158 @@ describe("admin review", () => {
       http.get(`${API}/moderation/reports/5/`, () => ok(makeReport())),
     );
     const { container } = renderRoute("/admin/reports/5");
+    await screen.findByRole("button", { name: "Submit review" });
+
+    await expectNoA11yViolations(container);
+  });
+});
+
+function makeItemReport(overrides: Partial<ItemReportReview> = {}): ItemReportReview {
+  return {
+    id: 8,
+    item_type: "tool",
+    item_id: 98,
+    item_name: "Rug",
+    item: {
+      id: 98,
+      name: "Rug",
+      is_hidden: false,
+      added_by: { id: 50, display_name: "Mehmet" },
+      crafts_count: 1,
+    },
+    reporter: { id: 7, display_name: "Ayşe" },
+    reason: "duplicate",
+    note: "Not a tool.",
+    status: "open",
+    created_at: "2026-10-06T09:00:00Z",
+    actions: [],
+    ...overrides,
+  } as ItemReportReview;
+}
+
+function serveItemReport(report = makeItemReport()) {
+  const reviews: unknown[] = [];
+  server.use(
+    ...signedIn(admin),
+    http.get(`${API}/moderation/item-reports/8/`, () => ok(report)),
+    http.post(`${API}/moderation/item-reports/8/actions/`, async ({ request }) => {
+      reviews.push(await request.json());
+      return ok(makeItemReport({ status: "resolved" }));
+    }),
+  );
+  return reviews;
+}
+
+describe("item review", () => {
+  test("admins see reported items with who added them and how many crafts use them", async () => {
+    server.use(
+      ...signedIn(admin),
+      http.get(`${API}/moderation/item-reports/`, () =>
+        ok({ items: [makeItemReport()], total: 1, page: 1, pageSize: 20, totalPages: 1 }),
+      ),
+    );
+    renderRoute("/admin/item-reports");
+
+    const row = (await screen.findByRole("link", { name: "Rug" })).closest("tr")!;
+    expect(within(row).getByText("Tool")).toBeInTheDocument();
+    expect(within(row).getByText("1 craft")).toBeInTheDocument();
+    expect(within(row).getByText("Duplicate")).toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: "Admin" });
+    expect(within(nav).getByRole("link", { name: "Reported items" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+
+  test("renaming sends the new name", async () => {
+    const reviews = serveItemReport();
+    renderRoute("/admin/item-reports/8");
+
+    expect(await screen.findByText("Mehmet")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("radio", { name: "Rename the item" }));
+    const name = screen.getByLabelText("New name");
+    expect(name).toHaveValue("Rug");
+    await userEvent.clear(name);
+    await userEvent.type(name, "Rug hook");
+    await userEvent.type(screen.getByLabelText("Reason"), "Typo.");
+    await userEvent.click(screen.getByRole("button", { name: "Submit review" }));
+
+    await waitFor(() =>
+      expect(reviews).toEqual([{ action: "rename", reason: "Typo.", name: "Rug hook" }]),
+    );
+  });
+
+  test("merging asks for confirmation and names the crafts that move", async () => {
+    const reviews = serveItemReport();
+    renderRoute("/admin/item-reports/8");
+
+    await userEvent.click(await screen.findByRole("radio", { name: "Merge into another item" }));
+    const target = screen.getByLabelText("Merge into");
+    await userEvent.selectOptions(target, await screen.findByRole("option", { name: "Loom" }));
+    expect(within(target).queryByRole("option", { name: "Rug" })).not.toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText("Reason"), "Duplicate of Loom.");
+    await userEvent.click(screen.getByRole("button", { name: "Submit review" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Merge “Rug” into “Loom”?" });
+    expect(dialog).toHaveTextContent("The 1 craft that use “Rug” will use “Loom” instead");
+    expect(reviews).toEqual([]);
+    await userEvent.click(within(dialog).getByRole("button", { name: "Merge" }));
+
+    await waitFor(() =>
+      expect(reviews).toEqual([{ action: "merge", reason: "Duplicate of Loom.", merge_into: 33 }]),
+    );
+  });
+
+  test("craft types to merge into show their category", async () => {
+    serveItemReport(
+      makeItemReport({
+        item_type: "craft_type",
+        item_name: "Rag rug",
+        item: { ...makeItemReport().item!, id: 99, name: "Rag rug" },
+      }),
+    );
+    renderRoute("/admin/item-reports/8");
+
+    await userEvent.click(await screen.findByRole("radio", { name: "Merge into another item" }));
+
+    expect(await screen.findByRole("option", { name: "Carpet (Textiles)" })).toBeInTheDocument();
+  });
+
+  test("a report on an item that was merged away can only be dismissed", async () => {
+    serveItemReport(makeItemReport({ item: null as never }));
+    renderRoute("/admin/item-reports/8");
+
+    expect(await screen.findByText("Merged away or deleted")).toBeInTheDocument();
+    expect(screen.getAllByRole("radio").map((radio) => radio.getAttribute("value"))).toEqual([
+      "dismiss",
+    ]);
+  });
+
+  test("the review history shows what changed", async () => {
+    serveItemReport(
+      makeItemReport({
+        status: "resolved",
+        actions: [
+          {
+            id: 1,
+            action: "rename",
+            reason: "Typo.",
+            details: { name: "Rug hook" },
+            admin: { id: 1, display_name: "Admin" },
+            created_at: "2026-10-07T09:00:00Z",
+          },
+        ],
+      }),
+    );
+    renderRoute("/admin/item-reports/8");
+
+    expect(await screen.findByText("Renamed to “Rug hook”.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Submit review" })).not.toBeInTheDocument();
+  });
+
+  test("the item review page has no accessibility violations", async () => {
+    serveItemReport();
+    const { container } = renderRoute("/admin/item-reports/8");
     await screen.findByRole("button", { name: "Submit review" });
 
     await expectNoA11yViolations(container);
