@@ -60,7 +60,7 @@ export function apiLogin(email: string) {
 }
 
 /** Publishes a craft through the API and returns its id. */
-export async function apiCreateCraft(email: string, name: string) {
+export async function apiCreateCraft(email: string, name: string, extra: object = {}) {
   const { access } = await apiLogin(email);
   const textiles = (await apiGet<{ id: number; slug: string }[]>("/categories/")).find(
     (category) => category.slug === "textiles",
@@ -84,10 +84,17 @@ export async function apiCreateCraft(email: string, name: string) {
       latitude: 38.68,
       longitude: 29.41,
       description: "Hand-knotted wool carpet with medallion layouts.",
+      ...extra,
     },
     access,
   );
   return craft.id;
+}
+
+/** Adds a tool to the lookup list as the given user and returns its id. */
+export async function apiAddTool(email: string, name: string) {
+  const { access } = await apiLogin(email);
+  return (await apiPost<{ id: number }>("/tools/", { name }, access)).id;
 }
 
 /**

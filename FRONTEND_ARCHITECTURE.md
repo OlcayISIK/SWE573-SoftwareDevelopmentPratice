@@ -95,7 +95,7 @@ frontend/
 │   │   ├── crafts/             # Map, craft list, craft details, craft form
 │   │   ├── profiles/           # Public profile, own profile and privacy settings
 │   │   ├── social/             # Favorite and follow buttons, favorites list
-│   │   ├── moderation/         # Report dialog, admin review queue
+│   │   ├── moderation/         # Report dialogs, admin review of crafts and items
 │   │   └── notifications/      # Notification bell and list
 │   ├── components/             # Shared UI: Button, Modal, Pagination, EmptyState
 │   ├── hooks/                  # Shared hooks
@@ -157,8 +157,10 @@ Features may use shared `components`, `hooks`, and `lib`. A feature may use anot
 | `/login`                      | Log in                        | Guest           | FR-02           |
 | `/verify-email`               | Confirm email (link target)   | Guest           | FR-02           |
 | `/password-reset`             | Request and confirm reset     | Guest           | FR-02           |
-| `/admin/reports`              | Review queue                  | Admin           | FR-11, FR-12    |
-| `/admin/reports/:id`          | Review a report               | Admin           | FR-12           |
+| `/admin/reports`              | Reported crafts               | Admin           | FR-11, FR-12    |
+| `/admin/reports/:id`          | Review a craft report         | Admin           | FR-12           |
+| `/admin/item-reports`         | Reported lookup items         | Admin           | FR-11, FR-12    |
+| `/admin/item-reports/:id`     | Review an item report         | Admin           | FR-12           |
 | `*`                           | Not found                     | Public          |                 |
 
 Routes are lazy-loaded with `React.lazy`, so the map library and the admin screens are only downloaded when needed.
@@ -168,7 +170,7 @@ Protected routes are wrapped in route guards:
 - `RequireAuth` redirects guests to `/login` and returns them to the original page after login.
 - `RequireAdmin` shows a "not authorized" page to non-admin users.
 
-Map filters and list filters (category, search, page) are kept in the URL query string, so filtered views can be shared and the back button works.
+Map filters and list filters (category, craft type, culture, country, search, page) are kept in the URL query string, so filtered views can be shared and the back button works.
 
 ---
 
@@ -268,7 +270,7 @@ Users must verify their email before publishing. If an unverified user opens `/c
 - **Library:** Leaflet with react-leaflet and OpenStreetMap tiles. Leaflet is free, has no API key, and is enough for pins, zoom, and pan. The OpenStreetMap attribution is shown on the map, as its license requires.
 - **Data:** the map loads lightweight pins from `/crafts/map/` (id, name, category, latitude, longitude). Full craft data is loaded only when a pin is opened.
 - **Clustering:** nearby pins are grouped with Leaflet.markercluster, so the map stays readable and fast as the number of crafts grows (NFR-02).
-- **Filters:** the category filter and search update the URL and refetch the pins.
+- **Filters:** category, craft type (listed for the chosen category, and cleared when it changes), culture, country, and search update the URL and refetch the pins. The country list comes from `/crafts/countries/`, so it only offers countries that have crafts.
 - **Pin details:** clicking a pin opens a preview card (photo, name, craft type, culture, and place) with a link to the craft details page. On mobile the preview opens as a bottom sheet.
 - **Picking a location:** the craft form includes a small map. The author types an address and pins it (the map moves to the found point), or clicks or drags the pin and the address is filled in from the point.
 - **Performance:** the map component is lazy-loaded, and pin data is cached by TanStack Query so returning to the map does not refetch immediately.
@@ -293,6 +295,10 @@ The craft form follows the craft data model:
 - **Media:** photos, video links, and documents (FR-06).
 
 Long forms save a draft in `localStorage`, so an author does not lose their work if the page reloads.
+
+The craft page shows a facts card with the category, craft type, culture (with its homeland), tools, materials, and place. Each one links to the list of crafts that share it.
+
+Items that users added to the lookup lists can be reported from the facts card, with their own reasons (duplicate, inaccurate, inappropriate). Admins review them under "Reported items": the page shows who added the item and how many crafts use it, and offers rename, hide, merge into another item of the same kind (confirmed first, since it moves the crafts and deletes the item), or dismiss.
 
 ---
 
@@ -353,7 +359,7 @@ Long forms save a draft in `localStorage`, so an author does not lose their work
 | ----------- | ---------------------------------------------------------- | ------------------------------ |
 | Unit        | Helpers, Zod schemas, envelope handling                    | Vitest                         |
 | Component   | Components and pages with mocked API responses             | React Testing Library + MSW    |
-| End-to-end  | Key flows against the real backend: register, publish, report, admin hide | Playwright      |
+| End-to-end  | Key flows against the real backend: register, publish, report, admin hide, report and merge an added tool | Playwright      |
 
 The token refresh flow, including the single-flight behavior, has dedicated tests. Route guards and role-based UI (guest, registered user, admin) are tested at the component level.
 
