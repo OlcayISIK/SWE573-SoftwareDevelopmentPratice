@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Craft, CraftMedia, Region
+from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Region, Tool
 
 
 class CraftMediaInline(admin.TabularInline):
@@ -12,11 +12,34 @@ class CraftMediaInline(admin.TabularInline):
         return CraftMedia.all_objects.all()
 
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ["name", "slug"]
+class LookupItemAdmin(admin.ModelAdmin):
+    list_display = ["name", "is_hidden", "created_by", "created_at"]
+    list_filter = ["is_hidden"]
     search_fields = ["name"]
+    raw_id_fields = ["created_by"]
+
+
+@admin.register(Category)
+class CategoryAdmin(LookupItemAdmin):
+    list_display = ["name", "slug", "is_hidden", "created_by", "created_at"]
     prepopulated_fields = {"slug": ["name"]}
+
+
+@admin.register(CraftType)
+class CraftTypeAdmin(LookupItemAdmin):
+    list_display = ["name", "category", "is_hidden", "created_by", "created_at"]
+    list_filter = ["is_hidden", "category"]
+
+
+@admin.register(Tool, Material)
+class LinkedItemAdmin(LookupItemAdmin):
+    filter_horizontal = ["craft_types"]
+
+
+@admin.register(Culture)
+class CultureAdmin(LookupItemAdmin):
+    list_display = ["name", "homeland", "is_hidden", "created_by", "created_at"]
+    search_fields = ["name", "homeland"]
 
 
 @admin.register(Region)

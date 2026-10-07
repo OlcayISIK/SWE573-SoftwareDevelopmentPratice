@@ -4,20 +4,77 @@ from pathlib import Path
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.functions import Lower
 
 from core.models import BaseModel, SoftDeleteModel
 
 
-class Category(BaseModel):
-    name = models.CharField(max_length=60, unique=True)
-    slug = models.SlugField(max_length=60, unique=True)
+class LookupItem(BaseModel):
+    """
+    A value picked from a list on the craft form. Seeded items have no `created_by`; items added
+    by users can be used by everyone right away and reported to admins, who can hide them.
+    """
+
+    name = models.CharField(max_length=80)
+    is_hidden = models.BooleanField(default=False)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
 
     class Meta:
+        abstract = True
         ordering = ["name"]
-        verbose_name_plural = "categories"
 
     def __str__(self):
         return self.name
+
+    @property
+    def user_added(self):
+        return self.created_by_id is not None
+
+
+def _unique_name(model_name, *fields):
+    return models.UniqueConstraint(*fields, Lower("name"), name=f"unique_{model_name}_name_ci")
+
+
+class Category(LookupItem):
+    slug = models.SlugField(max_length=90, unique=True)
+
+    class Meta(LookupItem.Meta):
+        verbose_name_plural = "categories"
+        constraints = [_unique_name("category")]
+
+
+class CraftType(LookupItem):
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="craft_types")
+
+    class Meta(LookupItem.Meta):
+        constraints = [_unique_name("craft_type", "category")]
+
+
+class Tool(LookupItem):
+    craft_types = models.ManyToManyField(CraftType, related_name="tools", blank=True)
+
+    class Meta(LookupItem.Meta):
+        constraints = [_unique_name("tool")]
+
+
+class Material(LookupItem):
+    craft_types = models.ManyToManyField(CraftType, related_name="materials", blank=True)
+
+    class Meta(LookupItem.Meta):
+        constraints = [_unique_name("material")]
+
+
+class Culture(LookupItem):
+    homeland = models.CharField(max_length=120, blank=True)
+
+    class Meta(LookupItem.Meta):
+        constraints = [_unique_name("culture")]
 
 
 class Region(BaseModel):
