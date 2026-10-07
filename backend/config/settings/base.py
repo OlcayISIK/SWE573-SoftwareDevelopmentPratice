@@ -138,6 +138,7 @@ REST_FRAMEWORK = {
         "password_reset": "5/hour",
         "report": "20/hour",
         "lookup_add": "30/hour",
+        "geocode": "30/min",
     },
 }
 
@@ -158,6 +159,13 @@ FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:5173").rstrip("/")
 # Until a real mail provider is configured, new accounts can be verified on registration
 # instead of through an emailed link. Turn this off once email delivery works.
 AUTO_VERIFY_EMAIL = env.bool("AUTO_VERIFY_EMAIL", default=False)
+
+# Address lookup. Nominatim asks every application to identify itself in the user agent.
+GEOCODER_URL = env("GEOCODER_URL", default="https://nominatim.openstreetmap.org").rstrip("/")
+GEOCODER_USER_AGENT = env(
+    "GEOCODER_USER_AGENT",
+    default="IndigenousCrafts/1.0 (+https://github.com/OlcayISIK/SWE573-SoftwareDevelopmentPratice)",
+)
 
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = env("EMAIL_HOST", default="localhost")

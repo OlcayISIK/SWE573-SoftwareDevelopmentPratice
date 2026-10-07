@@ -259,6 +259,8 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 | GET    | `/crafts/`                             | Public          | List crafts (filter by category, craft type, culture, country, search) |
 | GET    | `/crafts/map/`                         | Public          | Lightweight pins for the map (same filters, plus `bbox=west,south,east,north`) |
 | GET    | `/crafts/countries/`                   | Public          | Countries that have crafts, for the country filter |
+| GET    | `/geocode/search/?q=`                  | Registered user | Coordinates, address, city, and country for an address (404 if not found) |
+| GET    | `/geocode/reverse/?lat=&lng=`          | Registered user | Address at a point, for a pin placed on the map (404 if none) |
 | GET    | `/crafts/{id}/`                        | Public          | Craft details                         |
 | POST   | `/crafts/`                             | Registered user | Publish a craft                       |
 | PATCH  | `/crafts/{id}/`                        | Author or admin | Edit a craft                          |
@@ -286,9 +288,18 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 
 The OpenAPI schema is served at `/api/schema/` and Swagger UI at `/api/docs/`.
 
+### Address Lookup
+
+The craft form finds coordinates for an address, and the address for a pin placed on the map, through `/geocode/`. The backend calls OpenStreetMap Nominatim (`crafts.geocoding`) instead of the browser, so its usage policy holds for the whole application and the frontend's Content Security Policy does not need another origin:
+
+- Every request sends an identifying `User-Agent` (`GEOCODER_USER_AGENT`).
+- At most one request per second goes out across all Gunicorn workers: a one-second slot is taken in the shared cache, and a request that cannot get one within 3 seconds returns 503.
+- Results are cached for a day, and "not found" for an hour, so repeated lookups do not reach Nominatim.
+- If Nominatim cannot be reached the endpoints return 503, and the user can still place the pin on the map by hand.
+
 ### Throttling
 
-DRF throttle classes limit request rates. Anonymous and authenticated clients have default rates, and stricter scoped rates apply to the endpoints most open to abuse: registration, login, token refresh, resending the verification email, password reset, reporting a craft, and adding lookup items.
+DRF throttle classes limit request rates. Anonymous and authenticated clients have default rates, and stricter scoped rates apply to the endpoints most open to abuse: registration, login, token refresh, resending the verification email, password reset, reporting a craft, adding lookup items, and address lookups.
 
 Throttle counters are stored in Django's database cache, so the limits hold across Gunicorn workers without adding another service.
 
@@ -448,6 +459,8 @@ JWT_SIGNING_KEY=change-me
 CORS_ALLOWED_ORIGINS=https://example.com
 FRONTEND_URL=https://example.com
 AUTO_VERIFY_EMAIL=false
+GEOCODER_URL=https://nominatim.openstreetmap.org
+GEOCODER_USER_AGENT=IndigenousCrafts/1.0 (+https://example.com)
 EMAIL_HOST=smtp.example.com
 EMAIL_PORT=587
 EMAIL_HOST_USER=change-me

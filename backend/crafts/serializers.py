@@ -400,3 +400,20 @@ class CraftDetailSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = fields
+
+
+class GeocodeSearchSerializer(serializers.Serializer):
+    q = serializers.CharField(min_length=3, max_length=255, help_text="The address to look up.")
+
+
+class GeocodeReverseSerializer(serializers.Serializer):
+    lat = serializers.FloatField(min_value=-90, max_value=90)
+    lng = serializers.FloatField(min_value=-180, max_value=180)
+
+
+class PlaceSerializer(serializers.Serializer):
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+    address = serializers.CharField()
+    city = serializers.CharField(allow_blank=True)
+    country = serializers.CharField(allow_blank=True)
