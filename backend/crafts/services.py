@@ -1,9 +1,10 @@
-from django.db import transaction
+from django.db import IntegrityError, transaction
+from django.utils.text import slugify
 
-from core.exceptions import PermissionDeniedError, ValidationError
+from core.exceptions import ConflictError, PermissionDeniedError, ValidationError
 
 from . import signals
-from .models import Craft, CraftMedia
+from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Tool
 
 MAX_MEDIA_PER_CRAFT = 20
 
@@ -26,6 +27,8 @@ NOT_ALLOWED_TO_EDIT = "Only the author or an admin can change this craft."
 ADMIN_ONLY = "Only admins can perform this action."
 AUTHOR_ONLY = "Only the author can add media to this craft."
 TOO_MANY_MEDIA = f"A craft can have at most {MAX_MEDIA_PER_CRAFT} media items."
+VERIFY_BEFORE_ADDING = "Verify your email address before adding new items."
+REMOVED_BY_ADMIN = "{name} was removed by an admin. Choose another name."
 
 
 def _ensure_can_edit(craft, actor):
@@ -111,3 +114,66 @@ def add_media(*, craft, actor, data):
 def remove_media(*, media, actor):
     _ensure_can_edit(media.craft, actor)
     media.delete()
+
+
+def _add_lookup(model, *, user, name, scope=None, **extra):
+    """
+    Adds a lookup item, or returns the existing one with the same name (ignoring case), so
+    "carpet" and "Carpet" stay one item. Returns the item and whether it was created.
+    """
+    if not user.is_email_verified:
+        raise PermissionDeniedError(VERIFY_BEFORE_ADDING)
+    scope = scope or {}
+    existing = model.objects.filter(name__iexact=name, **scope).first()
+    if existing is None:
+        try:
+            with transaction.atomic():
+                item = model.objects.create(name=name, created_by=user, **scope, **extra)
+            return item, True
+        except IntegrityError:
+            # Someone added the same name at the same moment.
+            existing = model.objects.filter(name__iexact=name, **scope).first()
+            if existing is None:
+                raise
+    if existing.is_hidden:
+        raise ConflictError(REMOVED_BY_ADMIN.format(name=existing.name))
+    return existing, False
+
+
+def _unique_slug(name):
+    base = slugify(name)[:80] or "category"
+    slug, suffix = base, 2
+    while Category.objects.filter(slug=slug).exists():
+        slug, suffix = f"{base}-{suffix}", suffix + 1
+    return slug
+
+
+def add_category(*, user, name):
+    if Category.objects.filter(name__iexact=name).exists():
+        return _add_lookup(Category, user=user, name=name)
+    return _add_lookup(Category, user=user, name=name, slug=_unique_slug(name))
+
+
+def add_craft_type(*, user, name, category):
+    return _add_lookup(CraftType, user=user, name=name, scope={"category": category})
+
+
+def _add_linked(model, *, user, name, craft_type=None):
+    item, created = _add_lookup(model, user=user, name=name)
+    if craft_type is not None:
+        # The user picked it for this craft type, so suggest it there from now on.
+        item.craft_types.add(craft_type)
+    item.typical = craft_type is not None
+    return item, created
+
+
+def add_tool(*, user, name, craft_type=None):
+    return _add_linked(Tool, user=user, name=name, craft_type=craft_type)
+
+
+def add_material(*, user, name, craft_type=None):
+    return _add_linked(Material, user=user, name=name, craft_type=craft_type)
+
+
+def add_culture(*, user, name, homeland=""):
+    return _add_lookup(Culture, user=user, name=name, homeland=homeland)

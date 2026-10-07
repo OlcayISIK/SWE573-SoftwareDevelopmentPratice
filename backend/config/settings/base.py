@@ -137,6 +137,7 @@ REST_FRAMEWORK = {
         "token_refresh": "30/min",
         "password_reset": "5/hour",
         "report": "20/hour",
+        "lookup_add": "30/hour",
     },
 }
 

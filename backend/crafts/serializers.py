@@ -8,16 +8,91 @@ from rest_framework import serializers
 
 from core.validators import MB, validate_image_upload
 
-from .models import Category, Craft, CraftMedia, Region
+from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Region, Tool
 
 PHOTO_MAX_BYTES = 5 * MB
 DOCUMENT_MAX_BYTES = 10 * MB
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    user_added = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = Category
-        fields = ["id", "name", "slug"]
+        fields = ["id", "name", "slug", "user_added"]
+
+
+class CraftTypeSerializer(serializers.ModelSerializer):
+    user_added = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = CraftType
+        fields = ["id", "name", "category", "user_added"]
+
+
+class LinkedItemSerializer(serializers.ModelSerializer):
+    typical = serializers.SerializerMethodField(
+        help_text="Typical for the craft type given in the request."
+    )
+    user_added = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        fields = ["id", "name", "typical", "user_added"]
+
+    def get_typical(self, item) -> bool:
+        return getattr(item, "typical", False)
+
+
+class ToolSerializer(LinkedItemSerializer):
+    class Meta(LinkedItemSerializer.Meta):
+        model = Tool
+
+
+class MaterialSerializer(LinkedItemSerializer):
+    class Meta(LinkedItemSerializer.Meta):
+        model = Material
+
+
+class CultureSerializer(serializers.ModelSerializer):
+    user_added = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Culture
+        fields = ["id", "name", "homeland", "user_added"]
+
+
+class AddItemSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=80)
+
+    def validate_name(self, value):
+        name = " ".join(value.split())
+        if len(name) < 2 or not any(char.isalpha() for char in name):
+            raise serializers.ValidationError("Enter a name of at least 2 characters.")
+        return name[0].upper() + name[1:]
+
+
+class AddCraftTypeSerializer(AddItemSerializer):
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.filter(is_hidden=False))
+
+
+class AddLinkedItemSerializer(AddItemSerializer):
+    craft_type = serializers.PrimaryKeyRelatedField(
+        queryset=CraftType.objects.filter(is_hidden=False),
+        required=False,
+        help_text="Craft type the item is typical for.",
+    )
+
+
+class AddCultureSerializer(AddItemSerializer):
+    homeland = serializers.CharField(max_length=120, required=False, allow_blank=True)
+
+
+class CraftTypeFilterSerializer(serializers.Serializer):
+    category = serializers.IntegerField(required=False, min_value=1)
+
+
+class LinkedItemFilterSerializer(serializers.Serializer):
+    craft_type = serializers.IntegerField(required=False, min_value=1)
 
 
 class RegionSerializer(serializers.ModelSerializer):

@@ -1,8 +1,8 @@
-from django.db.models import Prefetch, Q
+from django.db.models import Exists, OuterRef, Prefetch, Q, Value
 
 from core.exceptions import NotFoundError
 
-from .models import Category, Craft, CraftMedia, Region
+from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Region, Tool
 
 CRAFT_NOT_FOUND = "Craft not found."
 MEDIA_NOT_FOUND = "Media not found."
@@ -14,7 +14,37 @@ def _with_photos(crafts):
 
 
 def list_categories():
-    return Category.objects.all()
+    return Category.objects.filter(is_hidden=False)
+
+
+def list_craft_types(*, category=None):
+    craft_types = CraftType.objects.filter(is_hidden=False, category__is_hidden=False)
+    if category is not None:
+        craft_types = craft_types.filter(category_id=category)
+    return craft_types
+
+
+def _typical_first(model, craft_type):
+    """Visible items, with the ones linked to `craft_type` marked `typical` and listed first."""
+    items = model.objects.filter(is_hidden=False)
+    if craft_type is None:
+        return items.annotate(typical=Value(False))
+    links = model.craft_types.through.objects.filter(
+        **{f"{model._meta.model_name}_id": OuterRef("pk")}, crafttype_id=craft_type
+    )
+    return items.annotate(typical=Exists(links)).order_by("-typical", "name")
+
+
+def list_tools(*, craft_type=None):
+    return _typical_first(Tool, craft_type)
+
+
+def list_materials(*, craft_type=None):
+    return _typical_first(Material, craft_type)
+
+
+def list_cultures():
+    return Culture.objects.filter(is_hidden=False)
 
 
 def list_regions(*, country=None):
