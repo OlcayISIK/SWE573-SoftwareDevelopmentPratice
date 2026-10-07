@@ -2,8 +2,9 @@ import type { RouteObject } from "react-router";
 
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
-import { RequireAuth } from "@/features/auth/components/RouteGuards";
+import { RequireAdmin, RequireAuth } from "@/features/auth/components/RouteGuards";
 
+import { AdminLayout } from "./layouts/AdminLayout";
 import { MainLayout } from "./layouts/MainLayout";
 
 export const routes: RouteObject[] = [
@@ -77,6 +78,31 @@ export const routes: RouteObject[] = [
                   import("@/features/crafts/pages/EditCraftPage").then((m) => ({
                     Component: m.EditCraftPage,
                   })),
+              },
+            ],
+          },
+          {
+            path: "admin",
+            element: <RequireAdmin />,
+            children: [
+              {
+                element: <AdminLayout />,
+                children: [
+                  {
+                    path: "reports",
+                    lazy: () =>
+                      import("@/features/moderation/pages/ReviewQueuePage").then((m) => ({
+                        Component: m.ReviewQueuePage,
+                      })),
+                  },
+                  {
+                    path: "reports/:id",
+                    lazy: () =>
+                      import("@/features/moderation/pages/ReviewReportPage").then((m) => ({
+                        Component: m.ReviewReportPage,
+                      })),
+                  },
+                ],
               },
             ],
           },

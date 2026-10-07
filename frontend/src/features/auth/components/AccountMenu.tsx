@@ -31,6 +31,14 @@ export function AccountMenu() {
 
   return (
     <>
+      {auth.user.role === "admin" && (
+        <Link
+          to="/admin/reports"
+          className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
+        >
+          Review reports
+        </Link>
+      )}
       <Link
         to="/me/favorites"
         className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
