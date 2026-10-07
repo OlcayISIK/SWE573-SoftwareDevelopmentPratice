@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { craftsApi, type NewMedia } from "./api";
+import { craftsApi, lookupsApi, type NewMedia } from "./api";
 import type { CraftFilters } from "./types";
 
 export const craftKeys = {
@@ -11,7 +11,14 @@ export const craftKeys = {
   detail: (id: number) => [...craftKeys.all, "detail", id] as const,
   byUser: (userId: number, page: number) => [...craftKeys.all, "user", userId, page] as const,
   categories: ["reference", "categories"] as const,
-  regions: ["reference", "regions"] as const,
+};
+
+export const lookupKeys = {
+  all: ["reference"] as const,
+  craftTypes: (category: number) => ["reference", "craft-types", category] as const,
+  tools: (craftType: number | null) => ["reference", "tools", craftType] as const,
+  materials: (craftType: number | null) => ["reference", "materials", craftType] as const,
+  cultures: ["reference", "cultures"] as const,
 };
 
 export function useCraftList(filters: CraftFilters) {
@@ -92,6 +99,47 @@ export function useCategories() {
   });
 }
 
-export function useRegions() {
-  return useQuery({ queryKey: craftKeys.regions, queryFn: craftsApi.regions, staleTime: Infinity });
+export function useCraftTypes(category: number | null) {
+  return useQuery({
+    queryKey: lookupKeys.craftTypes(category ?? 0),
+    queryFn: () => lookupsApi.craftTypes(category as number),
+    enabled: category !== null,
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useTools(craftType: number | null) {
+  return useQuery({
+    queryKey: lookupKeys.tools(craftType),
+    queryFn: () => lookupsApi.tools(craftType ?? undefined),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useMaterials(craftType: number | null) {
+  return useQuery({
+    queryKey: lookupKeys.materials(craftType),
+    queryFn: () => lookupsApi.materials(craftType ?? undefined),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useCultures() {
+  return useQuery({
+    queryKey: lookupKeys.cultures,
+    queryFn: lookupsApi.cultures,
+    staleTime: 5 * 60_000,
+  });
+}
+
+/**
+ * Adds an item to a lookup list. The lists are refreshed so the new item can be picked at once,
+ * by everyone on this page and later visitors.
+ */
+export function useAddLookup<Args extends unknown[], Item>(add: (...args: Args) => Promise<Item>) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (args: Args) => add(...args),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: lookupKeys.all }),
+  });
 }

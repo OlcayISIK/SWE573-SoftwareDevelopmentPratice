@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/api/v1/{items}/{item_id}/report/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Reports a category, craft type, tool, material, or culture added by another user. */
+        post: operations["v1_report_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/logout/": {
         parameters: {
             query?: never;
@@ -147,9 +164,41 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * @description A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+         *     adding a name that already exists returns the existing item with 200 instead of 201.
+         */
         get: operations["v1_categories_list"];
         put?: never;
-        post?: never;
+        /**
+         * @description A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+         *     adding a name that already exists returns the existing item with 200 instead of 201.
+         */
+        post: operations["v1_categories_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/craft-types/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+         *     adding a name that already exists returns the existing item with 200 instead of 201.
+         */
+        get: operations["v1_craft_types_list"];
+        put?: never;
+        /**
+         * @description A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+         *     adding a name that already exists returns the existing item with 200 instead of 201.
+         */
+        post: operations["v1_craft_types_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -252,6 +301,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/crafts/countries/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Countries that have crafts, for the country filter. */
+        get: operations["v1_crafts_countries_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/crafts/map/": {
         parameters: {
             query?: never;
@@ -262,6 +328,88 @@ export interface paths {
         get: operations["v1_crafts_map_list"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cultures/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+         *     adding a name that already exists returns the existing item with 200 instead of 201.
+         */
+        get: operations["v1_cultures_list"];
+        put?: never;
+        /**
+         * @description A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+         *     adding a name that already exists returns the existing item with 200 instead of 201.
+         */
+        post: operations["v1_cultures_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/geocode/reverse/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Finds the address at a point. Returns 404 when there is none, for example at sea. */
+        get: operations["v1_geocode_reverse_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/geocode/search/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Finds the coordinates of an address. Returns 404 when nothing matches. */
+        get: operations["v1_geocode_search_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/materials/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+         *     adding a name that already exists returns the existing item with 200 instead of 201.
+         */
+        get: operations["v1_materials_list"];
+        put?: never;
+        /**
+         * @description A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+         *     adding a name that already exists returns the existing item with 200 instead of 201.
+         */
+        post: operations["v1_materials_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -380,6 +528,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/moderation/item-reports/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_moderation_item_reports_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/moderation/item-reports/{report_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_moderation_item_reports_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/moderation/item-reports/{report_id}/actions/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Renames, hides, or merges the reported item, or dismisses the report. */
+        post: operations["v1_moderation_item_reports_actions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/moderation/reports/": {
         parameters: {
             query?: never;
@@ -428,16 +625,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/regions/": {
+    "/api/v1/tools/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["v1_regions_list"];
+        /**
+         * @description A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+         *     adding a name that already exists returns the existing item with 200 instead of 201.
+         */
+        get: operations["v1_tools_list"];
         put?: never;
-        post?: never;
+        /**
+         * @description A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+         *     adding a name that already exists returns the existing item with 200 instead of 201.
+         */
+        post: operations["v1_tools_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -510,6 +715,22 @@ export interface components {
          * @enum {string}
          */
         ActionEnum: "edit" | "hide" | "remove" | "dismiss";
+        AddCraftTypeRequest: {
+            name: string;
+            category: number;
+        };
+        AddCultureRequest: {
+            name: string;
+            homeland?: string;
+        };
+        AddItemRequest: {
+            name: string;
+        };
+        AddLinkedItemRequest: {
+            name: string;
+            /** @description Craft type the item is typical for. */
+            craft_type?: number;
+        };
         Author: {
             readonly id: number;
             readonly display_name: string;
@@ -518,6 +739,7 @@ export interface components {
             readonly id: number;
             name: string;
             slug: string;
+            readonly user_added: boolean;
         };
         CoverPhoto: {
             url: string;
@@ -525,28 +747,29 @@ export interface components {
         };
         /** @description Rejects keys that are not declared, so stored JSON stays predictable. */
         CraftAttributesRequest: {
-            dimensions_cm?: components["schemas"]["DimensionsRequest"];
+            dimensions?: components["schemas"]["DimensionRequest"][];
             /** Format: double */
             weight_g?: number;
             colors?: string[];
-            materials?: string[];
             distinguishing_features?: string;
         };
         CraftDetail: {
             readonly id: number;
             readonly name: string;
-            readonly craft_type: string;
             readonly category: components["schemas"]["Category"];
-            readonly region: components["schemas"]["Region"];
+            readonly craft_type: components["schemas"]["NamedItem"];
+            readonly tools: components["schemas"]["NamedItem"][];
+            readonly materials: components["schemas"]["NamedItem"][];
+            readonly culture: components["schemas"]["Culture"] | null;
+            readonly address: string;
+            readonly city: string;
+            readonly country: string;
             /** Format: double */
             readonly latitude: number;
             /** Format: double */
             readonly longitude: number;
             readonly media: components["schemas"]["Media"][];
             readonly description: string;
-            readonly production_process: string;
-            readonly how_to_understand: string;
-            readonly cultural_relevance: string;
             readonly attributes: unknown;
             readonly status: components["schemas"]["CraftStatusEnum"];
             readonly author: components["schemas"]["Author"];
@@ -558,9 +781,11 @@ export interface components {
         CraftList: {
             readonly id: number;
             readonly name: string;
-            readonly craft_type: string;
             readonly category: components["schemas"]["Category"];
-            readonly region: components["schemas"]["Region"];
+            readonly craft_type: components["schemas"]["NamedItem"];
+            readonly culture: components["schemas"]["Culture"] | null;
+            readonly city: string;
+            readonly country: string;
             /** Format: double */
             readonly latitude: number;
             /** Format: double */
@@ -586,37 +811,55 @@ export interface components {
          * @enum {string}
          */
         CraftStatusEnum: "published" | "hidden";
+        CraftType: {
+            readonly id: number;
+            name: string;
+            category: number;
+            readonly user_added: boolean;
+        };
         CraftWriteRequest: {
             name: string;
-            craft_type: string;
             category: number;
-            region: number;
+            craft_type: number;
+            tools?: number[];
+            materials?: number[];
+            culture: number;
+            address: string;
+            city?: string;
+            country?: string;
             /** Format: double */
             latitude: number;
             /** Format: double */
             longitude: number;
             description: string;
-            production_process: string;
-            how_to_understand: string;
-            cultural_relevance: string;
             attributes?: components["schemas"]["CraftAttributesRequest"];
+        };
+        Culture: {
+            readonly id: number;
+            name: string;
+            homeland?: string;
+            readonly user_added: boolean;
         };
         Detail: {
             detail: string;
         };
         /** @description Rejects keys that are not declared, so stored JSON stays predictable. */
-        DimensionsRequest: {
+        DimensionRequest: {
+            type: components["schemas"]["DimensionTypeEnum"];
             /** Format: double */
-            height?: number;
-            /** Format: double */
-            width?: number;
-            /** Format: double */
-            depth?: number;
-            /** Format: double */
-            length?: number;
-            /** Format: double */
-            diameter?: number;
+            value: number;
+            unit: components["schemas"]["UnitEnum"];
         };
+        /**
+         * @description * `height` - height
+         *     * `width` - width
+         *     * `depth` - depth
+         *     * `length` - length
+         *     * `diameter` - diameter
+         *     * `thickness` - thickness
+         * @enum {string}
+         */
+        DimensionTypeEnum: "height" | "width" | "depth" | "length" | "diameter" | "thickness";
         EmailRequest: {
             /** Format: email */
             email: string;
@@ -640,6 +883,78 @@ export interface components {
             /** Format: date-time */
             readonly since: string;
         };
+        ItemReport: {
+            readonly id: number;
+            readonly item_type: components["schemas"]["ItemTypeEnum"];
+            readonly item_id: number;
+            readonly item_name: string;
+            readonly reason: components["schemas"]["ItemReportReasonEnum"];
+            readonly note: string;
+            readonly status: components["schemas"]["ReportStatusEnum"];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        ItemReportCreateRequest: {
+            reason: components["schemas"]["ItemReportReasonEnum"];
+            note?: string;
+        };
+        /**
+         * @description * `duplicate` - Duplicate
+         *     * `inaccurate` - Inaccurate
+         *     * `inappropriate` - Inappropriate
+         * @enum {string}
+         */
+        ItemReportReasonEnum: "duplicate" | "inaccurate" | "inappropriate";
+        ItemReportReview: {
+            readonly id: number;
+            readonly item_type: components["schemas"]["ItemTypeEnum"];
+            readonly item_id: number;
+            readonly item_name: string;
+            /** @description The reported item as it is now, or null if it was merged away. */
+            readonly item: components["schemas"]["ReportedItem"] | null;
+            readonly reporter: components["schemas"]["Person"];
+            readonly reason: components["schemas"]["ItemReportReasonEnum"];
+            readonly note: string;
+            /** @default open */
+            readonly status: components["schemas"]["ReportStatusEnum"];
+            /** Format: date-time */
+            readonly created_at: string;
+            readonly actions: components["schemas"]["ItemReviewAction"][];
+        };
+        ItemReviewAction: {
+            readonly id: number;
+            readonly action: components["schemas"]["ItemReviewActionEnum"];
+            readonly reason: string;
+            readonly details: unknown;
+            readonly admin: components["schemas"]["Person"];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        ItemReviewActionCreateRequest: {
+            action: components["schemas"]["ItemReviewActionEnum"];
+            reason: string;
+            /** @description The new name. Required to rename. */
+            name?: string;
+            /** @description Id of the item of the same kind to merge into. Required to merge. */
+            merge_into?: number;
+        };
+        /**
+         * @description * `rename` - Rename
+         *     * `hide` - Hide
+         *     * `merge` - Merge
+         *     * `dismiss` - Dismiss
+         * @enum {string}
+         */
+        ItemReviewActionEnum: "rename" | "hide" | "merge" | "dismiss";
+        /**
+         * @description * `category` - Category
+         *     * `craft_type` - Craft type
+         *     * `tool` - Tool
+         *     * `material` - Material
+         *     * `culture` - Culture
+         * @enum {string}
+         */
+        ItemTypeEnum: "category" | "craft_type" | "tool" | "material" | "culture";
         LoginRequest: {
             email: string;
             password: string;
@@ -650,6 +965,13 @@ export interface components {
         };
         MarkReadResult: {
             updated: number;
+        };
+        Material: {
+            readonly id: number;
+            name: string;
+            /** @description Typical for the craft type given in the request. */
+            readonly typical: boolean;
+            readonly user_added: boolean;
         };
         Media: {
             readonly id: number;
@@ -678,9 +1000,15 @@ export interface components {
             alt_text?: string;
             order?: number;
         };
+        /** @description A lookup item as shown on a craft. */
+        NamedItem: {
+            readonly id: number;
+            readonly name: string;
+            readonly user_added: boolean;
+        };
         Notification: {
             readonly id: number;
-            readonly type: components["schemas"]["TypeEnum"];
+            readonly type: components["schemas"]["NotificationTypeEnum"];
             readonly is_read: boolean;
             readonly actor: components["schemas"]["NotificationActor"] | null;
             readonly craft: components["schemas"]["NotificationCraft"] | null;
@@ -696,6 +1024,13 @@ export interface components {
             id: number;
             name: string;
         };
+        /**
+         * @description * `new_craft_from_followed` - New craft from someone you follow
+         *     * `favorite_updated` - A favorited craft was updated
+         *     * `report_resolved` - Your report was reviewed
+         * @enum {string}
+         */
+        NotificationTypeEnum: "new_craft_from_followed" | "favorite_updated" | "report_resolved";
         OwnProfile: {
             readonly id: number;
             /** Format: email */
@@ -733,6 +1068,13 @@ export interface components {
             pageSize: number;
             totalPages: number;
         };
+        PaginatedItemReportReviewList: {
+            items: components["schemas"]["ItemReportReview"][];
+            total: number;
+            page: number;
+            pageSize: number;
+            totalPages: number;
+        };
         PaginatedNotificationList: {
             items: components["schemas"]["Notification"][];
             total: number;
@@ -754,17 +1096,19 @@ export interface components {
         };
         PatchedCraftWriteRequest: {
             name?: string;
-            craft_type?: string;
             category?: number;
-            region?: number;
+            craft_type?: number;
+            tools?: number[];
+            materials?: number[];
+            culture?: number;
+            address?: string;
+            city?: string;
+            country?: string;
             /** Format: double */
             latitude?: number;
             /** Format: double */
             longitude?: number;
             description?: string;
-            production_process?: string;
-            how_to_understand?: string;
-            cultural_relevance?: string;
             attributes?: components["schemas"]["CraftAttributesRequest"];
         };
         PatchedProfileUpdateRequest: {
@@ -788,6 +1132,15 @@ export interface components {
             readonly city: string;
             readonly country: string;
         };
+        Place: {
+            /** Format: double */
+            latitude: number;
+            /** Format: double */
+            longitude: number;
+            address: string;
+            city: string;
+            country: string;
+        };
         PublicProfile: {
             readonly id: number;
             readonly display_name: string;
@@ -809,12 +1162,6 @@ export interface components {
         ReasonEnum: "inaccurate" | "inappropriate" | "disrespectful";
         RefreshTokenRequest: {
             refresh: string;
-        };
-        Region: {
-            readonly id: number;
-            name: string;
-            country: string;
-            description?: string;
         };
         RegisterRequest: {
             /** Format: email */
@@ -861,6 +1208,13 @@ export interface components {
             readonly is_deleted: boolean;
             readonly author: components["schemas"]["Person"];
         };
+        ReportedItem: {
+            readonly id: number;
+            readonly name: string;
+            readonly is_hidden: boolean;
+            readonly added_by: components["schemas"]["Person"] | null;
+            readonly crafts_count: number;
+        };
         ReviewAction: {
             readonly id: number;
             readonly action: components["schemas"]["ActionEnum"];
@@ -890,13 +1244,20 @@ export interface components {
         TokenRefreshRequest: {
             refresh: string;
         };
+        Tool: {
+            readonly id: number;
+            name: string;
+            /** @description Typical for the craft type given in the request. */
+            readonly typical: boolean;
+            readonly user_added: boolean;
+        };
         /**
-         * @description * `new_craft_from_followed` - New craft from someone you follow
-         *     * `favorite_updated` - A favorited craft was updated
-         *     * `report_resolved` - Your report was reviewed
+         * @description * `mm` - mm
+         *     * `cm` - cm
+         *     * `m` - m
          * @enum {string}
          */
-        TypeEnum: "new_craft_from_followed" | "favorite_updated" | "report_resolved";
+        UnitEnum: "mm" | "cm" | "m";
         UnreadCount: {
             count: number;
         };
@@ -913,6 +1274,38 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    v1_report_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                items: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemReportCreateRequest"];
+                "multipart/form-data": components["schemas"]["ItemReportCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ItemReportCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["ItemReport"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
     v1_auth_logout_create: {
         parameters: {
             query?: never;
@@ -1158,19 +1551,129 @@ export interface operations {
             };
         };
     };
+    v1_categories_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddItemRequest"];
+                "multipart/form-data": components["schemas"]["AddItemRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AddItemRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Category"];
+                        message: string;
+                    };
+                };
+            };
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Category"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_craft_types_list: {
+        parameters: {
+            query?: {
+                /** @description Category id */
+                category?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["CraftType"][];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_craft_types_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddCraftTypeRequest"];
+                "multipart/form-data": components["schemas"]["AddCraftTypeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AddCraftTypeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["CraftType"];
+                        message: string;
+                    };
+                };
+            };
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["CraftType"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
     v1_crafts_list: {
         parameters: {
             query?: {
                 /** @description Category slug */
                 category?: string;
-                /** @description Country of the region */
+                /** @description Country of the craft */
                 country?: string;
+                /** @description Craft type id */
+                craft_type?: number;
+                /** @description Culture id */
+                culture?: number;
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
                 pageSize?: number;
-                /** @description Region id */
-                region?: number;
                 /** @description Text search */
                 search?: string;
             };
@@ -1462,6 +1965,29 @@ export interface operations {
             };
         };
     };
+    v1_crafts_countries_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: string[];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
     v1_crafts_map_list: {
         parameters: {
             query?: {
@@ -1469,10 +1995,12 @@ export interface operations {
                 bbox?: string;
                 /** @description Category slug */
                 category?: string;
-                /** @description Country of the region */
+                /** @description Country of the craft */
                 country?: string;
-                /** @description Region id */
-                region?: number;
+                /** @description Craft type id */
+                craft_type?: number;
+                /** @description Culture id */
+                culture?: number;
                 /** @description Text search */
                 search?: string;
             };
@@ -1490,6 +2018,189 @@ export interface operations {
                     "application/json": {
                         success: boolean;
                         data: components["schemas"]["CraftPin"][];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_cultures_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Culture"][];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_cultures_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddCultureRequest"];
+                "multipart/form-data": components["schemas"]["AddCultureRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AddCultureRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Culture"];
+                        message: string;
+                    };
+                };
+            };
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Culture"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_geocode_reverse_retrieve: {
+        parameters: {
+            query: {
+                lat: number;
+                lng: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Place"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_geocode_search_retrieve: {
+        parameters: {
+            query: {
+                /** @description The address to look up. */
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Place"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_materials_list: {
+        parameters: {
+            query?: {
+                /** @description List the items typical for this craft type first */
+                craft_type?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Material"][];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_materials_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddLinkedItemRequest"];
+                "multipart/form-data": components["schemas"]["AddLinkedItemRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AddLinkedItemRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Material"];
+                        message: string;
+                    };
+                };
+            };
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Material"];
                         message: string;
                     };
                 };
@@ -1714,6 +2425,92 @@ export interface operations {
             };
         };
     };
+    v1_moderation_item_reports_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                pageSize?: number;
+                /** @description Defaults to open */
+                status?: "all" | "dismissed" | "open" | "resolved";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["PaginatedItemReportReviewList"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_moderation_item_reports_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["ItemReportReview"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_moderation_item_reports_actions_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemReviewActionCreateRequest"];
+                "multipart/form-data": components["schemas"]["ItemReviewActionCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ItemReviewActionCreateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["ItemReportReview"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
     v1_moderation_reports_list: {
         parameters: {
             query?: {
@@ -1800,11 +2597,11 @@ export interface operations {
             };
         };
     };
-    v1_regions_list: {
+    v1_tools_list: {
         parameters: {
             query?: {
-                /** @description Filter by country */
-                country?: string;
+                /** @description List the items typical for this craft type first */
+                craft_type?: number;
             };
             header?: never;
             path?: never;
@@ -1819,7 +2616,48 @@ export interface operations {
                 content: {
                     "application/json": {
                         success: boolean;
-                        data: components["schemas"]["Region"][];
+                        data: components["schemas"]["Tool"][];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_tools_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddLinkedItemRequest"];
+                "multipart/form-data": components["schemas"]["AddLinkedItemRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AddLinkedItemRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Tool"];
+                        message: string;
+                    };
+                };
+            };
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Tool"];
                         message: string;
                     };
                 };
@@ -1856,14 +2694,16 @@ export interface operations {
             query?: {
                 /** @description Category slug */
                 category?: string;
-                /** @description Country of the region */
+                /** @description Country of the craft */
                 country?: string;
+                /** @description Craft type id */
+                craft_type?: number;
+                /** @description Culture id */
+                culture?: number;
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
                 pageSize?: number;
-                /** @description Region id */
-                region?: number;
                 /** @description Text search */
                 search?: string;
             };
