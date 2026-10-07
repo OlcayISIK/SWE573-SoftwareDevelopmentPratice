@@ -1,10 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-import { latestEmailLink, PASSWORD, PNG_BYTES, uniqueEmail } from "./support";
+import { PASSWORD, PNG_BYTES, uniqueEmail } from "./support";
 
-test("a new user registers, verifies their email, logs in, and publishes a craft", async ({
-  page,
-}) => {
+test("a new user registers, is signed in, and publishes a craft", async ({ page }) => {
   const email = uniqueEmail("author");
   const craftName = `Kütahya Çinisi ${Date.now()}`;
 
@@ -14,16 +12,7 @@ test("a new user registers, verifies their email, logs in, and publishes a craft
   await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByLabel("Confirm password").fill(PASSWORD);
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page.getByRole("heading", { name: "Check your email" })).toBeVisible();
-
-  const link = latestEmailLink(email, "verify-email");
-  await page.goto(`${link.pathname}${link.search}`);
-  await expect(page.getByRole("heading", { name: "Email verified" })).toBeVisible();
-
-  await page.getByRole("main").getByRole("link", { name: "Log in" }).click();
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill(PASSWORD);
-  await page.getByRole("button", { name: "Log in" }).click();
+  // Docker Compose runs with AUTO_VERIFY_EMAIL, so the new account is verified and signed in.
   await expect(page.getByRole("link", { name: "E2E Author" })).toBeVisible();
 
   await page.getByRole("link", { name: "Add a craft" }).click();

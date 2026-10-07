@@ -32,22 +32,6 @@ export function createUser(email: string, { admin = false, name = "E2E User" } =
   );
 }
 
-/** Finds the newest link of the given kind in emails printed by the backend's console backend. */
-export function latestEmailLink(email: string, path: "verify-email" | "password-reset") {
-  const logs = compose("logs", "--no-log-prefix", "backend");
-  const start = logs.lastIndexOf(`To: ${email}`);
-  if (start === -1) {
-    throw new Error(`No email to ${email} in the backend logs.`);
-  }
-  const match = logs
-    .slice(start)
-    .match(new RegExp(`https?://\\S+/${path}\\?uid=[\\w-]+&token=[\\w-]+`));
-  if (!match) {
-    throw new Error(`No ${path} link in the email to ${email}.`);
-  }
-  return new URL(match[0]);
-}
-
 async function apiPost<T>(path: string, body: unknown, token?: string): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
     method: "POST",
