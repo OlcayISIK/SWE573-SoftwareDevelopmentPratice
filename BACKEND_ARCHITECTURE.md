@@ -187,6 +187,7 @@ All models inherit `core.BaseModel`, which adds `id`, `created_at`, and `updated
 - **Craft**: `name`, `category` (FK), `craft_type` (FK, must belong to the category), `tools` and `materials` (many-to-many, optional), `culture` (FK, required for new crafts), `address`, `city`, `country`, `latitude`, `longitude`, `description` (one text covering what it is, how it is made, how to understand it, and its cultural relevance), `attributes` (`JSONField`), `status` (`published` or `hidden`), `author` (FK User).
   - Hidden lookup items cannot be chosen for a craft, but crafts that already use them keep showing them.
   - Crafts added before these fields existed were converted by a migration: the craft type text was matched to a craft type in the same category (or added as one), the region became the address and country and set the culture, the four texts were joined into `description` under their old labels, and the material names became material entries.
+- **CraftColor**: `craft` (FK), `value` (`#rrggbb`, or `#rrggbbaa` when see-through), `order`, and the color's CIELAB values (`lab_l`, `lab_a`, `lab_b`). The API reads and writes a craft's colors as a list of these values, e.g. `["#1e40af", "#40e0d080"]`. A craft has up to 10 colors, each listed once. The frontend accepts hex, `rgb()`, `hsl()`, and CSS color names and sends the hex form, which the backend checks.
 - **CraftMedia**: `craft` (FK), `media_type` (`photo`, `video`, `document`), `file` or `url`, `caption`, `alt_text`, `order`.
 
 `attributes` stores craft-specific properties that vary between crafts, for example:
@@ -198,7 +199,6 @@ All models inherit `core.BaseModel`, which adds `id`, `created_at`, and `updated
     { "type": "width", "value": 20, "unit": "cm" }
   ],
   "weight_g": 450,
-  "colors": ["cobalt blue", "turquoise"],
   "distinguishing_features": "Hand-painted floral motifs under a transparent glaze"
 }
 ```
@@ -258,7 +258,7 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 | POST   | `/auth/logout/`                        | Guest           | Blacklist the refresh token           |
 | POST   | `/auth/password-reset/`                | Guest           | Request a password reset email        |
 | POST   | `/auth/password-reset/confirm/`        | Guest           | Set a new password with the token     |
-| GET    | `/crafts/`                             | Public          | List crafts (filter by category, craft type, culture, country, search) |
+| GET    | `/crafts/`                             | Public          | List crafts (filter by category, craft type, culture, country, similar color, search) |
 | GET    | `/crafts/map/`                         | Public          | Lightweight pins for the map (same filters, plus `bbox=west,south,east,north`) |
 | GET    | `/crafts/countries/`                   | Public          | Countries that have crafts, for the country filter |
 | GET    | `/geocode/search/?q=`                  | Registered user | Coordinates, address, city, and country for an address (404 if not found) |
@@ -293,6 +293,10 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 | POST   | `/me/notifications/read/`              | Registered user | Mark notifications as read (given `ids`, or all) |
 
 The OpenAPI schema is served at `/api/schema/` and Swagger UI at `/api/docs/`.
+
+### Similar Colors
+
+`/crafts/` and `/crafts/map/` accept `color=rrggbb`. A craft matches when one of its colors is within a CIE76 distance of 20 of the given color in the CIELAB color space, where distance follows how different colors look: two shades of royal blue are about 15 apart, while blue and purple are about 37. The CIELAB values are computed when a craft's colors are saved, so the filter is one `EXISTS` query over `CraftColor` without converting colors at query time. Transparency is ignored when comparing.
 
 ### Address Lookup
 

@@ -27,7 +27,7 @@ def craft_payload(**overrides):
     payload = {}
     for field, value in craft_data(**overrides).items():
         if isinstance(value, list):
-            payload[field] = [item.pk for item in value]
+            payload[field] = [getattr(item, "pk", item) for item in value]
         elif hasattr(value, "pk"):
             payload[field] = value.pk
         else:

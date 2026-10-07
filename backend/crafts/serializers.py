@@ -8,12 +8,14 @@ from rest_framework import serializers
 
 from core.validators import MB, validate_image_upload
 
+from .colors import HEX_COLOR, SEARCH_COLOR
 from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Tool
 
 PHOTO_MAX_BYTES = 5 * MB
 DOCUMENT_MAX_BYTES = 10 * MB
 MAX_TOOLS = 20
 MAX_MATERIALS = 20
+MAX_COLORS = 10
 DIMENSION_TYPES = ["height", "width", "depth", "length", "diameter", "thickness"]
 DIMENSION_UNITS = ["mm", "cm", "m"]
 
@@ -134,9 +136,6 @@ class DimensionSerializer(StrictSerializer):
 class CraftAttributesSerializer(StrictSerializer):
     dimensions = DimensionSerializer(many=True, required=False, max_length=len(DIMENSION_TYPES))
     weight_g = serializers.FloatField(min_value=0.01, required=False)
-    colors = serializers.ListField(
-        child=serializers.CharField(max_length=40), max_length=10, required=False
-    )
     distinguishing_features = serializers.CharField(
         max_length=1000, required=False, allow_blank=True
     )
@@ -170,6 +169,19 @@ class CoordinateField(serializers.FloatField):
         return float(value)
 
 
+class ColorField(serializers.CharField):
+    """A color as "#rrggbb", or "#rrggbbaa" when see-through."""
+
+    def __init__(self, **kwargs):
+        super().__init__(max_length=9, **kwargs)
+
+    def to_internal_value(self, data):
+        value = super().to_internal_value(data).strip().lower()
+        if not HEX_COLOR.match(value):
+            raise serializers.ValidationError('Use a hex color such as "#1e40af".')
+        return value
+
+
 def _visible(model):
     return model.objects.filter(is_hidden=False)
 
@@ -183,6 +195,12 @@ class CraftWriteSerializer(serializers.ModelSerializer):
     )
     culture = serializers.PrimaryKeyRelatedField(queryset=_visible(Culture))
     address = serializers.CharField(max_length=255)
+    colors = serializers.ListField(
+        child=ColorField(),
+        required=False,
+        max_length=MAX_COLORS,
+        help_text='Colors as "#rrggbb", or "#rrggbbaa" when see-through.',
+    )
     latitude = CoordinateField(min_value=-90, max_value=90)
     longitude = CoordinateField(min_value=-180, max_value=180)
     attributes = CraftAttributesSerializer(required=False)
@@ -202,6 +220,7 @@ class CraftWriteSerializer(serializers.ModelSerializer):
             "latitude",
             "longitude",
             "description",
+            "colors",
             "attributes",
         ]
 
@@ -214,6 +233,13 @@ class CraftWriteSerializer(serializers.ModelSerializer):
         if len(materials) > MAX_MATERIALS:
             raise serializers.ValidationError(f"Choose at most {MAX_MATERIALS} materials.")
         return list(dict.fromkeys(materials))
+
+    def validate_colors(self, colors):
+        # The same color with another opacity counts as the same color.
+        values = [color[:7] for color in colors]
+        if len(values) != len(set(values)):
+            raise serializers.ValidationError("Enter each color once.")
+        return colors
 
     def validate(self, attrs):
         if "category" in attrs or "craft_type" in attrs:
@@ -298,10 +324,19 @@ class AuthorSerializer(serializers.Serializer):
 
 class CraftFilterSerializer(serializers.Serializer):
     category = serializers.SlugField(required=False)
+    color = serializers.CharField(
+        required=False, help_text="Crafts with a color similar to this one, as rrggbb."
+    )
     craft_type = serializers.IntegerField(required=False, min_value=1)
     culture = serializers.IntegerField(required=False, min_value=1)
     country = serializers.CharField(required=False, max_length=100)
     search = serializers.CharField(required=False, max_length=100)
+
+    def validate_color(self, value):
+        match = SEARCH_COLOR.match(value.strip())
+        if not match:
+            raise serializers.ValidationError('Use a hex color such as "1e40af".')
+        return f"#{match.group(1).lower()}"
 
 
 class MapFilterSerializer(CraftFilterSerializer):
@@ -376,6 +411,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
     tools = NamedItemSerializer(many=True, read_only=True)
     materials = NamedItemSerializer(many=True, read_only=True)
     culture = CultureSerializer(read_only=True, allow_null=True)
+    colors = serializers.SlugRelatedField(slug_field="value", many=True, read_only=True)
     author = AuthorSerializer(read_only=True)
     latitude = serializers.FloatField(read_only=True)
     longitude = serializers.FloatField(read_only=True)
@@ -398,6 +434,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
             "longitude",
             "media",
             "description",
+            "colors",
             "attributes",
             "status",
             "author",

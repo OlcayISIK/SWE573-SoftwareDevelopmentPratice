@@ -17,6 +17,7 @@ import {
 import type { CraftDetail } from "../types";
 
 import { AddItemInline } from "./AddItemInline";
+import { ColorRows } from "./ColorRows";
 import { DimensionRows } from "./DimensionRows";
 import { ItemPicker } from "./ItemPicker";
 import { LocationPicker } from "./LocationPicker";
@@ -222,12 +223,7 @@ export function CraftFields({
           error={errors.attributes?.weight_g?.message}
           {...register("attributes.weight_g")}
         />
-        <TextField
-          label="Colors"
-          hint="Separate with commas, for example: cobalt blue, turquoise."
-          error={errors.attributes?.colors?.message}
-          {...register("attributes.colors")}
-        />
+        <ColorRows form={form} />
         <TextAreaField
           label="Distinguishing features"
           rows={3}

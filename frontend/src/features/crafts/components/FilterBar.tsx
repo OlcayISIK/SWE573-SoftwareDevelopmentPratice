@@ -1,6 +1,8 @@
 import { useEffect, useId, useState } from "react";
 
 import { useCategories, useCountries, useCraftTypes, useCultures } from "../queries";
+
+import { ColorFilter } from "./ColorFilter";
 import type { CraftFilters } from "../types";
 
 interface FilterBarProps {
@@ -40,7 +42,7 @@ export function FilterBar({ filters, onChange, onClear, hasFilters }: FilterBarP
           id={`${id}-filters`}
           role="search"
           aria-label="Filter crafts"
-          className={`${open ? "grid" : "hidden"} mt-3 gap-3 md:mt-0 md:grid md:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_minmax(0,2fr)_auto] md:items-end`}
+          className={`${open ? "grid" : "hidden"} mt-3 gap-3 md:mt-0 md:grid md:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] md:items-end`}
           onSubmit={(event) => {
             event.preventDefault();
             onChange({ search: search.trim() || undefined });
@@ -124,7 +126,8 @@ export function FilterBar({ filters, onChange, onClear, hasFilters }: FilterBarP
               ))}
             </select>
           </div>
-          <div>
+          <ColorFilter value={filters.color} onChange={(color) => onChange({ color })} />
+          <div className="md:col-span-2 lg:col-span-4">
             <label htmlFor={`${id}-search`} className="text-sm font-medium">
               Search
             </label>

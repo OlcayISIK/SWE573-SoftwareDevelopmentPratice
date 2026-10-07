@@ -17,6 +17,8 @@ export interface CraftFilters {
   craft_type?: number;
   culture?: number;
   country?: string;
+  /** rrggbb, without "#". */
+  color?: string;
   search?: string;
   page?: number;
 }

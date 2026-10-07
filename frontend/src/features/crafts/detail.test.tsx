@@ -16,9 +16,9 @@ const richCraft = makeCraftDetail({
       { type: "width", value: 20, unit: "cm" },
     ],
     weight_g: 850,
-    colors: ["cobalt blue", "turquoise"],
     distinguishing_features: "Hand-painted floral motifs under a clear glaze",
   },
+  colors: ["#1e40af", "#40e0d080"],
   media: [
     ...makeCraftDetail().media,
     {
@@ -68,7 +68,15 @@ test("shows the description, characteristics, culture, and location", async () =
   const characteristics = screen.getByRole("heading", { name: "Characteristics" }).parentElement!;
   expect(within(characteristics).getByText("height 20 cm, width 20 cm")).toBeInTheDocument();
   expect(within(characteristics).getByText("850 g")).toBeInTheDocument();
-  expect(within(characteristics).getByText("cobalt blue, turquoise")).toBeInTheDocument();
+  expect(within(characteristics).getByRole("link", { name: "#1e40af" })).toHaveAttribute(
+    "href",
+    "/crafts?color=1e40af",
+  );
+  // A see-through color shows its full code and links to its solid color.
+  expect(within(characteristics).getByRole("link", { name: "#40e0d080" })).toHaveAttribute(
+    "href",
+    "/crafts?color=40e0d0",
+  );
 
   const aside = screen.getByRole("complementary", { name: "Facts and location" });
   expect(within(aside).getByText("Cumhuriyet Caddesi, Kütahya")).toBeInTheDocument();

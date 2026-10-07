@@ -49,7 +49,9 @@ test("a new user registers, is signed in, and publishes a craft", async ({ page 
     .fill("Hand-painted glazed tiles, shaped, painted, glazed, and fired.");
   await page.getByRole("button", { name: "Add a dimension" }).click();
   await page.getByLabel("Size").fill("20");
-  await page.getByLabel("Colors").fill("cobalt blue, turquoise");
+  await page.getByRole("button", { name: "Add a color" }).click();
+  const color = page.getByRole("group", { name: "Color 1" });
+  await color.getByLabel("Color code").fill("rgb(30, 64, 175)");
   await page
     .getByLabel("Photo file")
     .setInputFiles({ name: "tile.png", mimeType: "image/png", buffer: PNG_BYTES });
@@ -63,10 +65,16 @@ test("a new user registers, is signed in, and publishes a craft", async ({ page 
   await expect
     .poll(() => photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth))
     .toBeGreaterThan(0);
-  await expect(page.getByText("cobalt blue, turquoise")).toBeVisible();
+  await expect(page.getByRole("link", { name: "#1e40af" })).toBeVisible();
   await expect(page.getByText("Ceramics · Tile")).toBeVisible();
   await expect(page.getByText(/Turkish · From Kütahya, Türkiye/)).toBeVisible();
   await expect(page.getByText("height 20 cm")).toBeVisible();
+
+  // A similar blue finds it; a red does not.
+  await page.goto("/crafts?color=1d4ed8");
+  await expect(page.getByRole("link", { name: craftName })).toBeVisible();
+  await page.goto("/crafts?color=dc2626");
+  await expect(page.getByRole("link", { name: craftName })).toHaveCount(0);
 
   await page.goto(`/crafts?search=${encodeURIComponent(craftName)}`);
   await expect(page.getByRole("link", { name: craftName })).toBeVisible();

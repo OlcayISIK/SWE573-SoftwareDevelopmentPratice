@@ -20,7 +20,6 @@ export interface Dimension {
 export interface CraftAttributes {
   dimensions?: Dimension[];
   weight_g?: number;
-  colors?: string[];
   distinguishing_features?: string;
 }
 
