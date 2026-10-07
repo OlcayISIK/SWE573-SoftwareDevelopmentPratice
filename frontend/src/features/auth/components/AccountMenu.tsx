@@ -31,7 +31,12 @@ export function AccountMenu() {
 
   return (
     <>
-      <span className="text-sm text-stone-700">{auth.user.display_name}</span>
+      <Link
+        to="/me"
+        className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
+      >
+        {auth.user.display_name}
+      </Link>
       <button
         type="button"
         className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"

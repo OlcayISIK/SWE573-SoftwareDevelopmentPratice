@@ -34,8 +34,29 @@ export const routes: RouteObject[] = [
               })),
           },
           {
+            path: "users/:id",
+            lazy: () =>
+              import("@/features/profiles/pages/PublicProfilePage").then((m) => ({
+                Component: m.PublicProfilePage,
+              })),
+          },
+          {
             element: <RequireAuth />,
             children: [
+              {
+                path: "me",
+                lazy: () =>
+                  import("@/features/profiles/pages/MyProfilePage").then((m) => ({
+                    Component: m.MyProfilePage,
+                  })),
+              },
+              {
+                path: "me/settings",
+                lazy: () =>
+                  import("@/features/profiles/pages/SettingsPage").then((m) => ({
+                    Component: m.SettingsPage,
+                  })),
+              },
               {
                 path: "crafts/new",
                 lazy: () =>
