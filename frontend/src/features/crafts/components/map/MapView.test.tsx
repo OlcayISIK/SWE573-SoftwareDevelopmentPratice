@@ -31,3 +31,16 @@ test("the real Leaflet map loads the cluster plugin and selects pins", async () 
 
   expect(onSelect).toHaveBeenCalledWith(1);
 });
+
+test("the world is shown once: no tile is drawn twice", async () => {
+  const { default: MapView } = await import("./MapView");
+  const { container } = render(<MapView pins={pins} onSelect={() => undefined} />);
+
+  await waitFor(() =>
+    expect(container.querySelectorAll("img.leaflet-tile").length).toBeGreaterThan(0),
+  );
+  const sources = [...container.querySelectorAll<HTMLImageElement>("img.leaflet-tile")].map(
+    (tile) => tile.getAttribute("src"),
+  );
+  expect(new Set(sources).size).toBe(sources.length);
+});

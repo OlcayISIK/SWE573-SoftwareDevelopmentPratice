@@ -13,6 +13,13 @@ vi.mock("@/features/crafts/components/map/LocationMap", () => import("./mocks/Lo
 // jsdom does not implement scrolling; Leaflet calls it when focusing markers.
 window.scrollTo = () => undefined;
 
+// jsdom has no layout, so nothing ever resizes; the map only needs the constructor to exist.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 // React Router builds requests with jsdom's AbortSignal, which Node's Request rejects.
 // Navigation aborts do not matter in tests, so the signal is dropped.
 const NodeRequest = globalThis.Request;

@@ -172,6 +172,7 @@ export function CraftDetailPage() {
                     },
                   ]}
                   onSelect={() => undefined}
+                  focus={[data.latitude, data.longitude]}
                 />
               </Suspense>
             </div>
