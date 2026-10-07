@@ -3,7 +3,7 @@ from django.contrib import admin, messages
 from core.exceptions import DomainError
 
 from . import services
-from .models import Report, ReviewAction
+from .models import ItemReport, ItemReviewAction, Report, ReviewAction
 
 ADMIN_REVIEW_REASON = "Reviewed in the Django admin."
 
@@ -57,3 +57,51 @@ class ReportAdmin(admin.ModelAdmin):
     @admin.action(description="Dismiss the reports")
     def dismiss_reports(self, request, queryset):
         self._review(request, queryset, ReviewAction.Action.DISMISS)
+
+
+class ItemReviewActionInline(admin.TabularInline):
+    model = ItemReviewAction
+    extra = 0
+    can_delete = False
+    fields = ["action", "reason", "details", "admin", "created_at"]
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(ItemReport)
+class ItemReportAdmin(admin.ModelAdmin):
+    list_display = ["id", "item_type", "item_name", "reporter", "reason", "status", "created_at"]
+    list_filter = ["status", "item_type", "reason"]
+    search_fields = ["item_name", "reporter__email", "note"]
+    raw_id_fields = ["reporter"]
+    readonly_fields = ["item_type", "item_id", "item_name", "status", "created_at", "updated_at"]
+    inlines = [ItemReviewActionInline]
+    # Renaming and merging need a name or a target, so they are done in the review screen.
+    actions = ["hide_items", "dismiss_reports"]
+
+    def _review(self, request, queryset, action):
+        reviewed = 0
+        for report in queryset.filter(status=Report.Status.OPEN):
+            try:
+                services.review_item_report(
+                    admin=request.user,
+                    report_id=report.pk,
+                    action=action,
+                    reason=ADMIN_REVIEW_REASON,
+                )
+            except DomainError as exc:
+                self.message_user(request, f"Report {report.pk}: {exc.message}", messages.ERROR)
+            else:
+                reviewed += 1
+        if reviewed:
+            self.message_user(request, f"{reviewed} report(s) reviewed.", messages.SUCCESS)
+
+    @admin.action(description="Hide the reported items")
+    def hide_items(self, request, queryset):
+        self._review(request, queryset, ItemReviewAction.Action.HIDE)
+
+    @admin.action(description="Dismiss the reports")
+    def dismiss_reports(self, request, queryset):
+        self._review(request, queryset, ItemReviewAction.Action.DISMISS)

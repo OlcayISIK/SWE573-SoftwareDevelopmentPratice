@@ -32,6 +32,10 @@ AUTHOR_ONLY = "Only the author can add media to this craft."
 TOO_MANY_MEDIA = f"A craft can have at most {MAX_MEDIA_PER_CRAFT} media items."
 VERIFY_BEFORE_ADDING = "Verify your email address before adding new items."
 REMOVED_BY_ADMIN = "{name} was removed by an admin. Choose another name."
+NAME_TAKEN = "{name} already exists. Merge into it instead."
+MERGE_SAME_KIND = "Choose another item of the same kind to merge into."
+MERGE_INTO_VISIBLE = "Choose an item that is not hidden to merge into."
+MERGE_SAME_CATEGORY = "Choose a craft type of the same category to merge into."
 
 
 def _ensure_can_edit(craft, actor):
@@ -187,3 +191,73 @@ def add_material(*, user, name, craft_type=None):
 
 def add_culture(*, user, name, homeland=""):
     return _add_lookup(Culture, user=user, name=name, homeland=homeland)
+
+
+def _same_name(item, name):
+    others = type(item).objects.filter(name__iexact=name).exclude(pk=item.pk)
+    if isinstance(item, CraftType):
+        others = others.filter(category_id=item.category_id)
+    return others.first()
+
+
+@transaction.atomic
+def rename_lookup(*, item, name, actor):
+    _ensure_admin(actor)
+    taken = _same_name(item, name)
+    if taken is not None:
+        raise ConflictError(NAME_TAKEN.format(name=taken.name))
+    item.name = name
+    item.save(update_fields=["name", "updated_at"])
+    return item
+
+
+@transaction.atomic
+def hide_lookup(*, item, actor):
+    """Removes the item from the lists. Crafts that use it keep showing it."""
+    _ensure_admin(actor)
+    item.is_hidden = True
+    item.save(update_fields=["is_hidden", "updated_at"])
+    return item
+
+
+def _move_crafts(item, into):
+    crafts = Craft.all_objects
+    if isinstance(item, (Tool, Material)):
+        field = "tools" if isinstance(item, Tool) else "materials"
+        for craft in crafts.filter(**{field: item}):
+            getattr(craft, field).add(into)
+        into.craft_types.add(*item.craft_types.all())
+        return
+    field = {Category: "category", CraftType: "craft_type", Culture: "culture"}[type(item)]
+    crafts.filter(**{field: item}).update(**{field: into})
+
+
+def _merge(item, into):
+    if isinstance(item, Category):
+        # The craft types move along; one with the same name in the target is merged too.
+        for craft_type in item.craft_types.all():
+            twin = into.craft_types.filter(name__iexact=craft_type.name).first()
+            if twin is None:
+                craft_type.category = into
+                craft_type.save(update_fields=["category", "updated_at"])
+            else:
+                _merge(craft_type, twin)
+    _move_crafts(item, into)
+    item.delete()
+
+
+@transaction.atomic
+def merge_lookup(*, item, into, actor):
+    """
+    Merges a duplicate into another item of the same kind: every craft that used it uses the
+    other item instead, and the duplicate is deleted.
+    """
+    _ensure_admin(actor)
+    if type(into) is not type(item) or into.pk == item.pk:
+        raise ValidationError(MERGE_SAME_KIND, errors={"merge_into": [MERGE_SAME_KIND]})
+    if into.is_hidden:
+        raise ValidationError(MERGE_INTO_VISIBLE, errors={"merge_into": [MERGE_INTO_VISIBLE]})
+    if isinstance(item, CraftType) and into.category_id != item.category_id:
+        raise ValidationError(MERGE_SAME_CATEGORY, errors={"merge_into": [MERGE_SAME_CATEGORY]})
+    _merge(item, into)
+    return into

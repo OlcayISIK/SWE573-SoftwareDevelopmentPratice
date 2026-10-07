@@ -65,14 +65,19 @@ class CultureSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "homeland", "user_added"]
 
 
+def clean_lookup_name(value):
+    """Tidies a lookup item name: single spaces, a capital first letter, and some letters."""
+    name = " ".join(value.split())
+    if len(name) < 2 or not any(char.isalpha() for char in name):
+        raise serializers.ValidationError("Enter a name of at least 2 characters.")
+    return name[0].upper() + name[1:]
+
+
 class AddItemSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=80)
 
     def validate_name(self, value):
-        name = " ".join(value.split())
-        if len(name) < 2 or not any(char.isalpha() for char in name):
-            raise serializers.ValidationError("Enter a name of at least 2 characters.")
-        return name[0].upper() + name[1:]
+        return clean_lookup_name(value)
 
 
 class AddCraftTypeSerializer(AddItemSerializer):
