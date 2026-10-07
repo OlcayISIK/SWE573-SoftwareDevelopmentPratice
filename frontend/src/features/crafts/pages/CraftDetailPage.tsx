@@ -12,6 +12,7 @@ import { toast } from "@/lib/toast";
 
 import type { CraftAttributes } from "../attributes";
 import { AttributeList } from "../components/detail/AttributeList";
+import { CraftFacts } from "../components/detail/CraftFacts";
 import { PhotoGallery } from "../components/detail/PhotoGallery";
 import { Documents, Videos } from "../components/detail/VideosAndDocuments";
 import { placeName } from "../place";
@@ -140,7 +141,8 @@ export function CraftDetailPage() {
           <Documents documents={documents} />
         </div>
 
-        <aside aria-label="Location" className="space-y-6">
+        <aside aria-label="Facts and location" className="space-y-6">
+          <CraftFacts craft={data} />
           <section className="overflow-hidden rounded-lg border border-brand-100 bg-white">
             <h2 className="px-5 pt-4 text-lg font-semibold">Location</h2>
             <p className="px-5 pt-1 text-stone-700">{data.address}</p>
