@@ -1,6 +1,6 @@
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
-from rest_framework import generics, status, viewsets
+from rest_framework import generics, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -28,14 +28,14 @@ from .serializers import (
     MaterialSerializer,
     MediaSerializer,
     MediaUploadSerializer,
-    RegionSerializer,
     ToolSerializer,
 )
 
 FILTER_PARAMETERS = [
     OpenApiParameter("category", OpenApiTypes.STR, description="Category slug"),
-    OpenApiParameter("region", OpenApiTypes.INT, description="Region id"),
-    OpenApiParameter("country", OpenApiTypes.STR, description="Country of the region"),
+    OpenApiParameter("craft_type", OpenApiTypes.INT, description="Craft type id"),
+    OpenApiParameter("culture", OpenApiTypes.INT, description="Culture id"),
+    OpenApiParameter("country", OpenApiTypes.STR, description="Country of the craft"),
     OpenApiParameter("search", OpenApiTypes.STR, description="Text search"),
 ]
 
@@ -145,18 +145,6 @@ class CultureListView(LookupListView):
         return selectors.list_cultures()
 
 
-@extend_schema(
-    tags=["reference data"],
-    parameters=[OpenApiParameter("country", OpenApiTypes.STR, description="Filter by country")],
-)
-class RegionListView(generics.ListAPIView):
-    serializer_class = RegionSerializer
-    pagination_class = None
-
-    def get_queryset(self):
-        return selectors.list_regions(country=self.request.query_params.get("country"))
-
-
 @extend_schema(tags=["crafts"])
 class CraftViewSet(viewsets.GenericViewSet):
     lookup_value_regex = r"\d+"
@@ -193,6 +181,12 @@ class CraftViewSet(viewsets.GenericViewSet):
     def map(self, request):
         pins = selectors.map_pins(request.user, **_filters(request, MapFilterSerializer))
         return Response(CraftPinSerializer(pins, many=True).data)
+
+    @extend_schema(responses=serializers.ListSerializer(child=serializers.CharField()))
+    @action(detail=False, methods=["get"], url_path="countries", pagination_class=None)
+    def countries(self, request):
+        """Countries that have crafts, for the country filter."""
+        return Response(list(selectors.craft_countries(request.user)))
 
     @extend_schema(request=CraftWriteSerializer, responses={201: CraftDetailSerializer})
     def create(self, request):

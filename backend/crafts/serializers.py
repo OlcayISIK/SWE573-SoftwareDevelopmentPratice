@@ -8,10 +8,14 @@ from rest_framework import serializers
 
 from core.validators import MB, validate_image_upload
 
-from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Region, Tool
+from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Tool
 
 PHOTO_MAX_BYTES = 5 * MB
 DOCUMENT_MAX_BYTES = 10 * MB
+MAX_TOOLS = 20
+MAX_MATERIALS = 20
+DIMENSION_TYPES = ["height", "width", "depth", "length", "diameter", "thickness"]
+DIMENSION_UNITS = ["mm", "cm", "m"]
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -95,10 +99,12 @@ class LinkedItemFilterSerializer(serializers.Serializer):
     craft_type = serializers.IntegerField(required=False, min_value=1)
 
 
-class RegionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Region
-        fields = ["id", "name", "country", "description"]
+class NamedItemSerializer(serializers.Serializer):
+    """A lookup item as shown on a craft."""
+
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    user_added = serializers.BooleanField(read_only=True)
 
 
 class StrictSerializer(serializers.Serializer):
@@ -114,31 +120,27 @@ class StrictSerializer(serializers.Serializer):
         return super().to_internal_value(data)
 
 
-class DimensionsSerializer(StrictSerializer):
-    height = serializers.FloatField(min_value=0.01, required=False)
-    width = serializers.FloatField(min_value=0.01, required=False)
-    depth = serializers.FloatField(min_value=0.01, required=False)
-    length = serializers.FloatField(min_value=0.01, required=False)
-    diameter = serializers.FloatField(min_value=0.01, required=False)
-
-    def validate(self, attrs):
-        if not attrs:
-            raise serializers.ValidationError("Provide at least one dimension.")
-        return attrs
+class DimensionSerializer(StrictSerializer):
+    type = serializers.ChoiceField(choices=DIMENSION_TYPES)
+    value = serializers.FloatField(min_value=0.01, max_value=100000)
+    unit = serializers.ChoiceField(choices=DIMENSION_UNITS)
 
 
 class CraftAttributesSerializer(StrictSerializer):
-    dimensions_cm = DimensionsSerializer(required=False)
+    dimensions = DimensionSerializer(many=True, required=False, max_length=len(DIMENSION_TYPES))
     weight_g = serializers.FloatField(min_value=0.01, required=False)
     colors = serializers.ListField(
         child=serializers.CharField(max_length=40), max_length=10, required=False
     )
-    materials = serializers.ListField(
-        child=serializers.CharField(max_length=60), max_length=10, required=False
-    )
     distinguishing_features = serializers.CharField(
         max_length=1000, required=False, allow_blank=True
     )
+
+    def validate_dimensions(self, dimensions):
+        types = [dimension["type"] for dimension in dimensions]
+        if len(types) != len(set(types)):
+            raise serializers.ValidationError("Enter each dimension once.")
+        return dimensions
 
     def to_internal_value(self, data):
         return _plain(super().to_internal_value(data))
@@ -163,7 +165,19 @@ class CoordinateField(serializers.FloatField):
         return float(value)
 
 
+def _visible(model):
+    return model.objects.filter(is_hidden=False)
+
+
 class CraftWriteSerializer(serializers.ModelSerializer):
+    category = serializers.PrimaryKeyRelatedField(queryset=_visible(Category))
+    craft_type = serializers.PrimaryKeyRelatedField(queryset=_visible(CraftType))
+    tools = serializers.PrimaryKeyRelatedField(queryset=_visible(Tool), many=True, required=False)
+    materials = serializers.PrimaryKeyRelatedField(
+        queryset=_visible(Material), many=True, required=False
+    )
+    culture = serializers.PrimaryKeyRelatedField(queryset=_visible(Culture))
+    address = serializers.CharField(max_length=255)
     latitude = CoordinateField(min_value=-90, max_value=90)
     longitude = CoordinateField(min_value=-180, max_value=180)
     attributes = CraftAttributesSerializer(required=False)
@@ -172,17 +186,39 @@ class CraftWriteSerializer(serializers.ModelSerializer):
         model = Craft
         fields = [
             "name",
-            "craft_type",
             "category",
-            "region",
+            "craft_type",
+            "tools",
+            "materials",
+            "culture",
+            "address",
+            "city",
+            "country",
             "latitude",
             "longitude",
             "description",
-            "production_process",
-            "how_to_understand",
-            "cultural_relevance",
             "attributes",
         ]
+
+    def validate_tools(self, tools):
+        if len(tools) > MAX_TOOLS:
+            raise serializers.ValidationError(f"Choose at most {MAX_TOOLS} tools.")
+        return list(dict.fromkeys(tools))
+
+    def validate_materials(self, materials):
+        if len(materials) > MAX_MATERIALS:
+            raise serializers.ValidationError(f"Choose at most {MAX_MATERIALS} materials.")
+        return list(dict.fromkeys(materials))
+
+    def validate(self, attrs):
+        if "category" in attrs or "craft_type" in attrs:
+            category = attrs.get("category") or self.instance.category
+            craft_type = attrs.get("craft_type") or self.instance.craft_type
+            if craft_type.category_id != category.id:
+                raise serializers.ValidationError(
+                    {"craft_type": ["Choose a craft type from the selected category."]}
+                )
+        return attrs
 
 
 class MediaSerializer(serializers.ModelSerializer):
@@ -257,7 +293,8 @@ class AuthorSerializer(serializers.Serializer):
 
 class CraftFilterSerializer(serializers.Serializer):
     category = serializers.SlugField(required=False)
-    region = serializers.IntegerField(required=False, min_value=1)
+    craft_type = serializers.IntegerField(required=False, min_value=1)
+    culture = serializers.IntegerField(required=False, min_value=1)
     country = serializers.CharField(required=False, max_length=100)
     search = serializers.CharField(required=False, max_length=100)
 
@@ -280,7 +317,8 @@ class MapFilterSerializer(CraftFilterSerializer):
 
 class CraftListSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
-    region = RegionSerializer(read_only=True)
+    craft_type = NamedItemSerializer(read_only=True)
+    culture = CultureSerializer(read_only=True, allow_null=True)
     author = AuthorSerializer(read_only=True)
     latitude = serializers.FloatField(read_only=True)
     longitude = serializers.FloatField(read_only=True)
@@ -291,9 +329,11 @@ class CraftListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "craft_type",
             "category",
-            "region",
+            "craft_type",
+            "culture",
+            "city",
+            "country",
             "latitude",
             "longitude",
             "cover_photo",
@@ -327,7 +367,10 @@ class CraftPinSerializer(serializers.Serializer):
 
 class CraftDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
-    region = RegionSerializer(read_only=True)
+    craft_type = NamedItemSerializer(read_only=True)
+    tools = NamedItemSerializer(many=True, read_only=True)
+    materials = NamedItemSerializer(many=True, read_only=True)
+    culture = CultureSerializer(read_only=True, allow_null=True)
     author = AuthorSerializer(read_only=True)
     latitude = serializers.FloatField(read_only=True)
     longitude = serializers.FloatField(read_only=True)
@@ -338,16 +381,18 @@ class CraftDetailSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "craft_type",
             "category",
-            "region",
+            "craft_type",
+            "tools",
+            "materials",
+            "culture",
+            "address",
+            "city",
+            "country",
             "latitude",
             "longitude",
             "media",
             "description",
-            "production_process",
-            "how_to_understand",
-            "cultural_relevance",
             "attributes",
             "status",
             "author",

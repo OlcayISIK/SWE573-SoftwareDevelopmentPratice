@@ -1,8 +1,9 @@
 import pytest
 
 from crafts import signals
-from crafts.models import Category, Craft, Region
+from crafts.models import Category, Craft, CraftType, Culture, Material, Tool
 from tests.factories import CraftFactory, UserFactory
+from tests.payloads import craft_payload
 
 pytestmark = pytest.mark.django_db
 
@@ -15,23 +16,18 @@ def craft_url(craft):
 
 @pytest.fixture
 def payload():
-    return {
-        "name": "Kütahya Çinisi",
-        "craft_type": "Tile",
-        "category": Category.objects.get(slug="ceramics").id,
-        "region": Region.objects.get(name="Kütahya").id,
-        "latitude": 39.4192345,
-        "longitude": 29.9833471,
-        "description": "Hand-painted glazed tiles and ceramics.",
-        "production_process": "Clay is shaped, painted with underglaze, glazed, and fired.",
-        "how_to_understand": "Floral motifs and cobalt blue are typical.",
-        "cultural_relevance": "A living tradition of Anatolian ceramic art.",
-        "attributes": {
-            "dimensions_cm": {"height": 20, "width": 20},
-            "colors": ["cobalt blue", "turquoise"],
-            "distinguishing_features": "Hand-painted floral motifs under a clear glaze",
+    return craft_payload(
+        latitude=38.6812345,
+        longitude=29.4083471,
+        attributes={
+            "dimensions": [
+                {"type": "length", "value": 300, "unit": "cm"},
+                {"type": "width", "value": 2, "unit": "m"},
+            ],
+            "colors": ["madder red", "indigo"],
+            "distinguishing_features": "Central medallion with a floral border",
         },
-    }
+    )
 
 
 @pytest.fixture
@@ -58,17 +54,25 @@ def test_verified_user_publishes_craft_without_approval(client_for, user, payloa
     assert response.status_code == 201
     assert data["status"] == "published"
     assert data["author"] == {"id": user.id, "display_name": user.profile.display_name}
-    assert data["category"]["slug"] == "ceramics"
-    assert data["region"]["name"] == "Kütahya"
-    assert data["attributes"]["colors"] == ["cobalt blue", "turquoise"]
-    assert data["how_to_understand"] == payload["how_to_understand"]
+    assert data["category"]["slug"] == "textiles"
+    assert data["craft_type"] == {
+        "id": payload["craft_type"],
+        "name": "Carpet",
+        "user_added": False,
+    }
+    assert [tool["name"] for tool in data["tools"]] == ["Knotting knife", "Loom"]
+    assert [material["name"] for material in data["materials"]] == ["Madder", "Wool"]
+    assert data["culture"]["name"] == "Turkish"
+    assert (data["address"], data["city"], data["country"]) == ("Uşak, Türkiye", "Uşak", "Türkiye")
+    assert data["description"] == payload["description"]
+    assert data["attributes"]["dimensions"][1] == {"type": "width", "value": 2.0, "unit": "m"}
 
 
 def test_coordinates_are_rounded_to_six_decimals(client_for, user, payload):
     data = client_for(user).post(CRAFTS_URL, payload, format="json").json()["data"]
 
-    assert data["latitude"] == 39.419235
-    assert data["longitude"] == 29.983347
+    assert data["latitude"] == 38.681235
+    assert data["longitude"] == 29.408347
 
 
 def test_unverified_user_cannot_publish(client_for, unverified_user, payload):
@@ -84,7 +88,7 @@ def test_guest_cannot_publish(api_client, payload):
 
 
 @pytest.mark.parametrize(
-    "field", ["name", "category", "region", "latitude", "description", "cultural_relevance"]
+    "field", ["name", "category", "craft_type", "culture", "address", "latitude", "description"]
 )
 def test_required_fields(client_for, user, payload, field):
     payload.pop(field)
@@ -118,9 +122,18 @@ def test_unknown_category_is_rejected(client_for, user, payload):
     "attributes",
     [
         {"price": 10},
-        {"dimensions_cm": {"height": -1}},
-        {"dimensions_cm": {"volume": 3}},
-        {"dimensions_cm": {}},
+        {"materials": ["wool"]},
+        {"dimensions": [{"type": "height", "value": -1, "unit": "cm"}]},
+        {"dimensions": [{"type": "volume", "value": 3, "unit": "cm"}]},
+        {"dimensions": [{"type": "height", "value": 3, "unit": "inch"}]},
+        {"dimensions": [{"type": "height", "value": 3}]},
+        {"dimensions": [{"type": "height", "value": 3, "unit": "cm", "note": "x"}]},
+        {
+            "dimensions": [
+                {"type": "height", "value": 3, "unit": "cm"},
+                {"type": "height", "value": 4, "unit": "cm"},
+            ]
+        },
         {"colors": "blue"},
         {"weight_g": 0},
     ],
@@ -233,3 +246,88 @@ def test_publish_and_update_send_signals(client_for, user, payload, captured_sig
 
 def test_unknown_craft_returns_404(api_client):
     assert api_client.get(f"{CRAFTS_URL}999999/").status_code == 404
+
+
+def test_tools_materials_and_dimensions_are_optional(client_for, user, payload):
+    payload.update(tools=[], materials=[], attributes={"dimensions": []})
+
+    response = client_for(user).post(CRAFTS_URL, payload, format="json")
+
+    assert response.status_code == 201
+    assert response.json()["data"]["tools"] == []
+
+
+def test_craft_type_must_belong_to_the_category(client_for, user, payload):
+    payload["category"] = Category.objects.get(slug="ceramics").id
+
+    response = client_for(user).post(CRAFTS_URL, payload, format="json")
+
+    assert response.status_code == 400
+    assert "craft_type" in response.json()["errors"]
+
+
+def test_changing_only_the_craft_type_is_checked_against_the_category(client_for):
+    craft = CraftFactory(category=Category.objects.get(slug="ceramics"))
+    carpet = CraftType.objects.get(name="Carpet")
+
+    response = client_for(craft.author).patch(
+        craft_url(craft), {"craft_type": carpet.id}, format="json"
+    )
+
+    assert response.status_code == 400
+    assert "craft_type" in response.json()["errors"]
+
+
+@pytest.mark.parametrize(
+    ("field", "model"), [("craft_type", CraftType), ("tools", Tool), ("culture", Culture)]
+)
+def test_hidden_items_cannot_be_chosen(client_for, user, payload, field, model):
+    ids = payload[field] if isinstance(payload[field], list) else [payload[field]]
+    model.objects.filter(pk__in=ids).update(is_hidden=True)
+
+    response = client_for(user).post(CRAFTS_URL, payload, format="json")
+
+    assert response.status_code == 400
+    assert field in response.json()["errors"]
+
+
+def test_too_many_tools_are_rejected(client_for, user, payload):
+    payload["tools"] = list(Tool.objects.values_list("pk", flat=True)[:21])
+
+    response = client_for(user).post(CRAFTS_URL, payload, format="json")
+
+    assert response.status_code == 400
+    assert "tools" in response.json()["errors"]
+
+
+def test_editing_replaces_tools_and_materials(client_for, payload, user):
+    client = client_for(user)
+    craft_id = client.post(CRAFTS_URL, payload, format="json").json()["data"]["id"]
+    shears = Tool.objects.get(name="Shears")
+    silk = Material.objects.get(name="Silk")
+
+    response = client.patch(
+        f"{CRAFTS_URL}{craft_id}/",
+        {"tools": [shears.id], "materials": [silk.id]},
+        format="json",
+    )
+
+    data = response.json()["data"]
+    assert [tool["name"] for tool in data["tools"]] == ["Shears"]
+    assert [material["name"] for material in data["materials"]] == ["Silk"]
+
+
+def test_items_hidden_later_still_show_on_the_craft(api_client, client_for, user, payload):
+    craft_id = client_for(user).post(CRAFTS_URL, payload, format="json").json()["data"]["id"]
+    Tool.objects.filter(name="Loom").update(is_hidden=True)
+
+    data = api_client.get(f"{CRAFTS_URL}{craft_id}/").json()["data"]
+
+    assert "Loom" in [tool["name"] for tool in data["tools"]]
+
+
+def test_detail_query_count_is_fixed(api_client, django_assert_max_num_queries, payload):
+    craft = CraftFactory()
+
+    with django_assert_max_num_queries(5):
+        api_client.get(craft_url(craft))

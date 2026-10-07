@@ -186,7 +186,7 @@ def test_auto_verify_skips_the_verification_email(
 
 
 def test_auto_verified_users_can_publish_right_away(api_client, settings):
-    from crafts.models import Category, Region
+    from tests.payloads import craft_payload
 
     settings.AUTO_VERIFY_EMAIL = True
     register(api_client)
@@ -197,21 +197,6 @@ def test_auto_verified_users_can_publish_right_away(api_client, settings):
     ).json()["data"]
     api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
 
-    response = api_client.post(
-        "/api/v1/crafts/",
-        {
-            "name": "Kilim",
-            "craft_type": "Rug",
-            "category": Category.objects.get(slug="textiles").id,
-            "region": Region.objects.get(name="Uşak").id,
-            "latitude": 38.68,
-            "longitude": 29.41,
-            "description": "Flat-woven rug.",
-            "production_process": "Woven on a loom.",
-            "how_to_understand": "Geometric motifs.",
-            "cultural_relevance": "Anatolian tradition.",
-        },
-        format="json",
-    )
+    response = api_client.post("/api/v1/crafts/", craft_payload(), format="json")
 
     assert response.status_code == 201
