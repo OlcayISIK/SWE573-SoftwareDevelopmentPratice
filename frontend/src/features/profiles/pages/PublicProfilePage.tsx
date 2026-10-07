@@ -4,6 +4,7 @@ import { toApiError } from "@/api/envelope";
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { PageLoader } from "@/components/PageLoader";
 import { useAuth } from "@/features/auth/context";
+import { FollowButton, FollowSummary } from "@/features/social/components/FollowButton";
 
 import { Avatar } from "../components/Avatar";
 import { UserCrafts } from "../components/UserCrafts";
@@ -55,7 +56,11 @@ export function PublicProfilePage() {
             </p>
           )}
           <p className="mt-1 text-sm text-stone-600">{formatJoined(data.date_joined)}</p>
+          <div className="mt-2">
+            <FollowSummary userId={data.id} />
+          </div>
         </div>
+        <FollowButton userId={data.id} name={data.display_name} />
         {isMe && (
           <Link
             to="/me/settings"
