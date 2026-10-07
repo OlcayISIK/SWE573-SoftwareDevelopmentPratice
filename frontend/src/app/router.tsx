@@ -18,6 +18,18 @@ export const routes: RouteObject[] = [
             lazy: () =>
               import("@/features/crafts/pages/MapPage").then((m) => ({ Component: m.MapPage })),
           },
+          {
+            path: "login",
+            lazy: () =>
+              import("@/features/auth/pages/LoginPage").then((m) => ({ Component: m.LoginPage })),
+          },
+          {
+            path: "password-reset",
+            lazy: () =>
+              import("@/features/auth/pages/PasswordResetPage").then((m) => ({
+                Component: m.PasswordResetPage,
+              })),
+          },
           { path: "*", element: <NotFoundPage /> },
         ],
       },
