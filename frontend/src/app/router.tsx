@@ -2,6 +2,7 @@ import type { RouteObject } from "react-router";
 
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
+import { RequireAuth } from "@/features/auth/components/RouteGuards";
 
 import { MainLayout } from "./layouts/MainLayout";
 
@@ -31,6 +32,25 @@ export const routes: RouteObject[] = [
               import("@/features/crafts/pages/CraftDetailPage").then((m) => ({
                 Component: m.CraftDetailPage,
               })),
+          },
+          {
+            element: <RequireAuth />,
+            children: [
+              {
+                path: "crafts/new",
+                lazy: () =>
+                  import("@/features/crafts/pages/NewCraftPage").then((m) => ({
+                    Component: m.NewCraftPage,
+                  })),
+              },
+              {
+                path: "crafts/:id/edit",
+                lazy: () =>
+                  import("@/features/crafts/pages/EditCraftPage").then((m) => ({
+                    Component: m.EditCraftPage,
+                  })),
+              },
+            ],
           },
           {
             path: "login",
