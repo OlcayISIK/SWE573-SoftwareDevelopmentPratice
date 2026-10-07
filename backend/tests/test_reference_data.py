@@ -15,7 +15,7 @@ def test_categories_are_seeded_and_listed_alphabetically(api_client):
     names = [category["name"] for category in data]
     assert names == sorted(names)
     assert {"Ceramics", "Textiles", "Woodwork", "Metalwork"} <= set(names)
-    assert set(data[0]) == {"id", "name", "slug"}
+    assert set(data[0]) == {"id", "name", "slug", "user_added"}
 
 
 def test_regions_include_description(api_client):
@@ -34,8 +34,7 @@ def test_regions_filter_by_country(api_client):
     assert countries == {"Türkiye"}
 
 
-def test_reference_lists_are_public_and_read_only(api_client):
-    assert api_client.post("/api/v1/categories/", {"name": "X"}, format="json").status_code == 405
+def test_regions_are_read_only(api_client):
     assert api_client.post("/api/v1/regions/", {"name": "X"}, format="json").status_code == 405
 
 

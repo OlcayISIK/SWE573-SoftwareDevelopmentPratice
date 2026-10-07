@@ -1,5 +1,5 @@
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,16 +10,26 @@ from core.permissions import IsAuthorOrAdmin
 
 from . import selectors, services
 from .serializers import (
+    AddCraftTypeSerializer,
+    AddCultureSerializer,
+    AddItemSerializer,
+    AddLinkedItemSerializer,
     CategorySerializer,
     CraftDetailSerializer,
     CraftFilterSerializer,
     CraftListSerializer,
     CraftPinSerializer,
+    CraftTypeFilterSerializer,
+    CraftTypeSerializer,
     CraftWriteSerializer,
+    CultureSerializer,
+    LinkedItemFilterSerializer,
     MapFilterSerializer,
+    MaterialSerializer,
     MediaSerializer,
     MediaUploadSerializer,
     RegionSerializer,
+    ToolSerializer,
 )
 
 FILTER_PARAMETERS = [
@@ -36,13 +46,103 @@ def _filters(request, serializer_class=CraftFilterSerializer):
     return serializer.validated_data
 
 
-@extend_schema(tags=["reference data"])
-class CategoryListView(generics.ListAPIView):
-    serializer_class = CategorySerializer
+class LookupListView(generics.ListCreateAPIView):
+    """
+    A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+    adding a name that already exists returns the existing item with 200 instead of 201.
+    """
+
     pagination_class = None
+    add_serializer_class = None
+    add = None
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+    @property
+    def throttle_scope(self):
+        return "lookup_add" if self.request.method == "POST" else None
+
+    def create(self, request):
+        serializer = self.add_serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        item, created = self.add(user=request.user, **serializer.validated_data)
+        return Response(
+            self.get_serializer(item).data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+
+def _lookup_schema(item_serializer, add_serializer, parameters=()):
+    return extend_schema_view(
+        get=extend_schema(tags=["reference data"], parameters=list(parameters)),
+        post=extend_schema(
+            tags=["reference data"],
+            request=add_serializer,
+            responses={201: item_serializer, 200: item_serializer},
+        ),
+    )
+
+
+@_lookup_schema(CategorySerializer, AddItemSerializer)
+class CategoryListView(LookupListView):
+    serializer_class = CategorySerializer
+    add_serializer_class = AddItemSerializer
+    add = staticmethod(services.add_category)
 
     def get_queryset(self):
         return selectors.list_categories()
+
+
+@_lookup_schema(
+    CraftTypeSerializer,
+    AddCraftTypeSerializer,
+    [OpenApiParameter("category", OpenApiTypes.INT, description="Category id")],
+)
+class CraftTypeListView(LookupListView):
+    serializer_class = CraftTypeSerializer
+    add_serializer_class = AddCraftTypeSerializer
+    add = staticmethod(services.add_craft_type)
+
+    def get_queryset(self):
+        return selectors.list_craft_types(**_filters(self.request, CraftTypeFilterSerializer))
+
+
+TYPICAL_FOR = OpenApiParameter(
+    "craft_type", OpenApiTypes.INT, description="List the items typical for this craft type first"
+)
+
+
+@_lookup_schema(ToolSerializer, AddLinkedItemSerializer, [TYPICAL_FOR])
+class ToolListView(LookupListView):
+    serializer_class = ToolSerializer
+    add_serializer_class = AddLinkedItemSerializer
+    add = staticmethod(services.add_tool)
+
+    def get_queryset(self):
+        return selectors.list_tools(**_filters(self.request, LinkedItemFilterSerializer))
+
+
+@_lookup_schema(MaterialSerializer, AddLinkedItemSerializer, [TYPICAL_FOR])
+class MaterialListView(LookupListView):
+    serializer_class = MaterialSerializer
+    add_serializer_class = AddLinkedItemSerializer
+    add = staticmethod(services.add_material)
+
+    def get_queryset(self):
+        return selectors.list_materials(**_filters(self.request, LinkedItemFilterSerializer))
+
+
+@_lookup_schema(CultureSerializer, AddCultureSerializer)
+class CultureListView(LookupListView):
+    serializer_class = CultureSerializer
+    add_serializer_class = AddCultureSerializer
+    add = staticmethod(services.add_culture)
+
+    def get_queryset(self):
+        return selectors.list_cultures()
 
 
 @extend_schema(

@@ -85,7 +85,7 @@ backend/
 │   ├── renderers.py           # Response envelope
 │   └── schema.py              # OpenAPI extension for the envelope
 ├── accounts/                  # Users, profiles, privacy settings
-├── crafts/                    # Craft entries, categories, regions, media
+├── crafts/                    # Craft entries, lookup lists, regions, media
 ├── moderation/                # Reports and admin review actions
 ├── social/                    # Favorites and follows
 ├── notifications/             # In-app notifications
@@ -158,7 +158,7 @@ The order is enforced in CI with an import-linter `layers` contract, so an impor
 | Module          | Responsibility                                                  | Requirements        |
 | --------------- | --------------------------------------------------------------- | ------------------- |
 | `accounts`      | Registration with email, login, profile, privacy settings       | FR-02, FR-16 to 19  |
-| `crafts`        | Craft entries, categories, regions, attributes, media, browsing | FR-01, FR-03 to 10  |
+| `crafts`        | Craft entries, lookup lists, regions, attributes, media, browsing | FR-01, FR-03 to 10  |
 | `moderation`    | Reporting entries, admin review queue, review history           | FR-11, FR-12        |
 | `social`        | Favorites and follows                                           | FR-13, FR-14        |
 | `notifications` | Creating and listing in-app notifications                       | FR-15               |
@@ -176,7 +176,14 @@ All models inherit `core.BaseModel`, which adds `id`, `created_at`, and `updated
 
 ### crafts
 
-- **Category**: `name`, `slug` (e.g., ceramics, textiles, woodwork, metalwork).
+- **Lookup lists**: `Category`, `CraftType`, `Tool`, `Material`, and `Culture` share `name`, `is_hidden`, and `created_by` (FK User, nullable).
+  - **Category** adds `slug` (e.g., ceramics, textiles, woodwork, metalwork).
+  - **CraftType** belongs to a `category` (e.g., Textiles has Carpet, Kilim, Felt).
+  - **Tool** and **Material** are linked many-to-many to the craft types they are typical for, so the form can suggest them first. Any tool or material can still be picked for any craft.
+  - **Culture** adds `homeland` (e.g., Diné (Navajo), Southwestern United States).
+  - Names are unique ignoring case (per category for craft types), so "carpet" and "Carpet" stay one item.
+  - The lists are seeded by data migrations, so a new database starts with them. Seeded items have no `created_by`.
+  - Registered users with a verified email can add items, and everyone can use them right away. Adding a name that already exists returns the existing item. Admins hide items with `is_hidden`, which removes them from the lists; a hidden name cannot be added again.
 - **Region**: `name`, `country`, `description`.
 - **Craft**: `name`, `craft_type`, `category` (FK), `region` (FK), `latitude`, `longitude`, `description`, `production_process`, `how_to_understand`, `cultural_relevance`, `attributes` (`JSONField`), `status` (`published` or `hidden`), `author` (FK User).
 - **CraftMedia**: `craft` (FK), `media_type` (`photo`, `video`, `document`), `file` or `url`, `caption`, `alt_text`, `order`.
@@ -230,7 +237,7 @@ Because of that limit, craft visibility is defined once and reused:
 
 ## API Design
 
-All endpoints are under `/api/v1/`. List endpoints are paginated, except the small reference lists (`/categories/` and `/regions/`), which return every row so the frontend can fill its filters in one request. `/regions/` accepts an optional `country` filter.
+All endpoints are under `/api/v1/`. List endpoints are paginated, except the reference and lookup lists, which return every visible row so the frontend can fill its pickers and filters in one request. `/regions/` accepts an optional `country` filter, `/craft-types/` a `category` id, and `/tools/` and `/materials/` a `craft_type` id that marks the typical items with `typical: true` and lists them first.
 
 | Method | Endpoint                               | Access          | Purpose                               |
 | ------ | -------------------------------------- | --------------- | ------------------------------------- |
@@ -251,6 +258,8 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the sma
 | POST   | `/crafts/{id}/media/`                  | Author          | Upload photo, video, or document      |
 | DELETE | `/crafts/{id}/media/{media_id}/`       | Author or admin | Remove a media item                   |
 | GET    | `/categories/`, `/regions/`            | Public          | Reference data for filters            |
+| GET    | `/craft-types/`, `/tools/`, `/materials/`, `/cultures/` | Public | Lookup lists for the craft form |
+| POST   | `/categories/`, `/craft-types/`, `/tools/`, `/materials/`, `/cultures/` | Registered user | Add a lookup item (201), or get the existing one with the same name (200) |
 | POST   | `/crafts/{id}/report/`                 | Registered user | Report a craft                        |
 | GET    | `/moderation/reports/`                 | Admin           | Review queue (`status=open` by default; also `resolved`, `dismissed`, `all`) |
 | GET    | `/moderation/reports/{id}/`            | Admin           | Report details with its review history |
@@ -272,7 +281,7 @@ The OpenAPI schema is served at `/api/schema/` and Swagger UI at `/api/docs/`.
 
 ### Throttling
 
-DRF throttle classes limit request rates. Anonymous and authenticated clients have default rates, and stricter scoped rates apply to the endpoints most open to abuse: registration, login, token refresh, resending the verification email, password reset, and reporting a craft.
+DRF throttle classes limit request rates. Anonymous and authenticated clients have default rates, and stricter scoped rates apply to the endpoints most open to abuse: registration, login, token refresh, resending the verification email, password reset, reporting a craft, and adding lookup items.
 
 Throttle counters are stored in Django's database cache, so the limits hold across Gunicorn workers without adding another service.
 
