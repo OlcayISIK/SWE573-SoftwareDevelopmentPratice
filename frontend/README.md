@@ -29,3 +29,19 @@ The Vite dev server proxies `/api` and `/media` to the backend, so no CORS setup
 | `npm run lint`         | Lint with ESLint                                       |
 | `npm run format`       | Format with Prettier                                   |
 | `npm run generate:api` | Regenerate API types from the running backend's schema |
+| `npm run test:e2e`     | Run the Playwright end-to-end tests                    |
+
+## End-to-end tests
+
+The Playwright tests run against the full Docker Compose stack, including the production Nginx build.
+
+```
+# from the repository root
+docker compose up -d --build
+
+# from frontend/
+npx playwright install chromium   # first time only
+npm run test:e2e
+```
+
+The tests create their own users, read verification emails from the backend logs, and reset the rate-limit counters at the start of each run.
