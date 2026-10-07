@@ -77,6 +77,16 @@ class Culture(LookupItem):
         constraints = [_unique_name("culture")]
 
 
+# Lookup lists by the name other modules and the API use for them.
+LOOKUP_MODELS = {
+    "category": Category,
+    "craft_type": CraftType,
+    "tool": Tool,
+    "material": Material,
+    "culture": Culture,
+}
+
+
 class Craft(SoftDeleteModel):
     class Status(models.TextChoices):
         PUBLISHED = "published", "Published"
