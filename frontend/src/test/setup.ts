@@ -2,6 +2,9 @@ import "@testing-library/jest-dom/vitest";
 
 import { cleanup } from "@testing-library/react";
 
+import { session } from "@/api/session";
+import { toast } from "@/lib/toast";
+
 import { server } from "./server";
 
 // React Router builds requests with jsdom's AbortSignal, which Node's Request rejects.
@@ -18,6 +21,8 @@ beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 afterEach(() => {
   cleanup();
   server.resetHandlers();
+  session.clear();
+  toast.clear();
   localStorage.clear();
 });
 afterAll(() => server.close());
