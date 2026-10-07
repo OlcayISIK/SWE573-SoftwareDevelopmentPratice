@@ -10,17 +10,20 @@ MAX_MEDIA_PER_CRAFT = 20
 
 EDITABLE_FIELDS = {
     "name",
-    "craft_type",
     "category",
-    "region",
+    "craft_type",
+    "tools",
+    "materials",
+    "culture",
+    "address",
+    "city",
+    "country",
     "latitude",
     "longitude",
     "description",
-    "production_process",
-    "how_to_understand",
-    "cultural_relevance",
     "attributes",
 }
+MANY_TO_MANY_FIELDS = ("tools", "materials")
 
 VERIFY_BEFORE_PUBLISHING = "Verify your email address before publishing crafts."
 NOT_ALLOWED_TO_EDIT = "Only the author or an admin can change this craft."
@@ -55,7 +58,11 @@ def publish_craft(*, author, data):
         raise PermissionDeniedError(VERIFY_BEFORE_PUBLISHING)
     _ensure_editable(data)
 
-    craft = Craft.objects.create(author=author, **data)
+    fields = dict(data)
+    related = {field: fields.pop(field, []) for field in MANY_TO_MANY_FIELDS}
+    craft = Craft.objects.create(author=author, **fields)
+    for field, items in related.items():
+        getattr(craft, field).set(items)
     signals.craft_published.send(sender=Craft, craft=craft)
     return craft
 
@@ -68,7 +75,10 @@ def update_craft(*, craft, actor, data):
         return craft
 
     for field, value in data.items():
-        setattr(craft, field, value)
+        if field in MANY_TO_MANY_FIELDS:
+            getattr(craft, field).set(value)
+        else:
+            setattr(craft, field, value)
     craft.save()
     signals.craft_updated.send(sender=Craft, craft=craft, actor=actor)
     return craft

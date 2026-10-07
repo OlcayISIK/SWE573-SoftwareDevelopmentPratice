@@ -1,7 +1,7 @@
 import factory
 
 from accounts.models import User
-from crafts.models import Category, Craft, Region
+from crafts.models import Category, Craft, CraftType, Culture
 from moderation.models import Report
 
 DEFAULT_PASSWORD = "Str0ng-Passw0rd!"
@@ -34,29 +34,22 @@ class CategoryFactory(factory.django.DjangoModelFactory):
     slug = factory.Sequence(lambda n: f"test-category-{n}")
 
 
-class RegionFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Region
-
-    name = factory.Sequence(lambda n: f"Test Region {n}")
-    country = "Testland"
-    description = "A region used in tests."
-
-
 class CraftFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Craft
 
     name = factory.Sequence(lambda n: f"Craft {n}")
-    craft_type = "Tile"
     category = factory.SubFactory(CategoryFactory)
-    region = factory.SubFactory(RegionFactory)
+    craft_type = factory.LazyAttribute(
+        lambda craft: CraftType.objects.get_or_create(category=craft.category, name="Tile")[0]
+    )
+    culture = factory.LazyFunction(lambda: Culture.objects.get(name="Turkish"))
+    address = "Kütahya, Türkiye"
+    city = "Kütahya"
+    country = "Türkiye"
     latitude = "39.419200"
     longitude = "29.983300"
-    description = "Hand-painted glazed tile."
-    production_process = "Shaped, painted, glazed, and fired in a kiln."
-    how_to_understand = "Motifs reflect local flora."
-    cultural_relevance = "Part of a centuries-old regional tradition."
+    description = "Hand-painted glazed tile, shaped, painted, glazed, and fired in a kiln."
     attributes = factory.LazyFunction(dict)
     author = factory.SubFactory(UserFactory)
 
@@ -68,4 +61,4 @@ class ReportFactory(factory.django.DjangoModelFactory):
     craft = factory.SubFactory(CraftFactory)
     reporter = factory.SubFactory(UserFactory)
     reason = Report.Reason.INACCURATE
-    note = "The region looks wrong."
+    note = "The culture looks wrong."

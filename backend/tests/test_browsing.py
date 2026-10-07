@@ -1,6 +1,6 @@
 import pytest
 
-from crafts.models import Category, Craft, Region
+from crafts.models import Category, Craft, CraftType, Culture
 from tests.factories import CraftFactory, UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -26,13 +26,12 @@ def textiles():
 
 
 @pytest.fixture
-def kutahya():
-    return Region.objects.get(name="Kütahya")
+def zapotec():
+    return Culture.objects.get(name="Zapotec")
 
 
-@pytest.fixture
-def oaxaca():
-    return Region.objects.get(name="Oaxaca")
+def craft_type(category, name):
+    return CraftType.objects.get_or_create(category=category, name=name)[0]
 
 
 def test_list_is_paginated_and_newest_first(api_client):
@@ -43,7 +42,17 @@ def test_list_is_paginated_and_newest_first(api_client):
 
     assert data["total"] == 2
     assert [item["id"] for item in data["items"]] == [second.id, first.id]
-    assert set(data["items"][0]) >= {"id", "name", "category", "region", "author", "latitude"}
+    assert set(data["items"][0]) >= {
+        "id",
+        "name",
+        "category",
+        "craft_type",
+        "culture",
+        "city",
+        "country",
+        "author",
+        "latitude",
+    }
 
 
 def test_list_includes_crafts_from_all_users(api_client):
@@ -69,29 +78,52 @@ def test_filter_by_category(api_client, ceramics, textiles):
     assert names(api_client.get(CRAFTS_URL, {"category": "ceramics"})) == {"Tile"}
 
 
-def test_filter_by_region_and_country(api_client, kutahya, oaxaca):
-    CraftFactory(name="Tile", region=kutahya)
-    CraftFactory(name="Barro negro", region=oaxaca)
+def test_filter_by_culture_and_country(api_client, zapotec):
+    CraftFactory(name="Tile")
+    CraftFactory(
+        name="Barro negro", culture=zapotec, address="San Bartolo Coyotepec", country="Mexico"
+    )
 
-    assert names(api_client.get(CRAFTS_URL, {"region": oaxaca.id})) == {"Barro negro"}
+    assert names(api_client.get(CRAFTS_URL, {"culture": zapotec.id})) == {"Barro negro"}
     assert names(api_client.get(CRAFTS_URL, {"country": "türkiye"})) == {"Tile"}
 
 
-def test_search_matches_name_type_and_region(api_client, kutahya):
-    CraftFactory(name="Kütahya Çinisi", region=kutahya)
-    CraftFactory(name="Kilim", craft_type="Flat-woven rug")
-    CraftFactory(name="Unrelated", craft_type="Basket")
+def test_filter_by_craft_type(api_client, textiles):
+    kilim = craft_type(textiles, "Kilim")
+    CraftFactory(name="Kilim from Uşak", category=textiles, craft_type=kilim)
+    CraftFactory(name="Carpet", category=textiles, craft_type=craft_type(textiles, "Carpet"))
+
+    assert names(api_client.get(CRAFTS_URL, {"craft_type": kilim.id})) == {"Kilim from Uşak"}
+
+
+def test_search_matches_name_type_culture_and_place(api_client, textiles, zapotec):
+    CraftFactory(name="Kütahya Çinisi")
+    CraftFactory(name="Rug", category=textiles, craft_type=craft_type(textiles, "Kilim"))
+    CraftFactory(name="Black pottery", culture=zapotec, address="Oaxaca", country="Mexico")
 
     assert names(api_client.get(CRAFTS_URL, {"search": "çini"})) == {"Kütahya Çinisi"}
-    assert names(api_client.get(CRAFTS_URL, {"search": "rug"})) == {"Kilim"}
-    assert names(api_client.get(CRAFTS_URL, {"search": "Kütahya"})) == {"Kütahya Çinisi"}
+    assert names(api_client.get(CRAFTS_URL, {"search": "kilim"})) == {"Rug"}
+    assert names(api_client.get(CRAFTS_URL, {"search": "zapotec"})) == {"Black pottery"}
+    assert names(api_client.get(CRAFTS_URL, {"search": "oaxaca"})) == {"Black pottery"}
 
 
 def test_invalid_filter_is_rejected(api_client):
-    response = api_client.get(CRAFTS_URL, {"region": "abc"})
+    response = api_client.get(CRAFTS_URL, {"culture": "abc"})
 
     assert response.status_code == 400
-    assert "region" in response.json()["errors"]
+    assert "culture" in response.json()["errors"]
+
+
+def test_countries_with_crafts_are_listed_once(api_client):
+    CraftFactory(country="Türkiye")
+    CraftFactory(country="Türkiye")
+    CraftFactory(country="Mexico")
+    CraftFactory(country="Peru", status=Craft.Status.HIDDEN)
+    CraftFactory(country="")
+
+    response = api_client.get(f"{CRAFTS_URL}countries/")
+
+    assert response.json()["data"] == ["Mexico", "Türkiye"]
 
 
 def test_list_query_count_does_not_grow_with_results(api_client, django_assert_max_num_queries):

@@ -85,7 +85,7 @@ backend/
 │   ├── renderers.py           # Response envelope
 │   └── schema.py              # OpenAPI extension for the envelope
 ├── accounts/                  # Users, profiles, privacy settings
-├── crafts/                    # Craft entries, lookup lists, regions, media
+├── crafts/                    # Craft entries, lookup lists, media
 ├── moderation/                # Reports and admin review actions
 ├── social/                    # Favorites and follows
 ├── notifications/             # In-app notifications
@@ -158,7 +158,7 @@ The order is enforced in CI with an import-linter `layers` contract, so an impor
 | Module          | Responsibility                                                  | Requirements        |
 | --------------- | --------------------------------------------------------------- | ------------------- |
 | `accounts`      | Registration with email, login, profile, privacy settings       | FR-02, FR-16 to 19  |
-| `crafts`        | Craft entries, lookup lists, regions, attributes, media, browsing | FR-01, FR-03 to 10  |
+| `crafts`        | Craft entries, lookup lists, attributes, media, browsing | FR-01, FR-03 to 10  |
 | `moderation`    | Reporting entries, admin review queue, review history           | FR-11, FR-12        |
 | `social`        | Favorites and follows                                           | FR-13, FR-14        |
 | `notifications` | Creating and listing in-app notifications                       | FR-15               |
@@ -184,19 +184,26 @@ All models inherit `core.BaseModel`, which adds `id`, `created_at`, and `updated
   - Names are unique ignoring case (per category for craft types), so "carpet" and "Carpet" stay one item.
   - The lists are seeded by data migrations, so a new database starts with them. Seeded items have no `created_by`.
   - Registered users with a verified email can add items, and everyone can use them right away. Adding a name that already exists returns the existing item. Admins hide items with `is_hidden`, which removes them from the lists; a hidden name cannot be added again.
-- **Region**: `name`, `country`, `description`.
-- **Craft**: `name`, `craft_type`, `category` (FK), `region` (FK), `latitude`, `longitude`, `description`, `production_process`, `how_to_understand`, `cultural_relevance`, `attributes` (`JSONField`), `status` (`published` or `hidden`), `author` (FK User).
+- **Craft**: `name`, `category` (FK), `craft_type` (FK, must belong to the category), `tools` and `materials` (many-to-many, optional), `culture` (FK, required for new crafts), `address`, `city`, `country`, `latitude`, `longitude`, `description` (one text covering what it is, how it is made, how to understand it, and its cultural relevance), `attributes` (`JSONField`), `status` (`published` or `hidden`), `author` (FK User).
+  - Hidden lookup items cannot be chosen for a craft, but crafts that already use them keep showing them.
+  - Crafts added before these fields existed were converted by a migration: the craft type text was matched to a craft type in the same category (or added as one), the region became the address and country and set the culture, the four texts were joined into `description` under their old labels, and the material names became material entries.
 - **CraftMedia**: `craft` (FK), `media_type` (`photo`, `video`, `document`), `file` or `url`, `caption`, `alt_text`, `order`.
 
 `attributes` stores craft-specific properties that vary between crafts, for example:
 
 ```json
 {
-  "dimensions_cm": { "height": 20, "width": 20 },
+  "dimensions": [
+    { "type": "height", "value": 20, "unit": "cm" },
+    { "type": "width", "value": 20, "unit": "cm" }
+  ],
+  "weight_g": 450,
   "colors": ["cobalt blue", "turquoise"],
   "distinguishing_features": "Hand-painted floral motifs under a transparent glaze"
 }
 ```
+
+Dimensions are optional rows. The type is one of `height`, `width`, `depth`, `length`, `diameter`, or `thickness`, each entered once, and the unit is `mm`, `cm`, or `m`.
 
 ### moderation
 
@@ -214,7 +221,7 @@ All models inherit `core.BaseModel`, which adds `id`, `created_at`, and `updated
 
 ### Indexes
 
-- `Craft(category)`, `Craft(region)`, and `Craft(latitude, longitude)` for map and filter queries.
+- `Craft(category)`, `Craft(craft_type)`, `Craft(culture)`, and `Craft(latitude, longitude)` for map and filter queries.
 - `Notification(recipient, is_read)` for the unread count.
 - `Report(status)` for the admin queue.
 
@@ -237,7 +244,7 @@ Because of that limit, craft visibility is defined once and reused:
 
 ## API Design
 
-All endpoints are under `/api/v1/`. List endpoints are paginated, except the reference and lookup lists, which return every visible row so the frontend can fill its pickers and filters in one request. `/regions/` accepts an optional `country` filter, `/craft-types/` a `category` id, and `/tools/` and `/materials/` a `craft_type` id that marks the typical items with `typical: true` and lists them first.
+All endpoints are under `/api/v1/`. List endpoints are paginated, except the reference and lookup lists, which return every visible row so the frontend can fill its pickers and filters in one request. `/craft-types/` accepts a `category` id, and `/tools/` and `/materials/` a `craft_type` id that marks the typical items with `typical: true` and lists them first.
 
 | Method | Endpoint                               | Access          | Purpose                               |
 | ------ | -------------------------------------- | --------------- | ------------------------------------- |
@@ -249,16 +256,16 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 | POST   | `/auth/logout/`                        | Guest           | Blacklist the refresh token           |
 | POST   | `/auth/password-reset/`                | Guest           | Request a password reset email        |
 | POST   | `/auth/password-reset/confirm/`        | Guest           | Set a new password with the token     |
-| GET    | `/crafts/`                             | Public          | List crafts (filter by category, region, country, search) |
+| GET    | `/crafts/`                             | Public          | List crafts (filter by category, craft type, culture, country, search) |
 | GET    | `/crafts/map/`                         | Public          | Lightweight pins for the map (same filters, plus `bbox=west,south,east,north`) |
+| GET    | `/crafts/countries/`                   | Public          | Countries that have crafts, for the country filter |
 | GET    | `/crafts/{id}/`                        | Public          | Craft details                         |
 | POST   | `/crafts/`                             | Registered user | Publish a craft                       |
 | PATCH  | `/crafts/{id}/`                        | Author or admin | Edit a craft                          |
 | DELETE | `/crafts/{id}/`                        | Author or admin | Soft delete a craft                   |
 | POST   | `/crafts/{id}/media/`                  | Author          | Upload photo, video, or document      |
 | DELETE | `/crafts/{id}/media/{media_id}/`       | Author or admin | Remove a media item                   |
-| GET    | `/categories/`, `/regions/`            | Public          | Reference data for filters            |
-| GET    | `/craft-types/`, `/tools/`, `/materials/`, `/cultures/` | Public | Lookup lists for the craft form |
+| GET    | `/categories/`, `/craft-types/`, `/tools/`, `/materials/`, `/cultures/` | Public | Lookup lists for the craft form and filters |
 | POST   | `/categories/`, `/craft-types/`, `/tools/`, `/materials/`, `/cultures/` | Registered user | Add a lookup item (201), or get the existing one with the same name (200) |
 | POST   | `/crafts/{id}/report/`                 | Registered user | Report a craft                        |
 | GET    | `/moderation/reports/`                 | Admin           | Review queue (`status=open` by default; also `resolved`, `dismissed`, `all`) |

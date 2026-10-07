@@ -3,30 +3,16 @@ from django.db import transaction
 
 from crafts import services as craft_services
 from crafts import signals as craft_signals
-from crafts.models import Category, Craft, Region
+from crafts.models import Craft
 from notifications.models import Notification
 from tests.factories import CraftFactory, ReportFactory, UserFactory
+from tests.payloads import craft_data, craft_payload
 
 pytestmark = pytest.mark.django_db
 
 NOTIFICATIONS_URL = "/api/v1/me/notifications/"
 UNREAD_URL = "/api/v1/me/notifications/unread-count/"
 READ_URL = "/api/v1/me/notifications/read/"
-
-
-def craft_payload():
-    return {
-        "name": "Uşak Halısı",
-        "craft_type": "Carpet",
-        "category": Category.objects.get(slug="textiles").id,
-        "region": Region.objects.get(name="Uşak").id,
-        "latitude": 38.68,
-        "longitude": 29.41,
-        "description": "Hand-knotted wool carpet.",
-        "production_process": "Knotted by hand on a loom.",
-        "how_to_understand": "Medallion layouts are typical.",
-        "cultural_relevance": "Exported widely since the 16th century.",
-    }
 
 
 def follow(client_for, follower, author):
@@ -148,11 +134,7 @@ def test_notifications_roll_back_with_the_change(user):
         with pytest.raises(RuntimeError), transaction.atomic():
             craft_services.publish_craft(
                 author=author,
-                data={
-                    **craft_payload(),
-                    "category": Category.objects.get(slug="textiles"),
-                    "region": Region.objects.get(name="Uşak"),
-                },
+                data=craft_data(),
             )
     finally:
         craft_signals.craft_published.disconnect(dispatch_uid="test_fail")

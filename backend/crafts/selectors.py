@@ -2,7 +2,7 @@ from django.db.models import Exists, OuterRef, Prefetch, Q, Value
 
 from core.exceptions import NotFoundError
 
-from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Region, Tool
+from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Tool
 
 CRAFT_NOT_FOUND = "Craft not found."
 MEDIA_NOT_FOUND = "Media not found."
@@ -47,13 +47,6 @@ def list_cultures():
     return Culture.objects.filter(is_hidden=False)
 
 
-def list_regions(*, country=None):
-    regions = Region.objects.all()
-    if country:
-        regions = regions.filter(country__iexact=country)
-    return regions
-
-
 def visible_crafts(viewer=None):
     """Crafts a viewer may see: not deleted, and published or their own. Admins see hidden too."""
     crafts = Craft.objects.all()
@@ -64,26 +57,45 @@ def visible_crafts(viewer=None):
     return crafts.filter(status=Craft.Status.PUBLISHED)
 
 
-def _apply_filters(crafts, *, category=None, region=None, country=None, search=None):
+def _apply_filters(
+    crafts, *, category=None, craft_type=None, culture=None, country=None, search=None
+):
     if category:
         crafts = crafts.filter(category__slug=category)
-    if region:
-        crafts = crafts.filter(region_id=region)
+    if craft_type:
+        crafts = crafts.filter(craft_type_id=craft_type)
+    if culture:
+        crafts = crafts.filter(culture_id=culture)
     if country:
-        crafts = crafts.filter(region__country__iexact=country)
+        crafts = crafts.filter(country__iexact=country)
     if search:
         crafts = crafts.filter(
             Q(name__icontains=search)
-            | Q(craft_type__icontains=search)
+            | Q(craft_type__name__icontains=search)
             | Q(description__icontains=search)
             | Q(category__name__icontains=search)
-            | Q(region__name__icontains=search)
+            | Q(culture__name__icontains=search)
+            | Q(address__icontains=search)
+            | Q(country__icontains=search)
         )
     return crafts
 
 
+def craft_countries(viewer=None):
+    """Countries that have crafts the viewer can see, for the country filter."""
+    return (
+        visible_crafts(viewer)
+        .exclude(country="")
+        .order_by("country")
+        .values_list("country", flat=True)
+        .distinct()
+    )
+
+
 def browse_crafts(viewer=None, *, author_id=None, **filters):
-    crafts = visible_crafts(viewer).select_related("category", "region", "author__profile")
+    crafts = visible_crafts(viewer).select_related(
+        "category", "craft_type", "culture", "author__profile"
+    )
     if author_id is not None:
         crafts = crafts.filter(author_id=author_id)
     return _with_photos(_apply_filters(crafts, **filters))
@@ -104,8 +116,8 @@ def map_pins(viewer=None, *, bbox=None, **filters):
 def get_visible_craft(craft_id, viewer=None):
     craft = (
         visible_crafts(viewer)
-        .select_related("category", "region", "author__profile")
-        .prefetch_related("media")
+        .select_related("category", "craft_type", "culture", "author__profile")
+        .prefetch_related("media", "tools", "materials")
         .filter(pk=craft_id)
         .first()
     )
