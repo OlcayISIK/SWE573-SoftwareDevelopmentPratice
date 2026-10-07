@@ -32,6 +32,12 @@ export function AccountMenu() {
   return (
     <>
       <Link
+        to="/me/favorites"
+        className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
+      >
+        Favorites
+      </Link>
+      <Link
         to="/me"
         className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
       >

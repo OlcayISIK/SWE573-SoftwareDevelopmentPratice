@@ -51,6 +51,13 @@ export const routes: RouteObject[] = [
                   })),
               },
               {
+                path: "me/favorites",
+                lazy: () =>
+                  import("@/features/social/pages/MyFavoritesPage").then((m) => ({
+                    Component: m.MyFavoritesPage,
+                  })),
+              },
+              {
                 path: "me/settings",
                 lazy: () =>
                   import("@/features/profiles/pages/SettingsPage").then((m) => ({
