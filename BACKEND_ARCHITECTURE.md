@@ -481,6 +481,7 @@ FRONTEND_URL=https://example.com
 AUTO_VERIFY_EMAIL=false
 GEOCODER_URL=https://nominatim.openstreetmap.org
 GEOCODER_USER_AGENT=IndigenousCrafts/1.0 (+https://example.com)
+LOAD_SAMPLE_DATA=false
 EMAIL_HOST=smtp.example.com
 EMAIL_PORT=587
 EMAIL_HOST_USER=change-me
@@ -498,6 +499,7 @@ The application runs as a single instance.
 - **Local development:** Docker Compose starts two containers, `backend` and `db` (PostgreSQL).
 - **Image:** multi-stage Docker build. The runtime stage uses a slim Python image, runs as a non-root user, and contains no build tools.
 - **Startup:** the entrypoint runs `python manage.py migrate --noinput`, then `createcachetable`, then `collectstatic`, then starts Gunicorn. With one instance there is no risk of concurrent migrations.
+- **Sample data:** `python manage.py load_sample_crafts` adds 30 real crafts at their real towns, with freely licensed photos from Wikimedia Commons, owned by sample contributor accounts that cannot log in. Running it again adds nothing, and `--remove` takes the crafts, their photo files, and the contributors out again. The data and photos live in `crafts/sample_data/`, with every photo credited in its caption and in `CREDITS.md`. The entrypoint runs the command when `LOAD_SAMPLE_DATA=true`, which Docker Compose sets for local use; production leaves it off.
 - **Admin account:** created once with `python manage.py createsuperuser`, then given the `admin` role.
 - **Maintenance:** `python manage.py flushexpiredtokens` runs daily (host cron or the platform's scheduler) to clear expired entries from the token blacklist.
 
