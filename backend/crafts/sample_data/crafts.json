@@ -1,0 +1,1885 @@
+{
+  "authors": {
+    "anatolia": {
+      "display_name": "Sample Contributor (Anatolia)",
+      "city": "Kütahya",
+      "country": "Türkiye"
+    },
+    "americas": {
+      "display_name": "Sample Contributor (Americas)",
+      "city": "Santa Fe",
+      "country": "United States"
+    },
+    "africa": {
+      "display_name": "Sample Contributor (Africa)",
+      "city": "Kumasi",
+      "country": "Ghana"
+    },
+    "asia": {
+      "display_name": "Sample Contributor (Asia)",
+      "city": "Kyoto",
+      "country": "Japan"
+    },
+    "pacific": {
+      "display_name": "Sample Contributor (Pacific)",
+      "city": "Rotorua",
+      "country": "New Zealand"
+    },
+    "europe": {
+      "display_name": "Sample Contributor (Europe)",
+      "city": "Jokkmokk",
+      "country": "Sweden"
+    }
+  },
+  "crafts": [
+    {
+      "slug": "kutahya-cini",
+      "name": "Kütahya Çinisi",
+      "category": "ceramics",
+      "craft_type": "Tile",
+      "culture": "Turkish",
+      "tools": [
+        "Pounce stencil",
+        "Brush",
+        "Kiln"
+      ],
+      "materials": [
+        "Clay",
+        "Quartz",
+        "Cobalt oxide",
+        "Glaze"
+      ],
+      "address": "Kütahya, Türkiye",
+      "city": "Kütahya",
+      "country": "Türkiye",
+      "latitude": 39.41991,
+      "longitude": 29.98579,
+      "description": "Glazed tiles and vessels from Kütahya in western Anatolia, a center of ceramic production since at least the 14th century. Kütahya workshops grew in importance in the 17th and 18th centuries, after the decline of İznik.\n\nHow it is made\nA design drawn on paper is pricked along its lines and charcoal dust is pounced through it onto the white slip. The outlines are drawn in dark paint, the motifs are filled with cobalt blue, turquoise, green, and red, and the piece is covered with a clear glaze and fired in a kiln.\n\nHow to understand it\nTulips, carnations, hyacinths, and rumi scrolls are the usual motifs. Pieces made in the 18th century often show yellow and a freer, more personal drawing style than İznik ware.\n\nCultural relevance\nKütahya tiles decorate mosques, fountains, and homes across Türkiye, and the craft is still practiced in many family workshops in the city, which also has a museum dedicated to its ceramics.",
+      "colors": [
+        "#1e3a8a",
+        "#0e9aa7",
+        "#2f7d32",
+        "#b91c1c",
+        "#f8f5ee"
+      ],
+      "dimensions": [
+        {
+          "type": "height",
+          "value": 20,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 20,
+          "unit": "cm"
+        },
+        {
+          "type": "thickness",
+          "value": 1,
+          "unit": "cm"
+        }
+      ],
+      "author": "anatolia",
+      "photos": [
+        {
+          "file": "kutahya-cini-1.jpg",
+          "alt_text": "Glazed tile with large blue, green, and red floral scrolls on a white ground",
+          "caption": "Tile at the Kütahya Ceramics Museum. Photo: Dosseman, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Dosseman",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:K%C3%BCtahya_Ceramics_Museum_tile_107.jpg"
+          }
+        },
+        {
+          "file": "kutahya-cini-2.jpg",
+          "alt_text": "Small domed mosque with a slim minaret, its walls covered in turquoise and blue tiles",
+          "caption": "The Tiled Mosque in Kütahya. Photo: Ömerserez, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Ömerserez",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:K%C3%BCtahya_%C3%A7inili_cami.JPG"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "barro-negro",
+      "name": "Barro negro pottery",
+      "category": "ceramics",
+      "craft_type": "Pottery",
+      "culture": "Zapotec",
+      "tools": [
+        "Burnishing stone",
+        "Kiln"
+      ],
+      "materials": [
+        "Clay"
+      ],
+      "address": "San Bartolo Coyotepec, Oaxaca, Mexico",
+      "city": "San Bartolo Coyotepec",
+      "country": "Mexico",
+      "latitude": 16.948863,
+      "longitude": -96.693195,
+      "description": "Black pottery from San Bartolo Coyotepec, a Zapotec town south of the city of Oaxaca, made from a local grey clay.\n\nHow it is made\nPieces are shaped by hand, often turning the clay on a pair of plates instead of a wheel. Once partly dry they are polished with a quartz stone and fired at a low temperature in an underground kiln, where the smoke of a reducing fire turns the clay black.\n\nHow to understand it\nThe glossy black finish comes only from burnishing before firing; no glaze is used. Older, matte pieces were made for carrying water and mezcal. The shiny finish was developed in the 1950s by the potter Doña Rosa Real.\n\nCultural relevance\nBarro negro supports many families in the town and is one of the best known crafts of Oaxaca.",
+      "colors": [
+        "#1c1c1c",
+        "#3b3b3b"
+      ],
+      "dimensions": [
+        {
+          "type": "height",
+          "value": 25,
+          "unit": "cm"
+        },
+        {
+          "type": "diameter",
+          "value": 18,
+          "unit": "cm"
+        }
+      ],
+      "author": "americas",
+      "photos": [
+        {
+          "file": "barro-negro-1.jpg",
+          "alt_text": "Round, glossy black clay jar with a short neck, standing on an orange surface",
+          "caption": "Burnished barro negro jar. Photo: Juan Carlos Fonseca Mata, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Juan Carlos Fonseca Mata",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:C%C3%A1ntaro_liso_de_barro_negro_de_Oaxaca_de_Ju%C3%A1rez,_Oaxaca,_M%C3%A9xico.jpg"
+          }
+        },
+        {
+          "file": "barro-negro-2.jpg",
+          "alt_text": "Potter shaping a grey clay jug on a turning plate in a workshop",
+          "caption": "Shaping barro negro at a workshop in San Bartolo Coyotepec. Photo: Inakiherrasti, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Inakiherrasti",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Elaboraci%C3%B3n_del_barro_negro23_inakiherrasti.JPG"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "usak-carpet",
+      "name": "Uşak carpet",
+      "category": "textiles",
+      "craft_type": "Carpet",
+      "culture": "Turkish",
+      "tools": [
+        "Loom",
+        "Knotting knife",
+        "Beater comb",
+        "Shears"
+      ],
+      "materials": [
+        "Wool",
+        "Madder",
+        "Indigo"
+      ],
+      "address": "Uşak, Türkiye",
+      "city": "Uşak",
+      "country": "Türkiye",
+      "latitude": 38.67404,
+      "longitude": 29.40584,
+      "description": "Hand-knotted wool carpets from the region of Uşak in western Anatolia, famous since the 15th century.\n\nHow it is made\nWool is spun, dyed with plant dyes such as madder for red and indigo for blue, and knotted row by row on a vertical loom with the symmetrical Turkish knot. Each row is beaten down with a comb and the pile is trimmed with shears.\n\nHow to understand it\nThe classic designs are the medallion Uşak, with large pointed medallions on a red field, and the star Uşak. Many have a deep red ground with dark blue and yellow details.\n\nCultural relevance\nUşak carpets were exported to Europe from the 15th to the 17th century and appear in many European paintings of the period, which made them some of the best known Anatolian carpets.",
+      "colors": [
+        "#9b1b1b",
+        "#1f2a5a",
+        "#c9a227",
+        "#f2e8cf"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 300,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 200,
+          "unit": "cm"
+        }
+      ],
+      "author": "anatolia",
+      "photos": [
+        {
+          "file": "usak-carpet-1.jpg",
+          "alt_text": "Detail of a red carpet with a large dark blue star-shaped medallion and floral ornament",
+          "caption": "17th century Uşak carpet, Turkish and Islamic Arts Museum, İstanbul. Photo: Dosseman, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Dosseman",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Istanbul_Turkish_and_Islamic_Museum_U%C5%9Fak_carpet_17th_century_in_2006_68_049.jpg"
+          }
+        },
+        {
+          "file": "usak-carpet-2.jpg",
+          "alt_text": "Worn cream carpet with rows of red crescent and dot motifs",
+          "caption": "Uşak çintemani carpet, Carpet Museum, İstanbul. Photo: Dosseman, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Dosseman",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Istanbul_Carpet_Museum_U%C5%9Fak_%C5%9Fintemani_carpet_in_2015_5454.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "kente-cloth",
+      "name": "Kente cloth",
+      "category": "textiles",
+      "craft_type": "Handwoven cloth",
+      "culture": "Asante",
+      "tools": [
+        "Strip loom",
+        "Shuttle",
+        "Heddle"
+      ],
+      "materials": [
+        "Cotton",
+        "Silk"
+      ],
+      "address": "Bonwire, Ghana",
+      "city": "Bonwire",
+      "country": "Ghana",
+      "latitude": 6.79334,
+      "longitude": -1.47323,
+      "description": "Woven cloth of the Asante people of Ghana. Bonwire, near Kumasi, is one of the best known weaving towns.\n\nHow it is made\nWeavers work on narrow horizontal strip looms worked with the feet. Strips about ten centimeters wide are woven with blocks of pattern and then sewn together edge to edge to make a large cloth.\n\nHow to understand it\nEach pattern has a name, and many refer to proverbs, history, or people. Colors also carry meaning: gold is often linked with wealth and royalty, green with growth, and red with sacrifice.\n\nCultural relevance\nKente was once reserved for royalty and is now worn at festivals, weddings, and graduations, and as a sign of African heritage worldwide.",
+      "colors": [
+        "#f2b705",
+        "#1f7a3a",
+        "#c1121f",
+        "#111111"
+      ],
+      "dimensions": [
+        {
+          "type": "width",
+          "value": 10,
+          "unit": "cm"
+        },
+        {
+          "type": "length",
+          "value": 300,
+          "unit": "cm"
+        }
+      ],
+      "author": "africa",
+      "photos": [
+        {
+          "file": "kente-cloth-1.jpg",
+          "alt_text": "Man weaving a narrow strip of yellow and green kente on a wooden strip loom",
+          "caption": "Weaving kente in Bonwire. Photo: Sadads, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Sadads",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Bonwire_man_weaving.jpg"
+          }
+        },
+        {
+          "file": "kente-cloth-2.jpg",
+          "alt_text": "Chiefs in bright kente cloths walking under large umbrellas in a street procession",
+          "caption": "Bonwire Kente Festival, 2024. Photo: Baah Badu Kurfass 1, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Baah Badu Kurfass 1",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Image_of_2024_Bonwire_Kente_Festival_21.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "two-grey-hills-rug",
+      "name": "Two Grey Hills rug",
+      "category": "textiles",
+      "craft_type": "Tapestry",
+      "culture": "Diné (Navajo)",
+      "tools": [
+        "Loom",
+        "Beater comb",
+        "Drop spindle",
+        "Carding comb"
+      ],
+      "materials": [
+        "Wool"
+      ],
+      "address": "Newcomb, New Mexico, United States",
+      "city": "Newcomb",
+      "country": "United States",
+      "latitude": 36.28235,
+      "longitude": -108.710241,
+      "description": "A style of Diné (Navajo) weaving named after the Two Grey Hills trading post near Newcomb in northwestern New Mexico.\n\nHow it is made\nWeavers card and spin the wool, often very finely, and weave it on an upright loom, pressing each row of weft down with a wooden comb so the warp is fully covered.\n\nHow to understand it\nTwo Grey Hills rugs use the natural colors of the sheep, white, brown, black, and grey, often blended by carding. They have a central diamond or medallion and a dark border.\n\nCultural relevance\nWeaving is central to Diné life and teaching, and the finest Two Grey Hills pieces are among the most valued Navajo textiles.",
+      "colors": [
+        "#eae3d2",
+        "#5b4636",
+        "#1b1b1b",
+        "#8a8a8a"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 150,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 90,
+          "unit": "cm"
+        }
+      ],
+      "author": "americas",
+      "photos": [
+        {
+          "file": "two-grey-hills-rug-1.jpg",
+          "alt_text": "Rug in natural black, grey, white, and brown wool with a central diamond and dark border",
+          "caption": "Two Grey Hills rug. Photo: Kokopelli-UK, CC0, Wikimedia Commons",
+          "credit": {
+            "author": "Kokopelli-UK",
+            "license": "CC0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source": "https://commons.wikimedia.org/wiki/File:Two_Grey_Hills_rug.jpg"
+          }
+        },
+        {
+          "file": "two-grey-hills-rug-2.jpg",
+          "alt_text": "Inside a trading post, a black, white, and grey rug hangs below a Two Grey Hills sign",
+          "caption": "Two Grey Hills Trading Post, New Mexico. Photo: MPSharwood, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "MPSharwood",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Two_Grey_Hills_Trading_Post,_Navajo_Nation_(NM).jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "guna-mola",
+      "name": "Mola",
+      "category": "textiles",
+      "craft_type": "Embroidery",
+      "culture": "Guna",
+      "tools": [
+        "Needle",
+        "Scissors",
+        "Thimble"
+      ],
+      "materials": [
+        "Cotton"
+      ],
+      "address": "Gardi Sugdub, Guna Yala, Panama",
+      "city": "Gardi Sugdub",
+      "country": "Panama",
+      "latitude": 9.470658,
+      "longitude": -78.961023,
+      "description": "Panels made by Guna women of the San Blas islands (Guna Yala) of Panama, worn on the front and back of their blouses.\n\nHow it is made\nSeveral layers of colored cotton cloth are stacked. The design is cut through the top layers and the cut edges are turned under and sewn with tiny stitches, so the colors below show through. This is called reverse appliqué.\n\nHow to understand it\nDesigns range from geometric mazes to animals, plants, and scenes of daily life and stories. Fine stitching and many layers show great skill.\n\nCultural relevance\nMolas are part of the everyday dress of Guna women and a strong sign of Guna identity.",
+      "colors": [
+        "#c1121f",
+        "#111111",
+        "#f77f00",
+        "#1d4ed8"
+      ],
+      "dimensions": [
+        {
+          "type": "height",
+          "value": 40,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 50,
+          "unit": "cm"
+        }
+      ],
+      "author": "americas",
+      "photos": [
+        {
+          "file": "guna-mola-1.jpg",
+          "alt_text": "Red mola panel with layered cloth outlines forming birds and plants",
+          "caption": "Mola blouse panel, Honolulu Museum of Art. Photo: Hiart, CC0, Wikimedia Commons",
+          "credit": {
+            "author": "Hiart",
+            "license": "CC0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source": "https://commons.wikimedia.org/wiki/File:Mola_(blouse_panel),_Cuna_(Kuna)_Indians,_Honolulu_Museum_of_Art,_3740.1.JPG"
+          }
+        },
+        {
+          "file": "guna-mola-2.jpg",
+          "alt_text": "Guna woman in a red headscarf holding up a mola, with more molas hanging behind her",
+          "caption": "Molas by Guna women, Playón Chico. Photo: Kent MacElwee, CC BY 2.0, Wikimedia Commons",
+          "credit": {
+            "author": "Kent MacElwee",
+            "license": "CC BY 2.0",
+            "license_url": "https://creativecommons.org/licenses/by/2.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Mola_by_Kuna_women,_Playon_Chico.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "chinchero-weaving",
+      "name": "Chinchero weaving",
+      "category": "textiles",
+      "craft_type": "Handwoven cloth",
+      "culture": "Quechua",
+      "tools": [
+        "Loom",
+        "Drop spindle",
+        "Dye pot"
+      ],
+      "materials": [
+        "Alpaca wool",
+        "Wool",
+        "Natural dyes"
+      ],
+      "address": "Chinchero, Cusco, Peru",
+      "city": "Chinchero",
+      "country": "Peru",
+      "latitude": -13.409821,
+      "longitude": -72.043905,
+      "description": "Textiles woven by Quechua women in Chinchero, a town in the Andes above the Sacred Valley near Cusco.\n\nHow it is made\nSheep and alpaca wool is spun by hand with a drop spindle and dyed with plants, minerals, and cochineal insects, which give reds and pinks. The cloth is woven on a backstrap or ground loom.\n\nHow to understand it\nThe tight warp-faced patterns have names, and each community has its own designs, so a weaving shows where it comes from.\n\nCultural relevance\nWeaving cooperatives in Chinchero have revived natural dyeing and older patterns and teach them to young weavers.",
+      "colors": [
+        "#b5121b",
+        "#1f3a93",
+        "#f2a900",
+        "#1b5e20"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 100,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 80,
+          "unit": "cm"
+        }
+      ],
+      "author": "americas",
+      "photos": [
+        {
+          "file": "chinchero-weaving-1.jpg",
+          "alt_text": "Weaver in a red hat working at a backstrap loom with blue and red warp threads",
+          "caption": "A weaver from Chinchero. Photo: La Border, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "La Border",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Tejedora_de_Chincheros_en_Yucay.jpg"
+          }
+        },
+        {
+          "file": "chinchero-weaving-2.jpg",
+          "alt_text": "Woman in a flat embroidered hat weaving a striped red and yellow cloth on a ground loom",
+          "caption": "Cusco weavers at the 2015 Smithsonian Folklife Festival. Photo: Jarek Tuszyński, CC BY 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Jarek Tuszyński",
+            "license": "CC BY 4.0",
+            "license_url": "https://creativecommons.org/licenses/by/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:2015_Smithsonian_folklife_festival_DC_-_Cusco_Weavers_-_03.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "bagru-block-print",
+      "name": "Bagru block print",
+      "category": "textiles",
+      "craft_type": "Block printing",
+      "culture": "Rajasthani",
+      "tools": [
+        "Carved wooden block",
+        "Printing table",
+        "Dye vat"
+      ],
+      "materials": [
+        "Cotton",
+        "Natural dyes",
+        "Mordant"
+      ],
+      "address": "Bagru, Rajasthan, India",
+      "city": "Bagru",
+      "country": "India",
+      "latitude": 26.808795,
+      "longitude": 75.542312,
+      "description": "Hand block printed cotton from Bagru, a town near Jaipur in Rajasthan, made by the Chhipa community of printers.\n\nHow it is made\nCloth is treated, then printed by hand with carved wooden blocks, using mordants and a resist of clay paste called dabu. Dyeing in natural dyes such as indigo and boiling bring out the colors.\n\nHow to understand it\nBagru prints are known for earthy reds and blacks on a cream or yellowish ground, with floral and geometric motifs.\n\nCultural relevance\nThe craft has been passed down in Chhipa families for generations and is protected as a geographical indication.",
+      "colors": [
+        "#7a2e1d",
+        "#1b1b1b",
+        "#d9c7a7",
+        "#2b4c7e"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 250,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 110,
+          "unit": "cm"
+        }
+      ],
+      "author": "asia",
+      "photos": [
+        {
+          "file": "bagru-block-print-1.jpg",
+          "alt_text": "Woman pressing a carved block onto a long cloth laid out on a printing table",
+          "caption": "Block printing in Bagru. Photo: Anildiggiwal, CC0, Wikimedia Commons",
+          "credit": {
+            "author": "Anildiggiwal",
+            "license": "CC0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source": "https://commons.wikimedia.org/wiki/File:Woman_doing_Block_Printing_at_Bagru_village,_Jaipur,_India.jpg"
+          }
+        },
+        {
+          "file": "bagru-block-print-2.jpg",
+          "alt_text": "Long red and black block printed sari hanging against a white wall",
+          "caption": "Bagru printed sari, Honolulu Museum of Art. Photo: Hiart, CC0, Wikimedia Commons",
+          "credit": {
+            "author": "Hiart",
+            "license": "CC0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source": "https://commons.wikimedia.org/wiki/File:Sari_from_India,_Rajasthan,_Bagru,_Honolulu_Museum_of_Art_3967.1.JPG"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "yogyakarta-batik",
+      "name": "Yogyakarta batik",
+      "category": "textiles",
+      "craft_type": "Batik",
+      "culture": "Javanese",
+      "tools": [
+        "Tjanting",
+        "Tjap stamp",
+        "Wax pot",
+        "Dye vat"
+      ],
+      "materials": [
+        "Cotton",
+        "Beeswax",
+        "Indigo",
+        "Natural dyes"
+      ],
+      "address": "Yogyakarta, Indonesia",
+      "city": "Yogyakarta",
+      "country": "Indonesia",
+      "latitude": -7.80135,
+      "longitude": 110.36474,
+      "description": "Wax resist dyed cloth from Yogyakarta, one of the old court cities of central Java.\n\nHow it is made\nHot wax is drawn on the cloth with a small spouted tool called a tjanting, or stamped with a copper tjap. The cloth is dyed, and the waxed areas stay undyed. Repeating waxing and dyeing builds up several colors.\n\nHow to understand it\nYogyakarta batik is known for brown, indigo, and white, and for court patterns such as parang (diagonal bands) and kawung, which were once worn only by the royal family.\n\nCultural relevance\nIndonesian batik was inscribed on UNESCO's list of the intangible cultural heritage of humanity in 2009.",
+      "colors": [
+        "#5a3b1f",
+        "#1f2f4f",
+        "#f1e6cf",
+        "#111111"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 250,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 105,
+          "unit": "cm"
+        }
+      ],
+      "author": "asia",
+      "photos": [
+        {
+          "file": "yogyakarta-batik-1.jpg",
+          "alt_text": "Woman drawing wax lines on white cloth with a small tool",
+          "caption": "Drawing batik with a tjanting in Yogyakarta. Photo: CEphoto, Uwe Aranas, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "CEphoto, Uwe Aranas",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Yogyakarta_Indonesia_Taman-Sari-Batik-manufacturing-01.jpg"
+          }
+        },
+        {
+          "file": "yogyakarta-batik-2.jpg",
+          "alt_text": "Two batik cloths in brown, red, and cream patterns displayed in a glass case",
+          "caption": "Batik collection, Batik Museum Yogyakarta. Photo: Hernawanwan, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Hernawanwan",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Museum_Batik_Yogyakarta_koleksi_batik.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "bukhara-suzani",
+      "name": "Bukhara suzani",
+      "category": "textiles",
+      "craft_type": "Embroidery",
+      "culture": "Uzbek",
+      "tools": [
+        "Needle",
+        "Embroidery hoop"
+      ],
+      "materials": [
+        "Cotton",
+        "Silk"
+      ],
+      "address": "Bukhara, Uzbekistan",
+      "city": "Bukhara",
+      "country": "Uzbekistan",
+      "latitude": 39.775984,
+      "longitude": 64.415153,
+      "description": "Large embroidered hangings and covers from Bukhara, an old city on the Silk Road.\n\nHow it is made\nThe design is drawn on strips of cotton, which are embroidered separately, often by several women, and then sewn together. Silk thread is worked mainly in couching and chain stitches.\n\nHow to understand it\nSuzanis show large flowers, rosettes, and vines. The name comes from the Persian word for needle.\n\nCultural relevance\nSuzanis were made as part of a bride's dowry and used to decorate the home and the wedding bed.",
+      "colors": [
+        "#a4161a",
+        "#e85d04",
+        "#1b4332",
+        "#f1e9d2"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 240,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 170,
+          "unit": "cm"
+        }
+      ],
+      "author": "asia",
+      "photos": [
+        {
+          "file": "bukhara-suzani-1.jpg",
+          "alt_text": "Large embroidered cloth with rows of red and pink flowers on a cream ground with a border",
+          "caption": "Suzani from Bukhara, before 1850. Photo: Unknown author, Public domain, Wikimedia Commons",
+          "credit": {
+            "author": "Unknown author",
+            "license": "Public domain",
+            "license_url": "",
+            "source": "https://commons.wikimedia.org/wiki/File:Suzani,_Bukhara_pre-1850.jpg"
+          }
+        },
+        {
+          "file": "bukhara-suzani-2.jpg",
+          "alt_text": "Embroiderer seated in a shop, stitching a large colorful suzani on his lap",
+          "caption": "Embroidering a suzani in Bukhara. Photo: Ji-Elle, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Ji-Elle",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Boukhara-Brodeur_de_suzani_(1).jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "kyrgyz-shyrdak",
+      "name": "Shyrdak",
+      "category": "textiles",
+      "craft_type": "Felt",
+      "culture": "Kyrgyz",
+      "tools": [
+        "Reed mat",
+        "Scissors",
+        "Needle"
+      ],
+      "materials": [
+        "Wool"
+      ],
+      "address": "Kochkor, Kyrgyzstan",
+      "city": "Kochkor",
+      "country": "Kyrgyzstan",
+      "latitude": 42.20895,
+      "longitude": 75.629533,
+      "description": "Felt carpets of the Kyrgyz, made in villages such as Kochkor in the Naryn region.\n\nHow it is made\nWool is laid out on a reed mat, wetted, and rolled for hours until it becomes felt. Two dyed felts are cut with the same pattern, the pieces are swapped like a puzzle, and they are stitched to a backing with a cord along the seams.\n\nHow to understand it\nThe mirrored patterns are often horn shapes (kochkor muiuz, the ram's horn) and other motifs of nature and protection.\n\nCultural relevance\nShyrdaks cover the floor of the yurt. The art of Kyrgyz and Kazakh felt carpets was inscribed by UNESCO in 2012 as needing urgent safeguarding.",
+      "colors": [
+        "#b91c1c",
+        "#1e3a8a",
+        "#f2e8cf",
+        "#111111"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 250,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 150,
+          "unit": "cm"
+        }
+      ],
+      "author": "asia",
+      "photos": [
+        {
+          "file": "kyrgyz-shyrdak-1.jpg",
+          "alt_text": "Felt carpet on a floor with mirrored red, black, and pink horn shaped patterns",
+          "caption": "Shyrdak. Photo: Firespeaker, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Firespeaker",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Shyrdak_on_floor.jpg"
+          }
+        },
+        {
+          "file": "kyrgyz-shyrdak-2.jpg",
+          "alt_text": "Two felt carpets with orange, turquoise, and red ram's horn patterns on a tiled floor",
+          "caption": "Kyrgyz shyrdaks. Photo: Ada Awa, CC BY-SA 2.0, Wikimedia Commons",
+          "credit": {
+            "author": "Ada Awa",
+            "license": "CC BY-SA 2.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Kyrgyz_shyrdak.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "haida-totem-pole",
+      "name": "Haida totem pole",
+      "category": "woodwork",
+      "craft_type": "Totem pole",
+      "culture": "Haida",
+      "tools": [
+        "Adze",
+        "Chisel",
+        "Gouge",
+        "Carving knife"
+      ],
+      "materials": [
+        "Cedar wood",
+        "Natural pigments"
+      ],
+      "address": "Skidegate, Haida Gwaii, British Columbia, Canada",
+      "city": "Skidegate",
+      "country": "Canada",
+      "latitude": 53.26494,
+      "longitude": -131.99339,
+      "description": "Monumental poles carved by Haida artists on Haida Gwaii, the islands off the north coast of British Columbia.\n\nHow it is made\nA single western red cedar log is hollowed at the back and carved with adzes, chisels, and knives. Parts are painted in black, red, and blue-green.\n\nHow to understand it\nThe figures are family crests, such as Raven, Eagle, Bear, and Killer Whale, stacked from bottom to top, and tell the history and rights of a family or clan.\n\nCultural relevance\nPoles are raised at potlatch ceremonies. Six poles stand in front of the Haida Heritage Centre at Kay Llnagaay near Skidegate.",
+      "colors": [
+        "#9c5b32",
+        "#1a1a1a",
+        "#a33a2b",
+        "#2f6f73"
+      ],
+      "dimensions": [
+        {
+          "type": "height",
+          "value": 12,
+          "unit": "m"
+        }
+      ],
+      "author": "americas",
+      "photos": [
+        {
+          "file": "haida-totem-pole-1.jpg",
+          "alt_text": "Tall weathered cedar pole with carved crest figures rising under a glass roof",
+          "caption": "Haida pole from Tanu, Haida Gwaii, in a museum hall. Photo: Vysotsky, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Vysotsky",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Haida_totem_pole_from_Tanu_2.jpg"
+          }
+        },
+        {
+          "file": "haida-totem-pole-2.jpg",
+          "alt_text": "Historic photo of a tall carved pole in front of a plank house, with a person in front",
+          "caption": "House pole at Haina, Haida Gwaii, 1888. Photo: Richard Maynard, Public domain, Wikimedia Commons",
+          "credit": {
+            "author": "Richard Maynard",
+            "license": "Public domain",
+            "license_url": "",
+            "source": "https://commons.wikimedia.org/wiki/File:Haida_house_totem_pole_regalia_Haina_1888_RCBM_AA-00073.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "ainu-robe",
+      "name": "Ainu embroidered robe",
+      "category": "textiles",
+      "craft_type": "Embroidery",
+      "culture": "Ainu",
+      "tools": [
+        "Needle",
+        "Scissors"
+      ],
+      "materials": [
+        "Cotton",
+        "Thread"
+      ],
+      "address": "Nibutani, Biratori, Hokkaido, Japan",
+      "city": "Nibutani",
+      "country": "Japan",
+      "latitude": 42.635429,
+      "longitude": 142.178393,
+      "description": "Robes of the Ainu of Hokkaido, decorated with cut cloth appliqué and embroidery. The Nibutani Ainu Culture Museum in Biratori holds many examples.\n\nHow it is made\nShapes of cotton cloth are cut and sewn onto a dark robe, and their lines are then embroidered over, often in chain stitch.\n\nHow to understand it\nThe patterns are built from moreu, a swirling line, and aiushi, a thorn shape. They are placed around the collar, cuffs, back, and hem, and are traditionally believed to keep evil spirits away from these openings.\n\nCultural relevance\nThe skill was passed from mother to daughter, and robes are worn today at ceremonies and dances.",
+      "colors": [
+        "#1b1b2f",
+        "#f5f5f5",
+        "#b91c1c"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 120,
+          "unit": "cm"
+        }
+      ],
+      "author": "asia",
+      "photos": [
+        {
+          "file": "ainu-robe-1.jpg",
+          "alt_text": "Dark robe with bold white swirling appliqué patterns and red details in a glass case",
+          "caption": "Ainu robe, Nibutani Ainu Culture Museum. Photo: Calistemon, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Calistemon",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Exhibitions_in_the_Nibutani_Ainu_Culture_Museum,_April_2023_09.jpg"
+          }
+        },
+        {
+          "file": "ainu-robe-2.jpg",
+          "alt_text": "Black and white Ainu robe with swirl patterns at the hem and sleeves in a display case",
+          "caption": "Ainu robe, Nibutani Ainu Culture Museum. Photo: Calistemon, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Calistemon",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Exhibitions_in_the_Nibutani_Ainu_Culture_Museum,_April_2023_08.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "kinngait-soapstone",
+      "name": "Kinngait stone carving",
+      "category": "stone-carving",
+      "craft_type": "Soapstone carving",
+      "culture": "Inuit",
+      "tools": [
+        "Rasp",
+        "File",
+        "Saw",
+        "Abrasive stone"
+      ],
+      "materials": [
+        "Soapstone"
+      ],
+      "address": "Kinngait, Nunavut, Canada",
+      "city": "Kinngait",
+      "country": "Canada",
+      "latitude": 64.232277,
+      "longitude": -76.543218,
+      "description": "Stone sculpture from Kinngait (formerly Cape Dorset) on Baffin Island, one of the most famous art communities of the Arctic.\n\nHow it is made\nCarvers cut the stone, often a green serpentinite, roughly to shape with saws and axes, refine it with rasps and files, and polish it smooth.\n\nHow to understand it\nCommon subjects are animals of the Arctic, such as bears, owls, and walrus, and figures from Inuit life and stories. The dancing bear is a well known Kinngait theme.\n\nCultural relevance\nThe West Baffin Eskimo Co-operative, founded in 1959, brought Kinngait carving and printmaking to galleries around the world.",
+      "colors": [
+        "#2f4f4f",
+        "#4a5d23",
+        "#111111"
+      ],
+      "dimensions": [
+        {
+          "type": "height",
+          "value": 30,
+          "unit": "cm"
+        }
+      ],
+      "author": "americas",
+      "photos": [
+        {
+          "file": "kinngait-soapstone-1.jpg",
+          "alt_text": "Polished green stone sculpture of two figures facing each other",
+          "caption": "Legendary figure, Kinngait (Cape Dorset), Honolulu Museum of Art. Photo: Hiart, CC0, Wikimedia Commons",
+          "credit": {
+            "author": "Hiart",
+            "license": "CC0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source": "https://commons.wikimedia.org/wiki/File:Legendary_figure,_Cape_Dorset,_Canada,_Inuit_people,_green_serpentine,_HAA.JPG"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "hokitika-pounamu",
+      "name": "Pounamu carving",
+      "category": "stone-carving",
+      "craft_type": "Greenstone carving",
+      "culture": "Māori",
+      "tools": [
+        "Grinding wheel",
+        "Bow drill",
+        "Abrasive stone"
+      ],
+      "materials": [
+        "Pounamu (nephrite jade)"
+      ],
+      "address": "Hokitika, West Coast, New Zealand",
+      "city": "Hokitika",
+      "country": "New Zealand",
+      "latitude": -42.71789,
+      "longitude": 170.96465,
+      "description": "Carved greenstone (pounamu, nephrite jade) from the West Coast of the South Island of Aotearoa New Zealand. Hokitika is known for its pounamu carvers.\n\nHow it is made\nPounamu is very hard, so it is cut with diamond saws and ground and polished with wheels and stones. Holes were traditionally drilled with a bow drill and sand.\n\nHow to understand it\nForms include the hei-tiki, the koru (an unfurling fern), the twist, and the toki (adze). Pounamu is often given as a gift, and many believe it should not be bought for oneself.\n\nCultural relevance\nPounamu is a taonga (treasure) for Māori. Ngāi Tahu are the kaitiaki (guardians) of pounamu on the South Island under the Ngāi Tahu (Pounamu Vesting) Act 1997.",
+      "colors": [
+        "#2e6b3a",
+        "#173f24",
+        "#7da36b"
+      ],
+      "dimensions": [
+        {
+          "type": "height",
+          "value": 8,
+          "unit": "cm"
+        }
+      ],
+      "author": "pacific",
+      "photos": [
+        {
+          "file": "hokitika-pounamu-1.jpg",
+          "alt_text": "Green stone hook shaped pendant hanging from a cord, with trees behind",
+          "caption": "Pounamu pendant. Photo: Andrew Sullivan, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Andrew Sullivan",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Pounamu_pendant.jpg"
+          }
+        },
+        {
+          "file": "hokitika-pounamu-2.jpg",
+          "alt_text": "Large boulder of pounamu with green and golden surfaces on a round base in a museum",
+          "caption": "Pounamu mauri stone, Te Papa. Photo: L Maule, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "L Maule",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Pounamu_mauri_stone_Te_Papa_01.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "eskisehir-meerschaum",
+      "name": "Eskişehir meerschaum pipe",
+      "category": "stone-carving",
+      "craft_type": "Meerschaum carving",
+      "culture": "Turkish",
+      "tools": [
+        "Carving knife",
+        "File",
+        "Hand drill"
+      ],
+      "materials": [
+        "Meerschaum",
+        "Beeswax"
+      ],
+      "address": "Eskişehir, Türkiye",
+      "city": "Eskişehir",
+      "country": "Türkiye",
+      "latitude": 39.774394,
+      "longitude": 30.519116,
+      "description": "Pipes and objects carved from meerschaum (sepiolite), a soft white mineral mined around Eskişehir in central Anatolia.\n\nHow it is made\nBlocks of meerschaum are soaked in water to soften them, carved with knives and files, drilled, dried, and polished in hot beeswax.\n\nHow to understand it\nPipe bowls are carved as heads, animals, and flowers. With smoking, a meerschaum pipe slowly changes from white to honey and amber.\n\nCultural relevance\nEskişehir has supplied most of the world's block meerschaum, and carving it is a well known craft of the city.",
+      "colors": [
+        "#efe6d2",
+        "#d9a066"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 15,
+          "unit": "cm"
+        }
+      ],
+      "author": "anatolia",
+      "photos": [
+        {
+          "file": "eskisehir-meerschaum-1.jpg",
+          "alt_text": "White meerschaum pipe bowl carved as a smiling woman's head with flowers in her hair",
+          "caption": "Carved pipe, Eskişehir Meerschaum Museum. Photo: Dosseman, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Dosseman",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Eski%C5%9Fehir_Meerschaum_Museum_in_2012_1650.jpg"
+          }
+        },
+        {
+          "file": "eskisehir-meerschaum-2.jpg",
+          "alt_text": "White meerschaum pipe carved with an eagle and a dragon",
+          "caption": "Carved pipe, Eskişehir Meerschaum Museum. Photo: Dosseman, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Dosseman",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Eski%C5%9Fehir_Meerschaum_Museum_in_2012_1643.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "wajima-nuri",
+      "name": "Wajima-nuri lacquerware",
+      "category": "lacquerware",
+      "craft_type": "Urushi lacquerware",
+      "culture": "Japanese",
+      "tools": [
+        "Lacquer brush",
+        "Spatula",
+        "Polishing charcoal"
+      ],
+      "materials": [
+        "Urushi lacquer",
+        "Cypress wood",
+        "Gold powder"
+      ],
+      "address": "Wajima, Ishikawa, Japan",
+      "city": "Wajima",
+      "country": "Japan",
+      "latitude": 37.390938,
+      "longitude": 136.89957,
+      "description": "Lacquerware from Wajima on the Noto Peninsula of Ishikawa, known for its strength.\n\nHow it is made\nWooden pieces are reinforced with cloth on weak points and coated with many layers of urushi lacquer mixed with jinoko, a powdered earth found near Wajima. Each layer dries and is polished before the next. Decoration is added with maki-e (sprinkled gold) or chinkin (gold pressed into carved lines).\n\nHow to understand it\nThe deep red and black surfaces come from many thin layers, and a finished piece can take months.\n\nCultural relevance\nWajima-nuri is an Important Intangible Cultural Property of Japan. Many workshops were damaged in the Noto Peninsula earthquake of January 2024.",
+      "colors": [
+        "#7f1d1d",
+        "#111111",
+        "#c9a227"
+      ],
+      "dimensions": [
+        {
+          "type": "diameter",
+          "value": 12,
+          "unit": "cm"
+        },
+        {
+          "type": "height",
+          "value": 8,
+          "unit": "cm"
+        }
+      ],
+      "author": "asia",
+      "photos": [
+        {
+          "file": "wajima-nuri-1.jpg",
+          "alt_text": "Glossy red lacquered rice bowl on a low foot",
+          "caption": "Wajima-nuri rice bowl. Photo: yuuki ゆうき(金野裕希), CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "yuuki ゆうき(金野裕希)",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Wajima-nuri_red_rice_bowl.jpg"
+          }
+        },
+        {
+          "file": "wajima-nuri-2.jpg",
+          "alt_text": "Large black lacquered globe with gold continents in a dark museum room",
+          "caption": "Wajima-nuri globe. Photo: 掬茶, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "掬茶",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Wajima_lacquerware_globe.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "turkish-ebru",
+      "name": "Ebru marbled paper",
+      "category": "paper-and-calligraphy",
+      "craft_type": "Paper marbling",
+      "culture": "Turkish",
+      "tools": [
+        "Marbling tray",
+        "Horsehair brush",
+        "Awl"
+      ],
+      "materials": [
+        "Ox gall",
+        "Gum tragacanth",
+        "Natural pigments",
+        "Handmade paper"
+      ],
+      "address": "Üsküdar, İstanbul, Türkiye",
+      "city": "Üsküdar",
+      "country": "Türkiye",
+      "latitude": 41.02655,
+      "longitude": 29.015132,
+      "description": "The art of marbling paper, practiced in İstanbul since the Ottoman period.\n\nHow it is made\nWater in a shallow tray is thickened with gum tragacanth. Colors mixed with ox gall are sprinkled onto the surface with horsehair brushes and float. Patterns are drawn with an awl or comb, and a sheet of paper is laid on the water to take up the design.\n\nHow to understand it\nEach sheet is unique. Classic patterns include battal (stone), gelgit (back and forth), and flower ebru, invented by Necmeddin Okyay.\n\nCultural relevance\nMarbled paper was used for book covers and calligraphy borders. Turkish ebru was inscribed on UNESCO's intangible heritage list in 2014.",
+      "colors": [
+        "#1e40af",
+        "#b91c1c",
+        "#f2c94c",
+        "#f8f5ee"
+      ],
+      "dimensions": [
+        {
+          "type": "height",
+          "value": 50,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 35,
+          "unit": "cm"
+        }
+      ],
+      "author": "anatolia",
+      "photos": [
+        {
+          "file": "turkish-ebru-1.jpg",
+          "alt_text": "Marbled paper with a red and green flower inside a yellow circle on a swirled background",
+          "caption": "Flower ebru. Photo: Brcan, CC0, Wikimedia Commons",
+          "credit": {
+            "author": "Brcan",
+            "license": "CC0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source": "https://commons.wikimedia.org/wiki/File:Ebru_Sanat%C4%B1_Resim_Art.jpg"
+          }
+        },
+        {
+          "file": "turkish-ebru-2.jpg",
+          "alt_text": "Hand drawing green leaves with a stylus on colors floating in a marbling tray",
+          "caption": "Making ebru. Photo: Metasqaure10, CC0, Wikimedia Commons",
+          "credit": {
+            "author": "Metasqaure10",
+            "license": "CC0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source": "https://commons.wikimedia.org/wiki/File:Ebru_(Water_Marbling)_Art.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "hon-minoshi",
+      "name": "Hon-minoshi washi",
+      "category": "paper-and-calligraphy",
+      "craft_type": "Handmade paper",
+      "culture": "Japanese",
+      "tools": [
+        "Paper mould",
+        "Vat",
+        "Press"
+      ],
+      "materials": [
+        "Kozo (paper mulberry)"
+      ],
+      "address": "Mino, Gifu, Japan",
+      "city": "Mino",
+      "country": "Japan",
+      "latitude": 35.544262,
+      "longitude": 136.907518,
+      "description": "Handmade paper from Mino in Gifu Prefecture, where paper has been made for more than 1,300 years.\n\nHow it is made\nThe inner bark of the kozo (paper mulberry) is soaked, boiled, cleaned of specks by hand, and beaten into fibers. The fibers are mixed with water and plant mucilage and scooped up on a mesh mould, which is rocked to spread them evenly. The sheets are pressed and dried on boards.\n\nHow to understand it\nHon-minoshi is thin, strong, and even, with long fibers that can be seen when it is held to the light.\n\nCultural relevance\nWashi made in Mino, Hamada, and Ogawa was inscribed on UNESCO's intangible heritage list in 2014. It is used for shoji screens and the repair of books and art.",
+      "colors": [
+        "#f7f3e8"
+      ],
+      "dimensions": [
+        {
+          "type": "height",
+          "value": 64,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 94,
+          "unit": "cm"
+        }
+      ],
+      "author": "asia",
+      "photos": [
+        {
+          "file": "hon-minoshi-1.jpg",
+          "alt_text": "Row of glowing lamps made of washi paper on a dark wall",
+          "caption": "Washi lamps, Mino Washi Akari Art Hall. Photo: Asturio Cantabrio, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Asturio Cantabrio",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Mino_Washi_Akari_Art_Hall_ac_(2).jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "hopi-coiled-plaque",
+      "name": "Hopi coiled plaque",
+      "category": "basketry",
+      "craft_type": "Coiled basket",
+      "culture": "Hopi",
+      "tools": [
+        "Awl",
+        "Knife"
+      ],
+      "materials": [
+        "Yucca",
+        "Grass"
+      ],
+      "address": "Second Mesa, Arizona, United States",
+      "city": "Second Mesa",
+      "country": "United States",
+      "latitude": 35.834238,
+      "longitude": -110.501425,
+      "description": "Coiled plaques and baskets made by Hopi women on Second Mesa in northern Arizona.\n\nHow it is made\nThick bundles of galleta grass are coiled and wrapped with strips of yucca leaf, stitch by stitch, using an awl. Yucca is used in its natural colors or dyed.\n\nHow to understand it\nDesigns include katsina figures, birds, clouds, and whirlwind patterns. Second Mesa is known for coiled work, Third Mesa for wicker.\n\nCultural relevance\nPlaques are given at weddings, ceremonies, and dances, and are an important part of Hopi life.",
+      "colors": [
+        "#d9b44a",
+        "#2f6b3a",
+        "#8b2e1d",
+        "#111111"
+      ],
+      "dimensions": [
+        {
+          "type": "diameter",
+          "value": 30,
+          "unit": "cm"
+        }
+      ],
+      "author": "americas",
+      "photos": [
+        {
+          "file": "hopi-coiled-plaque-1.jpg",
+          "alt_text": "Round coiled tray in cream yucca with brown radiating patterns",
+          "caption": "Hopi coiled meal tray, Chazen Museum of Art. Photo: Daderot, CC0, Wikimedia Commons",
+          "credit": {
+            "author": "Daderot",
+            "license": "CC0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source": "https://commons.wikimedia.org/wiki/File:Meal_Tray,_Hopi_people,_Arizona,_undated,_coiled_yucca_and_grass_-_Chazen_Museum_of_Art_-_DSC01858.JPG"
+          }
+        },
+        {
+          "file": "hopi-coiled-plaque-2.jpg",
+          "alt_text": "Historic photo of a Hopi woman seated against an adobe wall, weaving a coiled basket",
+          "caption": "Basket weaver at Mishongnovi, Second Mesa, about 1897. Photo: George Wharton James, Public domain, Wikimedia Commons",
+          "credit": {
+            "author": "George Wharton James",
+            "license": "Public domain",
+            "license_url": "",
+            "source": "https://commons.wikimedia.org/wiki/File:Hopi_basket_weaver,_Koch-ye-amp-se,_at_Mishongnovi,_Arizona,_ca.1897_(CHS-4739).jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "maori-kete",
+      "name": "Kete",
+      "category": "basketry",
+      "craft_type": "Plaited basket",
+      "culture": "Māori",
+      "tools": [
+        "Knife"
+      ],
+      "materials": [
+        "Harakeke (New Zealand flax)"
+      ],
+      "address": "Rotorua, New Zealand",
+      "city": "Rotorua",
+      "country": "New Zealand",
+      "latitude": -38.136073,
+      "longitude": 176.252543,
+      "description": "Bags and baskets plaited from harakeke (New Zealand flax) by Māori weavers. Rotorua is home to Te Wānanga Raranga Whatu, the national weaving school at Te Puia.\n\nHow it is made\nLeaves are cut following tikanga (customs), split into strips, softened, and sometimes dyed black with mud and plant tannins. The strips are plaited into the body of the kete, and handles are added.\n\nHow to understand it\nKete whakairo have patterns plaited in, with names such as poutama (a stepped pattern of growth and learning).\n\nCultural relevance\nKete are part of everyday life and of stories: knowledge is said to have come to people in three baskets of knowledge.",
+      "colors": [
+        "#c8a96e",
+        "#1b1b1b",
+        "#7a3e1d"
+      ],
+      "dimensions": [
+        {
+          "type": "height",
+          "value": 30,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 35,
+          "unit": "cm"
+        }
+      ],
+      "author": "pacific",
+      "photos": [
+        {
+          "file": "maori-kete-1.jpg",
+          "alt_text": "Several plaited flax bags with handles and black, red, and natural patterns",
+          "caption": "Kete whakairo, National Museum of Ethnology, Osaka. Photo: Yanajin33, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Yanajin33",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:National_Museum_of_Ethnology,_Osaka_-_Flax_basket_(kete_whakairo)_-_M%C3%A2ori_people_in_New_Zealand_-_Made_in_the_1990s.jpg"
+          }
+        },
+        {
+          "file": "maori-kete-2.jpg",
+          "alt_text": "Historic photo of Māori women seated together, plaiting flax baskets",
+          "caption": "Weaving kete at Rangiahua, 1918. Photo: Albert Percy Godber, Public domain, Wikimedia Commons",
+          "credit": {
+            "author": "Albert Percy Godber",
+            "license": "Public domain",
+            "license_url": "",
+            "source": "https://commons.wikimedia.org/wiki/File:Group_of_Maori_women_weaving_flax_baskets_(kete),_at_Rangiahua,_1918._ATLIB_297992.png"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "ndebele-beadwork",
+      "name": "Ndebele beadwork",
+      "category": "jewelry",
+      "craft_type": "Beaded jewelry",
+      "culture": "Ndebele",
+      "tools": [
+        "Beading needle"
+      ],
+      "materials": [
+        "Glass beads",
+        "Thread"
+      ],
+      "address": "KwaMhlanga, Mpumalanga, South Africa",
+      "city": "KwaMhlanga",
+      "country": "South Africa",
+      "latitude": -25.426216,
+      "longitude": 28.704527,
+      "description": "Beadwork of the Ndebele people of South Africa, made in Mpumalanga and nearby regions.\n\nHow it is made\nSmall glass beads are threaded and stitched onto grass or fabric rings, aprons, and blankets.\n\nHow to understand it\nBold geometric patterns in bright colors on a white background, like Ndebele house painting. The kind of item worn shows stages of a woman's life, such as the apron of a married woman.\n\nCultural relevance\nBeadwork and painted houses are some of the best known expressions of Ndebele identity.",
+      "colors": [
+        "#ffffff",
+        "#1d4ed8",
+        "#c1121f",
+        "#f2c94c",
+        "#1b5e20"
+      ],
+      "dimensions": [
+        {
+          "type": "diameter",
+          "value": 25,
+          "unit": "cm"
+        }
+      ],
+      "author": "africa",
+      "photos": [
+        {
+          "file": "ndebele-beadwork-1.jpg",
+          "alt_text": "White beaded cape with black geometric house shapes and a fringed band",
+          "caption": "Ndebele beaded cape, Dallas Museum of Art. Photo: Mary Harrsch, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Mary Harrsch",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Beadwork_Cape_(Linaga)_South_Africa_Ndebele_peoples_early_20th_century_Dallas_Museum_of_Art.jpg"
+          }
+        },
+        {
+          "file": "ndebele-beadwork-2.jpg",
+          "alt_text": "Beaded apron with green, blue, and black geometric shapes on white",
+          "caption": "Ndebele beaded apron. Photo: Yanajin33, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Yanajin33",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Little_world,_Aichi_prefecture_-_African_plaza_-_Frontal_apron_for_mother_generation_women_-_%22iphoto%22_-_Ndebele_people_in_South_Africa_-_Collected_in_2001.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "maasai-beadwork",
+      "name": "Maasai beadwork",
+      "category": "jewelry",
+      "craft_type": "Beaded jewelry",
+      "culture": "Maasai",
+      "tools": [
+        "Beading needle"
+      ],
+      "materials": [
+        "Glass beads",
+        "Leather cord"
+      ],
+      "address": "Narok, Kenya",
+      "city": "Narok",
+      "country": "Kenya",
+      "latitude": -1.08869,
+      "longitude": 35.87149,
+      "description": "Collars, earrings, and bracelets made by Maasai women in Kenya and Tanzania. Narok is a market town in Maasai country.\n\nHow it is made\nGlass beads are strung on wire or thread and sewn onto leather or stiff supports to make flat collars and other pieces.\n\nHow to understand it\nColors are often linked with meanings, such as red with bravery and unity, blue with the sky and water, and green with the land, though meanings differ between communities.\n\nCultural relevance\nBeadwork shows a person's age, status, and life events, and is worn at ceremonies such as weddings.",
+      "colors": [
+        "#c1121f",
+        "#1d4ed8",
+        "#ffffff",
+        "#1b5e20",
+        "#f77f00"
+      ],
+      "dimensions": [
+        {
+          "type": "diameter",
+          "value": 30,
+          "unit": "cm"
+        }
+      ],
+      "author": "africa",
+      "photos": [
+        {
+          "file": "maasai-beadwork-1.jpg",
+          "alt_text": "Large round beaded collar in red, blue, green, and white hanging from a stick",
+          "caption": "Maasai beaded collar. Photo: Cecilia Nkini, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Cecilia Nkini",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Maasai_beadwork.jpg"
+          }
+        },
+        {
+          "file": "maasai-beadwork-2.jpg",
+          "alt_text": "Maasai woman wearing layered beaded collars in blue, white, and red",
+          "caption": "Beadwork in Kajiado County, Kenya. Photo: Mark Myles Mugambi, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Mark Myles Mugambi",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Traditional_Maasai_beadwork_and_cultural_identity_in_Kajiado_County.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "zuni-silver-turquoise",
+      "name": "Zuni jewelry",
+      "category": "jewelry",
+      "craft_type": "Silver jewelry",
+      "culture": "Zuni",
+      "tools": [
+        "Jeweller's saw",
+        "File",
+        "Soldering torch"
+      ],
+      "materials": [
+        "Silver",
+        "Turquoise",
+        "Coral"
+      ],
+      "address": "Zuni Pueblo, New Mexico, United States",
+      "city": "Zuni Pueblo",
+      "country": "United States",
+      "latitude": 35.069396,
+      "longitude": -108.84939,
+      "description": "Silver jewelry set with small cut stones, made by Zuni artists at Zuni Pueblo in western New Mexico.\n\nHow it is made\nTurquoise and other stones are cut and ground into tiny pieces, then set one by one in silver bezels soldered onto the piece.\n\nHow to understand it\nIn needlepoint the stones are long and pointed; in petit point they are small ovals or teardrops. Zuni artists are also known for inlay, where stones are fitted side by side.\n\nCultural relevance\nJewelry making is a major source of income at Zuni Pueblo, and many families have practiced it for generations.",
+      "colors": [
+        "#40c4b5",
+        "#c0c0c0",
+        "#c1121f"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 6,
+          "unit": "cm"
+        }
+      ],
+      "author": "americas",
+      "photos": [
+        {
+          "file": "zuni-silver-turquoise-1.jpg",
+          "alt_text": "Silver necklace with clusters of small turquoise stones and a horseshoe shaped pendant",
+          "caption": "Zuni necklace with small set turquoise. Photo: Epolk, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Epolk",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Zuni_necklace.jpg"
+          }
+        },
+        {
+          "file": "zuni-silver-turquoise-2.jpg",
+          "alt_text": "Silver brooch of a bird figure inlaid with turquoise, coral, jet, and shell",
+          "caption": "Zuni inlay brooch, 1890s. Photo: Anagoria, CC BY 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Anagoria",
+            "license": "CC BY 3.0",
+            "license_url": "https://creativecommons.org/licenses/by/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:189X_Silberbrosche_Zuni_anagoria.JPG"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "gaziantep-copper",
+      "name": "Gaziantep copperware",
+      "category": "metalwork",
+      "craft_type": "Copperware",
+      "culture": "Turkish",
+      "tools": [
+        "Hammer",
+        "Anvil",
+        "Chasing tools",
+        "Stake"
+      ],
+      "materials": [
+        "Copper",
+        "Tin"
+      ],
+      "address": "Gaziantep, Türkiye",
+      "city": "Gaziantep",
+      "country": "Türkiye",
+      "latitude": 37.062832,
+      "longitude": 37.379262,
+      "description": "Copper trays, pots, and coffee sets hammered and engraved by coppersmiths in Gaziantep, in southeastern Türkiye.\n\nHow it is made\nSheets of copper are hammered into shape over stakes, decorated with chasing and engraving tools, and lined with tin so they can be used for food.\n\nHow to understand it\nPieces are decorated with floral and geometric patterns, and the hammer marks are often left visible.\n\nCultural relevance\nThe coppersmiths' bazaar (Bakırcılar Çarşısı) in the old city is one of the best known places where the craft is still practiced.",
+      "colors": [
+        "#b87333",
+        "#c0c0c0"
+      ],
+      "dimensions": [
+        {
+          "type": "diameter",
+          "value": 30,
+          "unit": "cm"
+        },
+        {
+          "type": "height",
+          "value": 12,
+          "unit": "cm"
+        }
+      ],
+      "author": "anatolia",
+      "photos": [
+        {
+          "file": "gaziantep-copper-1.jpg",
+          "alt_text": "Round copper plate engraved with fine patterns and writing around the rim",
+          "caption": "Engraved copper plate, Gaziantep. Photo: Dosseman, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Dosseman",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Gaziantep_Sakl%C4%B1_Konak_Copper_works_museum_in_2014_0987.jpg"
+          }
+        },
+        {
+          "file": "gaziantep-copper-2.jpg",
+          "alt_text": "Large engraved copper tray hanging on a stone wall",
+          "caption": "Engraved copper tray, Gaziantep. Photo: Dosseman, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Dosseman",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Gaziantep_Sakl%C4%B1_Konak_Copper_works_museum_in_2014_0994.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "krofofrom-brass",
+      "name": "Krofofrom brass casting",
+      "category": "metalwork",
+      "craft_type": "Lost-wax casting",
+      "culture": "Asante",
+      "tools": [
+        "Crucible",
+        "Furnace",
+        "Modelling tool"
+      ],
+      "materials": [
+        "Brass",
+        "Beeswax",
+        "Clay"
+      ],
+      "address": "Krofofrom, Ashanti, Ghana",
+      "city": "Krofofrom",
+      "country": "Ghana",
+      "latitude": 6.613892,
+      "longitude": -1.625454,
+      "description": "Brass figures cast in Krofofrom, a village of brass casters near Kumasi in Ghana.\n\nHow it is made\nA model is made in beeswax, covered with clay, and heated so the wax melts out. Molten brass, often from recycled metal, is poured into the space left by the wax, and the mold is broken to free the casting.\n\nHow to understand it\nThe craft continues the tradition of Akan gold weights, small brass figures used to weigh gold dust, many of which illustrate proverbs.\n\nCultural relevance\nKrofofrom has been a center of Asante brass casting for generations and supplies figures, weights, and jewelry.",
+      "colors": [
+        "#b5a642",
+        "#5c4a1f"
+      ],
+      "dimensions": [
+        {
+          "type": "height",
+          "value": 10,
+          "unit": "cm"
+        }
+      ],
+      "author": "africa",
+      "photos": [
+        {
+          "file": "krofofrom-brass-1.jpg",
+          "alt_text": "Brass weights cast as animal heads and shapes on a black background",
+          "caption": "Akan goldweights, Muséum de Toulouse. Photo: Didier Descouens, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Didier Descouens",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Akan_Gold_Weight_MHNT_bovid_head.jpg"
+          }
+        },
+        {
+          "file": "krofofrom-brass-2.jpg",
+          "alt_text": "Brass goldweight of two birds facing each other on a base",
+          "caption": "Akan goldweight, Muséum de Toulouse. Photo: Didier Descouens, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Didier Descouens",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Akan_MHNT.ETH.2010.25.017.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "nazar-boncuk",
+      "name": "Nazar boncuk",
+      "category": "glass",
+      "craft_type": "Glass beads",
+      "culture": "Turkish",
+      "tools": [
+        "Furnace",
+        "Mandrel"
+      ],
+      "materials": [
+        "Coloured glass",
+        "Metal oxides"
+      ],
+      "address": "Görece, Menderes, İzmir, Türkiye",
+      "city": "Görece",
+      "country": "Türkiye",
+      "latitude": 38.278435,
+      "longitude": 27.122943,
+      "description": "Blue glass eye beads made in the villages of Görece and Kurudere near İzmir.\n\nHow it is made\nMolten glass from a wood-fired furnace is wound onto an iron rod, then drops of white, light blue, and dark glass are added to form the eye, and the bead is flattened and cooled slowly in ash.\n\nHow to understand it\nThe dark blue color comes from cobalt. The eye is believed to turn away the evil eye.\n\nCultural relevance\nNazar beads are hung in homes and cars and given to newborn babies across Türkiye, but only a few masters still make them by hand.",
+      "colors": [
+        "#1d4ed8",
+        "#ffffff",
+        "#7dd3fc",
+        "#111111"
+      ],
+      "dimensions": [
+        {
+          "type": "diameter",
+          "value": 5,
+          "unit": "cm"
+        }
+      ],
+      "author": "anatolia",
+      "photos": [
+        {
+          "file": "nazar-boncuk-1.jpg",
+          "alt_text": "Round blue glass bead with a white, light blue, and dark eye hanging from a branch",
+          "caption": "Nazar bead. Photo: Alev Akın, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Alev Akın",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Kapadokya%27dan_Nazar_Boncu%C4%9Fu.jpg"
+          }
+        },
+        {
+          "file": "nazar-boncuk-2.jpg",
+          "alt_text": "Many blue glass eye beads of different sizes for sale on a stand",
+          "caption": "Nazar beads for sale. Photo: FocalPoint, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "FocalPoint",
+            "license": "CC BY-SA 3.0",
+            "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+            "source": "https://commons.wikimedia.org/wiki/File:Blue_eyes.JPG"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "sami-shoes",
+      "name": "Sámi shoes",
+      "category": "leatherwork",
+      "craft_type": "Footwear",
+      "culture": "Sámi",
+      "tools": [
+        "Stitching needle",
+        "Awl"
+      ],
+      "materials": [
+        "Deerskin",
+        "Sinew"
+      ],
+      "address": "Jokkmokk, Sweden",
+      "city": "Jokkmokk",
+      "country": "Sweden",
+      "latitude": 66.60585,
+      "longitude": 19.83793,
+      "description": "Shoes made of reindeer skin with upturned toes, a part of Sámi duodji (handicraft). Jokkmokk in northern Sweden hosts Ájtte, the Swedish mountain and Sámi museum, and a winter market held since 1605.\n\nHow it is made\nReindeer skin from the legs or body is cut and sewn with sinew thread. The shoes are filled with dried sedge grass (shoe grass), which keeps the feet warm and dry, and tied with woven bands.\n\nHow to understand it\nThe colorful woven shoe bands and the cut of the shoe can show which area the maker comes from.\n\nCultural relevance\nDuodji is a way of passing on Sámi knowledge, and makers can mark genuine Sámi work with the Duodji label.",
+      "colors": [
+        "#6b4f3a",
+        "#c1121f",
+        "#1d4ed8",
+        "#f2c94c"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 30,
+          "unit": "cm"
+        }
+      ],
+      "author": "europe",
+      "photos": [
+        {
+          "file": "sami-shoes-1.jpg",
+          "alt_text": "Pair of light fur shoes with upturned toes and red and green woven bands",
+          "caption": "Sámi shoes, Nordiska museet, Stockholm. Photo: Daderot, CC0, Wikimedia Commons",
+          "credit": {
+            "author": "Daderot",
+            "license": "CC0",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+            "source": "https://commons.wikimedia.org/wiki/File:Sami_shoes_-_Nordiska_museet_-_Stockholm,_Sweden_-_DSC09905.JPG"
+          }
+        },
+        {
+          "file": "sami-shoes-2.jpg",
+          "alt_text": "Reindeer fur shoes with red, yellow, and green woven bands and tassels",
+          "caption": "Inari Sámi fur shoes, Siida museum. Photo: Richard Mortel, CC BY 2.0, Wikimedia Commons",
+          "credit": {
+            "author": "Richard Mortel",
+            "license": "CC BY 2.0",
+            "license_url": "https://creativecommons.org/licenses/by/2.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Sami_reindeer_fur_shoes,_Siida_Museum,_Inari,_Finland_(2)_(35849373974).jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "lakota-parfleche",
+      "name": "Lakota parfleche",
+      "category": "leatherwork",
+      "craft_type": "Bags and pouches",
+      "culture": "Lakota",
+      "tools": [
+        "Knife",
+        "Brush"
+      ],
+      "materials": [
+        "Rawhide",
+        "Natural pigments"
+      ],
+      "address": "Pine Ridge, South Dakota, United States",
+      "city": "Pine Ridge",
+      "country": "United States",
+      "latitude": 43.028378,
+      "longitude": -102.552263,
+      "description": "Folded rawhide cases used by Plains peoples, including the Lakota, to store and carry food, clothing, and belongings.\n\nHow it is made\nA buffalo or cow hide is staked out, scraped, and dried into hard rawhide. Designs are painted on before the hide is cut and folded like an envelope and tied with thongs.\n\nHow to understand it\nParfleches are painted with bold geometric patterns of triangles, rectangles, and lines. The painting was traditionally women's work.\n\nCultural relevance\nParfleches were essential on the move between camps, and painted rawhide work continues on reservations such as Pine Ridge.",
+      "colors": [
+        "#c8a96e",
+        "#b91c1c",
+        "#1d4ed8",
+        "#1b5e20"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 60,
+          "unit": "cm"
+        },
+        {
+          "type": "width",
+          "value": 35,
+          "unit": "cm"
+        }
+      ],
+      "author": "americas",
+      "photos": [
+        {
+          "file": "lakota-parfleche-1.jpg",
+          "alt_text": "Painted rawhide cases and boxes with bold red, blue, and yellow geometric designs",
+          "caption": "Lakota parfleches, National Museum of the American Indian. Photo: Taoboy49, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Taoboy49",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Lakota_Parflech_Displayed_at_the_National_Museum_of_the_American_Indian,_Washington,_D.C..jpg"
+          }
+        },
+        {
+          "file": "lakota-parfleche-2.jpg",
+          "alt_text": "Close view of painted rawhide containers with triangles and diamonds",
+          "caption": "Lakota parfleche, National Museum of the American Indian. Photo: Taoboy49, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Taoboy49",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Lakota_parfleche_exhibit_-_National_Museum_of_the_American_Indian.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "morin-khuur",
+      "name": "Morin khuur",
+      "category": "musical-instruments",
+      "craft_type": "Long-necked lute",
+      "culture": "Mongolian",
+      "tools": [
+        "Gouge",
+        "Chisel",
+        "Hand plane"
+      ],
+      "materials": [
+        "Hardwood"
+      ],
+      "address": "Ulaanbaatar, Mongolia",
+      "city": "Ulaanbaatar",
+      "country": "Mongolia",
+      "latitude": 47.918468,
+      "longitude": 106.917702,
+      "description": "The horse head fiddle, a two-stringed bowed instrument of Mongolia.\n\nHow it is made\nA trapezoid wooden sound box is joined to a long neck topped with a carved horse head. The two strings and the bow are traditionally made of horse hair, from a stallion and a mare.\n\nHow to understand it\nThe instrument is played in many styles, often imitating the sounds of horses and the steppe.\n\nCultural relevance\nThe morin khuur is a national symbol of Mongolia. Its traditional music was inscribed by UNESCO in 2008.",
+      "colors": [
+        "#7a4a2a",
+        "#3b2414",
+        "#c9a227"
+      ],
+      "dimensions": [
+        {
+          "type": "length",
+          "value": 115,
+          "unit": "cm"
+        }
+      ],
+      "author": "asia",
+      "photos": [
+        {
+          "file": "morin-khuur-1.jpg",
+          "alt_text": "Red-brown morin khuur with a carved horse head, two strings, and a trapezoid body",
+          "caption": "Morin khuur. Photo: Mizu_Basyo, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Mizu_Basyo",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Morin_Khuur,_Today%27s_North_Mongolian_Style.jpg"
+          }
+        },
+        {
+          "file": "morin-khuur-2.jpg",
+          "alt_text": "Group of musicians playing morin khuurs outdoors above the city of Ulaanbaatar",
+          "caption": "Playing morin khuur in Ulaanbaatar. Photo: Quintin Soloviev, CC BY 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Quintin Soloviev",
+            "license": "CC BY 4.0",
+            "license_url": "https://creativecommons.org/licenses/by/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Morin_Khuur_performance_in_Ulaanbaatar.jpg"
+          }
+        }
+      ]
+    }
+  ]
+}
