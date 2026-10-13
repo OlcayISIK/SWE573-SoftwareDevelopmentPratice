@@ -57,6 +57,7 @@ def test_verified_user_publishes_craft_without_approval(client_for, user, payloa
     assert data["craft_type"] == {
         "id": payload["craft_type"],
         "name": "Carpet",
+        "description": "A pile rug made by tying rows of knots around the warp threads of a loom.",
         "user_added": False,
     }
     assert [tool["name"] for tool in data["tools"]] == ["Knotting knife", "Loom"]

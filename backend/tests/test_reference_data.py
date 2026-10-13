@@ -15,7 +15,7 @@ def test_categories_are_seeded_and_listed_alphabetically(api_client):
     names = [category["name"] for category in data]
     assert names == sorted(names)
     assert {"Ceramics", "Textiles", "Woodwork", "Metalwork"} <= set(names)
-    assert set(data[0]) == {"id", "name", "slug", "user_added"}
+    assert set(data[0]) == {"id", "name", "slug", "description", "user_added"}
 
 
 def test_admins_manage_reference_data_in_django_admin():

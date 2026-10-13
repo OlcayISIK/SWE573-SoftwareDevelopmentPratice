@@ -107,7 +107,7 @@ class ItemReport(BaseModel):
 
 class ItemReviewAction(BaseModel):
     class Action(models.TextChoices):
-        RENAME = "rename", "Rename"
+        EDIT = "edit", "Edit"
         HIDE = "hide", "Hide"
         MERGE = "merge", "Merge"
         DISMISS = "dismiss", "Dismiss"
@@ -118,7 +118,7 @@ class ItemReviewAction(BaseModel):
     )
     action = models.CharField(max_length=10, choices=Action.choices)
     reason = models.TextField(max_length=1000)
-    # What changed: the new name for a rename, the item merged into for a merge.
+    # What changed: the new name or description for an edit, the item merged into for a merge.
     details = models.JSONField(default=dict, blank=True)
 
     class Meta:

@@ -158,6 +158,7 @@ def test_queue_shows_the_item_and_who_added_it(admin_client, adder, rug, open_re
     assert entry["item"] == {
         "id": rug.id,
         "name": "Rug",
+        "description": "",
         "is_hidden": False,
         "added_by": {"id": adder.id, "display_name": adder.profile.display_name},
         "crafts_count": 1,
@@ -178,8 +179,8 @@ def test_queue_query_count_does_not_grow_with_reports(
 # Review actions
 
 
-def test_rename_fixes_the_name(admin_client, rug, open_report):
-    response = review(admin_client, open_report, "rename", name="  rug   hook ")
+def test_edit_fixes_the_name(admin_client, rug, open_report):
+    response = review(admin_client, open_report, "edit", name="  rug   hook ")
 
     assert response.status_code == 200
     data = response.json()["data"]
@@ -188,8 +189,22 @@ def test_rename_fixes_the_name(admin_client, rug, open_report):
     assert data["actions"][0]["details"] == {"name": "Rug hook"}
 
 
-def test_rename_to_an_existing_name_suggests_merging(admin_client, open_report):
-    response = review(admin_client, open_report, "rename", name="loom")
+def test_edit_fixes_the_description(admin_client, rug, open_report):
+    response = review(
+        admin_client, open_report, "edit", description=" A hook for  latch-hooked rugs. "
+    )
+
+    data = response.json()["data"]
+    assert data["item"] == {
+        **data["item"],
+        "name": "Rug",
+        "description": "A hook for latch-hooked rugs.",
+    }
+    assert data["actions"][0]["details"] == {"description": "A hook for latch-hooked rugs."}
+
+
+def test_edit_to_an_existing_name_suggests_merging(admin_client, open_report):
+    response = review(admin_client, open_report, "edit", name="loom")
 
     assert response.status_code == 409
     assert "Merge" in response.json()["message"]
@@ -304,8 +319,8 @@ def test_craft_types_merge_only_within_their_category(admin_client, client_for, 
     assert response.status_code == 400
 
 
-@pytest.mark.parametrize(("action", "field"), [("rename", "name"), ("merge", "merge_into")])
-def test_rename_and_merge_need_their_input(admin_client, open_report, action, field):
+@pytest.mark.parametrize(("action", "field"), [("edit", "name"), ("merge", "merge_into")])
+def test_edit_and_merge_need_their_input(admin_client, open_report, action, field):
     response = review(admin_client, open_report, action)
 
     assert response.status_code == 400

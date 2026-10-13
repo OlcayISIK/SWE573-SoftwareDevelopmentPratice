@@ -176,18 +176,22 @@ def _unique_slug(name):
     return slug
 
 
-def add_category(*, user, name):
+def add_category(*, user, name, description=""):
     if Category.objects.filter(name__iexact=name).exists():
         return _add_lookup(Category, user=user, name=name)
-    return _add_lookup(Category, user=user, name=name, slug=_unique_slug(name))
+    return _add_lookup(
+        Category, user=user, name=name, slug=_unique_slug(name), description=description
+    )
 
 
-def add_craft_type(*, user, name, category):
-    return _add_lookup(CraftType, user=user, name=name, scope={"category": category})
+def add_craft_type(*, user, name, category, description=""):
+    return _add_lookup(
+        CraftType, user=user, name=name, scope={"category": category}, description=description
+    )
 
 
-def _add_linked(model, *, user, name, craft_type=None):
-    item, created = _add_lookup(model, user=user, name=name)
+def _add_linked(model, *, user, name, craft_type=None, description=""):
+    item, created = _add_lookup(model, user=user, name=name, description=description)
     if craft_type is not None:
         # The user picked it for this craft type, so suggest it there from now on.
         item.craft_types.add(craft_type)
@@ -195,16 +199,18 @@ def _add_linked(model, *, user, name, craft_type=None):
     return item, created
 
 
-def add_tool(*, user, name, craft_type=None):
-    return _add_linked(Tool, user=user, name=name, craft_type=craft_type)
+def add_tool(*, user, name, craft_type=None, description=""):
+    return _add_linked(Tool, user=user, name=name, craft_type=craft_type, description=description)
 
 
-def add_material(*, user, name, craft_type=None):
-    return _add_linked(Material, user=user, name=name, craft_type=craft_type)
+def add_material(*, user, name, craft_type=None, description=""):
+    return _add_linked(
+        Material, user=user, name=name, craft_type=craft_type, description=description
+    )
 
 
-def add_culture(*, user, name, homeland=""):
-    return _add_lookup(Culture, user=user, name=name, homeland=homeland)
+def add_culture(*, user, name, homeland="", description=""):
+    return _add_lookup(Culture, user=user, name=name, homeland=homeland, description=description)
 
 
 def _same_name(item, name):
@@ -215,13 +221,17 @@ def _same_name(item, name):
 
 
 @transaction.atomic
-def rename_lookup(*, item, name, actor):
+def edit_lookup(*, item, actor, name=None, description=None):
+    """Changes the item's name, its description, or both. None leaves a field as it is."""
     _ensure_admin(actor)
-    taken = _same_name(item, name)
-    if taken is not None:
-        raise ConflictError(NAME_TAKEN.format(name=taken.name))
-    item.name = name
-    item.save(update_fields=["name", "updated_at"])
+    if name is not None:
+        taken = _same_name(item, name)
+        if taken is not None:
+            raise ConflictError(NAME_TAKEN.format(name=taken.name))
+        item.name = name
+    if description is not None:
+        item.description = description
+    item.save(update_fields=["name", "description", "updated_at"])
     return item
 
 

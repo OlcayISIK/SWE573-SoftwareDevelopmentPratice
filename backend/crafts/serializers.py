@@ -36,7 +36,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ["id", "name", "slug", "user_added"]
+        fields = ["id", "name", "slug", "description", "user_added"]
+        read_only_fields = fields
 
 
 class CraftTypeSerializer(serializers.ModelSerializer):
@@ -44,7 +45,8 @@ class CraftTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CraftType
-        fields = ["id", "name", "category", "user_added"]
+        fields = ["id", "name", "category", "description", "user_added"]
+        read_only_fields = fields
 
 
 class LinkedItemSerializer(serializers.ModelSerializer):
@@ -54,7 +56,8 @@ class LinkedItemSerializer(serializers.ModelSerializer):
     user_added = serializers.BooleanField(read_only=True)
 
     class Meta:
-        fields = ["id", "name", "typical", "user_added"]
+        fields = ["id", "name", "description", "typical", "user_added"]
+        read_only_fields = fields
 
     def get_typical(self, item) -> bool:
         return getattr(item, "typical", False)
@@ -75,7 +78,8 @@ class CultureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Culture
-        fields = ["id", "name", "homeland", "user_added"]
+        fields = ["id", "name", "homeland", "description", "user_added"]
+        read_only_fields = fields
 
 
 def clean_lookup_name(value):
@@ -86,11 +90,20 @@ def clean_lookup_name(value):
     return name[0].upper() + name[1:]
 
 
+def clean_description(value):
+    """Tidies an item description: single spaces, no space at either end."""
+    return " ".join(value.split())
+
+
 class AddItemSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=80)
+    description = serializers.CharField(max_length=300, required=False, allow_blank=True)
 
     def validate_name(self, value):
         return clean_lookup_name(value)
+
+    def validate_description(self, value):
+        return clean_description(value)
 
 
 class AddCraftTypeSerializer(AddItemSerializer):
@@ -122,6 +135,7 @@ class NamedItemSerializer(serializers.Serializer):
 
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(read_only=True)
+    description = serializers.CharField(read_only=True)
     user_added = serializers.BooleanField(read_only=True)
 
 
