@@ -71,6 +71,7 @@ export const craftFormSchema = z.object({
   latitude: coordinate(90),
   longitude: coordinate(180),
   description: required("Describe the craft."),
+  story: z.string(),
   colors: z
     .array(color)
     .max(MAX_COLORS, `Add at most ${MAX_COLORS} colors.`)
@@ -125,6 +126,7 @@ export const CRAFT_FORM_FIELDS = [
   "latitude",
   "longitude",
   "description",
+  "story",
   "colors",
   "attributes.dimensions",
   "attributes.weight_g",
@@ -144,6 +146,7 @@ export const emptyCraftForm: CraftFormValues = {
   latitude: "",
   longitude: "",
   description: "",
+  story: "",
   colors: [],
   attributes: {
     dimensions: [],
@@ -167,6 +170,7 @@ export interface CraftPayload {
   latitude: number;
   longitude: number;
   description: string;
+  story: string;
   colors: string[];
   attributes: CraftAttributes;
 }
@@ -198,6 +202,7 @@ export function toPayload(values: CraftFormValues): CraftPayload {
     latitude: Number(values.latitude),
     longitude: Number(values.longitude),
     description: values.description.trim(),
+    story: values.story.trim(),
     colors: values.colors.map((row) => toStoredColor(parseColor(row.code)!)),
     attributes: payloadAttributes,
   };
@@ -219,6 +224,7 @@ export function fromCraft(craft: CraftDetail): CraftFormValues {
     latitude: String(craft.latitude),
     longitude: String(craft.longitude),
     description: craft.description,
+    story: craft.story,
     colors: craft.colors.map((code) => ({ code })),
     attributes: {
       dimensions: (attributes.dimensions ?? []).map((row) => ({

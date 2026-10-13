@@ -47,6 +47,9 @@ test("a new user registers, is signed in, and publishes a craft", async ({ page 
   await page
     .getByLabel("About this craft")
     .fill("Hand-painted glazed tiles, shaped, painted, glazed, and fired.");
+  await page
+    .getByLabel("Story (optional)")
+    .fill("Kütahya tiles have lined mosques and fountains since the 1400s.");
   await page.getByRole("button", { name: "Add a dimension" }).click();
   await page.getByLabel("Size").fill("20");
   await page.getByRole("button", { name: "Add a color" }).click();
@@ -69,6 +72,8 @@ test("a new user registers, is signed in, and publishes a craft", async ({ page 
   await expect(page.getByText("Ceramics · Tile")).toBeVisible();
   await expect(page.getByText(/Turkish · From Kütahya, Türkiye/)).toBeVisible();
   await expect(page.getByText("height 20 cm")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
+  await expect(page.getByText(/lined mosques and fountains/)).toBeVisible();
 
   await page.goto(`/crafts?search=${encodeURIComponent(craftName)}`);
   await expect(page.getByRole("link", { name: craftName })).toBeVisible();

@@ -25,6 +25,7 @@ import { useReport, useReviewReport } from "../queries";
 const TEXT_FIELDS: [keyof CraftTextChanges, string][] = [
   ["name", "Name"],
   ["description", "Description"],
+  ["story", "Story"],
 ];
 
 const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" });

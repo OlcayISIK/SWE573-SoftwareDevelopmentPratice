@@ -10,6 +10,7 @@ import { renderRoute } from "@/test/render";
 import { server } from "@/test/server";
 
 const richCraft = makeCraftDetail({
+  story: "Tiles from Kütahya decorated mosques across the Ottoman lands.",
   attributes: {
     dimensions: [
       { type: "height", value: 20, unit: "cm" },
@@ -55,7 +56,7 @@ function serveCraft(craft: CraftDetail) {
   server.use(http.get(`${API}/crafts/${craft.id}/`, () => ok(craft)));
 }
 
-test("shows the description, characteristics, culture, and location", async () => {
+test("shows the description, story, characteristics, culture, and location", async () => {
   serveCraft(richCraft);
   renderRoute("/crafts/1");
 
@@ -63,6 +64,8 @@ test("shows the description, characteristics, culture, and location", async () =
   expect(screen.getByText("Ceramics · Tile")).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "About this craft" })).toBeInTheDocument();
   expect(screen.getByText("Hand-painted glazed tiles.")).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Story" })).toBeInTheDocument();
+  expect(screen.getByText(/decorated mosques across the Ottoman lands/)).toBeInTheDocument();
   expect(screen.getByText(/Turkish · From Kütahya, Türkiye/)).toBeInTheDocument();
 
   const characteristics = screen.getByRole("heading", { name: "Characteristics" }).parentElement!;
@@ -76,6 +79,14 @@ test("shows the description, characteristics, culture, and location", async () =
   expect(within(aside).getByText("Cumhuriyet Caddesi, Kütahya")).toBeInTheDocument();
   expect(await within(aside).findByRole("region", { name: "Map of crafts" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Ayşe" })).toHaveAttribute("href", "/users/7");
+});
+
+test("a craft without a story has no story section", async () => {
+  serveCraft(makeCraftDetail());
+  renderRoute("/crafts/1");
+
+  expect(await screen.findByRole("heading", { name: "About this craft" })).toBeVisible();
+  expect(screen.queryByRole("heading", { name: "Story" })).not.toBeInTheDocument();
 });
 
 test("the gallery switches photos", async () => {

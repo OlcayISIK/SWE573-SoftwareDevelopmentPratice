@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
-import type { CraftFormValues } from "./schema";
+import { emptyCraftForm, type CraftFormValues } from "./schema";
 
-// The key changes with the shape of the form, so a draft from an older form is not restored.
+// The key changes when the form is reshaped, so a draft from an older form is not restored.
+// Newly added fields do not need a new key; see loadDraft.
 const DRAFT_KEY = "ic.craft-draft.v2";
 const OLD_DRAFT_KEYS = ["ic.craft-draft"];
 
@@ -11,7 +12,8 @@ export function loadDraft(): CraftFormValues | null {
   try {
     OLD_DRAFT_KEYS.forEach((key) => localStorage.removeItem(key));
     const raw = localStorage.getItem(DRAFT_KEY);
-    return raw ? (JSON.parse(raw) as CraftFormValues) : null;
+    // Fields added to the form since the draft was saved start empty.
+    return raw ? { ...emptyCraftForm, ...(JSON.parse(raw) as Partial<CraftFormValues>) } : null;
   } catch {
     return null;
   }

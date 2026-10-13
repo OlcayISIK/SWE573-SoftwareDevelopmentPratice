@@ -4,6 +4,8 @@ import { http, HttpResponse } from "msw";
 
 import { toast } from "@/lib/toast";
 import { craftsApi, mediaBody } from "@/features/crafts/api";
+import { emptyCraftForm } from "@/features/crafts/form/schema";
+import { loadDraft } from "@/features/crafts/form/useDraft";
 import type { CraftType } from "@/features/crafts/types";
 import { expectNoA11yViolations } from "@/test/axe";
 import { makeCraftDetail, makeUser, signedIn } from "@/test/fixtures";
@@ -97,6 +99,7 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
   await userEvent.click(screen.getByRole("button", { name: "Add a color" }));
   const secondColor = screen.getByRole("group", { name: "Color 2" });
   await userEvent.type(within(secondColor).getByLabelText("Color code"), "turquoise");
+  await userEvent.type(screen.getByLabelText("Story (optional)"), "Made for mosques.");
   await userEvent.upload(screen.getByLabelText("Photo file"), png());
   await userEvent.type(screen.getByLabelText("Alt text"), "Blue tile");
   await userEvent.click(screen.getByRole("button", { name: "Add to craft" }));
@@ -120,6 +123,7 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
     latitude: 39.419923,
     longitude: 29.985743,
     description: "Glazed tiles.",
+    story: "Made for mosques.",
     colors: ["#1e40af", "#40e0d0"],
     attributes: {
       dimensions: [{ type: "height", value: 20, unit: "cm" }],
@@ -441,6 +445,14 @@ test("a draft survives a reload and can be discarded", async () => {
   expect(notice).toHaveTextContent("We restored your unsaved draft.");
   await userEvent.click(within(notice).getByRole("button", { name: "Start over" }));
   expect(screen.getByLabelText("Name")).toHaveValue("");
+});
+
+test("a draft saved before the story field existed still loads", async () => {
+  const { story: _story, ...older } = { ...emptyCraftForm, name: "Saved earlier" };
+  localStorage.setItem("ic.craft-draft.v2", JSON.stringify(older));
+
+  // An empty story passes validation; a missing one would block publishing.
+  expect(loadDraft()).toEqual({ ...emptyCraftForm, name: "Saved earlier" });
 });
 
 test("drafts from the old form are dropped", async () => {

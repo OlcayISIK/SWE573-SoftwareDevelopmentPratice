@@ -778,6 +778,7 @@ export interface components {
             readonly longitude: number;
             readonly media: components["schemas"]["Media"][];
             readonly description: string;
+            readonly story: string;
             readonly colors: string[];
             readonly attributes: unknown;
             readonly status: components["schemas"]["CraftStatusEnum"];
@@ -847,6 +848,7 @@ export interface components {
             /** Format: double */
             longitude: number;
             description: string;
+            story?: string;
             /** @description Colors as "#rrggbb", or "#rrggbbaa" when see-through. */
             colors?: string[];
             attributes?: components["schemas"]["CraftAttributesRequest"];
@@ -1137,6 +1139,7 @@ export interface components {
             /** Format: double */
             longitude?: number;
             description?: string;
+            story?: string;
             /** @description Colors as "#rrggbb", or "#rrggbbaa" when see-through. */
             colors?: string[];
             attributes?: components["schemas"]["CraftAttributesRequest"];
