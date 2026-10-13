@@ -170,7 +170,7 @@ Protected routes are wrapped in route guards:
 - `RequireAuth` redirects guests to `/login` and returns them to the original page after login.
 - `RequireAdmin` shows a "not authorized" page to non-admin users.
 
-Map filters and list filters (category, craft type, culture, country, similar color, search, page) are kept in the URL query string, so filtered views can be shared and the back button works.
+Map filters and list filters (category, craft type, culture, country, search, page) are kept in the URL query string, so filtered views can be shared and the back button works.
 
 ---
 
@@ -270,7 +270,7 @@ Users must verify their email before publishing. If an unverified user opens `/c
 - **Library:** Leaflet with react-leaflet and OpenStreetMap tiles. Leaflet is free, has no API key, and is enough for pins, zoom, and pan. The OpenStreetMap attribution is shown on the map, as its license requires.
 - **Data:** the map loads lightweight pins from `/crafts/map/` (id, name, category, latitude, longitude). Full craft data is loaded only when a pin is opened.
 - **Clustering:** nearby pins are grouped with Leaflet.markercluster, so the map stays readable and fast as the number of crafts grows (NFR-02).
-- **Filters:** category, craft type (listed for the chosen category, and cleared when it changes), culture, country, a similar color, and search update the URL and refetch the pins. The color picker waits until the choice settles before filtering, so dragging through colors does not send a request for each one. The country list comes from `/crafts/countries/`, so it only offers countries that have crafts.
+- **Filters:** category, craft type (listed for the chosen category, and cleared when it changes), culture, country, and search update the URL and refetch the pins. The country list comes from `/crafts/countries/`, so it only offers countries that have crafts.
 - **Pin details:** clicking a pin opens a preview card (photo, name, craft type, culture, and place) with a link to the craft details page. On mobile the preview opens as a bottom sheet.
 - **Picking a location:** the craft form includes a small map. The author types an address and pins it (the map moves to the found point), or clicks or drags the pin and the address is filled in from the point.
 - **Performance:** the map component is lazy-loaded, and pin data is cached by TanStack Query so returning to the map does not refetch immediately.
@@ -291,7 +291,7 @@ The craft form follows the craft data model:
 - **Location:** the address with a "Pin address" button, which looks up the coordinates through the backend (`/geocode/search/`) and shows "Address not found." when nothing matches. Placing the pin on the map fills in the address (`/geocode/reverse/`). City and country come from the lookup.
 - **Tools and materials:** the items typical for the chosen craft type are offered as checkboxes, and any other item is found by typing its name, or added as a new one.
 - **Description:** one text covering what it is, how it is made, how to understand it, and its cultural relevance (FR-05).
-- **Colors:** up to 10 rows, each with a color picker, a code field, and an opacity slider. The code accepts hex (`#14a`, `#1e40af`, `#1e40af80`), `rgb()`/`rgba()`, `hsl()`/`hsla()`, and CSS color names, and the picker, code, and opacity stay in step. Colors are sent as `#rrggbb`, or `#rrggbbaa` when see-through, and shown on the craft page as swatches that link to crafts with a similar color.
+- **Colors:** up to 10 rows, each with a color picker, a code field, and an opacity slider. The code accepts hex (`#14a`, `#1e40af`, `#1e40af80`), `rgb()`/`rgba()`, `hsl()`/`hsla()`, and CSS color names, and the picker, code, and opacity stay in step. Colors are sent as `#rrggbb`, or `#rrggbbaa` when see-through, and shown on the craft page as swatches with their codes.
 - **Attributes:** optional dimension rows (measure, size, and unit, each measure once), weight, and distinguishing features, stored in the backend `attributes` field (FR-07).
 - **Media:** photos, video links, and documents (FR-06).
 

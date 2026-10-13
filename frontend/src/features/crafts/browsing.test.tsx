@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http } from "msw";
 
@@ -87,23 +87,6 @@ describe("craft list", () => {
       "51",
       "Türkiye",
     ]);
-  });
-
-  test("the color filter sends the picked color once the choice settles", async () => {
-    const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
-    const { router } = renderRoute("/crafts");
-
-    const picker = await screen.findByLabelText("Similar color");
-    fireEvent.input(picker, { target: { value: "#ff0000" } });
-    fireEvent.input(picker, { target: { value: "#B91C1C" } });
-
-    await waitFor(() => expect(router.state.location.search).toBe("?color=b91c1c"));
-    await waitFor(() => expect(calls.at(-1)!.get("color")).toBe("b91c1c"));
-    // Dragging through red on the way did not send a request for it.
-    expect(calls.map((call) => call.get("color"))).not.toContain("ff0000");
-
-    await userEvent.click(screen.getByRole("button", { name: "Any color" }));
-    await waitFor(() => expect(router.state.location.search).toBe(""));
   });
 
   test("a new category clears the craft type filter", async () => {

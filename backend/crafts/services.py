@@ -4,7 +4,6 @@ from django.utils.text import slugify
 from core.exceptions import ConflictError, PermissionDeniedError, ValidationError
 
 from . import signals
-from .colors import to_lab
 from .models import Category, Craft, CraftColor, CraftMedia, CraftType, Culture, Material, Tool
 
 MAX_MEDIA_PER_CRAFT = 20
@@ -62,13 +61,7 @@ def _set_colors(craft, colors):
     """Replaces the craft's colors, keeping the order they were given in."""
     craft.colors.all().delete()
     CraftColor.objects.bulk_create(
-        CraftColor(
-            craft=craft,
-            value=color,
-            order=index,
-            **dict(zip(("lab_l", "lab_a", "lab_b"), to_lab(color), strict=True)),
-        )
-        for index, color in enumerate(colors)
+        CraftColor(craft=craft, value=color, order=index) for index, color in enumerate(colors)
     )
 
 

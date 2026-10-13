@@ -1,9 +1,8 @@
-from django.db.models import Exists, F, OuterRef, Prefetch, Q, Value
+from django.db.models import Exists, OuterRef, Prefetch, Q, Value
 
 from core.exceptions import NotFoundError
 
-from .colors import SIMILAR_DISTANCE, to_lab
-from .models import Category, Craft, CraftColor, CraftMedia, CraftType, Culture, Material, Tool
+from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Tool
 
 CRAFT_NOT_FOUND = "Craft not found."
 MEDIA_NOT_FOUND = "Media not found."
@@ -58,26 +57,6 @@ def visible_crafts(viewer=None):
     return crafts.filter(status=Craft.Status.PUBLISHED)
 
 
-def _squared_difference(field, value):
-    difference = F(field) - value
-    return difference * difference
-
-
-def _with_similar_color(crafts, color):
-    """Crafts with at least one color within SIMILAR_DISTANCE of `color` in CIELAB."""
-    lightness, green_red, blue_yellow = to_lab(color)
-    similar = (
-        CraftColor.objects.filter(craft=OuterRef("pk"))
-        .alias(
-            distance_squared=_squared_difference("lab_l", lightness)
-            + _squared_difference("lab_a", green_red)
-            + _squared_difference("lab_b", blue_yellow)
-        )
-        .filter(distance_squared__lte=SIMILAR_DISTANCE**2)
-    )
-    return crafts.filter(Exists(similar))
-
-
 def _apply_filters(
     crafts,
     *,
@@ -85,7 +64,6 @@ def _apply_filters(
     craft_type=None,
     culture=None,
     country=None,
-    color=None,
     search=None,
 ):
     if category:
@@ -96,8 +74,6 @@ def _apply_filters(
         crafts = crafts.filter(culture_id=culture)
     if country:
         crafts = crafts.filter(country__iexact=country)
-    if color:
-        crafts = _with_similar_color(crafts, color)
     if search:
         crafts = crafts.filter(
             Q(name__icontains=search)

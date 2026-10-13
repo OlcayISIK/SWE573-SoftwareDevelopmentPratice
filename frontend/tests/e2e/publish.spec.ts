@@ -65,16 +65,10 @@ test("a new user registers, is signed in, and publishes a craft", async ({ page 
   await expect
     .poll(() => photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth))
     .toBeGreaterThan(0);
-  await expect(page.getByRole("link", { name: "#1e40af" })).toBeVisible();
+  await expect(page.getByText("#1e40af")).toBeVisible();
   await expect(page.getByText("Ceramics · Tile")).toBeVisible();
   await expect(page.getByText(/Turkish · From Kütahya, Türkiye/)).toBeVisible();
   await expect(page.getByText("height 20 cm")).toBeVisible();
-
-  // A similar blue finds it; a red does not.
-  await page.goto("/crafts?color=1d4ed8");
-  await expect(page.getByRole("link", { name: craftName })).toBeVisible();
-  await page.goto("/crafts?color=dc2626");
-  await expect(page.getByRole("link", { name: craftName })).toHaveCount(0);
 
   await page.goto(`/crafts?search=${encodeURIComponent(craftName)}`);
   await expect(page.getByRole("link", { name: craftName })).toBeVisible();

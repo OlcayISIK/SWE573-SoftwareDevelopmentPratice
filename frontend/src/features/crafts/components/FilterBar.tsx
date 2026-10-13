@@ -2,7 +2,6 @@ import { useEffect, useId, useState } from "react";
 
 import { useCategories, useCountries, useCraftTypes, useCultures } from "../queries";
 
-import { ColorFilter } from "./ColorFilter";
 import type { CraftFilters } from "../types";
 
 interface FilterBarProps {
@@ -126,7 +125,6 @@ export function FilterBar({ filters, onChange, onClear, hasFilters }: FilterBarP
               ))}
             </select>
           </div>
-          <ColorFilter value={filters.color} onChange={(color) => onChange({ color })} />
           <div className="md:col-span-2 lg:col-span-4">
             <label htmlFor={`${id}-search`} className="text-sm font-medium">
               Search

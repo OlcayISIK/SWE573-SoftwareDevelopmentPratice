@@ -68,15 +68,9 @@ test("shows the description, characteristics, culture, and location", async () =
   const characteristics = screen.getByRole("heading", { name: "Characteristics" }).parentElement!;
   expect(within(characteristics).getByText("height 20 cm, width 20 cm")).toBeInTheDocument();
   expect(within(characteristics).getByText("850 g")).toBeInTheDocument();
-  expect(within(characteristics).getByRole("link", { name: "#1e40af" })).toHaveAttribute(
-    "href",
-    "/crafts?color=1e40af",
-  );
-  // A see-through color shows its full code and links to its solid color.
-  expect(within(characteristics).getByRole("link", { name: "#40e0d080" })).toHaveAttribute(
-    "href",
-    "/crafts?color=40e0d0",
-  );
+  // Colors are shown as swatches with their code, including see-through colors.
+  expect(within(characteristics).getByText("#1e40af")).toBeInTheDocument();
+  expect(within(characteristics).getByText("#40e0d080")).toBeInTheDocument();
 
   const aside = screen.getByRole("complementary", { name: "Facts and location" });
   expect(within(aside).getByText("Cumhuriyet Caddesi, Kütahya")).toBeInTheDocument();

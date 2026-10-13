@@ -8,7 +8,7 @@ from rest_framework import serializers
 
 from core.validators import MB, validate_image_upload
 
-from .colors import HEX_COLOR, SEARCH_COLOR
+from .colors import HEX_COLOR
 from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Tool
 
 PHOTO_MAX_BYTES = 5 * MB
@@ -324,19 +324,10 @@ class AuthorSerializer(serializers.Serializer):
 
 class CraftFilterSerializer(serializers.Serializer):
     category = serializers.SlugField(required=False)
-    color = serializers.CharField(
-        required=False, help_text="Crafts with a color similar to this one, as rrggbb."
-    )
     craft_type = serializers.IntegerField(required=False, min_value=1)
     culture = serializers.IntegerField(required=False, min_value=1)
     country = serializers.CharField(required=False, max_length=100)
     search = serializers.CharField(required=False, max_length=100)
-
-    def validate_color(self, value):
-        match = SEARCH_COLOR.match(value.strip())
-        if not match:
-            raise serializers.ValidationError('Use a hex color such as "1e40af".')
-        return f"#{match.group(1).lower()}"
 
 
 class MapFilterSerializer(CraftFilterSerializer):
