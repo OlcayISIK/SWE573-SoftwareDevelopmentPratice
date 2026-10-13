@@ -16,8 +16,19 @@ DOCUMENT_MAX_BYTES = 10 * MB
 MAX_TOOLS = 20
 MAX_MATERIALS = 20
 MAX_COLORS = 10
-DIMENSION_TYPES = ["height", "width", "depth", "length", "diameter", "thickness"]
-DIMENSION_UNITS = ["mm", "cm", "m"]
+LENGTH_UNITS = ["mm", "cm", "m", "in", "ft"]
+WEIGHT_UNITS = ["g", "kg", "oz", "lb"]
+VOLUME_UNITS = ["ml", "l", "fl oz"]
+# Each kind of dimension and the units it can be given in.
+DIMENSION_UNITS = {
+    **dict.fromkeys(
+        ["height", "width", "depth", "length", "diameter", "circumference", "thickness"],
+        LENGTH_UNITS,
+    ),
+    "weight": WEIGHT_UNITS,
+    "volume": VOLUME_UNITS,
+}
+DIMENSION_TYPES = list(DIMENSION_UNITS)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -130,12 +141,19 @@ class StrictSerializer(serializers.Serializer):
 class DimensionSerializer(StrictSerializer):
     type = serializers.ChoiceField(choices=DIMENSION_TYPES)
     value = serializers.FloatField(min_value=0.01, max_value=100000)
-    unit = serializers.ChoiceField(choices=DIMENSION_UNITS)
+    unit = serializers.ChoiceField(choices=LENGTH_UNITS + WEIGHT_UNITS + VOLUME_UNITS)
+
+    def validate(self, data):
+        units = DIMENSION_UNITS[data["type"]]
+        if data["unit"] not in units:
+            raise serializers.ValidationError(
+                {"unit": [f"Give the {data['type']} in {', '.join(units)}."]}
+            )
+        return data
 
 
 class CraftAttributesSerializer(StrictSerializer):
     dimensions = DimensionSerializer(many=True, required=False, max_length=len(DIMENSION_TYPES))
-    weight_g = serializers.FloatField(min_value=0.01, required=False)
     distinguishing_features = serializers.CharField(
         max_length=1000, required=False, allow_blank=True
     )
