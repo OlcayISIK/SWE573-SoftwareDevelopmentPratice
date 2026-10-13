@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router";
 
 import { formatDimensions, formatWeight, type CraftAttributes } from "../../attributes";
 import type { CraftDetail } from "../../types";
@@ -9,15 +8,9 @@ function ColorList({ colors }: { colors: CraftDetail["colors"] }) {
   return (
     <ul className="flex flex-wrap gap-x-5 gap-y-2">
       {colors.map((color) => (
-        <li key={color}>
-          <Link
-            to={`/crafts?color=${color.slice(1, 7)}`}
-            className="flex items-center gap-2 hover:underline"
-            title="Find crafts with a similar color"
-          >
-            <Swatch color={color} className="h-6 w-6" />
-            <span className="font-mono text-sm text-stone-700">{color}</span>
-          </Link>
+        <li key={color} className="flex items-center gap-2">
+          <Swatch color={color} className="h-6 w-6" />
+          <span className="font-mono text-sm text-stone-700">{color}</span>
         </li>
       ))}
     </ul>

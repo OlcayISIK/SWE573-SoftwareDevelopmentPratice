@@ -1668,8 +1668,6 @@ export interface operations {
             query?: {
                 /** @description Category slug */
                 category?: string;
-                /** @description Crafts with a similar color, as rrggbb */
-                color?: string;
                 /** @description Country of the craft */
                 country?: string;
                 /** @description Craft type id */
@@ -2001,8 +1999,6 @@ export interface operations {
                 bbox?: string;
                 /** @description Category slug */
                 category?: string;
-                /** @description Crafts with a similar color, as rrggbb */
-                color?: string;
                 /** @description Country of the craft */
                 country?: string;
                 /** @description Craft type id */
@@ -2702,8 +2698,6 @@ export interface operations {
             query?: {
                 /** @description Category slug */
                 category?: string;
-                /** @description Crafts with a similar color, as rrggbb */
-                color?: string;
                 /** @description Country of the craft */
                 country?: string;
                 /** @description Craft type id */
