@@ -44,4 +44,4 @@ npx playwright install chromium   # first time only
 npm run test:e2e
 ```
 
-The tests create their own users and reset the rate-limit counters at the start of each run. Docker Compose runs the backend with `AUTO_VERIFY_EMAIL=true`, so new accounts are verified on registration.
+The tests create their own users and reset the rate-limit counters at the start of each run. When the run ends, everything the tests created (users named `e2e-...@example.com`, their crafts, photos, reports, and added list items) is deleted again, so the local database keeps only real and sample data. Docker Compose runs the backend with `AUTO_VERIFY_EMAIL=true`, so new accounts are verified on registration.
