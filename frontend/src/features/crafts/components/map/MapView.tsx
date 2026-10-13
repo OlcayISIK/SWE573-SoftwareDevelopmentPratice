@@ -2,8 +2,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
-import L from "./leafletSetup";
-import "leaflet.markercluster";
+import L from "./markerCluster";
 
 import { useEffect } from "react";
 import { MapContainer, useMap } from "react-leaflet";
