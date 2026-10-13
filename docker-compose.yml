@@ -25,6 +25,7 @@ services:
       DATABASE_URL: postgres://ic:ic@db:5432/indigenous_crafts
       CORS_ALLOWED_ORIGINS: http://localhost:5173
       SERVE_MEDIA: "true"
+      LOAD_SAMPLE_DATA: "true"
     ports:
       - "8000:8000"
     volumes:
