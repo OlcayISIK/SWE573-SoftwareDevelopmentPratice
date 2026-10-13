@@ -21,6 +21,7 @@ EDITABLE_FIELDS = {
     "latitude",
     "longitude",
     "description",
+    "story",
     "colors",
     "attributes",
 }

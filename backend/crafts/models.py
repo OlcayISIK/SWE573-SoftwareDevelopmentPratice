@@ -114,7 +114,10 @@ class Craft(SoftDeleteModel):
         decimal_places=6,
         validators=[MinValueValidator(-180), MaxValueValidator(180)],
     )
+    # What the craft is and how it is made.
     description = models.TextField()
+    # How to understand it, its history and meaning, and its role in the community.
+    story = models.TextField(blank=True)
     attributes = models.JSONField(default=dict, blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PUBLISHED)
     author = models.ForeignKey(

@@ -72,6 +72,7 @@ def _craft_fields(item):
         "latitude": Decimal(str(item["latitude"])),
         "longitude": Decimal(str(item["longitude"])),
         "description": item["description"],
+        "story": item.get("story", ""),
         "colors": item["colors"],
         "attributes": {"dimensions": item["dimensions"]} if item["dimensions"] else {},
     }

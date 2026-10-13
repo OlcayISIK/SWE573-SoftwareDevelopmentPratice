@@ -2,7 +2,7 @@ import pytest
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
-from crafts.models import CraftColor
+from crafts.models import Craft, CraftColor
 from tests.factories import CraftFactory, UserFactory
 from tests.payloads import craft_payload
 
@@ -68,17 +68,25 @@ def test_editing_replaces_the_colors(client_for, user):
     assert CraftColor.objects.filter(craft_id=craft_id).count() == 1
 
 
+def check_constraints_now():
+    with connection.cursor() as cursor:
+        cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+
+
 def test_old_text_colors_are_dropped_by_the_migration():
     craft = CraftFactory(attributes={"colors": ["cobalt blue"], "weight_g": 450})
+    # Data changes leave deferred checks pending, which block the next ALTER TABLE.
+    check_constraints_now()
     executor = MigrationExecutor(connection)
     executor.migrate([("crafts", "0009_remove_old_craft_fields")])
     try:
-        with connection.cursor() as cursor:
-            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+        check_constraints_now()
         MigrationExecutor(connection).migrate([("crafts", "0010_craft_colors")])
-        craft.refresh_from_db()
-        assert craft.attributes == {"weight_g": 450}
+        # Only this column: the model's later fields are not in the table yet.
+        attributes = Craft.objects.values_list("attributes", flat=True).get(pk=craft.pk)
+        assert attributes == {"weight_g": 450}
     finally:
+        check_constraints_now()
         executor = MigrationExecutor(connection)
         executor.migrate(executor.loader.graph.leaf_nodes())
 
