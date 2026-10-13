@@ -40,9 +40,6 @@ FILTER_PARAMETERS = [
     OpenApiParameter("craft_type", OpenApiTypes.INT, description="Craft type id"),
     OpenApiParameter("culture", OpenApiTypes.INT, description="Culture id"),
     OpenApiParameter("country", OpenApiTypes.STR, description="Country of the craft"),
-    OpenApiParameter(
-        "color", OpenApiTypes.STR, description="Crafts with a similar color, as rrggbb"
-    ),
     OpenApiParameter("search", OpenApiTypes.STR, description="Text search"),
 ]
 

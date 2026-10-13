@@ -149,10 +149,6 @@ class CraftColor(BaseModel):
     # "#rrggbb", or "#rrggbbaa" when the color is see-through.
     value = models.CharField(max_length=9)
     order = models.PositiveSmallIntegerField(default=0)
-    # CIELAB values, for finding crafts with a similar color.
-    lab_l = models.FloatField()
-    lab_a = models.FloatField()
-    lab_b = models.FloatField()
 
     class Meta:
         ordering = ["order", "id"]
