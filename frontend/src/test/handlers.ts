@@ -5,34 +5,107 @@ import type { Category, CraftType, Culture, Place, Tool } from "@/features/craft
 import { API, fail, ok } from "./http";
 
 export const categories: Category[] = [
-  { id: 1, name: "Ceramics", slug: "ceramics", user_added: false },
-  { id: 2, name: "Textiles", slug: "textiles", user_added: false },
+  {
+    id: 1,
+    name: "Ceramics",
+    slug: "ceramics",
+    description: "Objects shaped from clay and hardened by firing.",
+    user_added: false,
+  },
+  {
+    id: 2,
+    name: "Textiles",
+    slug: "textiles",
+    description: "Cloth and objects made from fibres.",
+    user_added: false,
+  },
 ];
 
 export const craftTypes: CraftType[] = [
-  { id: 21, name: "Tile", category: 1, user_added: false },
-  { id: 22, name: "Pottery", category: 1, user_added: false },
-  { id: 23, name: "Carpet", category: 2, user_added: false },
-  { id: 24, name: "Kilim", category: 2, user_added: false },
+  {
+    id: 21,
+    name: "Tile",
+    category: 1,
+    description: "A flat piece of fired clay, usually glazed and painted.",
+    user_added: false,
+  },
+  {
+    id: 22,
+    name: "Pottery",
+    category: 1,
+    description: "Vessels shaped from clay and fired.",
+    user_added: false,
+  },
+  {
+    id: 23,
+    name: "Carpet",
+    category: 2,
+    description: "A pile rug made by tying rows of knots.",
+    user_added: false,
+  },
+  {
+    id: 24,
+    name: "Kilim",
+    category: 2,
+    description: "A flat-woven rug without pile.",
+    user_added: false,
+  },
 ];
 
 export const cultures: Culture[] = [
-  { id: 51, name: "Turkish", homeland: "Anatolia, Türkiye", user_added: false },
-  { id: 52, name: "Zapotec", homeland: "Oaxaca, Mexico", user_added: false },
+  {
+    id: 51,
+    name: "Turkish",
+    homeland: "Anatolia, Türkiye",
+    description: "The people of Türkiye.",
+    user_added: false,
+  },
+  {
+    id: 52,
+    name: "Zapotec",
+    homeland: "Oaxaca, Mexico",
+    description: "An Indigenous people of Oaxaca, Mexico.",
+    user_added: false,
+  },
 ];
 
 type Linked = Omit<Tool, "typical">;
 
 export const tools: Linked[] = [
-  { id: 31, name: "Brush", user_added: false },
-  { id: 32, name: "Kiln", user_added: false },
-  { id: 33, name: "Loom", user_added: false },
+  {
+    id: 31,
+    name: "Brush",
+    description: "Bristles on a handle, used to paint or glaze.",
+    user_added: false,
+  },
+  {
+    id: 32,
+    name: "Kiln",
+    description: "An oven that fires clay, glaze or glass.",
+    user_added: false,
+  },
+  {
+    id: 33,
+    name: "Loom",
+    description: "A frame that holds warp threads taut for weaving.",
+    user_added: false,
+  },
 ];
 
 export const materials: Linked[] = [
-  { id: 41, name: "Clay", user_added: false },
-  { id: 42, name: "Glaze", user_added: false },
-  { id: 43, name: "Wool", user_added: false },
+  {
+    id: 41,
+    name: "Clay",
+    description: "Fine earth that is soft when wet and hardens when fired.",
+    user_added: false,
+  },
+  {
+    id: 42,
+    name: "Glaze",
+    description: "A glassy coating fused onto ceramics in the kiln.",
+    user_added: false,
+  },
+  { id: 43, name: "Wool", description: "Fibre shorn from sheep.", user_added: false },
 ];
 
 /** Which tools and materials are typical for each craft type. */

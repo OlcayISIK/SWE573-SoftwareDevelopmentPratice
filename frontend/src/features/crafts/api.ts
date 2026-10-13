@@ -70,15 +70,16 @@ export const lookupsApi = {
   materials: (craftType?: number) =>
     api.get<Material[]>("/materials/", { params: { craft_type: craftType } }),
   cultures: () => api.get<Culture[]>("/cultures/"),
-  addCategory: (name: string) => api.post<Category>("/categories/", { name }),
-  addCraftType: (name: string, category: number) =>
-    api.post<CraftType>("/craft-types/", { name, category }),
-  addTool: (name: string, craftType?: number) =>
-    api.post<Tool>("/tools/", { name, craft_type: craftType }),
-  addMaterial: (name: string, craftType?: number) =>
-    api.post<Material>("/materials/", { name, craft_type: craftType }),
-  addCulture: (name: string, homeland: string) =>
-    api.post<Culture>("/cultures/", { name, homeland }),
+  addCategory: (name: string, description = "") =>
+    api.post<Category>("/categories/", { name, description }),
+  addCraftType: (name: string, category: number, description = "") =>
+    api.post<CraftType>("/craft-types/", { name, category, description }),
+  addTool: (name: string, craftType?: number, description = "") =>
+    api.post<Tool>("/tools/", { name, craft_type: craftType, description }),
+  addMaterial: (name: string, craftType?: number, description = "") =>
+    api.post<Material>("/materials/", { name, craft_type: craftType, description }),
+  addCulture: (name: string, homeland: string, description = "") =>
+    api.post<Culture>("/cultures/", { name, homeland, description }),
 };
 
 export const geocodeApi = {

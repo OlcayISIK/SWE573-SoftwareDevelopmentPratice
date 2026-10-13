@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
+import { Tooltip } from "@/components/Tooltip";
 import { ReportItemButton } from "@/features/moderation/components/ReportDialog";
 
 import { placeName } from "../../place";
@@ -20,7 +21,18 @@ function ItemList({ kind, items }: { kind: "tool" | "material"; items: NamedItem
     <ul className="flex flex-wrap gap-x-3 gap-y-1">
       {items.map((item) => (
         <li key={item.id}>
-          {item.name}
+          <Tooltip text={item.description}>
+            {(describedBy) => (
+              // Crafts that use the item are found by searching for its name.
+              <Link
+                to={`/crafts?search=${encodeURIComponent(item.name)}`}
+                className="underline"
+                aria-describedby={describedBy}
+              >
+                {item.name}
+              </Link>
+            )}
+          </Tooltip>
           <ReportItemButton kind={kind} item={item} />
         </li>
       ))}
@@ -46,25 +58,46 @@ export function CraftFacts({ craft }: { craft: CraftDetail }) {
       </h2>
       <dl className="mt-3 space-y-3">
         <Fact label="Category">
-          <Link to={`/crafts?category=${category.slug}`} className="underline">
-            {category.name}
-          </Link>
+          <Tooltip text={category.description}>
+            {(describedBy) => (
+              <Link
+                to={`/crafts?category=${category.slug}`}
+                className="underline"
+                aria-describedby={describedBy}
+              >
+                {category.name}
+              </Link>
+            )}
+          </Tooltip>
           <ReportItemButton kind="category" item={category} />
         </Fact>
         <Fact label="Craft type">
-          <Link
-            to={`/crafts?category=${category.slug}&craft_type=${craftType.id}`}
-            className="underline"
-          >
-            {craftType.name}
-          </Link>
+          <Tooltip text={craftType.description}>
+            {(describedBy) => (
+              <Link
+                to={`/crafts?category=${category.slug}&craft_type=${craftType.id}`}
+                className="underline"
+                aria-describedby={describedBy}
+              >
+                {craftType.name}
+              </Link>
+            )}
+          </Tooltip>
           <ReportItemButton kind="craft_type" item={craftType} />
         </Fact>
         {culture && (
           <Fact label="Culture">
-            <Link to={`/crafts?culture=${culture.id}`} className="underline">
-              {culture.name}
-            </Link>
+            <Tooltip text={culture.description}>
+              {(describedBy) => (
+                <Link
+                  to={`/crafts?culture=${culture.id}`}
+                  className="underline"
+                  aria-describedby={describedBy}
+                >
+                  {culture.name}
+                </Link>
+              )}
+            </Tooltip>
             <ReportItemButton kind="culture" item={culture} />
             {culture.homeland && (
               <span className="block text-sm text-stone-600">{culture.homeland}</span>

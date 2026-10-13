@@ -10,7 +10,7 @@ interface AddItemInlineProps {
   withHomeland?: boolean;
   disabled?: boolean;
   disabledHint?: string;
-  onAdd: (name: string, homeland: string) => Promise<void>;
+  onAdd: (name: string, homeland: string, description: string) => Promise<void>;
 }
 
 /**
@@ -27,6 +27,7 @@ export function AddItemInline({
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [homeland, setHomeland] = useState("");
+  const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const nameInput = useRef<HTMLInputElement>(null);
@@ -56,6 +57,7 @@ export function AddItemInline({
     setOpen(false);
     setName("");
     setHomeland("");
+    setDescription("");
     setError(null);
   };
 
@@ -67,7 +69,7 @@ export function AddItemInline({
     setPending(true);
     setError(null);
     try {
-      await onAdd(name.trim(), homeland.trim());
+      await onAdd(name.trim(), homeland.trim(), description.trim());
       close();
     } catch (failure) {
       const apiError = toApiError(failure);
@@ -109,6 +111,14 @@ export function AddItemInline({
           onKeyDown={submitOnEnter}
         />
       )}
+      <TextField
+        label="Description (optional)"
+        hint={`A sentence on what the ${noun} is. People see it when they point at the ${noun}.`}
+        value={description}
+        maxLength={300}
+        onChange={(event) => setDescription(event.target.value)}
+        onKeyDown={submitOnEnter}
+      />
       <p className="text-sm text-stone-600">Everyone can pick it once it is added.</p>
       <div className="flex items-center gap-4">
         <button

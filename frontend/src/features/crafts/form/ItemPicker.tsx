@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 
 import { toApiError } from "@/api/envelope";
+import { Tooltip } from "@/components/Tooltip";
 
 import { AddItemInline } from "./AddItemInline";
 import type { ChosenItem } from "./schema";
@@ -8,6 +9,7 @@ import type { ChosenItem } from "./schema";
 interface PickableItem {
   id: number;
   name: string;
+  description: string;
   typical: boolean;
 }
 
@@ -20,7 +22,7 @@ interface ItemPickerProps {
   value: ChosenItem[];
   onChange: (value: ChosenItem[]) => void;
   /** Adds a name that is not in the list yet, and returns the new item. */
-  onCreate: (name: string) => Promise<ChosenItem>;
+  onCreate: (name: string, description?: string) => Promise<ChosenItem>;
   /** The chosen craft type, whose typical items are offered first. */
   craftTypeName?: string;
   max: number;
@@ -53,6 +55,7 @@ export function ItemPicker({
   const typical = craftTypeName ? items.filter((item) => item.typical) : [];
   const match = text.trim() ? items.find((item) => sameName(item.name, text)) : undefined;
   const full = value.length >= max;
+  const descriptionOf = (itemId: number) => items.find((item) => item.id === itemId)?.description;
 
   const add = (item: ChosenItem) => {
     if (!chosen.has(item.id) && !full) onChange([...value, item]);
@@ -93,19 +96,23 @@ export function ItemPicker({
       {value.length > 0 && (
         <ul aria-label={`Chosen ${label.toLowerCase()}`} className="flex flex-wrap gap-2">
           {value.map((item) => (
-            <li
-              key={item.id}
-              className="flex items-center gap-1 rounded-full bg-brand-100 py-1 pl-3 pr-1 text-sm"
-            >
-              {item.name}
-              <button
-                type="button"
-                className="rounded-full px-2 hover:bg-brand-200"
-                aria-label={`Remove ${item.name}`}
-                onClick={() => remove(item.id)}
-              >
-                ×
-              </button>
+            <li key={item.id}>
+              <Tooltip text={descriptionOf(item.id)}>
+                {(describedBy) => (
+                  <span className="flex items-center gap-1 rounded-full bg-brand-100 py-1 pl-3 pr-1 text-sm">
+                    {item.name}
+                    <button
+                      type="button"
+                      className="rounded-full px-2 hover:bg-brand-200"
+                      aria-label={`Remove ${item.name}`}
+                      aria-describedby={describedBy}
+                      onClick={() => remove(item.id)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+              </Tooltip>
             </li>
           ))}
         </ul>
@@ -116,17 +123,24 @@ export function ItemPicker({
           <p className="text-sm text-stone-700">Typical for {craftTypeName}:</p>
           <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
             {typical.map((item) => (
-              <label key={item.id} className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={chosen.has(item.id)}
-                  disabled={full && !chosen.has(item.id)}
-                  onChange={(event) =>
-                    event.target.checked ? add({ id: item.id, name: item.name }) : remove(item.id)
-                  }
-                />
-                {item.name}
-              </label>
+              <Tooltip key={item.id} text={item.description}>
+                {(describedBy) => (
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={chosen.has(item.id)}
+                      disabled={full && !chosen.has(item.id)}
+                      aria-describedby={describedBy}
+                      onChange={(event) =>
+                        event.target.checked
+                          ? add({ id: item.id, name: item.name })
+                          : remove(item.id)
+                      }
+                    />
+                    {item.name}
+                  </label>
+                )}
+              </Tooltip>
             ))}
           </div>
         </div>
@@ -184,7 +198,7 @@ export function ItemPicker({
       <AddItemInline
         noun={noun}
         disabled={full}
-        onAdd={async (name) => add(await onCreate(name))}
+        onAdd={async (name, _homeland, description) => add(await onCreate(name, description))}
       />
 
       {error && (

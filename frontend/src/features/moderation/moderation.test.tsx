@@ -268,6 +268,7 @@ function makeItemReport(overrides: Partial<ItemReportReview> = {}): ItemReportRe
     item: {
       id: 98,
       name: "Rug",
+      description: "A rug.",
       is_hidden: false,
       added_by: { id: 50, display_name: "Mehmet" },
       crafts_count: 1,
@@ -316,21 +317,45 @@ describe("item review", () => {
     );
   });
 
-  test("renaming sends the new name", async () => {
+  test("editing sends only what changed", async () => {
     const reviews = serveItemReport();
     renderRoute("/admin/item-reports/8");
 
     expect(await screen.findByText("Mehmet")).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("radio", { name: "Rename the item" }));
-    const name = screen.getByLabelText("New name");
+    await userEvent.click(screen.getByRole("radio", { name: "Edit the name or description" }));
+    const name = screen.getByLabelText("Name");
     expect(name).toHaveValue("Rug");
+    expect(screen.getByLabelText("Description")).toHaveValue("A rug.");
     await userEvent.clear(name);
     await userEvent.type(name, "Rug hook");
     await userEvent.type(screen.getByLabelText("Reason"), "Typo.");
     await userEvent.click(screen.getByRole("button", { name: "Submit review" }));
 
     await waitFor(() =>
-      expect(reviews).toEqual([{ action: "rename", reason: "Typo.", name: "Rug hook" }]),
+      expect(reviews).toEqual([{ action: "edit", reason: "Typo.", name: "Rug hook" }]),
+    );
+  });
+
+  test("editing the description alone sends the description", async () => {
+    const reviews = serveItemReport();
+    renderRoute("/admin/item-reports/8");
+
+    await userEvent.click(
+      await screen.findByRole("radio", { name: "Edit the name or description" }),
+    );
+    await userEvent.type(screen.getByLabelText("Reason"), "Unclear.");
+    await userEvent.click(screen.getByRole("button", { name: "Submit review" }));
+    expect(await screen.findByText("Change the name or the description.")).toBeInTheDocument();
+
+    const description = screen.getByLabelText("Description");
+    await userEvent.clear(description);
+    await userEvent.type(description, "A hook for latch-hooked rugs.");
+    await userEvent.click(screen.getByRole("button", { name: "Submit review" }));
+
+    await waitFor(() =>
+      expect(reviews).toEqual([
+        { action: "edit", reason: "Unclear.", description: "A hook for latch-hooked rugs." },
+      ]),
     );
   });
 
@@ -387,9 +412,9 @@ describe("item review", () => {
         actions: [
           {
             id: 1,
-            action: "rename",
+            action: "edit",
             reason: "Typo.",
-            details: { name: "Rug hook" },
+            details: { name: "Rug hook", description: "A hook for rugs." },
             admin: { id: 1, display_name: "Admin" },
             created_at: "2026-10-07T09:00:00Z",
           },
@@ -398,7 +423,9 @@ describe("item review", () => {
     );
     renderRoute("/admin/item-reports/8");
 
-    expect(await screen.findByText("Renamed to “Rug hook”.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Renamed to “Rug hook”. Description set to “A hook for rugs.”."),
+    ).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Submit review" })).not.toBeInTheDocument();
   });
 

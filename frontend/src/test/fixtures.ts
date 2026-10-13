@@ -3,7 +3,7 @@ import { http } from "msw";
 import type { CurrentUser } from "@/features/auth/types";
 import type { CraftDetail, CraftListItem } from "@/features/crafts/types";
 
-import { categories, cultures } from "./handlers";
+import { categories, craftTypes, cultures, materials, tools } from "./handlers";
 import { API, ok } from "./http";
 
 export function makeCraftListItem(overrides: Partial<CraftListItem> = {}): CraftListItem {
@@ -11,7 +11,7 @@ export function makeCraftListItem(overrides: Partial<CraftListItem> = {}): Craft
     id: 1,
     name: "Kütahya Çinisi",
     category: categories[0],
-    craft_type: { id: 21, name: "Tile", user_added: false },
+    craft_type: craftTypes[0],
     culture: cultures[0],
     city: "Kütahya",
     country: "Türkiye",
@@ -30,9 +30,9 @@ export function makeCraftDetail(overrides: Partial<CraftDetail> = {}): CraftDeta
     id: 1,
     name: "Kütahya Çinisi",
     category: categories[0],
-    craft_type: { id: 21, name: "Tile", user_added: false },
-    tools: [{ id: 32, name: "Kiln", user_added: false }],
-    materials: [{ id: 41, name: "Clay", user_added: false }],
+    craft_type: craftTypes[0],
+    tools: [tools[1]],
+    materials: [materials[0]],
     culture: cultures[0],
     address: "Cumhuriyet Caddesi, Kütahya",
     city: "Kütahya",
