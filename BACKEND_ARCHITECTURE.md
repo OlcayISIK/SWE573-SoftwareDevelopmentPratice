@@ -196,14 +196,22 @@ All models inherit `core.BaseModel`, which adds `id`, `created_at`, and `updated
 {
   "dimensions": [
     { "type": "height", "value": 20, "unit": "cm" },
-    { "type": "width", "value": 20, "unit": "cm" }
+    { "type": "width", "value": 20, "unit": "cm" },
+    { "type": "weight", "value": 450, "unit": "g" }
   ],
-  "weight_g": 450,
   "distinguishing_features": "Hand-painted floral motifs under a transparent glaze"
 }
 ```
 
-Dimensions are optional rows. The type is one of `height`, `width`, `depth`, `length`, `diameter`, or `thickness`, each entered once, and the unit is `mm`, `cm`, or `m`.
+Dimensions are optional rows, each type entered once. The unit must suit the type:
+
+| Types                                                                          | Units                       |
+| ------------------------------------------------------------------------------ | --------------------------- |
+| `height`, `width`, `depth`, `length`, `diameter`, `circumference`, `thickness` | `mm`, `cm`, `m`, `in`, `ft` |
+| `weight`                                                                       | `g`, `kg`, `oz`, `lb`       |
+| `volume`                                                                       | `ml`, `l`, `fl oz`          |
+
+Values are kept in the unit the author entered. Weight used to be a separate `weight_g` attribute; a migration turned it into a weight row in grams.
 
 ### moderation
 
