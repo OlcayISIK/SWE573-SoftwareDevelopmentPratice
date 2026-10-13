@@ -1,4 +1,6 @@
-from django.db.models import Exists, OuterRef, Prefetch, Q, Value
+import re
+
+from django.db.models import Count, Exists, OuterRef, Prefetch, Q, Value
 
 from core.exceptions import NotFoundError
 
@@ -57,6 +59,34 @@ def visible_crafts(viewer=None):
     return crafts.filter(status=Craft.Status.PUBLISHED)
 
 
+# Craft fields a search looks in. Tools and materials are searched too, see _matches.
+SEARCHED_FIELDS = [
+    "name",
+    "description",
+    "craft_type__name",
+    "category__name",
+    "culture__name",
+    "address",
+    "city",
+    "country",
+]
+MAX_SEARCH_WORDS = 6
+
+
+def _matches(word):
+    """
+    Crafts where some searched field has a word starting with `word`, so "tile" finds tiles
+    but not textiles. `\\m` is the start of a word in PostgreSQL regular expressions.
+    """
+    pattern = r"\m" + re.escape(word)
+    condition = Q()
+    for field in SEARCHED_FIELDS:
+        condition |= Q(**{f"{field}__iregex": pattern})
+    for model in (Tool, Material):
+        condition |= Exists(model.objects.filter(crafts=OuterRef("pk"), name__iregex=pattern))
+    return condition
+
+
 def _apply_filters(
     crafts,
     *,
@@ -75,27 +105,45 @@ def _apply_filters(
     if country:
         crafts = crafts.filter(country__iexact=country)
     if search:
-        crafts = crafts.filter(
-            Q(name__icontains=search)
-            | Q(craft_type__name__icontains=search)
-            | Q(description__icontains=search)
-            | Q(category__name__icontains=search)
-            | Q(culture__name__icontains=search)
-            | Q(address__icontains=search)
-            | Q(country__icontains=search)
-        )
+        # Every word must match, so adding words narrows the results.
+        for word in search.split()[:MAX_SEARCH_WORDS]:
+            crafts = crafts.filter(_matches(word))
     return crafts
 
 
-def craft_countries(viewer=None):
-    """Countries that have crafts the viewer can see, for the country filter."""
-    return (
-        visible_crafts(viewer)
-        .exclude(country="")
-        .order_by("country")
-        .values_list("country", flat=True)
-        .distinct()
-    )
+def craft_facets(viewer=None, **filters):
+    """
+    The values each filter can take among the crafts the other filters find, with counts, so
+    a filter list only offers values that lead to crafts. A list ignores its own filter, so
+    another value in the same list can still be picked.
+    """
+
+    def found(without):
+        others = {key: value for key, value in filters.items() if key != without}
+        return _apply_filters(visible_crafts(viewer), **others)
+
+    def counted(crafts, **fields):
+        """Counts crafts per value, as {output name: field path} plus "count", by name."""
+        paths = list(fields.values())
+        rows = crafts.values(*paths).annotate(count=Count("id")).order_by(fields["name"])
+        return [
+            {**{key: row[path] for key, path in fields.items()}, "count": row["count"]}
+            for row in rows
+        ]
+
+    return {
+        "categories": counted(found("category"), slug="category__slug", name="category__name"),
+        "craft_types": counted(
+            found("craft_type"),
+            id="craft_type_id",
+            name="craft_type__name",
+            category="craft_type__category_id",
+        ),
+        "cultures": counted(
+            found("culture").exclude(culture=None), id="culture_id", name="culture__name"
+        ),
+        "countries": counted(found("country").exclude(country=""), name="country"),
+    }
 
 
 def browse_crafts(viewer=None, *, author_id=None, **filters):

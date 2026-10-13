@@ -346,6 +346,37 @@ class MapFilterSerializer(CraftFilterSerializer):
         return west, south, east, north
 
 
+class CategoryFacetSerializer(serializers.Serializer):
+    slug = serializers.CharField()
+    name = serializers.CharField()
+    count = serializers.IntegerField()
+
+
+class CraftTypeFacetSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    category = serializers.IntegerField()
+    count = serializers.IntegerField()
+
+
+class CultureFacetSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    count = serializers.IntegerField()
+
+
+class CountryFacetSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    count = serializers.IntegerField()
+
+
+class FacetsSerializer(serializers.Serializer):
+    categories = CategoryFacetSerializer(many=True)
+    craft_types = CraftTypeFacetSerializer(many=True)
+    cultures = CultureFacetSerializer(many=True)
+    countries = CountryFacetSerializer(many=True)
+
+
 class CraftListSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     craft_type = NamedItemSerializer(read_only=True)
