@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import type { Page } from "@playwright/test";
@@ -14,6 +15,14 @@ function compose(...args: string[]) {
 /** Runs Python inside the backend container with Django set up. */
 export function djangoShell(code: string) {
   return compose("exec", "-T", "backend", "python", "manage.py", "shell", "-c", code);
+}
+
+/**
+ * Deletes everything earlier e2e runs created (see cleanup.py), so test users and crafts do not
+ * pile up in the local database.
+ */
+export function removeTestData() {
+  djangoShell(readFileSync(fileURLToPath(new URL("./cleanup.py", import.meta.url)), "utf-8"));
 }
 
 export function uniqueEmail(label: string) {
