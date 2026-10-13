@@ -1,4 +1,4 @@
-import { API_URL, djangoShell } from "./support";
+import { API_URL, djangoShell, removeTestData } from "./support";
 
 const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:5173";
 
@@ -21,6 +21,8 @@ export default async function globalSetup() {
   await waitFor(BASE_URL);
   // Registration and login are rate-limited; start every run with fresh counters.
   djangoShell("from django.core.cache import cache; cache.clear()");
+  // Also clears what a run that was stopped early left behind.
+  removeTestData();
   djangoShell(
     [
       "from accounts.models import User",
