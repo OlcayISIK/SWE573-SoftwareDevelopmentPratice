@@ -1,4 +1,4 @@
-import { formatDimensions, formatWeight } from "./attributes";
+import { formatAmount, formatDimensions } from "./attributes";
 import { toEmbedUrl } from "./media";
 
 test.each([
@@ -13,19 +13,25 @@ test.each([
   expect(toEmbedUrl(link)).toBe(expected);
 });
 
-test("dimensions are listed in the order they were entered, each with its unit", () => {
+test("sizes are listed in the order they were entered, each with its unit", () => {
   expect(
     formatDimensions([
       { type: "height", value: 25.5, unit: "cm" },
-      { type: "length", value: 2, unit: "m" },
+      { type: "weight", value: 2, unit: "kg" },
+      { type: "circumference", value: 3, unit: "ft" },
     ]),
-  ).toBe("height 25.5 cm, length 2 m");
-  expect(formatDimensions([])).toBeNull();
+  ).toBe("height 25.5 cm, circumference 3 ft");
+  expect(formatDimensions([{ type: "weight", value: 2, unit: "kg" }])).toBeNull();
   expect(formatDimensions(undefined)).toBeNull();
 });
 
-test("weight switches to kilograms from 1000 g", () => {
-  expect(formatWeight(850)).toBe("850 g");
-  expect(formatWeight(2400)).toBe("2.4 kg");
-  expect(formatWeight(undefined)).toBeNull();
+test("weight and volume are shown in the unit they were entered in", () => {
+  const rows = [
+    { type: "height", value: 20, unit: "cm" },
+    { type: "weight", value: 2.5, unit: "lb" },
+    { type: "volume", value: 16, unit: "fl oz" },
+  ] as const;
+  expect(formatAmount([...rows], "weight")).toBe("2.5 lb");
+  expect(formatAmount([...rows], "volume")).toBe("16 fl oz");
+  expect(formatAmount([rows[0]], "weight")).toBeNull();
 });

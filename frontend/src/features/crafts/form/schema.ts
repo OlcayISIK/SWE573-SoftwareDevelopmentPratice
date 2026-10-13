@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   DIMENSION_TYPES,
   DIMENSION_UNITS,
+  unitsFor,
   type CraftAttributes,
   type DimensionType,
 } from "../attributes";
@@ -21,11 +22,6 @@ const positive = (message: string) =>
     .trim()
     .min(1, message)
     .refine((value) => Number(value) > 0, "Enter a number greater than 0.");
-
-const optionalPositive = z
-  .string()
-  .trim()
-  .refine((value) => value === "" || Number(value) > 0, "Enter a number greater than 0.");
 
 const PIN_MESSAGE = "Pin the location: use Pin address or click the map.";
 
@@ -52,11 +48,16 @@ const color = z.object({
     ),
 });
 
-const dimension = z.object({
-  type: z.enum(DIMENSION_TYPES),
-  value: positive("Enter the size."),
-  unit: z.enum(DIMENSION_UNITS),
-});
+const dimension = z
+  .object({
+    type: z.enum(DIMENSION_TYPES),
+    value: positive("Enter the amount."),
+    unit: z.enum(DIMENSION_UNITS),
+  })
+  .refine((row) => unitsFor(row.type).includes(row.unit), {
+    path: ["unit"],
+    message: "Pick a unit for this measure.",
+  });
 
 export const craftFormSchema = z.object({
   name: required("Enter the name of the craft.").max(150),
@@ -104,7 +105,6 @@ export const craftFormSchema = z.object({
         seen.add(row.type);
       });
     }),
-    weight_g: optionalPositive,
     distinguishing_features: z.string().max(1000),
   }),
 });
@@ -129,7 +129,6 @@ export const CRAFT_FORM_FIELDS = [
   "story",
   "colors",
   "attributes.dimensions",
-  "attributes.weight_g",
   "attributes.distinguishing_features",
 ] as const;
 
@@ -150,7 +149,6 @@ export const emptyCraftForm: CraftFormValues = {
   colors: [],
   attributes: {
     dimensions: [],
-    weight_g: "",
     distinguishing_features: "",
   },
 };
@@ -184,7 +182,6 @@ export function toPayload(values: CraftFormValues): CraftPayload {
       value: Number(row.value),
     }));
   }
-  if (attributes.weight_g) payloadAttributes.weight_g = Number(attributes.weight_g);
   if (attributes.distinguishing_features.trim()) {
     payloadAttributes.distinguishing_features = attributes.distinguishing_features.trim();
   }
@@ -231,7 +228,6 @@ export function fromCraft(craft: CraftDetail): CraftFormValues {
         ...row,
         value: String(row.value),
       })),
-      weight_g: attributes.weight_g?.toString() ?? "",
       distinguishing_features: attributes.distinguishing_features ?? "",
     },
   };

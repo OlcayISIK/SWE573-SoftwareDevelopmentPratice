@@ -15,8 +15,8 @@ const richCraft = makeCraftDetail({
     dimensions: [
       { type: "height", value: 20, unit: "cm" },
       { type: "width", value: 20, unit: "cm" },
+      { type: "weight", value: 850, unit: "g" },
     ],
-    weight_g: 850,
     distinguishing_features: "Hand-painted floral motifs under a clear glaze",
   },
   colors: ["#1e40af", "#40e0d080"],

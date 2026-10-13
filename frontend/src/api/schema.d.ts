@@ -757,8 +757,6 @@ export interface components {
         /** @description Rejects keys that are not declared, so stored JSON stays predictable. */
         CraftAttributesRequest: {
             dimensions?: components["schemas"]["DimensionRequest"][];
-            /** Format: double */
-            weight_g?: number;
             distinguishing_features?: string;
         };
         CraftDetail: {
@@ -880,10 +878,13 @@ export interface components {
          *     * `depth` - depth
          *     * `length` - length
          *     * `diameter` - diameter
+         *     * `circumference` - circumference
          *     * `thickness` - thickness
+         *     * `weight` - weight
+         *     * `volume` - volume
          * @enum {string}
          */
-        DimensionTypeEnum: "height" | "width" | "depth" | "length" | "diameter" | "thickness";
+        DimensionTypeEnum: "height" | "width" | "depth" | "length" | "diameter" | "circumference" | "thickness" | "weight" | "volume";
         EmailRequest: {
             /** Format: email */
             email: string;
@@ -1288,9 +1289,18 @@ export interface components {
          * @description * `mm` - mm
          *     * `cm` - cm
          *     * `m` - m
+         *     * `in` - in
+         *     * `ft` - ft
+         *     * `g` - g
+         *     * `kg` - kg
+         *     * `oz` - oz
+         *     * `lb` - lb
+         *     * `ml` - ml
+         *     * `l` - l
+         *     * `fl oz` - fl oz
          * @enum {string}
          */
-        UnitEnum: "mm" | "cm" | "m";
+        UnitEnum: "mm" | "cm" | "m" | "in" | "ft" | "g" | "kg" | "oz" | "lb" | "ml" | "l" | "fl oz";
         UnreadCount: {
             count: number;
         };
