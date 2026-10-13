@@ -241,6 +241,7 @@ def test_map_pins_are_lightweight_and_unpaginated(api_client, ceramics):
     assert data == [
         {
             "id": craft.id,
+            "place": craft.places.get().id,
             "name": craft.name,
             "category": "ceramics",
             "latitude": 39.4192,

@@ -4,7 +4,17 @@ from django.utils.text import slugify
 from core.exceptions import ConflictError, PermissionDeniedError, ValidationError
 
 from . import signals
-from .models import Category, Craft, CraftColor, CraftMedia, CraftType, Culture, Material, Tool
+from .models import (
+    Category,
+    Craft,
+    CraftColor,
+    CraftMedia,
+    CraftPlace,
+    CraftType,
+    Culture,
+    Material,
+    Tool,
+)
 
 MAX_MEDIA_PER_CRAFT = 20
 
@@ -15,11 +25,7 @@ EDITABLE_FIELDS = {
     "tools",
     "materials",
     "culture",
-    "address",
-    "city",
-    "country",
-    "latitude",
-    "longitude",
+    "places",
     "description",
     "story",
     "colors",
@@ -66,6 +72,23 @@ def _set_colors(craft, colors):
     )
 
 
+PLACE_FIELDS = ("address", "city", "country", "latitude", "longitude")
+
+
+def _main_place(places):
+    """The origin, or the first place when all are equal, as craft fields."""
+    main = next((place for place in places if place.get("is_origin")), places[0])
+    return {field: main.get(field, "") for field in PLACE_FIELDS}
+
+
+def _set_places(craft, places):
+    """Replaces the craft's places, keeping the order they were given in."""
+    craft.places.all().delete()
+    CraftPlace.objects.bulk_create(
+        CraftPlace(craft=craft, order=index, **place) for index, place in enumerate(places)
+    )
+
+
 @transaction.atomic
 def publish_craft(*, author, data):
     if not author.is_email_verified:
@@ -75,10 +98,12 @@ def publish_craft(*, author, data):
     fields = dict(data)
     related = {field: fields.pop(field, []) for field in MANY_TO_MANY_FIELDS}
     colors = fields.pop("colors", [])
-    craft = Craft.objects.create(author=author, **fields)
+    places = fields.pop("places")
+    craft = Craft.objects.create(author=author, **fields, **_main_place(places))
     for field, items in related.items():
         getattr(craft, field).set(items)
     _set_colors(craft, colors)
+    _set_places(craft, places)
     signals.craft_published.send(sender=Craft, craft=craft)
     return craft
 
@@ -95,6 +120,10 @@ def update_craft(*, craft, actor, data):
             getattr(craft, field).set(value)
         elif field == "colors":
             _set_colors(craft, value)
+        elif field == "places":
+            _set_places(craft, value)
+            for name, main in _main_place(value).items():
+                setattr(craft, name, main)
         else:
             setattr(craft, field, value)
     craft.save()

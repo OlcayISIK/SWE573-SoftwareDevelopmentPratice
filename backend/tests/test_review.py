@@ -135,10 +135,11 @@ def test_edit_requires_changes(admin_client, report):
 
 
 def test_edit_changes_are_validated(admin_client, report):
-    response = review(admin_client, report, "edit", changes={"latitude": 200})
+    places = [{"address": "Nowhere", "latitude": 200, "longitude": 0}]
+    response = review(admin_client, report, "edit", changes={"places": places})
 
     assert response.status_code == 400
-    assert "latitude" in response.json()["errors"]["changes"]
+    assert "places" in response.json()["errors"]["changes"]
 
 
 def test_reason_is_required(admin_client, report):

@@ -1,7 +1,7 @@
 import factory
 
 from accounts.models import User
-from crafts.models import Category, Craft, CraftType, Culture
+from crafts.models import Category, Craft, CraftPlace, CraftType, Culture
 from moderation.models import Report
 
 DEFAULT_PASSWORD = "Str0ng-Passw0rd!"
@@ -37,6 +37,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
 class CraftFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Craft
+        skip_postgeneration_save = True
 
     name = factory.Sequence(lambda n: f"Craft {n}")
     category = factory.SubFactory(CategoryFactory)
@@ -52,6 +53,16 @@ class CraftFactory(factory.django.DjangoModelFactory):
     description = "Hand-painted glazed tile, shaped, painted, glazed, and fired in a kiln."
     attributes = factory.LazyFunction(dict)
     author = factory.SubFactory(UserFactory)
+
+    @factory.post_generation
+    def places(craft, create, extracted, **kwargs):
+        """The craft's own place, or the places given as a list of dicts."""
+        if not create:
+            return
+        fields = ("address", "city", "country", "latitude", "longitude")
+        rows = extracted or [{field: getattr(craft, field) for field in fields}]
+        for order, row in enumerate(rows):
+            CraftPlace.objects.create(craft=craft, order=order, **row)
 
 
 class ReportFactory(factory.django.DjangoModelFactory):
