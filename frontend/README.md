@@ -4,7 +4,7 @@ React single-page app for Indigenous Crafts, built with TypeScript and Vite.
 
 ## Run with Docker
 
-From the repository root, `docker compose up --build` starts the database, the backend, and this app at http://localhost:5173. The backend loads 30 sample crafts with photos on startup, so the map is not empty.
+From the repository root, `docker compose up --build` starts the database, the backend, and this app at http://localhost:5173. The backend loads 35 sample crafts with photos on startup, so the map is not empty.
 
 ## Run locally
 

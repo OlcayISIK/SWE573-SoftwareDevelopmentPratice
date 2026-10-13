@@ -12,6 +12,11 @@ pytestmark = pytest.mark.django_db
 SAMPLES = read_samples()
 
 
+def places_of(item):
+    """A sample in several places lists them; otherwise its own fields are its place."""
+    return item.get("places", [item])
+
+
 def sample_crafts():
     return Craft.all_objects.filter(
         author__email__endswith="@example.org", author__email__startswith="sample-"
@@ -23,8 +28,9 @@ def test_the_data_file_is_complete():
     assert len(names) == len(set(names)) >= 25
     for item in SAMPLES["crafts"]:
         assert item["author"] in SAMPLES["authors"]
-        assert -90 <= item["latitude"] <= 90 and -180 <= item["longitude"] <= 180
-        assert item["city"] and item["country"]
+        for place in places_of(item):
+            assert -90 <= place["latitude"] <= 90 and -180 <= place["longitude"] <= 180
+            assert place["address"] and place["city"] and place["country"]
         assert item["photos"], item["name"]
         for photo in item["photos"]:
             assert (SAMPLE_DATA / "photos" / photo["file"]).is_file()
@@ -71,8 +77,21 @@ def test_sample_crafts_show_on_the_map_and_filters(api_client):
     facets = api_client.get("/api/v1/crafts/facets/").json()["data"]
     countries = [item["name"] for item in facets["countries"]]
 
-    assert len(pins) == len(SAMPLES["crafts"])
+    # A pin for each place of each craft.
+    assert len(pins) == sum(len(places_of(item)) for item in SAMPLES["crafts"])
     assert {"Türkiye", "Ghana", "Japan", "Mexico"} <= set(countries)
+
+
+def test_samples_in_several_places_get_each_place(api_client):
+    call_command("load_sample_crafts")
+    craft = Craft.objects.get(name="Yörük kilim")
+
+    detail = api_client.get(f"/api/v1/crafts/{craft.id}/").json()["data"]
+
+    assert [place["city"] for place in detail["places"]] == ["Fethiye", "Mut"]
+    assert not any(place["is_origin"] for place in detail["places"])
+    kilims = api_client.get("/api/v1/crafts/", {"search": "kilim"}).json()["data"]["items"]
+    assert {"Yörük kilim", "Konya kilim", "Shirvan kilim"} <= {item["name"] for item in kilims}
 
 
 def test_loading_twice_adds_nothing():
