@@ -18,9 +18,11 @@ export interface MapViewProps {
   onSelect: (id: number) => void;
   /** Open on this point instead of the whole world, for example on a craft's page. */
   focus?: [number, number];
+  /** Open showing all of these points, for example the places of a craft. */
+  fit?: [number, number][];
 }
 
-function ClusteredPins({ pins, onSelect }: Omit<MapViewProps, "focus">) {
+function ClusteredPins({ pins, onSelect }: Pick<MapViewProps, "pins" | "onSelect">) {
   const map = useMap();
 
   useEffect(() => {
@@ -44,12 +46,12 @@ function ClusteredPins({ pins, onSelect }: Omit<MapViewProps, "focus">) {
   return null;
 }
 
-export default function MapView({ pins, onSelect, focus }: MapViewProps) {
+export default function MapView({ pins, onSelect, focus, fit }: MapViewProps) {
   return (
     <div role="region" aria-label="Map of crafts" className="h-full w-full">
       <MapContainer center={[20, 0]} zoom={2} {...singleWorldOptions} className="h-full w-full">
         <WorldTiles />
-        <FitWorld focus={focus} />
+        <FitWorld focus={focus} points={fit} />
         <ClusteredPins pins={pins} onSelect={onSelect} />
       </MapContainer>
     </div>
