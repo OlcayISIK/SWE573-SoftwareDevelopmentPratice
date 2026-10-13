@@ -268,12 +268,12 @@ Users must verify their email before publishing. If an unverified user opens `/c
 ## Map
 
 - **Library:** Leaflet with react-leaflet and OpenStreetMap tiles. Leaflet is free, has no API key, and is enough for pins, zoom, and pan. The OpenStreetMap attribution is shown on the map, as its license requires.
-- **Data:** the map loads lightweight pins from `/crafts/map/` (id, name, category, latitude, longitude). Full craft data is loaded only when a pin is opened.
+- **Data:** the map loads lightweight pins from `/crafts/map/` (craft id, place id, name, category, latitude, longitude): one per place, so a craft made in several places has a pin at each. The count and the list view show each craft once. Full craft data is loaded only when a pin is opened.
 - **Clustering:** nearby pins are grouped with Leaflet.markercluster, so the map stays readable and fast as the number of crafts grows (NFR-02).
 - **Filters:** category, craft type (cleared when the category changes), culture, country, and search update the URL and refetch the pins. Each list comes from `/crafts/facets/`, so it only offers values found with the other filters, with counts, for example "Türkiye (3)" after searching "kilim". A chosen value stays listed even when no results have it.
 - **No results:** when the filters find nothing, the map and the lists say so, for example "No crafts match “kilim”.", with a button to clear the filters.
 - **Pin details:** clicking a pin opens a preview card (photo, name, craft type, culture, and place) with a link to the craft details page. On mobile the preview opens as a bottom sheet.
-- **Picking a location:** the craft form includes a small map. The author types an address and pins it (the map moves to the found point), or clicks or drags the pin and the address is filled in from the point.
+- **Picking a location:** each place in the craft form has a small map. The author types an address and pins it (the map moves to the found point), or clicks or drags the pin and the address is filled in from the point.
 - **Performance:** the map component is lazy-loaded, and pin data is cached by TanStack Query so returning to the map does not refetch immediately.
 
 ---
@@ -290,7 +290,7 @@ The craft form follows the craft data model:
 - **Basics:** name, category, craft type, and culture, each picked from a lookup list. The craft types follow the chosen category, and cultures show their homeland.
 - **Adding to the lists:** each list has an "Add a new …" control that adds the item for everyone and picks it, with an optional description. Adding a name that already exists picks the existing item.
 - **Item descriptions:** the chosen category, craft type, and culture are described under their lists. Tools and materials show their description in a tooltip when the pointer is over them or they have focus, both as checkboxes and once chosen.
-- **Location:** the address with a "Pin address" button, which looks up the coordinates through the backend (`/geocode/search/`) and shows "Address not found." when nothing matches. Placing the pin on the map fills in the address (`/geocode/reverse/`). City and country come from the lookup.
+- **Places:** one or more places (up to 10), each with its address and a "Pin address" button, which looks up the coordinates through the backend (`/geocode/search/`) and shows "Address not found." when nothing matches. Placing the pin on the map fills in the address (`/geocode/reverse/`). City and country come from the lookup. With more than one place, the author picks one as the origin or keeps "All places are equal". The craft page lists every place, marks the origin, and pins each one on its map.
 - **Tools and materials:** the items typical for the chosen craft type are offered as checkboxes, and any other item is found by typing its name, or added as a new one.
 - **Description and story:** the description says what the craft is and how it is made. The optional story says how to understand it: its history, the meaning of its motifs, who makes it, and its role in the community (FR-05). The craft page shows the story in its own section, after the description.
 - **Colors:** up to 10 rows, each with a color picker, a code field, and an opacity slider. The code accepts hex (`#14a`, `#1e40af`, `#1e40af80`), `rgb()`/`rgba()`, `hsl()`/`hsla()`, and CSS color names, and the picker, code, and opacity stay in step. Colors are sent as `#rrggbb`, or `#rrggbbaa` when see-through, and shown on the craft page as swatches with their codes.
