@@ -1,3 +1,4 @@
+import type { Path } from "react-hook-form";
 import { z } from "zod";
 
 import {
@@ -13,6 +14,7 @@ import type { CraftDetail } from "../types";
 export const MAX_TOOLS = 20;
 export const MAX_MATERIALS = 20;
 export const MAX_COLORS = 10;
+export const MAX_PLACES = 10;
 
 const required = (message: string) => z.string().trim().min(1, message);
 
@@ -36,6 +38,14 @@ const coordinate = (limit: number) =>
     );
 
 const chosenItem = z.object({ id: z.number(), name: z.string() });
+
+const place = z.object({
+  address: required("Enter the address of this place.").max(255),
+  city: z.string(),
+  country: z.string(),
+  latitude: coordinate(90),
+  longitude: coordinate(180),
+});
 
 const color = z.object({
   code: z
@@ -66,11 +76,27 @@ export const craftFormSchema = z.object({
   culture: required("Choose the culture the craft belongs to."),
   tools: z.array(chosenItem).max(MAX_TOOLS, `Choose at most ${MAX_TOOLS} tools.`),
   materials: z.array(chosenItem).max(MAX_MATERIALS, `Choose at most ${MAX_MATERIALS} materials.`),
-  address: required("Enter the address the craft comes from.").max(255),
-  city: z.string(),
-  country: z.string(),
-  latitude: coordinate(90),
-  longitude: coordinate(180),
+  places: z
+    .array(place)
+    .min(1, "Add the place the craft comes from.")
+    .max(MAX_PLACES, `Add at most ${MAX_PLACES} places.`)
+    .superRefine((rows, context) => {
+      const seen = new Set<string>();
+      rows.forEach((row, index) => {
+        if (!row.latitude || !row.longitude) return;
+        const point = `${Number(row.latitude).toFixed(6)},${Number(row.longitude).toFixed(6)}`;
+        if (seen.has(point)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [index, "address"],
+            message: "This place is already listed.",
+          });
+        }
+        seen.add(point);
+      });
+    }),
+  /** The index of the place that is the origin, or "" when all places are equal. */
+  origin: z.string(),
   description: required("Describe the craft."),
   story: z.string(),
   colors: z
@@ -113,24 +139,38 @@ export type CraftFormValues = z.infer<typeof craftFormSchema>;
 export type DimensionRow = CraftFormValues["attributes"]["dimensions"][number];
 export type ChosenItem = z.infer<typeof chosenItem>;
 export type ColorRow = CraftFormValues["colors"][number];
+export type PlaceRow = CraftFormValues["places"][number];
+
+const PLACE_FIELDS = Array.from({ length: MAX_PLACES }, (_, index) =>
+  (["address", "latitude", "longitude"] as const).map(
+    (field) => `places.${index}.${field}` as const,
+  ),
+).flat();
 
 /** Every field the form renders, used to place server errors next to the right input. */
-export const CRAFT_FORM_FIELDS = [
+export const CRAFT_FORM_FIELDS: readonly Path<CraftFormValues>[] = [
   "name",
   "category",
   "craft_type",
   "culture",
   "tools",
   "materials",
-  "address",
-  "latitude",
-  "longitude",
+  "places",
+  ...PLACE_FIELDS,
   "description",
   "story",
   "colors",
   "attributes.dimensions",
   "attributes.distinguishing_features",
-] as const;
+];
+
+export const emptyPlace: PlaceRow = {
+  address: "",
+  city: "",
+  country: "",
+  latitude: "",
+  longitude: "",
+};
 
 export const emptyCraftForm: CraftFormValues = {
   name: "",
@@ -139,11 +179,8 @@ export const emptyCraftForm: CraftFormValues = {
   culture: "",
   tools: [],
   materials: [],
-  address: "",
-  city: "",
-  country: "",
-  latitude: "",
-  longitude: "",
+  places: [emptyPlace],
+  origin: "",
   description: "",
   story: "",
   colors: [],
@@ -162,11 +199,14 @@ export interface CraftPayload {
   culture: number;
   tools: number[];
   materials: number[];
-  address: string;
-  city: string;
-  country: string;
-  latitude: number;
-  longitude: number;
+  places: {
+    address: string;
+    city: string;
+    country: string;
+    latitude: number;
+    longitude: number;
+    is_origin: boolean;
+  }[];
   description: string;
   story: string;
   colors: string[];
@@ -193,11 +233,14 @@ export function toPayload(values: CraftFormValues): CraftPayload {
     culture: Number(values.culture),
     tools: values.tools.map((item) => item.id),
     materials: values.materials.map((item) => item.id),
-    address: values.address.trim(),
-    city: values.city,
-    country: values.country,
-    latitude: Number(values.latitude),
-    longitude: Number(values.longitude),
+    places: values.places.map((row, index) => ({
+      address: row.address.trim(),
+      city: row.city,
+      country: row.country,
+      latitude: Number(row.latitude),
+      longitude: Number(row.longitude),
+      is_origin: String(index) === values.origin,
+    })),
     description: values.description.trim(),
     story: values.story.trim(),
     colors: values.colors.map((row) => toStoredColor(parseColor(row.code)!)),
@@ -215,11 +258,14 @@ export function fromCraft(craft: CraftDetail): CraftFormValues {
     culture: craft.culture ? String(craft.culture.id) : "",
     tools: craft.tools.map(chosen),
     materials: craft.materials.map(chosen),
-    address: craft.address,
-    city: craft.city,
-    country: craft.country,
-    latitude: String(craft.latitude),
-    longitude: String(craft.longitude),
+    places: craft.places.map((row) => ({
+      address: row.address,
+      city: row.city,
+      country: row.country,
+      latitude: String(row.latitude),
+      longitude: String(row.longitude),
+    })),
+    origin: String(craft.places.findIndex((row) => row.is_origin)).replace("-1", ""),
     description: craft.description,
     story: craft.story,
     colors: craft.colors.map((code) => ({ code })),

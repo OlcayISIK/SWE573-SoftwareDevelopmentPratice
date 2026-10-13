@@ -5,8 +5,8 @@ import { emptyCraftForm, type CraftFormValues } from "./schema";
 
 // The key changes when the form is reshaped, so a draft from an older form is not restored.
 // Newly added fields do not need a new key; see loadDraft.
-const DRAFT_KEY = "ic.craft-draft.v2";
-const OLD_DRAFT_KEYS = ["ic.craft-draft"];
+const DRAFT_KEY = "ic.craft-draft.v3";
+const OLD_DRAFT_KEYS = ["ic.craft-draft", "ic.craft-draft.v2"];
 
 export function loadDraft(): CraftFormValues | null {
   try {

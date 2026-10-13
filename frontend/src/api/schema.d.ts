@@ -779,6 +779,7 @@ export interface components {
             readonly latitude: number;
             /** Format: double */
             readonly longitude: number;
+            readonly places: components["schemas"]["CraftPlace"][];
             readonly media: components["schemas"]["Media"][];
             readonly description: string;
             readonly story: string;
@@ -809,14 +810,29 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string;
         };
+        /** @description A pin for one place of a craft; a craft in several places has several pins. */
         CraftPin: {
+            /** @description The craft. */
             id: number;
+            /** @description The place of this pin. */
+            place: number;
             name: string;
             category: string;
             /** Format: double */
             latitude: number;
             /** Format: double */
             longitude: number;
+        };
+        CraftPlace: {
+            readonly id: number;
+            readonly address: string;
+            readonly city: string;
+            readonly country: string;
+            /** Format: double */
+            readonly latitude: number;
+            /** Format: double */
+            readonly longitude: number;
+            readonly is_origin: boolean;
         };
         /**
          * @description * `published` - Published
@@ -844,13 +860,8 @@ export interface components {
             tools?: number[];
             materials?: number[];
             culture: number;
-            address: string;
-            city?: string;
-            country?: string;
-            /** Format: double */
-            latitude: number;
-            /** Format: double */
-            longitude: number;
+            /** @description Where the craft is made or belongs. Mark at most one as the origin. */
+            places: components["schemas"]["PlaceInputRequest"][];
             description: string;
             story?: string;
             /** @description Colors as "#rrggbb", or "#rrggbbaa" when see-through. */
@@ -1143,13 +1154,8 @@ export interface components {
             tools?: number[];
             materials?: number[];
             culture?: number;
-            address?: string;
-            city?: string;
-            country?: string;
-            /** Format: double */
-            latitude?: number;
-            /** Format: double */
-            longitude?: number;
+            /** @description Where the craft is made or belongs. Mark at most one as the origin. */
+            places?: components["schemas"]["PlaceInputRequest"][];
             description?: string;
             story?: string;
             /** @description Colors as "#rrggbb", or "#rrggbbaa" when see-through. */
@@ -1185,6 +1191,20 @@ export interface components {
             address: string;
             city: string;
             country: string;
+        };
+        /** @description Rejects keys that are not declared, so stored JSON stays predictable. */
+        PlaceInputRequest: {
+            address: string;
+            /** @default  */
+            city: string;
+            /** @default  */
+            country: string;
+            /** Format: double */
+            latitude: number;
+            /** Format: double */
+            longitude: number;
+            /** @default false */
+            is_origin: boolean;
         };
         PublicProfile: {
             readonly id: number;

@@ -4,8 +4,22 @@ import userEvent from "@testing-library/user-event";
 vi.unmock("@/features/crafts/components/map/MapView");
 
 const pins = [
-  { id: 1, name: "Kütahya Çinisi", category: "ceramics", latitude: 39.42, longitude: 29.98 },
-  { id: 2, name: "Barro negro", category: "ceramics", latitude: 17.06, longitude: -96.72 },
+  {
+    id: 1,
+    place: 11,
+    name: "Kütahya Çinisi",
+    category: "ceramics",
+    latitude: 39.42,
+    longitude: 29.98,
+  },
+  {
+    id: 2,
+    place: 12,
+    name: "Barro negro",
+    category: "ceramics",
+    latitude: 17.06,
+    longitude: -96.72,
+  },
 ];
 
 // jsdom has no layout, so Leaflet would see a 0x0 map and draw nothing.
