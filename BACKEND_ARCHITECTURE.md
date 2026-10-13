@@ -260,7 +260,7 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 | POST   | `/auth/password-reset/confirm/`        | Guest           | Set a new password with the token     |
 | GET    | `/crafts/`                             | Public          | List crafts (filter by category, craft type, culture, country, search) |
 | GET    | `/crafts/map/`                         | Public          | Lightweight pins for the map (same filters, plus `bbox=west,south,east,north`) |
-| GET    | `/crafts/countries/`                   | Public          | Countries that have crafts, for the country filter |
+| GET    | `/crafts/facets/`                      | Public          | For each filter, the values the other filters' results have, with counts |
 | GET    | `/geocode/search/?q=`                  | Registered user | Coordinates, address, city, and country for an address (404 if not found) |
 | GET    | `/geocode/reverse/?lat=&lng=`          | Registered user | Address at a point, for a pin placed on the map (404 if none) |
 | GET    | `/crafts/{id}/`                        | Public          | Craft details                         |
@@ -293,6 +293,11 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 | POST   | `/me/notifications/read/`              | Registered user | Mark notifications as read (given `ids`, or all) |
 
 The OpenAPI schema is served at `/api/schema/` and Swagger UI at `/api/docs/`.
+
+### Search and Facets
+
+- **Search** splits the text into words, and every word must start a word in one of the craft's name, description, craft type, category, culture, address, city, country, tools, or materials. So "tile" finds tiles but not textiles, and "kilim mexico" finds Mexican kilims. Matching uses PostgreSQL's word-start regular expression (`\m`), with the user's text escaped. Tools and materials are matched with `EXISTS` subqueries, so a craft is listed once however many of them match.
+- **Facets** (`/crafts/facets/`) take the same filters and return, for each of category, craft type, culture, and country, the values found with a count of crafts. Each list leaves out its own filter, so the other countries stay available after picking one, while the other lists narrow to that country.
 
 ### Address Lookup
 

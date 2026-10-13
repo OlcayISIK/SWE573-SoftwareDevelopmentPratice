@@ -270,7 +270,8 @@ Users must verify their email before publishing. If an unverified user opens `/c
 - **Library:** Leaflet with react-leaflet and OpenStreetMap tiles. Leaflet is free, has no API key, and is enough for pins, zoom, and pan. The OpenStreetMap attribution is shown on the map, as its license requires.
 - **Data:** the map loads lightweight pins from `/crafts/map/` (id, name, category, latitude, longitude). Full craft data is loaded only when a pin is opened.
 - **Clustering:** nearby pins are grouped with Leaflet.markercluster, so the map stays readable and fast as the number of crafts grows (NFR-02).
-- **Filters:** category, craft type (listed for the chosen category, and cleared when it changes), culture, country, and search update the URL and refetch the pins. The country list comes from `/crafts/countries/`, so it only offers countries that have crafts.
+- **Filters:** category, craft type (cleared when the category changes), culture, country, and search update the URL and refetch the pins. Each list comes from `/crafts/facets/`, so it only offers values found with the other filters, with counts, for example "Türkiye (3)" after searching "kilim". A chosen value stays listed even when no results have it.
+- **No results:** when the filters find nothing, the map and the lists say so, for example "No crafts match “kilim”.", with a button to clear the filters.
 - **Pin details:** clicking a pin opens a preview card (photo, name, craft type, culture, and place) with a link to the craft details page. On mobile the preview opens as a bottom sheet.
 - **Picking a location:** the craft form includes a small map. The author types an address and pins it (the map moves to the found point), or clicks or drags the pin and the address is filled in from the point.
 - **Performance:** the map component is lazy-loaded, and pin data is cached by TanStack Query so returning to the map does not refetch immediately.
