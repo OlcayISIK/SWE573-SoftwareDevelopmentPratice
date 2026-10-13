@@ -288,7 +288,8 @@ Forms use React Hook Form with Zod schemas.
 The craft form follows the craft data model:
 
 - **Basics:** name, category, craft type, and culture, each picked from a lookup list. The craft types follow the chosen category, and cultures show their homeland.
-- **Adding to the lists:** each list has an "Add a new …" control that adds the item for everyone and picks it. Adding a name that already exists picks the existing item.
+- **Adding to the lists:** each list has an "Add a new …" control that adds the item for everyone and picks it, with an optional description. Adding a name that already exists picks the existing item.
+- **Item descriptions:** the chosen category, craft type, and culture are described under their lists. Tools and materials show their description in a tooltip when the pointer is over them or they have focus, both as checkboxes and once chosen.
 - **Location:** the address with a "Pin address" button, which looks up the coordinates through the backend (`/geocode/search/`) and shows "Address not found." when nothing matches. Placing the pin on the map fills in the address (`/geocode/reverse/`). City and country come from the lookup.
 - **Tools and materials:** the items typical for the chosen craft type are offered as checkboxes, and any other item is found by typing its name, or added as a new one.
 - **Description and story:** the description says what the craft is and how it is made. The optional story says how to understand it: its history, the meaning of its motifs, who makes it, and its role in the community (FR-05). The craft page shows the story in its own section, after the description.
@@ -298,9 +299,11 @@ The craft form follows the craft data model:
 
 Long forms save a draft in `localStorage`, so an author does not lose their work if the page reloads. Fields added to the form later start empty when an older draft is restored.
 
-The craft page shows a facts card with the category, craft type, culture (with its homeland), tools, materials, and place. Each one links to the list of crafts that share it.
+The craft page shows a facts card with the category, craft type, culture (with its homeland), tools, materials, and place. Each one links to the list of crafts that share it (for tools and materials, a search for the name), and shows the item's description in a tooltip on hover and focus.
 
-Items that users added to the lookup lists can be reported from the facts card, with their own reasons (duplicate, inaccurate, inappropriate). Admins review them under "Reported items": the page shows who added the item and how many crafts use it, and offers rename, hide, merge into another item of the same kind (confirmed first, since it moves the crafts and deletes the item), or dismiss.
+The shared `Tooltip` component links the text to its target with `aria-describedby`, stays open while the pointer moves onto the text, and closes with Escape.
+
+Items that users added to the lookup lists can be reported from the facts card, with their own reasons (duplicate, inaccurate, inappropriate). Admins review them under "Reported items": the page shows who added the item and how many crafts use it, and offers edit (the name or the description), hide, merge into another item of the same kind (confirmed first, since it moves the crafts and deletes the item), or dismiss.
 
 ---
 
