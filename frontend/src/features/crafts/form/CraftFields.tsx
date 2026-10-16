@@ -225,13 +225,6 @@ export function CraftFields({
         <legend className="text-lg font-semibold">Characteristics (optional)</legend>
         <p className="text-sm text-stone-600">Fill in only what applies to this craft.</p>
         <DimensionRows form={form} />
-        <TextField
-          label="Weight (g)"
-          inputMode="decimal"
-          className="sm:w-48"
-          error={errors.attributes?.weight_g?.message}
-          {...register("attributes.weight_g")}
-        />
         <ColorRows form={form} />
         <TextAreaField
           label="Distinguishing features"

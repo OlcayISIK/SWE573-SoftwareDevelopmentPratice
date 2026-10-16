@@ -51,7 +51,7 @@ test("a new user registers, is signed in, and publishes a craft", async ({ page 
     .getByLabel("Story (optional)")
     .fill("Kütahya tiles have lined mosques and fountains since the 1400s.");
   await page.getByRole("button", { name: "Add a dimension" }).click();
-  await page.getByLabel("Size").fill("20");
+  await page.getByLabel("Amount").fill("20");
   await page.getByRole("button", { name: "Add a color" }).click();
   const color = page.getByRole("group", { name: "Color 1" });
   await color.getByLabel("Color code").fill("rgb(30, 64, 175)");

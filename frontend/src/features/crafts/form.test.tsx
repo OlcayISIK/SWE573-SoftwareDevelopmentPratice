@@ -92,7 +92,7 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
   await userEvent.click(within(materials).getByRole("checkbox", { name: "Clay" }));
   await userEvent.click(screen.getByRole("button", { name: "Add a dimension" }));
   const dimension = screen.getByRole("group", { name: "Dimension 1" });
-  await userEvent.type(within(dimension).getByLabelText("Size"), "20");
+  await userEvent.type(within(dimension).getByLabelText("Amount"), "20");
   await userEvent.click(screen.getByRole("button", { name: "Add a color" }));
   const firstColor = screen.getByRole("group", { name: "Color 1" });
   await userEvent.type(within(firstColor).getByLabelText("Color code"), "rgb(30, 64, 175)");
@@ -315,7 +315,29 @@ test("each dimension can be entered once", async () => {
 
   expect(await within(second).findByText("This dimension is already entered.")).toBeVisible();
   const first = screen.getByRole("group", { name: "Dimension 1" });
-  expect(within(first).getByText("Enter the size.")).toBeVisible();
+  expect(within(first).getByText("Enter the amount.")).toBeVisible();
+});
+
+test("a weight or volume row offers the units of its kind", async () => {
+  server.use(...signedIn());
+  renderRoute("/crafts/new");
+
+  await userEvent.click(await screen.findByRole("button", { name: "Add a dimension" }));
+  const row = screen.getByRole("group", { name: "Dimension 1" });
+  const unit = within(row).getByLabelText("Unit");
+  const units = () =>
+    within(unit)
+      .getAllByRole("option")
+      .map((option) => option.textContent);
+  expect(units()).toEqual(["mm", "cm", "m", "in", "ft"]);
+
+  await userEvent.selectOptions(within(row).getByLabelText("Measure"), "weight");
+  expect(unit).toHaveValue("g");
+  expect(units()).toEqual(["g", "kg", "oz", "lb"]);
+  await userEvent.selectOptions(unit, "lb");
+  await userEvent.selectOptions(within(row).getByLabelText("Measure"), "volume");
+  expect(unit).toHaveValue("ml");
+  expect(within(unit).getByRole("option", { name: "fl oz" })).toBeInTheDocument();
 });
 
 describe("colors", () => {
@@ -387,7 +409,7 @@ test("server errors on dimensions appear with the dimensions", async () => {
 
   await fillRequiredFields();
   await userEvent.click(screen.getByRole("button", { name: "Add a dimension" }));
-  await userEvent.type(screen.getByLabelText("Size"), "1");
+  await userEvent.type(screen.getByLabelText("Amount"), "1");
   await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
 
   expect(await screen.findByText("Ensure this value is less than 100000.")).toBeInTheDocument();
@@ -498,7 +520,7 @@ describe("editing", () => {
     expect(screen.getByLabelText("Address")).toHaveValue("Cumhuriyet Caddesi, Kütahya");
     expect(screen.getByRole("button", { name: "Remove Kiln" })).toBeInTheDocument();
     expect(screen.getByLabelText("Color code")).toHaveValue("#1e40af80");
-    expect(screen.getByLabelText("Size")).toHaveValue("20");
+    expect(screen.getByLabelText("Amount")).toHaveValue("20");
     await userEvent.clear(name);
     await userEvent.type(name, "Kütahya Tiles");
     await userEvent.click(screen.getByRole("button", { name: "Save changes" }));

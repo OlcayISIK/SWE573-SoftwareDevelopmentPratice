@@ -124,6 +124,9 @@ def test_unknown_category_is_rejected(client_for, user, payload):
         {"materials": ["wool"]},
         {"dimensions": [{"type": "height", "value": -1, "unit": "cm"}]},
         {"dimensions": [{"type": "volume", "value": 3, "unit": "cm"}]},
+        {"dimensions": [{"type": "weight", "value": 3, "unit": "in"}]},
+        {"dimensions": [{"type": "height", "value": 3, "unit": "lb"}]},
+        {"dimensions": [{"type": "mass", "value": 3, "unit": "kg"}]},
         {"dimensions": [{"type": "height", "value": 3, "unit": "inch"}]},
         {"dimensions": [{"type": "height", "value": 3}]},
         {"dimensions": [{"type": "height", "value": 3, "unit": "cm", "note": "x"}]},
@@ -134,7 +137,8 @@ def test_unknown_category_is_rejected(client_for, user, payload):
             ]
         },
         {"colors": "blue"},
-        {"weight_g": 0},
+        # Weight is a dimension now.
+        {"weight_g": 450},
     ],
 )
 def test_invalid_attributes_are_rejected(client_for, user, payload, attributes):
@@ -144,6 +148,31 @@ def test_invalid_attributes_are_rejected(client_for, user, payload, attributes):
 
     assert response.status_code == 400
     assert "attributes" in response.json()["errors"]
+
+
+def test_dimensions_take_the_units_of_their_kind(client_for, user, payload):
+    rows = [
+        {"type": "height", "value": 12, "unit": "in"},
+        {"type": "circumference", "value": 3, "unit": "ft"},
+        {"type": "weight", "value": 2.5, "unit": "lb"},
+        {"type": "volume", "value": 16, "unit": "fl oz"},
+    ]
+    payload["attributes"] = {"dimensions": rows}
+
+    response = client_for(user).post(CRAFTS_URL, payload, format="json")
+
+    assert response.status_code == 201
+    assert response.json()["data"]["attributes"]["dimensions"] == rows
+
+
+def test_a_unit_of_another_kind_is_explained(client_for, user, payload):
+    payload["attributes"] = {"dimensions": [{"type": "weight", "value": 3, "unit": "cm"}]}
+
+    response = client_for(user).post(CRAFTS_URL, payload, format="json")
+
+    assert response.json()["errors"]["attributes"]["dimensions"]["0"]["unit"] == [
+        "Give the weight in g, kg, oz, lb."
+    ]
 
 
 def test_attributes_are_optional(client_for, user, payload):

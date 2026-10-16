@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { formatDimensions, formatWeight, type CraftAttributes } from "../../attributes";
+import { formatAmount, formatDimensions, type CraftAttributes } from "../../attributes";
 import type { CraftDetail } from "../../types";
 import { Swatch } from "../Swatch";
 
@@ -27,7 +27,8 @@ export function AttributeList({
   const rows = (
     [
       ["Dimensions", formatDimensions(attributes.dimensions)],
-      ["Weight", formatWeight(attributes.weight_g)],
+      ["Weight", formatAmount(attributes.dimensions, "weight")],
+      ["Volume", formatAmount(attributes.dimensions, "volume")],
       ["Colors", colors.length ? <ColorList colors={colors} /> : null],
       ["Distinguishing features", attributes.distinguishing_features || null],
     ] as [string, ReactNode][]
