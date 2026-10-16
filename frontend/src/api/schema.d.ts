@@ -569,7 +569,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Renames, hides, or merges the reported item, or dismisses the report. */
+        /** @description Edits, hides, or merges the reported item, or dismisses the report. */
         post: operations["v1_moderation_item_reports_actions_create"];
         delete?: never;
         options?: never;
@@ -717,17 +717,21 @@ export interface components {
         ActionEnum: "edit" | "hide" | "remove" | "dismiss";
         AddCraftTypeRequest: {
             name: string;
+            description?: string;
             category: number;
         };
         AddCultureRequest: {
             name: string;
+            description?: string;
             homeland?: string;
         };
         AddItemRequest: {
             name: string;
+            description?: string;
         };
         AddLinkedItemRequest: {
             name: string;
+            description?: string;
             /** @description Craft type the item is typical for. */
             craft_type?: number;
         };
@@ -737,8 +741,9 @@ export interface components {
         };
         Category: {
             readonly id: number;
-            name: string;
-            slug: string;
+            readonly name: string;
+            readonly slug: string;
+            readonly description: string;
             readonly user_added: boolean;
         };
         CategoryFacet: {
@@ -821,8 +826,9 @@ export interface components {
         CraftStatusEnum: "published" | "hidden";
         CraftType: {
             readonly id: number;
-            name: string;
-            category: number;
+            readonly name: string;
+            readonly category: number;
+            readonly description: string;
             readonly user_added: boolean;
         };
         CraftTypeFacet: {
@@ -853,8 +859,9 @@ export interface components {
         };
         Culture: {
             readonly id: number;
-            name: string;
-            homeland?: string;
+            readonly name: string;
+            readonly homeland: string;
+            readonly description: string;
             readonly user_added: boolean;
         };
         CultureFacet: {
@@ -964,19 +971,21 @@ export interface components {
         ItemReviewActionCreateRequest: {
             action: components["schemas"]["ItemReviewActionEnum"];
             reason: string;
-            /** @description The new name. Required to rename. */
+            /** @description The new name. */
             name?: string;
+            /** @description The new description. */
+            description?: string;
             /** @description Id of the item of the same kind to merge into. Required to merge. */
             merge_into?: number;
         };
         /**
-         * @description * `rename` - Rename
+         * @description * `edit` - Edit
          *     * `hide` - Hide
          *     * `merge` - Merge
          *     * `dismiss` - Dismiss
          * @enum {string}
          */
-        ItemReviewActionEnum: "rename" | "hide" | "merge" | "dismiss";
+        ItemReviewActionEnum: "edit" | "hide" | "merge" | "dismiss";
         /**
          * @description * `category` - Category
          *     * `craft_type` - Craft type
@@ -999,7 +1008,8 @@ export interface components {
         };
         Material: {
             readonly id: number;
-            name: string;
+            readonly name: string;
+            readonly description: string;
             /** @description Typical for the craft type given in the request. */
             readonly typical: boolean;
             readonly user_added: boolean;
@@ -1035,6 +1045,7 @@ export interface components {
         NamedItem: {
             readonly id: number;
             readonly name: string;
+            readonly description: string;
             readonly user_added: boolean;
         };
         Notification: {
@@ -1245,6 +1256,7 @@ export interface components {
         ReportedItem: {
             readonly id: number;
             readonly name: string;
+            readonly description: string;
             readonly is_hidden: boolean;
             readonly added_by: components["schemas"]["Person"] | null;
             readonly crafts_count: number;
@@ -1280,7 +1292,8 @@ export interface components {
         };
         Tool: {
             readonly id: number;
-            name: string;
+            readonly name: string;
+            readonly description: string;
             /** @description Typical for the craft type given in the request. */
             readonly typical: boolean;
             readonly user_added: boolean;

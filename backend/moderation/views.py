@@ -171,7 +171,7 @@ class ItemReviewActionView(APIView):
         tags=["moderation"],
     )
     def post(self, request, report_id):
-        """Renames, hides, or merges the reported item, or dismisses the report."""
+        """Edits, hides, or merges the reported item, or dismisses the report."""
         serializer = ItemReviewActionCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         services.review_item_report(

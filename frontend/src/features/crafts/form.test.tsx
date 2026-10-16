@@ -207,8 +207,12 @@ test("a missing craft type is added and chosen", async () => {
       return ok([...craftTypes, ...added].filter((item) => item.category === category));
     }),
     http.post(`${API}/craft-types/`, async ({ request }) => {
-      const body = (await request.json()) as { name: string; category: number };
-      const item = { id: 99, name: body.name, category: body.category, user_added: true };
+      const body = (await request.json()) as {
+        name: string;
+        category: number;
+        description: string;
+      };
+      const item = { id: 99, ...body, user_added: true };
       added.push(item);
       return ok(item, { status: 201 });
     }),
@@ -251,7 +255,7 @@ test("a tool that is not listed is added as a new tool for the craft type", asyn
   expect(
     await within(tools).findByRole("button", { name: "Remove Spinning wheel" }),
   ).toBeInTheDocument();
-  expect(bodies).toEqual([{ name: "Spinning wheel", craft_type: 21 }]);
+  expect(bodies).toEqual([{ name: "Spinning wheel", craft_type: 21, description: "" }]);
 });
 
 test("tools and materials have an add link like the other lists", async () => {
@@ -272,13 +276,43 @@ test("tools and materials have an add link like the other lists", async () => {
   const materials = screen.getByRole("group", { name: "Materials (optional)" });
   await userEvent.click(within(materials).getByRole("button", { name: "Add a new material" }));
   await userEvent.type(within(materials).getByLabelText("New material"), "Kermes dye");
+  await userEvent.type(
+    within(materials).getByLabelText("Description (optional)"),
+    "A red dye from kermes insects.",
+  );
   await userEvent.click(within(materials).getByRole("button", { name: "Add material" }));
 
   // The new material is chosen for the craft at once.
   expect(
     await within(materials).findByRole("button", { name: "Remove Kermes dye" }),
   ).toBeInTheDocument();
-  expect(bodies).toEqual([{ name: "Kermes dye", craft_type: 21 }]);
+  expect(bodies).toEqual([
+    { name: "Kermes dye", craft_type: 21, description: "A red dye from kermes insects." },
+  ]);
+});
+
+test("list items show their description on hover and focus", async () => {
+  server.use(...signedIn());
+  renderRoute("/crafts/new");
+  await screen.findByRole("option", { name: "Ceramics" });
+  await chooseCraftType();
+
+  // The chosen category and craft type are described under their lists.
+  expect(screen.getByLabelText("Category")).toHaveAccessibleDescription(
+    "Objects shaped from clay and hardened by firing.",
+  );
+  expect(screen.getByLabelText("Craft type")).toHaveAccessibleDescription(
+    "A flat piece of fired clay, usually glazed and painted.",
+  );
+  const tools = screen.getByRole("group", { name: "Tools (optional)" });
+  const kiln = within(tools).getByRole("checkbox", { name: "Kiln" });
+  expect(kiln).toHaveAccessibleDescription("An oven that fires clay, glaze or glass.");
+
+  // A chosen item keeps its description.
+  await userEvent.click(kiln);
+  expect(within(tools).getByRole("button", { name: "Remove Kiln" })).toHaveAccessibleDescription(
+    "An oven that fires clay, glaze or glass.",
+  );
 });
 
 test("the form validates required fields in the browser", async () => {
@@ -542,8 +576,8 @@ describe("editing", () => {
 
   test("a craft type or culture an admin hid stays chosen when editing", async () => {
     const hidden = makeCraftDetail({
-      craft_type: { id: 77, name: "Old tile", user_added: true },
-      culture: { id: 78, name: "Old culture", homeland: "", user_added: true },
+      craft_type: { id: 77, name: "Old tile", description: "", user_added: true },
+      culture: { id: 78, name: "Old culture", homeland: "", description: "", user_added: true },
     });
     server.use(
       ...signedIn(makeUser({ id: 7 })),

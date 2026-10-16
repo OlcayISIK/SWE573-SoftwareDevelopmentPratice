@@ -5,6 +5,7 @@ import { http, HttpResponse } from "msw";
 import type { CraftDetail } from "@/features/crafts/types";
 import { expectNoA11yViolations } from "@/test/axe";
 import { makeCraftDetail, makeUser, signedIn } from "@/test/fixtures";
+import { tools } from "@/test/handlers";
 import { API, fail, ok } from "@/test/http";
 import { renderRoute } from "@/test/render";
 import { server } from "@/test/server";
@@ -195,10 +196,7 @@ test("the detail page has no accessibility violations", async () => {
 test("the facts link to crafts that share them", async () => {
   serveCraft(
     makeCraftDetail({
-      tools: [
-        { id: 32, name: "Kiln", user_added: false },
-        { id: 31, name: "Brush", user_added: false },
-      ],
+      tools: [tools[1], tools[0]],
     }),
   );
   renderRoute("/crafts/1");
@@ -226,13 +224,26 @@ test("the facts link to crafts that share them", async () => {
   expect(within(facts).getByText("Clay")).toBeInTheDocument();
 });
 
+test("the facts describe their items on hover and focus", async () => {
+  serveCraft(makeCraftDetail());
+  renderRoute("/crafts/1");
+
+  const facts = (await screen.findByRole("heading", { name: "Craft facts" })).parentElement!;
+  expect(within(facts).getByRole("link", { name: "Tile" })).toHaveAccessibleDescription(
+    "A flat piece of fired clay, usually glazed and painted.",
+  );
+  expect(within(facts).getByRole("link", { name: "Turkish" })).toHaveAccessibleDescription(
+    "The people of Türkiye.",
+  );
+  const kiln = within(facts).getByRole("link", { name: "Kiln" });
+  expect(kiln).toHaveAccessibleDescription("An oven that fires clay, glaze or glass.");
+  expect(kiln).toHaveAttribute("href", "/crafts?search=Kiln");
+});
+
 describe("reporting items users added", () => {
   const craft = makeCraftDetail({
     author: { id: 50, display_name: "Mehmet" },
-    tools: [
-      { id: 32, name: "Kiln", user_added: false },
-      { id: 98, name: "Spinning wheel", user_added: true },
-    ],
+    tools: [tools[1], { id: 98, name: "Spinning wheel", description: "", user_added: true }],
   });
 
   test("a signed-in user reports a tool another user added", async () => {

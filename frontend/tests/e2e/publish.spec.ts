@@ -74,6 +74,13 @@ test("a new user registers, is signed in, and publishes a craft", async ({ page 
   await expect(page.getByText("height 20 cm")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
   await expect(page.getByText(/lined mosques and fountains/)).toBeVisible();
+  const facts = page.getByRole("region", { name: "Craft facts" });
+  const kilnHint = facts.getByRole("tooltip", { name: /oven that fires clay/ });
+  await expect(kilnHint).toBeHidden();
+  await facts.getByRole("link", { name: "Kiln", exact: true }).hover();
+  await expect(kilnHint).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(kilnHint).toBeHidden();
 
   await page.goto(`/crafts?search=${encodeURIComponent(craftName)}`);
   await expect(page.getByRole("link", { name: craftName })).toBeVisible();

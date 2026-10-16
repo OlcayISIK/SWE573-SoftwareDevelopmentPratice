@@ -16,6 +16,8 @@ class LookupItem(BaseModel):
     """
 
     name = models.CharField(max_length=80)
+    # A sentence or two on what the item is, shown when a user hovers over or focuses it.
+    description = models.CharField(max_length=300, blank=True)
     is_hidden = models.BooleanField(default=False)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

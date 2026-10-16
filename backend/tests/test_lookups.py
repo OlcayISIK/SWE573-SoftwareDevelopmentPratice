@@ -3,6 +3,7 @@ from django.contrib import admin
 from rest_framework.throttling import ScopedRateThrottle
 
 from crafts.models import Category, CraftType, Culture, Material, Tool
+from tests.factories import CraftFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -42,6 +43,24 @@ def test_cultures_are_seeded_with_their_homeland(api_client):
 
     assert cultures["Diné (Navajo)"]["homeland"] == "Southwestern United States"
     assert {"Māori", "Sámi", "Zapotec", "Yörük"} <= set(cultures)
+
+
+def test_every_seeded_item_has_a_description(api_client):
+    for name in LISTS:
+        items = api_client.get(f"/api/v1/{name}/").json()["data"]
+        missing = [item["name"] for item in items if not item["description"]]
+        assert missing == [], name
+
+
+def test_crafts_show_the_descriptions_of_their_items(api_client):
+    craft = CraftFactory(category=textiles(), craft_type=carpet())
+    craft.tools.add(Tool.objects.get(name="Loom"))
+
+    data = api_client.get(f"/api/v1/crafts/{craft.id}/").json()["data"]
+
+    assert data["tools"][0]["description"].startswith("A frame that holds warp threads")
+    assert data["craft_type"]["description"]
+    assert data["category"]["description"]
 
 
 # Listing
@@ -123,6 +142,35 @@ def test_adding_an_existing_name_reuses_it(client_for, user):
     assert response.status_code == 200
     assert response.json()["data"]["name"] == "Loom"
     assert Tool.objects.filter(name__iexact="loom").count() == 1
+
+
+def test_users_describe_the_items_they_add(client_for, user):
+    response = client_for(user).post(
+        "/api/v1/tools/",
+        {"name": "Spinning wheel", "description": " A wheel that  spins fibre into yarn. "},
+        format="json",
+    )
+
+    assert response.json()["data"]["description"] == "A wheel that spins fibre into yarn."
+
+
+def test_adding_an_existing_name_keeps_its_description(client_for, user):
+    loom = Tool.objects.get(name="Loom")
+
+    response = client_for(user).post(
+        "/api/v1/tools/", {"name": "loom", "description": "Something else."}, format="json"
+    )
+
+    assert response.json()["data"]["description"] == loom.description
+
+
+def test_descriptions_have_a_length_limit(client_for, user):
+    response = client_for(user).post(
+        "/api/v1/materials/", {"name": "Yak wool", "description": "x" * 301}, format="json"
+    )
+
+    assert response.status_code == 400
+    assert "description" in response.json()["errors"]
 
 
 def test_new_names_are_tidied(client_for, user):

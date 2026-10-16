@@ -176,14 +176,14 @@ All models inherit `core.BaseModel`, which adds `id`, `created_at`, and `updated
 
 ### crafts
 
-- **Lookup lists**: `Category`, `CraftType`, `Tool`, `Material`, and `Culture` share `name`, `is_hidden`, and `created_by` (FK User, nullable).
+- **Lookup lists**: `Category`, `CraftType`, `Tool`, `Material`, and `Culture` share `name`, `description` (up to 300 characters, shown when a user hovers over or focuses the item), `is_hidden`, and `created_by` (FK User, nullable).
   - **Category** adds `slug` (e.g., ceramics, textiles, woodwork, metalwork).
   - **CraftType** belongs to a `category` (e.g., Textiles has Carpet, Kilim, Felt).
   - **Tool** and **Material** are linked many-to-many to the craft types they are typical for, so the form can suggest them first. Any tool or material can still be picked for any craft.
   - **Culture** adds `homeland` (e.g., Diné (Navajo), Southwestern United States).
   - Names are unique ignoring case (per category for craft types), so "carpet" and "Carpet" stay one item.
-  - The lists are seeded by data migrations, so a new database starts with them. Seeded items have no `created_by`.
-  - Registered users with a verified email can add items, and everyone can use them right away. Adding a name that already exists returns the existing item. Admins hide items with `is_hidden`, which removes them from the lists; a hidden name cannot be added again.
+  - The lists are seeded by data migrations, so a new database starts with them. Seeded items have no `created_by`, and every seeded item has a description.
+  - Registered users with a verified email can add items, and everyone can use them right away. A user can describe the item they add. Adding a name that already exists returns the existing item, with its own description. Admins hide items with `is_hidden`, which removes them from the lists; a hidden name cannot be added again.
 - **Craft**: `name`, `category` (FK), `craft_type` (FK, must belong to the category), `tools` and `materials` (many-to-many, optional), `culture` (FK, required for new crafts), `address`, `city`, `country`, `latitude`, `longitude`, `description` (what the craft is and how it is made), `story` (optional: how to understand it, its history and meaning, and its role in the community), `attributes` (`JSONField`), `status` (`published` or `hidden`), `author` (FK User).
   - Hidden lookup items cannot be chosen for a craft, but crafts that already use them keep showing them.
   - Crafts added before these fields existed were converted by a migration: the craft type text was matched to a craft type in the same category (or added as one), the region became the address and country and set the culture, the four texts were joined into `description` under their old labels, and the material names became material entries. A later migration moved the "How to understand it" and "Cultural relevance" sections out of `description` into `story`.
@@ -218,7 +218,7 @@ Values are kept in the unit the author entered. Weight used to be a separate `we
 - **Report**: `craft` (FK), `reporter` (FK User), `reason` (`inaccurate`, `inappropriate`, `disrespectful`), `note`, `status` (`open`, `resolved`, `dismissed`). One open report per user per craft, enforced by a partial unique constraint on (`craft`, `reporter`) where `status = open`, so a user can report the same craft again after the earlier report is closed.
 - **ReviewAction**: `report` (FK), `admin` (FK User), `action` (`edit`, `hide`, `remove`, `dismiss`), `reason`.
 - **ItemReport**: a report on a lookup item added by a user. `item_type` (`category`, `craft_type`, `tool`, `material`, `culture`), `item_id`, `item_name` (kept so the report still reads well after a rename or merge), `reporter` (FK User), `reason` (`duplicate`, `inaccurate`, `inappropriate`), `note`, `status`. One open report per user per item, enforced the same way as for crafts.
-- **ItemReviewAction**: `report` (FK ItemReport), `admin` (FK User), `action` (`rename`, `hide`, `merge`, `dismiss`), `reason`, `details` (the new name, or the item merged into).
+- **ItemReviewAction**: `report` (FK ItemReport), `admin` (FK User), `action` (`edit`, `hide`, `merge`, `dismiss`), `reason`, `details` (the new name or description, or the item merged into).
 
 ### social
 
@@ -286,7 +286,7 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 | POST   | `/{categories,craft-types,tools,materials,cultures}/{id}/report/` | Registered user | Report a lookup item added by another user |
 | GET    | `/moderation/item-reports/`            | Admin           | Item review queue, with the item, who added it, and how many crafts use it |
 | GET    | `/moderation/item-reports/{id}/`       | Admin           | Item report details with its review history |
-| POST   | `/moderation/item-reports/{id}/actions/` | Admin         | Rename, hide, merge, or dismiss       |
+| POST   | `/moderation/item-reports/{id}/actions/` | Admin         | Edit, hide, merge, or dismiss         |
 | GET    | `/crafts/{id}/favorite/`               | Public          | Favorite status and count             |
 | POST   | `/crafts/{id}/favorite/`               | Registered user | Favorite (DELETE to unfavorite)       |
 | GET    | `/me/favorites/`                       | Registered user | List own favorites                    |
@@ -391,7 +391,7 @@ User reports craft ──▶ Report (open) ──▶ Admin review queue
 
 Users can add categories, craft types, tools, materials, and cultures that everyone can use right away, so these items can be reported too. Only items added by users can be reported, and not by the user who added them.
 
-- `rename` fixes the name, with the same rules as adding an item. A name that already exists returns `409 Conflict`, pointing the admin to merge instead.
+- `edit` takes a new `name`, a new `description`, or both, with the same rules as adding an item. A name that already exists returns `409 Conflict`, pointing the admin to merge instead. Admins edit seeded items, which cannot be reported, in Django admin.
 - `hide` removes the item from the lists. Crafts that already use it keep showing it.
 - `merge` takes `merge_into`, another visible item of the same kind (for craft types, of the same category). Every craft that used the item uses the target instead, a tool or material's typical craft types move over, and the item is deleted. Merging a category moves its craft types, and merges any with the same name in the target category.
 - `dismiss` leaves the item unchanged.

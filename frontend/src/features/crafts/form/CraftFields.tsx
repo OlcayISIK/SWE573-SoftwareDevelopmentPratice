@@ -28,6 +28,7 @@ const changed = { shouldValidate: true, shouldDirty: true };
 interface Option {
   id: number;
   name: string;
+  description?: string;
 }
 
 /** The list, plus the craft's current choice when it is no longer listed (an admin hid it). */
@@ -87,8 +88,12 @@ export function CraftFields({
     craftTypes.data,
     craft && String(craft.category.id) === category ? craft.craft_type : undefined,
   );
-  const craftTypeName = craftTypeOptions.find((option) => String(option.id) === craftType)?.name;
+  const chosenCraftType = craftTypeOptions.find((option) => String(option.id) === craftType);
+  const craftTypeName = chosenCraftType?.name;
   const cultureOptions = withCurrent(cultures.data, craft?.culture ?? undefined);
+  const culture = watch("culture");
+  const chosenCategory = categories.data?.find((option) => String(option.id) === category);
+  const chosenCulture = cultureOptions.find((option) => String(option.id) === culture);
 
   // The selects below take their value from the form state, so an item added a moment ago
   // shows as chosen as soon as its option is rendered.
@@ -101,21 +106,22 @@ export function CraftFields({
           <div>
             <SelectField
               label="Category"
+              hint={chosenCategory?.description || undefined}
               error={errors.category?.message}
               {...register("category")}
               value={category}
             >
               <option value="">Choose a category</option>
               {categories.data?.map((option) => (
-                <option key={option.id} value={option.id}>
+                <option key={option.id} value={option.id} title={option.description}>
                   {option.name}
                 </option>
               ))}
             </SelectField>
             <AddItemInline
               noun="category"
-              onAdd={async (name) => {
-                const added = await addCategory.mutateAsync([name]);
+              onAdd={async (name, _homeland, description) => {
+                const added = await addCategory.mutateAsync([name, description]);
                 setValue("category", String(added.id), changed);
               }}
             />
@@ -124,6 +130,7 @@ export function CraftFields({
             <SelectField
               label="Craft type"
               disabled={!categoryId}
+              hint={chosenCraftType?.description || undefined}
               error={errors.craft_type?.message}
               {...register("craft_type")}
               value={craftType}
@@ -132,7 +139,7 @@ export function CraftFields({
                 {categoryId ? "Choose a craft type" : "Choose a category first"}
               </option>
               {craftTypeOptions.map((option) => (
-                <option key={option.id} value={option.id}>
+                <option key={option.id} value={option.id} title={option.description}>
                   {option.name}
                 </option>
               ))}
@@ -141,8 +148,12 @@ export function CraftFields({
               noun="craft type"
               disabled={!categoryId}
               disabledHint="Choose a category to add a craft type to it."
-              onAdd={async (name) => {
-                const added = await addCraftType.mutateAsync([name, categoryId as number]);
+              onAdd={async (name, _homeland, description) => {
+                const added = await addCraftType.mutateAsync([
+                  name,
+                  categoryId as number,
+                  description,
+                ]);
                 setValue("craft_type", String(added.id), changed);
               }}
             />
@@ -151,13 +162,14 @@ export function CraftFields({
         <div>
           <SelectField
             label="Culture"
+            hint={chosenCulture?.description || undefined}
             error={errors.culture?.message}
             {...register("culture")}
-            value={watch("culture")}
+            value={culture}
           >
             <option value="">Choose the culture it belongs to</option>
             {cultureOptions.map((option) => (
-              <option key={option.id} value={option.id}>
+              <option key={option.id} value={option.id} title={option.description}>
                 {"homeland" in option && option.homeland
                   ? `${option.name} (${option.homeland})`
                   : option.name}
@@ -167,8 +179,8 @@ export function CraftFields({
           <AddItemInline
             noun="culture"
             withHomeland
-            onAdd={async (name, homeland) => {
-              const added = await addCulture.mutateAsync([name, homeland]);
+            onAdd={async (name, homeland, description) => {
+              const added = await addCulture.mutateAsync([name, homeland, description]);
               setValue("culture", String(added.id), changed);
             }}
           />
@@ -185,7 +197,9 @@ export function CraftFields({
           items={tools.data}
           value={watch("tools")}
           onChange={(value) => setValue("tools", value, changed)}
-          onCreate={(name) => addTool.mutateAsync([name, craftTypeId ?? undefined])}
+          onCreate={(name, description) =>
+            addTool.mutateAsync([name, craftTypeId ?? undefined, description])
+          }
           craftTypeName={craftTypeName}
           max={MAX_TOOLS}
           error={errors.tools?.message}
@@ -196,7 +210,9 @@ export function CraftFields({
           items={materials.data}
           value={watch("materials")}
           onChange={(value) => setValue("materials", value, changed)}
-          onCreate={(name) => addMaterial.mutateAsync([name, craftTypeId ?? undefined])}
+          onCreate={(name, description) =>
+            addMaterial.mutateAsync([name, craftTypeId ?? undefined, description])
+          }
           craftTypeName={craftTypeName}
           max={MAX_MATERIALS}
           error={errors.materials?.message}

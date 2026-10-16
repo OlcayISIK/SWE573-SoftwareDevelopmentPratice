@@ -29,13 +29,22 @@ const crafts = (count: number) => `${count} craft${count === 1 ? "" : "s"}`;
 
 /** What an action changed, as recorded in the review history. */
 function changeSummary(details: unknown) {
-  const { name, merged_into_name: mergedInto } = (details ?? {}) as {
+  const {
+    name,
+    description,
+    merged_into_name: mergedInto,
+  } = (details ?? {}) as {
     name?: string;
+    description?: string;
     merged_into_name?: string;
   };
-  if (name) return `Renamed to “${name}”.`;
   if (mergedInto) return `Merged into “${mergedInto}”.`;
-  return null;
+  const changes = [
+    name && `Renamed to “${name}”.`,
+    description !== undefined &&
+      (description ? `Description set to “${description}”.` : "Description removed."),
+  ].filter(Boolean);
+  return changes.length ? changes.join(" ") : null;
 }
 
 function ReviewForm({ report }: { report: ItemReportReview }) {
@@ -44,6 +53,12 @@ function ReviewForm({ report }: { report: ItemReportReview }) {
   const review = useReviewItemReport(report.id);
   const [action, setAction] = useState<ItemActionType | null>(null);
   const [name, setName] = useState(item?.name ?? "");
+  const [description, setDescription] = useState(item?.description ?? "");
+  // Only the fields the admin changed are sent.
+  const edits = {
+    ...(name.trim() !== item?.name ? { name: name.trim() } : {}),
+    ...(description.trim() !== item?.description ? { description: description.trim() } : {}),
+  };
   const [mergeInto, setMergeInto] = useState("");
   const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +77,7 @@ function ReviewForm({ report }: { report: ItemReportReview }) {
       {
         action: action!,
         reason: reason.trim(),
-        ...(action === "rename" ? { name: name.trim() } : {}),
+        ...(action === "edit" ? edits : {}),
         ...(action === "merge" ? { merge_into: Number(mergeInto) } : {}),
       },
       {
@@ -84,7 +99,10 @@ function ReviewForm({ report }: { report: ItemReportReview }) {
       onSubmit={(event) => {
         event.preventDefault();
         if (!action) return setError("Choose an action.");
-        if (action === "rename" && name.trim().length < 2) return setError("Enter the new name.");
+        if (action === "edit" && name.trim().length < 2) return setError("Enter the name.");
+        if (action === "edit" && Object.keys(edits).length === 0) {
+          return setError("Change the name or the description.");
+        }
         if (action === "merge" && !target) return setError("Choose the item to merge into.");
         if (!reason.trim()) return setError("Explain the reason for this decision.");
         if (action === "merge") return setConfirmingMerge(true);
@@ -108,13 +126,23 @@ function ReviewForm({ report }: { report: ItemReportReview }) {
           </label>
         ))}
       </fieldset>
-      {action === "rename" && (
-        <TextField
-          label="New name"
-          maxLength={80}
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
+      {action === "edit" && (
+        <>
+          <TextField
+            label="Name"
+            maxLength={80}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+          <TextAreaField
+            label="Description"
+            hint="Shown when people point at the item."
+            rows={3}
+            maxLength={300}
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+          />
+        </>
       )}
       {action === "hide" && (
         <p className="text-sm text-stone-700">
@@ -201,6 +229,8 @@ export function ItemReviewPage() {
         </dd>
         {data.item && (
           <>
+            <dt className="font-medium">Description</dt>
+            <dd>{data.item.description || "None"}</dd>
             <dt className="font-medium">Added by</dt>
             <dd>{data.item.added_by?.display_name ?? "Unknown"}</dd>
             <dt className="font-medium">Used by</dt>

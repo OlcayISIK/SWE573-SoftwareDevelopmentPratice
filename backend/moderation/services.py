@@ -110,16 +110,17 @@ def report_item(*, reporter, item_type, item_id, reason, note=""):
         raise ConflictError(ITEM_ALREADY_REPORTED) from exc
 
 
-def _apply_to_item(report, admin, action, name, merge_into):
+def _apply_to_item(report, admin, action, name, description, merge_into):
     """Changes the reported item and returns what changed, for the review history."""
     if action == ItemReviewAction.Action.DISMISS:
         return {}
     item = _item(report.item_type, report.item_id)
     if item is None:
         raise ConflictError(ITEM_GONE)
-    if action == ItemReviewAction.Action.RENAME:
-        craft_services.rename_lookup(item=item, name=name, actor=admin)
-        return {"name": name}
+    if action == ItemReviewAction.Action.EDIT:
+        craft_services.edit_lookup(item=item, actor=admin, name=name, description=description)
+        changes = {"name": name, "description": description}
+        return {key: value for key, value in changes.items() if value is not None}
     if action == ItemReviewAction.Action.HIDE:
         craft_services.hide_lookup(item=item, actor=admin)
         return {}
@@ -131,7 +132,9 @@ def _apply_to_item(report, admin, action, name, merge_into):
 
 
 @transaction.atomic
-def review_item_report(*, admin, report_id, action, reason, name=None, merge_into=None):
+def review_item_report(
+    *, admin, report_id, action, reason, name=None, description=None, merge_into=None
+):
     if not admin.is_admin:
         raise PermissionDeniedError(ADMIN_ONLY)
     report = ItemReport.objects.select_for_update().filter(pk=report_id).first()
@@ -140,7 +143,7 @@ def review_item_report(*, admin, report_id, action, reason, name=None, merge_int
     if report.status != Report.Status.OPEN:
         raise ConflictError(ALREADY_REVIEWED)
 
-    details = _apply_to_item(report, admin, action, name, merge_into)
+    details = _apply_to_item(report, admin, action, name, description, merge_into)
 
     closing = [report]
     if action in (ItemReviewAction.Action.HIDE, ItemReviewAction.Action.MERGE):

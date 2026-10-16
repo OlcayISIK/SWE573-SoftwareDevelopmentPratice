@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from crafts.serializers import clean_lookup_name
+from crafts.serializers import clean_description, clean_lookup_name
 
 from .models import ItemReport, ItemReviewAction, Report, ReviewAction
 
@@ -92,6 +92,7 @@ class ItemReportSerializer(serializers.ModelSerializer):
 class ReportedItemSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(read_only=True)
+    description = serializers.CharField(read_only=True)
     is_hidden = serializers.BooleanField(read_only=True)
     added_by = PersonSerializer(source="created_by", read_only=True, allow_null=True)
     crafts_count = serializers.IntegerField(read_only=True)
@@ -139,8 +140,9 @@ class ItemReportReviewSerializer(serializers.ModelSerializer):
 class ItemReviewActionCreateSerializer(serializers.Serializer):
     action = serializers.ChoiceField(choices=ItemReviewAction.Action.choices)
     reason = serializers.CharField(max_length=1000)
-    name = serializers.CharField(
-        max_length=80, required=False, help_text="The new name. Required to rename."
+    name = serializers.CharField(max_length=80, required=False, help_text="The new name.")
+    description = serializers.CharField(
+        max_length=300, required=False, allow_blank=True, help_text="The new description."
     )
     merge_into = serializers.IntegerField(
         min_value=1,
@@ -151,10 +153,13 @@ class ItemReviewActionCreateSerializer(serializers.Serializer):
     def validate_name(self, value):
         return clean_lookup_name(value)
 
+    def validate_description(self, value):
+        return clean_description(value)
+
     def validate(self, attrs):
         action = attrs["action"]
-        if action == ItemReviewAction.Action.RENAME and "name" not in attrs:
-            raise serializers.ValidationError({"name": ["Enter the new name."]})
+        if action == ItemReviewAction.Action.EDIT and not {"name", "description"} & set(attrs):
+            raise serializers.ValidationError({"name": ["Enter a new name or description."]})
         if action == ItemReviewAction.Action.MERGE and "merge_into" not in attrs:
             raise serializers.ValidationError({"merge_into": ["Choose the item to merge into."]})
         return attrs
