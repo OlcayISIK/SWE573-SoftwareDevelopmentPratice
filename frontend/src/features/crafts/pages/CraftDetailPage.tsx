@@ -175,6 +175,11 @@ export function CraftDetailPage() {
                   onSelect={() => undefined}
                   // A craft in one place opens on it; one in several shows them all.
                   focus={data.places.length === 1 ? [data.latitude, data.longitude] : undefined}
+                  fit={
+                    data.places.length > 1
+                      ? data.places.map((place) => [place.latitude, place.longitude])
+                      : undefined
+                  }
                 />
               </Suspense>
             </div>

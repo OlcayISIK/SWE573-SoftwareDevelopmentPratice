@@ -1,4 +1,4 @@
-import type { LatLngExpression, Map as LeafletMap } from "leaflet";
+import { latLngBounds, type LatLngExpression, type Map as LeafletMap } from "leaflet";
 import { useEffect } from "react";
 import { TileLayer, useMap } from "react-leaflet";
 
@@ -7,6 +7,8 @@ import { config } from "@/lib/config";
 import { WORLD_BOUNDS, WORLD_VIEW } from "./worldOptions";
 
 const TILE_SIZE = 256;
+// Places close together, such as two neighbouring villages, still get separate pins.
+const POINTS_MAX_ZOOM = 12;
 
 export function WorldTiles() {
   return (
@@ -38,19 +40,22 @@ function viewCenter(map: LeafletMap, zoom: number) {
 /**
  * Shows the world filling the width of the map, and keeps that as the furthest zoom-out level.
  * Until the user drags or zooms, the world is fitted again whenever the map changes size, so it
- * is right once the layout settles. With `focus`, the map opens on that point instead.
+ * is right once the layout settles. With `focus`, the map opens on that point instead, and with
+ * `points` it opens showing all of them.
  */
 export function FitWorld({
   focus,
+  points,
   focusZoom = 5,
 }: {
   focus?: LatLngExpression;
+  points?: [number, number][];
   focusZoom?: number;
 }) {
   const map = useMap();
 
   useEffect(() => {
-    let following = !focus;
+    let following = !focus && !points;
     let adjusting = false;
 
     const fit = () => {
@@ -75,6 +80,12 @@ export function FitWorld({
     fit();
     if (focus) {
       map.setView(focus, Math.max(fillZoom(map) ?? 0, focusZoom), { animate: false });
+    } else if (points) {
+      map.fitBounds(latLngBounds(points), {
+        padding: [40, 40],
+        maxZoom: POINTS_MAX_ZOOM,
+        animate: false,
+      });
     }
 
     map.on("resize", fit);

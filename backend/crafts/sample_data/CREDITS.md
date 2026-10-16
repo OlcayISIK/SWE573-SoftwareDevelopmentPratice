@@ -64,3 +64,13 @@ the app also names its author and license.
 | lakota-parfleche-2.jpg | Taoboy49 | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | [Commons](https://commons.wikimedia.org/wiki/File:Lakota_parfleche_exhibit_-_National_Museum_of_the_American_Indian.jpg) |
 | morin-khuur-1.jpg | Mizu_Basyo | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | [Commons](https://commons.wikimedia.org/wiki/File:Morin_Khuur,_Today%27s_North_Mongolian_Style.jpg) |
 | morin-khuur-2.jpg | Quintin Soloviev | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0) | [Commons](https://commons.wikimedia.org/wiki/File:Morin_Khuur_performance_in_Ulaanbaatar.jpg) |
+| yoruk-kilim-1.jpg | Dosseman | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | [Commons](https://commons.wikimedia.org/wiki/File:Ankara_Displays_in_Ankara_Vak%C4%B1f_Eserleri_M%C3%BCzesi_Kilim_from_Fethiye_in_2014_11.jpg) |
+| yoruk-kilim-2.jpg | Dosseman | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | [Commons](https://commons.wikimedia.org/wiki/File:Ankara_Displays_in_Ankara_Vak%C4%B1f_Eserleri_M%C3%BCzesi_Kilim_from_Mut_in_2012_01.jpg) |
+| konya-kilim-1.jpg | www.Kilim.com and Chiswick Chap | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0) | [Commons](https://commons.wikimedia.org/wiki/File:Antique_Konya_Kilim_detail.jpg) |
+| konya-kilim-2.jpg | Dosseman | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | [Commons](https://commons.wikimedia.org/wiki/File:Istanbul_Former_Mint_Kilim_exposition_Large_kilim._Probably_from_the_Konya_region_in_2003_02.jpg) |
+| azerbaijani-kilim-1.jpg | Şahzadə | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | [Commons](https://commons.wikimedia.org/wiki/File:Weaving_Kilim_in_Azerbaijan.JPG) |
+| azerbaijani-kilim-2.jpg | Şahzadə | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | [Commons](https://commons.wikimedia.org/wiki/File:Weaver_woman_in_Azerbaijan.JPG) |
+| zapotec-rug-1.jpg | Thelmadatter | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | [Commons](https://commons.wikimedia.org/wiki/File:WeavingTeotitlan1.JPG) |
+| zapotec-rug-2.jpg | Thelmadatter | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | [Commons](https://commons.wikimedia.org/wiki/File:RuginProgressTeotitlan.JPG) |
+| topeng-mask-1.jpg | Gunawan Kartapranata | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | [Commons](https://commons.wikimedia.org/wiki/File:Topeng_Bali.jpg) |
+| topeng-mask-2.jpg | Pande Putu Yoga Kamayana | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | [Commons](https://commons.wikimedia.org/wiki/File:Tari_Topeng_at_Bangli,_Bali.jpg) |

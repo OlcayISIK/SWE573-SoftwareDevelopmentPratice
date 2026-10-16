@@ -1910,6 +1910,328 @@
           }
         }
       ]
+    },
+    {
+      "slug": "yoruk-kilim",
+      "name": "Yörük kilim",
+      "category": "textiles",
+      "craft_type": "Kilim",
+      "culture": "Yörük",
+      "tools": [
+        "Loom",
+        "Beater comb",
+        "Drop spindle",
+        "Dye pot"
+      ],
+      "materials": [
+        "Wool",
+        "Goat hair",
+        "Madder",
+        "Indigo"
+      ],
+      "places": [
+        {
+          "address": "Fethiye, Muğla, Türkiye",
+          "city": "Fethiye",
+          "country": "Türkiye",
+          "latitude": 36.62212,
+          "longitude": 29.11534
+        },
+        {
+          "address": "Mut, Mersin, Türkiye",
+          "city": "Mut",
+          "country": "Türkiye",
+          "latitude": 36.64342,
+          "longitude": 33.43726
+        }
+      ],
+      "description": "Flat-woven wool kilims made by Yörük women in the Taurus Mountains and the southwest of Anatolia. The pattern is made by the coloured weft, which turns back where one colour meets the next and leaves small slits between them. The pieces were woven for everyday use in the tent and the home: floor covers, cushion faces, bags, and spreads laid under a low floor table (sofra altı).",
+      "story": "How to understand it\nBands of lozenges with hooked edges, ram's horns, stars, and small eye motifs are common. Many are read as wishes for plenty and as protection against the evil eye, and each weaver chooses and combines them in her own way.\n\nCultural relevance\nThe Yörük were nomadic herders who moved between summer and winter pastures, and their weaving followed that life: light pieces that fold for the journey, woven from the wool and hair of their own flocks. Kilims were part of a bride's trousseau and were passed down in families.",
+      "colors": [
+        "#a8322d",
+        "#2e3f73",
+        "#e4c98f",
+        "#f3ece0"
+      ],
+      "dimensions": [],
+      "author": "anatolia",
+      "photos": [
+        {
+          "file": "yoruk-kilim-1.jpg",
+          "alt_text": "Square kilim with a blue centre holding a white star, framed by red and ochre bands of small diamonds",
+          "caption": "19th-century kilim from Fethiye, Vakıf Eserleri Museum, Ankara. Photo: Dosseman, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Dosseman",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Ankara_Displays_in_Ankara_Vak%C4%B1f_Eserleri_M%C3%BCzesi_Kilim_from_Fethiye_in_2014_11.jpg"
+          }
+        },
+        {
+          "file": "yoruk-kilim-2.jpg",
+          "alt_text": "Long red kilim with horizontal bands of hooked lozenges and stars in white, blue, and green",
+          "caption": "19th-century kilim from Mut, Vakıf Eserleri Museum, Ankara. Photo: Dosseman, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Dosseman",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Ankara_Displays_in_Ankara_Vak%C4%B1f_Eserleri_M%C3%BCzesi_Kilim_from_Mut_in_2012_01.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "konya-kilim",
+      "name": "Konya kilim",
+      "category": "textiles",
+      "craft_type": "Kilim",
+      "culture": "Turkish",
+      "tools": [
+        "Loom",
+        "Beater comb",
+        "Shuttle",
+        "Dye pot"
+      ],
+      "materials": [
+        "Wool",
+        "Madder",
+        "Indigo",
+        "Walnut husk"
+      ],
+      "address": "Konya, Türkiye",
+      "city": "Konya",
+      "country": "Türkiye",
+      "latitude": 37.87273,
+      "longitude": 32.49244,
+      "description": "Wool kilims from the Konya plain in Central Anatolia, woven in slit tapestry with plant dyes. They are known for bold, large geometric designs in red, blue, yellow, and green. Large pieces were often woven in two halves on a narrow loom and sewn together.",
+      "story": "How to understand it\nThe motifs carry names and wishes. In the detail photo, the numbers mark the eye and the eye with a cross, both against the evil eye (1, 2), a column of ram's horns for strength (3), fertility (4), the wolf's mouth that protects the flock (5), and stars holding the motifs for love and unison (6) and for the fetter that binds a family together (7).\n\nCultural relevance\nKilims were woven by women at home, for the household and the trousseau, and were given to mosques as floor covers. Many old pieces survive because mosques kept them.",
+      "colors": [
+        "#9e2a2b",
+        "#5b7fa6",
+        "#e8a33d",
+        "#8aa05a",
+        "#f2e8d5"
+      ],
+      "dimensions": [],
+      "author": "anatolia",
+      "photos": [
+        {
+          "file": "konya-kilim-1.jpg",
+          "alt_text": "Corner of a red, blue, and white kilim with stars, eyes, and ram's horn motifs, each numbered from 1 to 7",
+          "caption": "Konya kilim detail with its motifs numbered. Photo: www.Kilim.com and Chiswick Chap, CC BY 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "www.Kilim.com and Chiswick Chap",
+            "license": "CC BY 3.0",
+            "license_url": "https://creativecommons.org/licenses/by/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Antique_Konya_Kilim_detail.jpg"
+          }
+        },
+        {
+          "file": "konya-kilim-2.jpg",
+          "alt_text": "Large kilim with vertical panels in brown, yellow, white, and blue, each holding a column of hooked medallions",
+          "caption": "Large kilim, probably from the Konya region, at an exhibition in Istanbul. Photo: Dosseman, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Dosseman",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Istanbul_Former_Mint_Kilim_exposition_Large_kilim._Probably_from_the_Konya_region_in_2003_02.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "azerbaijani-kilim",
+      "name": "Shirvan kilim",
+      "category": "textiles",
+      "craft_type": "Kilim",
+      "culture": "Azerbaijani",
+      "tools": [
+        "Loom",
+        "Beater comb",
+        "Drop spindle",
+        "Dye pot"
+      ],
+      "materials": [
+        "Wool",
+        "Cotton",
+        "Madder",
+        "Indigo"
+      ],
+      "address": "Shamakhi, Azerbaijan",
+      "city": "Shamakhi",
+      "country": "Azerbaijan",
+      "latitude": 40.63412,
+      "longitude": 48.63834,
+      "description": "Flat-woven wool kilims from the Shirvan region of Azerbaijan, woven on upright looms with the weaver seated in front of the warp. Shirvan kilims are known for wide bands of large geometric medallions with hooked edges, often in red, blue, and ivory.",
+      "story": "How to understand it\nThe designs are geometric: lozenges, hooks, stars, and small stylised animals, set in bands or in a field of repeating medallions. The weaver works from a pattern held in memory or drawn on paper, adding each colour row by row.\n\nCultural relevance\nCarpet and kilim weaving is a household art handed down from mothers to daughters in Azerbaijan. The traditional art of Azerbaijani carpet weaving was added to UNESCO's list of the Intangible Cultural Heritage of Humanity in 2010.",
+      "colors": [
+        "#a3262a",
+        "#1f2a4d",
+        "#c8a77a",
+        "#f1ece2"
+      ],
+      "dimensions": [],
+      "author": "asia",
+      "photos": [
+        {
+          "file": "azerbaijani-kilim-1.jpg",
+          "alt_text": "Kilim in progress on an upright loom: a white ground with red and dark blue motifs, with balls of yarn hanging from the weave",
+          "caption": "A kilim on the loom in Azerbaijan. Photo: Şahzadə, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Şahzadə",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Weaving_Kilim_in_Azerbaijan.JPG"
+          }
+        },
+        {
+          "file": "azerbaijani-kilim-2.jpg",
+          "alt_text": "A weaver seated at a tall upright loom, working the coloured yarns of a kilim into the white warp",
+          "caption": "A weaver at the loom in Azerbaijan. Photo: Şahzadə, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Şahzadə",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Weaver_woman_in_Azerbaijan.JPG"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "zapotec-rug",
+      "name": "Zapotec rug",
+      "category": "textiles",
+      "craft_type": "Tapestry",
+      "culture": "Zapotec",
+      "tools": [
+        "Loom",
+        "Carding comb",
+        "Dye pot"
+      ],
+      "materials": [
+        "Wool",
+        "Cotton",
+        "Natural dyes",
+        "Indigo"
+      ],
+      "places": [
+        {
+          "address": "Teotitlán del Valle, Oaxaca, Mexico",
+          "city": "Teotitlán del Valle",
+          "country": "Mexico",
+          "latitude": 17.02974,
+          "longitude": -96.51814
+        },
+        {
+          "address": "Santa Ana del Valle, Oaxaca, Mexico",
+          "city": "Santa Ana del Valle",
+          "country": "Mexico",
+          "latitude": 17.01611,
+          "longitude": -96.46312
+        }
+      ],
+      "description": "Wool rugs woven by Zapotec families in the villages of the Tlacolula valley in Oaxaca. They are woven on large treadle looms in tapestry technique, with a cotton warp hidden by the wool weft. Many weavers card, spin, and dye their own wool, using dyes such as cochineal, indigo, and pecan shell.",
+      "story": "How to understand it\nDesigns range from the stepped frets carved on the walls of nearby Mitla and the Zapotec diamond to pictures taken from old codices and from modern art. The diamond is often read as the eye of God or as the stages of life.\n\nCultural relevance\nWeaving in these villages is older than the Spanish arrival; the Spanish brought sheep and the treadle loom. Today weaving is the main livelihood of many families in Teotitlán del Valle, and the craft is taught at home from one generation to the next.",
+      "colors": [
+        "#b5651d",
+        "#7a1f1f",
+        "#d9a441",
+        "#3b2a20"
+      ],
+      "dimensions": [],
+      "author": "americas",
+      "photos": [
+        {
+          "file": "zapotec-rug-1.jpg",
+          "alt_text": "A young man weaving at a large wooden treadle loom in a brick workshop",
+          "caption": "Weaving a rug in Teotitlán del Valle. Photo: Thelmadatter, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Thelmadatter",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:WeavingTeotitlan1.JPG"
+          }
+        },
+        {
+          "file": "zapotec-rug-2.jpg",
+          "alt_text": "A rug rolled on a wooden loom, with orange, red, and gold bands of stepped diamonds",
+          "caption": "A large rug in progress at a family workshop in Teotitlán del Valle. Photo: Thelmadatter, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Thelmadatter",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:RuginProgressTeotitlan.JPG"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "topeng-mask",
+      "name": "Topeng mask",
+      "category": "woodwork",
+      "craft_type": "Mask",
+      "culture": "Balinese",
+      "tools": [
+        "Carving knife",
+        "Gouge",
+        "Rasp",
+        "Brush"
+      ],
+      "materials": [
+        "Hardwood",
+        "Natural pigments",
+        "Gold leaf"
+      ],
+      "places": [
+        {
+          "address": "Mas, Ubud, Gianyar, Bali, Indonesia",
+          "city": "Mas",
+          "country": "Indonesia",
+          "latitude": -8.54094,
+          "longitude": 115.27177
+        },
+        {
+          "address": "Singapadu, Sukawati, Gianyar, Bali, Indonesia",
+          "city": "Singapadu",
+          "country": "Indonesia",
+          "latitude": -8.59478,
+          "longitude": 115.258
+        }
+      ],
+      "description": "Carved and painted wooden masks for topeng, the Balinese masked dance drama. The carver shapes the face from a light wood, traditionally pule, fits it to the dancer, and builds up the colour in many thin layers of paint, adding hair, teeth, and gold leaf for some characters.",
+      "story": "How to understand it\nEach mask is a character: kings and ministers, refined heroes, old men, and comic servants whose half masks leave the mouth free so the dancer can speak. The colour and the shape of the eyes show the nature of a character: a pale face with narrow eyes is refined, a red face with bulging eyes is strong and rough.\n\nCultural relevance\nTopeng is danced at temple festivals and family ceremonies, and some masks are kept in temples and blessed before they are danced. Mask carving is handed down in carvers' families in villages such as Mas and Singapadu.",
+      "colors": [
+        "#f2efe6",
+        "#b3261e",
+        "#c9a227",
+        "#3a2a1e"
+      ],
+      "dimensions": [],
+      "author": "asia",
+      "photos": [
+        {
+          "file": "topeng-mask-1.jpg",
+          "alt_text": "Rows of carved and painted Balinese dance masks with white, red, and brown faces on a dark board",
+          "caption": "Balinese topeng masks at Taman Mini Indonesia Indah, Jakarta. Photo: Gunawan Kartapranata, CC BY-SA 3.0, Wikimedia Commons",
+          "credit": {
+            "author": "Gunawan Kartapranata",
+            "license": "CC BY-SA 3.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Topeng_Bali.jpg"
+          }
+        },
+        {
+          "file": "topeng-mask-2.jpg",
+          "alt_text": "A dancer in an old man's white mask with white hair, wearing a red and gold costume, before a gamelan",
+          "caption": "Topeng dance at a ceremony in Bangli, Bali. Photo: Pande Putu Yoga Kamayana, CC BY-SA 4.0, Wikimedia Commons",
+          "credit": {
+            "author": "Pande Putu Yoga Kamayana",
+            "license": "CC BY-SA 4.0",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "https://commons.wikimedia.org/wiki/File:Tari_Topeng_at_Bangli,_Bali.jpg"
+          }
+        }
+      ]
     }
   ]
 }
