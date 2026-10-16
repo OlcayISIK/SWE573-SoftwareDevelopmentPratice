@@ -150,22 +150,31 @@ export function CraftDetailPage() {
         <aside aria-label="Facts and location" className="space-y-6">
           <CraftFacts craft={data} />
           <section className="overflow-hidden rounded-lg border border-brand-100 bg-white">
-            <h2 className="px-5 pt-4 text-lg font-semibold">Location</h2>
-            <p className="px-5 pt-1 text-stone-700">{data.address}</p>
+            <h2 className="px-5 pt-4 text-lg font-semibold">
+              {data.places.length > 1 ? "Places" : "Location"}
+            </h2>
+            <ul className="space-y-1 px-5 pt-1 text-stone-700">
+              {data.places.map((place) => (
+                <li key={place.id}>
+                  {place.address}
+                  {place.is_origin && <span className="ml-1 text-sm text-stone-600">(origin)</span>}
+                </li>
+              ))}
+            </ul>
             <div className="mt-3 h-64">
               <Suspense fallback={<PageLoader label="Loading the map" />}>
                 <MapView
-                  pins={[
-                    {
-                      id: data.id,
-                      name: data.name,
-                      category: data.category.slug,
-                      latitude: data.latitude,
-                      longitude: data.longitude,
-                    },
-                  ]}
+                  pins={data.places.map((place) => ({
+                    id: data.id,
+                    place: place.id,
+                    name: data.name,
+                    category: data.category.slug,
+                    latitude: place.latitude,
+                    longitude: place.longitude,
+                  }))}
                   onSelect={() => undefined}
-                  focus={[data.latitude, data.longitude]}
+                  // A craft in one place opens on it; one in several shows them all.
+                  focus={data.places.length === 1 ? [data.latitude, data.longitude] : undefined}
                 />
               </Suspense>
             </div>

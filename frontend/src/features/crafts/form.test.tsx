@@ -9,7 +9,7 @@ import { loadDraft } from "@/features/crafts/form/useDraft";
 import type { CraftType } from "@/features/crafts/types";
 import { expectNoA11yViolations } from "@/test/axe";
 import { makeCraftDetail, makeUser, signedIn } from "@/test/fixtures";
-import { craftTypes } from "@/test/handlers";
+import { craftTypes, kutahya } from "@/test/handlers";
 import { API, fail, ok } from "@/test/http";
 import { renderRoute } from "@/test/render";
 import { server } from "@/test/server";
@@ -117,11 +117,16 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
     culture: 51,
     tools: [32, 33],
     materials: [41],
-    address: "Ulu Cami, Kütahya",
-    city: "Kütahya",
-    country: "Türkiye",
-    latitude: 39.419923,
-    longitude: 29.985743,
+    places: [
+      {
+        address: "Ulu Cami, Kütahya",
+        city: "Kütahya",
+        country: "Türkiye",
+        latitude: 39.419923,
+        longitude: 29.985743,
+        is_origin: false,
+      },
+    ],
     description: "Glazed tiles.",
     story: "Made for mosques.",
     colors: ["#1e40af", "#40e0d0"],
@@ -141,7 +146,7 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
     1,
   ]);
   expect(toastMessages()).toContain("Your craft is published.");
-  expect(localStorage.getItem("ic.craft-draft.v2")).toBeNull();
+  expect(localStorage.getItem("ic.craft-draft.v3")).toBeNull();
 }, 15_000);
 
 test("an address that cannot be found is reported and nothing is pinned", async () => {
@@ -327,7 +332,7 @@ test("the form validates required fields in the browser", async () => {
   expect(screen.getByText("Choose a category.")).toBeInTheDocument();
   expect(screen.getByText("Choose a craft type.")).toBeInTheDocument();
   expect(screen.getByText("Choose the culture the craft belongs to.")).toBeInTheDocument();
-  expect(screen.getByText("Enter the address the craft comes from.")).toBeInTheDocument();
+  expect(screen.getByText("Enter the address of this place.")).toBeInTheDocument();
   expect(
     screen.getByText("Pin the location: use Pin address or click the map."),
   ).toBeInTheDocument();
@@ -490,7 +495,7 @@ test("a draft survives a reload and can be discarded", async () => {
   server.use(...signedIn());
   const first = renderRoute("/crafts/new");
   await userEvent.type(await screen.findByLabelText("Name"), "Half-written craft");
-  await waitFor(() => expect(localStorage.getItem("ic.craft-draft.v2")).toContain("Half-written"));
+  await waitFor(() => expect(localStorage.getItem("ic.craft-draft.v3")).toContain("Half-written"));
   first.unmount();
 
   server.use(...signedIn());
@@ -505,7 +510,7 @@ test("a draft survives a reload and can be discarded", async () => {
 
 test("a draft saved before the story field existed still loads", async () => {
   const { story: _story, ...older } = { ...emptyCraftForm, name: "Saved earlier" };
-  localStorage.setItem("ic.craft-draft.v2", JSON.stringify(older));
+  localStorage.setItem("ic.craft-draft.v3", JSON.stringify(older));
 
   // An empty story passes validation; a missing one would block publishing.
   expect(loadDraft()).toEqual({ ...emptyCraftForm, name: "Saved earlier" });
@@ -513,11 +518,77 @@ test("a draft saved before the story field existed still loads", async () => {
 
 test("drafts from the old form are dropped", async () => {
   localStorage.setItem("ic.craft-draft", JSON.stringify({ name: "Old", region: "10" }));
+  localStorage.setItem("ic.craft-draft.v2", JSON.stringify({ name: "Old", address: "Uşak" }));
   server.use(...signedIn());
   renderRoute("/crafts/new");
 
   expect(await screen.findByLabelText("Name")).toHaveValue("");
   expect(localStorage.getItem("ic.craft-draft")).toBeNull();
+  expect(localStorage.getItem("ic.craft-draft.v2")).toBeNull();
+});
+
+describe("places", () => {
+  const iznik = {
+    latitude: 40.429,
+    longitude: 29.721,
+    address: "İznik, Bursa, Türkiye",
+    city: "İznik",
+    country: "Türkiye",
+  };
+
+  test("a craft made in several places names one as the origin", async () => {
+    server.use(...signedIn());
+    const { created } = publishHandlers();
+    server.use(
+      http.get(`${API}/geocode/search/`, ({ request }) =>
+        new URL(request.url).searchParams.get("q")?.includes("İznik") ? ok(iznik) : ok(kutahya),
+      ),
+    );
+    renderRoute("/crafts/new");
+    await fillRequiredFields();
+
+    // One place needs no origin choice.
+    expect(screen.queryByRole("group", { name: "Origin" })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Add another place" }));
+    const second = screen.getByRole("group", { name: "Place 2" });
+    await userEvent.type(within(second).getByLabelText("Address"), "İznik");
+    await userEvent.click(within(second).getByRole("button", { name: "Pin address" }));
+    expect(await within(second).findByText("Pinned at 40.42900, 29.72100.")).toBeVisible();
+
+    const origin = screen.getByRole("group", { name: "Origin" });
+    expect(within(origin).getByRole("radio", { name: "All places are equal" })).toBeChecked();
+    await userEvent.click(within(origin).getByRole("radio", { name: /Place 2 is the origin/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
+
+    await waitFor(() => expect(created).toHaveLength(1));
+    expect(created[0].places).toEqual([
+      expect.objectContaining({ city: "Kütahya", is_origin: false }),
+      expect.objectContaining({ city: "İznik", latitude: 40.429, is_origin: true }),
+    ]);
+  });
+
+  test("removing the origin makes all places equal again", async () => {
+    server.use(...signedIn());
+    renderRoute("/crafts/new");
+    await screen.findByRole("option", { name: "Ceramics" });
+
+    await userEvent.click(screen.getByRole("button", { name: "Add another place" }));
+    await userEvent.click(screen.getByRole("button", { name: "Add another place" }));
+    const origin = screen.getByRole("group", { name: "Origin" });
+    await userEvent.click(within(origin).getByRole("radio", { name: /Place 3 is the origin/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Remove place 1" }));
+    // Place 3 is now place 2 and stays the origin.
+    expect(within(origin).getByRole("radio", { name: /Place 2 is the origin/ })).toBeChecked();
+
+    await userEvent.click(screen.getByRole("button", { name: "Remove place 2" }));
+    expect(screen.queryByRole("group", { name: "Origin" })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Add another place" }));
+    expect(
+      within(screen.getByRole("group", { name: "Origin" })).getByRole("radio", {
+        name: "All places are equal",
+      }),
+    ).toBeChecked();
+  });
 });
 
 test("the new craft page has no accessibility violations", async () => {

@@ -11,11 +11,15 @@ def craft_data(**overrides):
         "tools": [Tool.objects.get(name="Loom"), Tool.objects.get(name="Knotting knife")],
         "materials": [Material.objects.get(name="Wool"), Material.objects.get(name="Madder")],
         "culture": Culture.objects.get(name="Turkish"),
-        "address": "Uşak, Türkiye",
-        "city": "Uşak",
-        "country": "Türkiye",
-        "latitude": 38.68,
-        "longitude": 29.41,
+        "places": [
+            {
+                "address": "Uşak, Türkiye",
+                "city": "Uşak",
+                "country": "Türkiye",
+                "latitude": 38.68,
+                "longitude": 29.41,
+            }
+        ],
         "description": "Hand-knotted wool carpet with medallion layouts, exported since the 1500s.",
     }
     data.update(overrides)

@@ -4,7 +4,16 @@ from django.db.models import Count, Exists, OuterRef, Prefetch, Q, Value
 
 from core.exceptions import NotFoundError
 
-from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Tool
+from .models import (
+    Category,
+    Craft,
+    CraftMedia,
+    CraftPlace,
+    CraftType,
+    Culture,
+    Material,
+    Tool,
+)
 
 CRAFT_NOT_FOUND = "Craft not found."
 MEDIA_NOT_FOUND = "Media not found."
@@ -67,10 +76,9 @@ SEARCHED_FIELDS = [
     "craft_type__name",
     "category__name",
     "culture__name",
-    "address",
-    "city",
-    "country",
 ]
+# Place fields a search looks in; a craft matches when any of its places does.
+SEARCHED_PLACE_FIELDS = ["address", "city", "country"]
 MAX_SEARCH_WORDS = 6
 
 
@@ -85,6 +93,10 @@ def _matches(word):
         condition |= Q(**{f"{field}__iregex": pattern})
     for model in (Tool, Material):
         condition |= Exists(model.objects.filter(crafts=OuterRef("pk"), name__iregex=pattern))
+    in_place = Q()
+    for field in SEARCHED_PLACE_FIELDS:
+        in_place |= Q(**{f"{field}__iregex": pattern})
+    condition |= Exists(CraftPlace.objects.filter(in_place, craft=OuterRef("pk")))
     return condition
 
 
@@ -104,7 +116,10 @@ def _apply_filters(
     if culture:
         crafts = crafts.filter(culture_id=culture)
     if country:
-        crafts = crafts.filter(country__iexact=country)
+        # Any of the craft's places can be in the country.
+        crafts = crafts.filter(
+            Exists(CraftPlace.objects.filter(craft=OuterRef("pk"), country__iexact=country))
+        )
     if search:
         # Every word must match, so adding words narrows the results.
         for word in search.split()[:MAX_SEARCH_WORDS]:
@@ -123,10 +138,14 @@ def craft_facets(viewer=None, **filters):
         others = {key: value for key, value in filters.items() if key != without}
         return _apply_filters(visible_crafts(viewer), **others)
 
-    def counted(crafts, **fields):
+    def counted(rows, counting="id", **fields):
         """Counts crafts per value, as {output name: field path} plus "count", by name."""
         paths = list(fields.values())
-        rows = crafts.values(*paths).annotate(count=Count("id")).order_by(fields["name"])
+        rows = (
+            rows.values(*paths)
+            .annotate(count=Count(counting, distinct=True))
+            .order_by(fields["name"])
+        )
         return [
             {**{key: row[path] for key, path in fields.items()}, "count": row["count"]}
             for row in rows
@@ -143,7 +162,12 @@ def craft_facets(viewer=None, **filters):
         "cultures": counted(
             found("culture").exclude(culture=None), id="culture_id", name="culture__name"
         ),
-        "countries": counted(found("country").exclude(country=""), name="country"),
+        # A craft counts once in each country it has a place in.
+        "countries": counted(
+            CraftPlace.objects.filter(craft__in=found("country")).exclude(country=""),
+            counting="craft",
+            name="country",
+        ),
     }
 
 
@@ -157,22 +181,26 @@ def browse_crafts(viewer=None, *, author_id=None, **filters):
 
 
 def map_pins(viewer=None, *, bbox=None, **filters):
+    """A pin for every place of the crafts the filters find."""
     crafts = _apply_filters(visible_crafts(viewer), **filters)
+    places = CraftPlace.objects.filter(craft__in=crafts)
     if bbox:
         west, south, east, north = bbox
-        crafts = crafts.filter(latitude__gte=south, latitude__lte=north)
+        places = places.filter(latitude__gte=south, latitude__lte=north)
         if west <= east:
-            crafts = crafts.filter(longitude__gte=west, longitude__lte=east)
+            places = places.filter(longitude__gte=west, longitude__lte=east)
         else:
-            crafts = crafts.filter(Q(longitude__gte=west) | Q(longitude__lte=east))
-    return crafts.values("id", "name", "category__slug", "latitude", "longitude")
+            places = places.filter(Q(longitude__gte=west) | Q(longitude__lte=east))
+    return places.order_by("-craft__created_at", "-craft_id", "order").values(
+        "id", "craft_id", "craft__name", "craft__category__slug", "latitude", "longitude"
+    )
 
 
 def get_visible_craft(craft_id, viewer=None):
     craft = (
         visible_crafts(viewer)
         .select_related("category", "craft_type", "culture", "author__profile")
-        .prefetch_related("media", "tools", "materials", "colors")
+        .prefetch_related("media", "tools", "materials", "colors", "places")
         .filter(pk=craft_id)
         .first()
     )

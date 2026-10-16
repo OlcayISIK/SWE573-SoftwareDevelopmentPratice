@@ -224,6 +224,38 @@ test("the facts link to crafts that share them", async () => {
   expect(within(facts).getByText("Clay")).toBeInTheDocument();
 });
 
+test("a craft in several places lists them and marks the origin", async () => {
+  const place = makeCraftDetail().places[0];
+  serveCraft(
+    makeCraftDetail({
+      places: [
+        place,
+        {
+          ...place,
+          id: 62,
+          address: "İznik, Bursa",
+          city: "İznik",
+          latitude: 40.43,
+          longitude: 29.72,
+          is_origin: true,
+        },
+      ],
+    }),
+  );
+  renderRoute("/crafts/1");
+
+  const aside = await screen.findByRole("complementary", { name: "Facts and location" });
+  expect(within(aside).getByRole("heading", { name: "Places" })).toBeInTheDocument();
+  expect(within(aside).getByText("İznik, Bursa")).toBeInTheDocument();
+  const facts = within(aside).getByRole("heading", { name: "Craft facts" }).parentElement!;
+  const places = within(facts).getByText("Places").nextElementSibling as HTMLElement;
+  expect(
+    within(places)
+      .getAllByRole("listitem")
+      .map((item) => item.textContent),
+  ).toEqual(["Kütahya, Türkiye", "İznik, Türkiye(origin)"]);
+});
+
 test("the facts describe their items on hover and focus", async () => {
   serveCraft(makeCraftDetail());
   renderRoute("/crafts/1");

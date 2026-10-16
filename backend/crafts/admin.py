@@ -1,6 +1,16 @@
 from django.contrib import admin
 
-from .models import Category, Craft, CraftColor, CraftMedia, CraftType, Culture, Material, Tool
+from .models import (
+    Category,
+    Craft,
+    CraftColor,
+    CraftMedia,
+    CraftPlace,
+    CraftType,
+    Culture,
+    Material,
+    Tool,
+)
 
 
 class CraftMediaInline(admin.TabularInline):
@@ -10,6 +20,12 @@ class CraftMediaInline(admin.TabularInline):
 
     def get_queryset(self, request):
         return CraftMedia.all_objects.all()
+
+
+class CraftPlaceInline(admin.TabularInline):
+    model = CraftPlace
+    extra = 0
+    fields = ["address", "city", "country", "latitude", "longitude", "is_origin", "order"]
 
 
 class CraftColorInline(admin.TabularInline):
@@ -60,7 +76,7 @@ class CraftAdmin(admin.ModelAdmin):
     raw_id_fields = ["author"]
     filter_horizontal = ["tools", "materials"]
     readonly_fields = ["created_at", "updated_at"]
-    inlines = [CraftColorInline, CraftMediaInline]
+    inlines = [CraftPlaceInline, CraftColorInline, CraftMediaInline]
 
     def get_queryset(self, request):
         return Craft.all_objects.select_related("author", "category", "craft_type", "culture")

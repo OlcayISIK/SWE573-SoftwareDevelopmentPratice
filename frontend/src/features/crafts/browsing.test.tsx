@@ -200,8 +200,22 @@ describe("craft list", () => {
 
 describe("map", () => {
   const pins = [
-    { id: 1, name: "Kütahya Çinisi", category: "ceramics", latitude: 39.42, longitude: 29.98 },
-    { id: 2, name: "Uşak Halısı", category: "textiles", latitude: 38.68, longitude: 29.41 },
+    {
+      id: 1,
+      place: 11,
+      name: "Kütahya Çinisi",
+      category: "ceramics",
+      latitude: 39.42,
+      longitude: 29.98,
+    },
+    {
+      id: 2,
+      place: 12,
+      name: "Uşak Halısı",
+      category: "textiles",
+      latitude: 38.68,
+      longitude: 29.41,
+    },
   ];
 
   test("an empty search on the map says nothing matches", async () => {
@@ -259,6 +273,16 @@ describe("map", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "View on map" }));
     expect(await screen.findByRole("region", { name: "Map of crafts" })).toBeInTheDocument();
+  });
+
+  test("a craft in several places is counted and listed once", async () => {
+    const konya = { ...pins[1], place: 13, latitude: 37.87, longitude: 32.49 };
+    recordRequests("/crafts/map/", () => [...pins, konya]);
+    renderRoute("/?view=list");
+
+    expect(await screen.findByText("2 crafts")).toBeInTheDocument();
+    const list = await screen.findByRole("region", { name: "Crafts as a list" });
+    expect(within(list).getAllByRole("link", { name: "Uşak Halısı" })).toHaveLength(1);
   });
 
   test("the list view has no accessibility violations", async () => {

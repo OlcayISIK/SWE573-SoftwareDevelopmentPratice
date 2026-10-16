@@ -9,13 +9,23 @@ from rest_framework import serializers
 from core.validators import MB, validate_image_upload
 
 from .colors import HEX_COLOR
-from .models import Category, Craft, CraftMedia, CraftType, Culture, Material, Tool
+from .models import (
+    Category,
+    Craft,
+    CraftMedia,
+    CraftPlace,
+    CraftType,
+    Culture,
+    Material,
+    Tool,
+)
 
 PHOTO_MAX_BYTES = 5 * MB
 DOCUMENT_MAX_BYTES = 10 * MB
 MAX_TOOLS = 20
 MAX_MATERIALS = 20
 MAX_COLORS = 10
+MAX_PLACES = 10
 LENGTH_UNITS = ["mm", "cm", "m", "in", "ft"]
 WEIGHT_UNITS = ["g", "kg", "oz", "lb"]
 VOLUME_UNITS = ["ml", "l", "fl oz"]
@@ -218,6 +228,25 @@ def _visible(model):
     return model.objects.filter(is_hidden=False)
 
 
+class PlaceInputSerializer(StrictSerializer):
+    address = serializers.CharField(max_length=255)
+    city = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
+    country = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
+    latitude = CoordinateField(min_value=-90, max_value=90)
+    longitude = CoordinateField(min_value=-180, max_value=180)
+    is_origin = serializers.BooleanField(required=False, default=False)
+
+
+class CraftPlaceSerializer(serializers.ModelSerializer):
+    latitude = serializers.FloatField(read_only=True)
+    longitude = serializers.FloatField(read_only=True)
+
+    class Meta:
+        model = CraftPlace
+        fields = ["id", "address", "city", "country", "latitude", "longitude", "is_origin"]
+        read_only_fields = fields
+
+
 class CraftWriteSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=_visible(Category))
     craft_type = serializers.PrimaryKeyRelatedField(queryset=_visible(CraftType))
@@ -226,15 +255,18 @@ class CraftWriteSerializer(serializers.ModelSerializer):
         queryset=_visible(Material), many=True, required=False
     )
     culture = serializers.PrimaryKeyRelatedField(queryset=_visible(Culture))
-    address = serializers.CharField(max_length=255)
+    places = PlaceInputSerializer(
+        many=True,
+        min_length=1,
+        max_length=MAX_PLACES,
+        help_text="Where the craft is made or belongs. Mark at most one as the origin.",
+    )
     colors = serializers.ListField(
         child=ColorField(),
         required=False,
         max_length=MAX_COLORS,
         help_text='Colors as "#rrggbb", or "#rrggbbaa" when see-through.',
     )
-    latitude = CoordinateField(min_value=-90, max_value=90)
-    longitude = CoordinateField(min_value=-180, max_value=180)
     attributes = CraftAttributesSerializer(required=False)
 
     class Meta:
@@ -246,11 +278,7 @@ class CraftWriteSerializer(serializers.ModelSerializer):
             "tools",
             "materials",
             "culture",
-            "address",
-            "city",
-            "country",
-            "latitude",
-            "longitude",
+            "places",
             "description",
             "story",
             "colors",
@@ -266,6 +294,16 @@ class CraftWriteSerializer(serializers.ModelSerializer):
         if len(materials) > MAX_MATERIALS:
             raise serializers.ValidationError(f"Choose at most {MAX_MATERIALS} materials.")
         return list(dict.fromkeys(materials))
+
+    def validate_places(self, places):
+        # A partial update skips the defaults of nested fields, so they are filled in here.
+        places = [{"city": "", "country": "", "is_origin": False, **place} for place in places]
+        if sum(place["is_origin"] for place in places) > 1:
+            raise serializers.ValidationError("Mark at most one place as the origin.")
+        points = [(place["latitude"], place["longitude"]) for place in places]
+        if len(points) != len(set(points)):
+            raise serializers.ValidationError("Enter each place once.")
+        return places
 
     def validate_colors(self, colors):
         # The same color with another opacity counts as the same color.
@@ -453,9 +491,12 @@ class CraftListSerializer(serializers.ModelSerializer):
 
 
 class CraftPinSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField()
-    category = serializers.CharField(source="category__slug")
+    """A pin for one place of a craft; a craft in several places has several pins."""
+
+    id = serializers.IntegerField(source="craft_id", help_text="The craft.")
+    place = serializers.IntegerField(source="id", help_text="The place of this pin.")
+    name = serializers.CharField(source="craft__name")
+    category = serializers.CharField(source="craft__category__slug")
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
 
@@ -470,6 +511,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     latitude = serializers.FloatField(read_only=True)
     longitude = serializers.FloatField(read_only=True)
+    places = CraftPlaceSerializer(many=True, read_only=True)
     media = MediaSerializer(many=True, read_only=True)
 
     class Meta:
@@ -487,6 +529,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
             "country",
             "latitude",
             "longitude",
+            "places",
             "media",
             "description",
             "story",

@@ -46,7 +46,7 @@ function ItemList({ kind, items }: { kind: "tool" | "material"; items: NamedItem
  */
 export function CraftFacts({ craft }: { craft: CraftDetail }) {
   const { category, craft_type: craftType, culture, tools, materials } = craft;
-  const place = placeName(craft);
+  const places = craft.places.filter((place) => placeName(place));
 
   return (
     <section
@@ -114,18 +114,25 @@ export function CraftFacts({ craft }: { craft: CraftDetail }) {
             <ItemList kind="material" items={materials} />
           </Fact>
         )}
-        {place && (
-          <Fact label="Place">
-            {craft.city}
-            {craft.city && craft.country && ", "}
-            {craft.country ? (
-              <Link
-                to={`/crafts?country=${encodeURIComponent(craft.country)}`}
-                className="underline"
-              >
-                {craft.country}
-              </Link>
-            ) : null}
+        {places.length > 0 && (
+          <Fact label={places.length > 1 ? "Places" : "Place"}>
+            <ul className="space-y-0.5">
+              {places.map((place) => (
+                <li key={place.id}>
+                  {place.city}
+                  {place.city && place.country && ", "}
+                  {place.country ? (
+                    <Link
+                      to={`/crafts?country=${encodeURIComponent(place.country)}`}
+                      className="underline"
+                    >
+                      {place.country}
+                    </Link>
+                  ) : null}
+                  {place.is_origin && <span className="ml-1 text-sm text-stone-600">(origin)</span>}
+                </li>
+              ))}
+            </ul>
           </Fact>
         )}
       </dl>

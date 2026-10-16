@@ -184,9 +184,10 @@ All models inherit `core.BaseModel`, which adds `id`, `created_at`, and `updated
   - Names are unique ignoring case (per category for craft types), so "carpet" and "Carpet" stay one item.
   - The lists are seeded by data migrations, so a new database starts with them. Seeded items have no `created_by`, and every seeded item has a description.
   - Registered users with a verified email can add items, and everyone can use them right away. A user can describe the item they add. Adding a name that already exists returns the existing item, with its own description. Admins hide items with `is_hidden`, which removes them from the lists; a hidden name cannot be added again.
-- **Craft**: `name`, `category` (FK), `craft_type` (FK, must belong to the category), `tools` and `materials` (many-to-many, optional), `culture` (FK, required for new crafts), `address`, `city`, `country`, `latitude`, `longitude`, `description` (what the craft is and how it is made), `story` (optional: how to understand it, its history and meaning, and its role in the community), `attributes` (`JSONField`), `status` (`published` or `hidden`), `author` (FK User).
+- **Craft**: `name`, `category` (FK), `craft_type` (FK, must belong to the category), `tools` and `materials` (many-to-many, optional), `culture` (FK, required for new crafts), `address`, `city`, `country`, `latitude`, `longitude` (a copy of the main place, see CraftPlace), `description` (what the craft is and how it is made), `story` (optional: how to understand it, its history and meaning, and its role in the community), `attributes` (`JSONField`), `status` (`published` or `hidden`), `author` (FK User).
   - Hidden lookup items cannot be chosen for a craft, but crafts that already use them keep showing them.
   - Crafts added before these fields existed were converted by a migration: the craft type text was matched to a craft type in the same category (or added as one), the region became the address and country and set the culture, the four texts were joined into `description` under their old labels, and the material names became material entries. A later migration moved the "How to understand it" and "Cultural relevance" sections out of `description` into `story`.
+- **CraftPlace**: `craft` (FK), `address`, `city`, `country`, `latitude`, `longitude`, `is_origin`, and `order`. A craft has 1 to 10 places, each listed once. The author can mark one place as the origin (at most one per craft, enforced by a partial unique constraint), or leave all places equal. The API writes a craft's places as a `places` list, and the services copy the main place (the origin, or the first place when all are equal) onto the craft's own location fields, so lists, cards, and profiles need no join. A migration gave each existing craft its location as its only place.
 - **CraftColor**: `craft` (FK), `value` (`#rrggbb`, or `#rrggbbaa` when see-through), and `order`. The API reads and writes a craft's colors as a list of these values, e.g. `["#1e40af", "#40e0d080"]`. A craft has up to 10 colors, each listed once. The frontend accepts hex, `rgb()`, `hsl()`, and CSS color names and sends the hex form, which the backend checks.
 - **CraftMedia**: `craft` (FK), `media_type` (`photo`, `video`, `document`), `file` or `url`, `caption`, `alt_text`, `order`.
 
@@ -231,7 +232,7 @@ Values are kept in the unit the author entered. Weight used to be a separate `we
 
 ### Indexes
 
-- `Craft(category)`, `Craft(craft_type)`, `Craft(culture)`, and `Craft(latitude, longitude)` for map and filter queries.
+- `Craft(category)`, `Craft(craft_type)`, `Craft(culture)`, and `CraftPlace(latitude, longitude)` for map and filter queries.
 - `Notification(recipient, is_read)` for the unread count.
 - `Report(status)` for the admin queue.
 
@@ -267,7 +268,7 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 | POST   | `/auth/password-reset/`                | Guest           | Request a password reset email        |
 | POST   | `/auth/password-reset/confirm/`        | Guest           | Set a new password with the token     |
 | GET    | `/crafts/`                             | Public          | List crafts (filter by category, craft type, culture, country, search) |
-| GET    | `/crafts/map/`                         | Public          | Lightweight pins for the map (same filters, plus `bbox=west,south,east,north`) |
+| GET    | `/crafts/map/`                         | Public          | Lightweight pins for the map, one per place of each craft (same filters, plus `bbox=west,south,east,north`) |
 | GET    | `/crafts/facets/`                      | Public          | For each filter, the values the other filters' results have, with counts |
 | GET    | `/geocode/search/?q=`                  | Registered user | Coordinates, address, city, and country for an address (404 if not found) |
 | GET    | `/geocode/reverse/?lat=&lng=`          | Registered user | Address at a point, for a pin placed on the map (404 if none) |
@@ -304,8 +305,8 @@ The OpenAPI schema is served at `/api/schema/` and Swagger UI at `/api/docs/`.
 
 ### Search and Facets
 
-- **Search** splits the text into words, and every word must start a word in one of the craft's name, description, story, craft type, category, culture, address, city, country, tools, or materials. So "tile" finds tiles but not textiles, and "kilim mexico" finds Mexican kilims. Matching uses PostgreSQL's word-start regular expression (`\m`), with the user's text escaped. Tools and materials are matched with `EXISTS` subqueries, so a craft is listed once however many of them match.
-- **Facets** (`/crafts/facets/`) take the same filters and return, for each of category, craft type, culture, and country, the values found with a count of crafts. Each list leaves out its own filter, so the other countries stay available after picking one, while the other lists narrow to that country.
+- **Search** splits the text into words, and every word must start a word in one of the craft's name, description, story, craft type, category, culture, tools, materials, or the address, city, or country of any of its places. So "tile" finds tiles but not textiles, and "kilim mexico" finds Mexican kilims. Matching uses PostgreSQL's word-start regular expression (`\m`), with the user's text escaped. Tools, materials, and places are matched with `EXISTS` subqueries, so a craft is listed once however many of them match. The country filter matches a craft with a place in that country.
+- **Facets** (`/crafts/facets/`) take the same filters and return, for each of category, craft type, culture, and country, the values found with a count of crafts. A craft counts once in each country it has a place in. Each list leaves out its own filter, so the other countries stay available after picking one, while the other lists narrow to that country.
 
 ### Address Lookup
 

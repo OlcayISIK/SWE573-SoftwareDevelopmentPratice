@@ -1,5 +1,5 @@
 import { lazy, Suspense, useRef, useState } from "react";
-import type { UseFormReturn } from "react-hook-form";
+import { useFieldArray, type UseFormReturn } from "react-hook-form";
 
 import { toApiError } from "@/api/envelope";
 import { TextField } from "@/components/form/TextField";
@@ -9,13 +9,21 @@ import { toast } from "@/lib/toast";
 import { geocodeApi } from "../api";
 import type { Place } from "../types";
 
-import type { CraftFormValues } from "./schema";
+import { emptyPlace, MAX_PLACES, type CraftFormValues } from "./schema";
 
 const LocationMap = lazy(() => import("../components/map/LocationMap"));
 
 const changed = { shouldValidate: true, shouldDirty: true };
 
-export function LocationPicker({ form }: { form: UseFormReturn<CraftFormValues> }) {
+interface PlaceFieldsProps {
+  form: UseFormReturn<CraftFormValues>;
+  index: number;
+  /** Shown when the craft has more than one place. */
+  onRemove?: () => void;
+}
+
+/** One place: its address with a "Pin address" button, and a map to place the pin on. */
+function PlaceFields({ form, index, onRemove }: PlaceFieldsProps) {
   const {
     register,
     setValue,
@@ -28,29 +36,33 @@ export function LocationPicker({ form }: { form: UseFormReturn<CraftFormValues> 
   const [target, setTarget] = useState<[number, number] | null>(null);
   // Only the answer to the latest pin counts when the user moves it quickly.
   const latestLookup = useRef(0);
+  const path = `places.${index}` as const;
+  const placeErrors = errors.places?.[index];
 
-  const latitude = Number(watch("latitude"));
-  const longitude = Number(watch("longitude"));
+  const rawLatitude = watch(`${path}.latitude`);
+  const rawLongitude = watch(`${path}.longitude`);
+  const latitude = Number(rawLatitude);
+  const longitude = Number(rawLongitude);
   const hasPosition =
-    watch("latitude") !== "" &&
-    watch("longitude") !== "" &&
+    rawLatitude !== "" &&
+    rawLongitude !== "" &&
     Number.isFinite(latitude) &&
     Number.isFinite(longitude);
 
   const setPosition = (lat: number, lng: number) => {
-    setValue("latitude", lat.toFixed(6), changed);
-    setValue("longitude", lng.toFixed(6), changed);
+    setValue(`${path}.latitude`, lat.toFixed(6), changed);
+    setValue(`${path}.longitude`, lng.toFixed(6), changed);
   };
 
   const setPlace = (place: Pick<Place, "city" | "country">) => {
-    setValue("city", place.city, { shouldDirty: true });
-    setValue("country", place.country, { shouldDirty: true });
+    setValue(`${path}.city`, place.city, { shouldDirty: true });
+    setValue(`${path}.country`, place.country, { shouldDirty: true });
   };
 
   const pinAddress = async () => {
-    const address = getValues("address").trim();
+    const address = getValues(`${path}.address`).trim();
     if (address.length < 3) {
-      setError("address", { message: "Enter the address to pin." }, { shouldFocus: true });
+      setError(`${path}.address`, { message: "Enter the address to pin." }, { shouldFocus: true });
       return;
     }
     latestLookup.current += 1;
@@ -76,7 +88,7 @@ export function LocationPicker({ form }: { form: UseFormReturn<CraftFormValues> 
     try {
       const place = await geocodeApi.reverse(lat, lng);
       if (lookup !== latestLookup.current) return;
-      setValue("address", place.address, changed);
+      setValue(`${path}.address`, place.address, changed);
       setPlace(place);
     } catch (error) {
       if (lookup !== latestLookup.current) return;
@@ -90,21 +102,18 @@ export function LocationPicker({ form }: { form: UseFormReturn<CraftFormValues> 
     }
   };
 
+  const coordinateError = placeErrors?.latitude?.message ?? placeErrors?.longitude?.message;
   return (
-    <fieldset className="space-y-3">
-      <legend className="text-lg font-semibold">Location</legend>
-      <p className="text-sm text-stone-600">
-        Type the address where the craft comes from and pin it, or click the map to place the pin
-        and the address is filled in for you.
-      </p>
+    <fieldset className="space-y-3 rounded border border-stone-200 p-4">
+      <legend className="px-1 font-medium">Place {index + 1}</legend>
       <div className="flex flex-wrap items-start gap-3">
         <TextField
           label="Address"
           hint="As specific as you know it: a street, a village, or a town."
           autoComplete="off"
           className="min-w-0 flex-1"
-          error={errors.address?.message}
-          {...register("address")}
+          error={placeErrors?.address?.message}
+          {...register(`${path}.address`)}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               event.preventDefault();
@@ -131,10 +140,106 @@ export function LocationPicker({ form }: { form: UseFormReturn<CraftFormValues> 
       <p className="text-sm text-stone-700" aria-live="polite">
         {hasPosition ? `Pinned at ${latitude.toFixed(5)}, ${longitude.toFixed(5)}.` : "No pin yet."}
       </p>
-      {(errors.latitude || errors.longitude) && (
+      {coordinateError && (
         <p role="alert" className="text-sm text-red-700">
-          {errors.latitude?.message ?? errors.longitude?.message}
+          {coordinateError}
         </p>
+      )}
+      {onRemove && (
+        <button
+          type="button"
+          className="text-sm font-medium text-red-800 underline"
+          onClick={onRemove}
+        >
+          Remove place {index + 1}
+        </button>
+      )}
+    </fieldset>
+  );
+}
+
+/**
+ * Where the craft is made or belongs: one or more places. With several, the author can name one
+ * as the origin, or leave all of them equal.
+ */
+export function LocationPicker({ form }: { form: UseFormReturn<CraftFormValues> }) {
+  const {
+    control,
+    getValues,
+    setValue,
+    watch,
+    formState: { errors },
+  } = form;
+  const { fields, append, remove } = useFieldArray({ control, name: "places" });
+  const places = watch("places");
+  // Controlled, so the choice follows its place when an earlier place is removed.
+  const origin = watch("origin");
+  const listError = errors.places?.message ?? errors.places?.root?.message;
+
+  const removePlace = (index: number) => {
+    // Keep the origin on the same place, or make all places equal if it is removed.
+    const origin = getValues("origin");
+    if (origin !== "") {
+      const originIndex = Number(origin);
+      if (originIndex === index) setValue("origin", "");
+      else if (originIndex > index) setValue("origin", String(originIndex - 1));
+    }
+    remove(index);
+  };
+
+  return (
+    <fieldset className="space-y-4">
+      <legend className="text-lg font-semibold">Places</legend>
+      <p className="text-sm text-stone-600">
+        Type the address where the craft comes from and pin it, or click the map to place the pin
+        and the address is filled in for you. A craft made in several places can list each of them.
+      </p>
+      {fields.map((field, index) => (
+        <PlaceFields
+          key={field.id}
+          form={form}
+          index={index}
+          onRemove={fields.length > 1 ? () => removePlace(index) : undefined}
+        />
+      ))}
+      {fields.length < MAX_PLACES && (
+        <button
+          type="button"
+          className="rounded border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-brand-100"
+          onClick={() => append({ ...emptyPlace })}
+        >
+          Add another place
+        </button>
+      )}
+      {listError && <p className="text-sm text-red-700">{listError}</p>}
+
+      {fields.length > 1 && (
+        <fieldset className="space-y-2">
+          <legend className="font-medium text-stone-800">Origin</legend>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="origin"
+              checked={origin === ""}
+              onChange={() => setValue("origin", "", { shouldDirty: true })}
+            />
+            All places are equal
+          </label>
+          {places.map((place, index) => (
+            <label key={fields[index]?.id ?? index} className="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="origin"
+                checked={origin === String(index)}
+                onChange={() => setValue("origin", String(index), { shouldDirty: true })}
+              />
+              Place {index + 1} is the origin
+              {place.address.trim() && (
+                <span className="text-stone-600">({place.address.trim()})</span>
+              )}
+            </label>
+          ))}
+        </fieldset>
       )}
     </fieldset>
   );

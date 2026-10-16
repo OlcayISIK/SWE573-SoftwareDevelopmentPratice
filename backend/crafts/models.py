@@ -103,6 +103,8 @@ class Craft(SoftDeleteModel):
     culture = models.ForeignKey(
         Culture, on_delete=models.PROTECT, related_name="crafts", null=True, blank=True
     )
+    # The main place: the origin, or the first place when all places are equal. A copy of one of
+    # `places`, kept in step by the services, so lists and cards need no join.
     address = models.CharField(max_length=255)
     city = models.CharField(max_length=100, blank=True)
     country = models.CharField(max_length=100, blank=True)
@@ -145,6 +147,52 @@ class Craft(SoftDeleteModel):
 
     def __str__(self):
         return self.name
+
+
+class CraftPlace(BaseModel):
+    """
+    A place where the craft is made or belongs. A craft has one or more; the author can mark one
+    as its origin, or leave all of them equal.
+    """
+
+    craft = models.ForeignKey(Craft, on_delete=models.CASCADE, related_name="places")
+    address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        validators=[MinValueValidator(-90), MaxValueValidator(90)],
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        validators=[MinValueValidator(-180), MaxValueValidator(180)],
+    )
+    is_origin = models.BooleanField(default=False)
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+        indexes = [models.Index(fields=["latitude", "longitude"], name="craft_place_location_idx")]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["craft"],
+                condition=models.Q(is_origin=True),
+                name="one_origin_per_craft",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(latitude__gte=-90, latitude__lte=90),
+                name="craft_place_latitude_range",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(longitude__gte=-180, longitude__lte=180),
+                name="craft_place_longitude_range",
+            ),
+        ]
+
+    def __str__(self):
+        return self.address
 
 
 class CraftColor(BaseModel):

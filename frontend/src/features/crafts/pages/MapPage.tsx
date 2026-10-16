@@ -13,6 +13,11 @@ import type { CraftPin } from "../types";
 
 const MapView = lazy(() => import("../components/map/MapView"));
 
+/** One pin per craft: a craft in several places has a pin for each of them. */
+function uniqueCrafts(pins: CraftPin[]) {
+  return pins.filter((pin, index) => pins.findIndex((other) => other.id === pin.id) === index);
+}
+
 function PinList({ pins, emptyMessage }: { pins: CraftPin[]; emptyMessage: string }) {
   const categories = useCategories();
   const categoryName = (slug: string) =>
@@ -23,7 +28,7 @@ function PinList({ pins, emptyMessage }: { pins: CraftPin[]; emptyMessage: strin
   }
   return (
     <ul className="divide-y divide-brand-100 rounded-lg border border-brand-100 bg-white">
-      {pins.map((pin) => (
+      {uniqueCrafts(pins).map((pin) => (
         <li key={pin.id} className="flex items-center justify-between gap-4 px-4 py-3">
           <Link to={`/crafts/${pin.id}`} className="font-medium hover:underline">
             {pin.name}
@@ -40,6 +45,7 @@ export function MapPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const showList = searchParams.get("view") === "list";
   const pins = useMapPins(filters);
+  const craftCount = pins.data ? uniqueCrafts(pins.data).length : 0;
   const [selected, setSelected] = useState<number | null>(null);
   const select = useCallback((id: number) => setSelected(id), []);
 
@@ -71,9 +77,7 @@ export function MapPage() {
         <div className="order-1 min-w-0 lg:order-2">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-sm text-stone-700" aria-live="polite">
-              {pins.data
-                ? `${pins.data.length} ${pins.data.length === 1 ? "craft" : "crafts"}`
-                : ""}
+              {pins.data ? `${craftCount} ${craftCount === 1 ? "craft" : "crafts"}` : ""}
             </p>
             <button
               type="button"

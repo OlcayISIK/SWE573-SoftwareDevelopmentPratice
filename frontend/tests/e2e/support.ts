@@ -68,9 +68,31 @@ export function apiLogin(email: string) {
   });
 }
 
+const accessTokens = new Map<string, Promise<string>>();
+
+/**
+ * An access token for API calls made as the user. Logging in is rate limited, so each user logs
+ * in once per test file for these calls.
+ */
+function apiAccess(email: string) {
+  if (!accessTokens.has(email)) {
+    accessTokens.set(
+      email,
+      apiLogin(email).then(({ access }) => access),
+    );
+  }
+  return accessTokens.get(email)!;
+}
+
+/** A place for a craft created through the API. */
+export function place(address: string, latitude: number, longitude: number, isOrigin = false) {
+  const [city, country] = address.split(", ");
+  return { address, city, country, latitude, longitude, is_origin: isOrigin };
+}
+
 /** Publishes a craft through the API and returns its id. */
 export async function apiCreateCraft(email: string, name: string, extra: object = {}) {
-  const { access } = await apiLogin(email);
+  const access = await apiAccess(email);
   const textiles = (await apiGet<{ id: number; slug: string }[]>("/categories/")).find(
     (category) => category.slug === "textiles",
   )!;
@@ -87,11 +109,7 @@ export async function apiCreateCraft(email: string, name: string, extra: object 
       category: textiles.id,
       craft_type: carpet.id,
       culture: turkish.id,
-      address: "Uşak, Türkiye",
-      city: "Uşak",
-      country: "Türkiye",
-      latitude: 38.68,
-      longitude: 29.41,
+      places: [place("Uşak, Türkiye", 38.68, 29.41)],
       description: "Hand-knotted wool carpet with medallion layouts.",
       ...extra,
     },
@@ -102,7 +120,7 @@ export async function apiCreateCraft(email: string, name: string, extra: object 
 
 /** Adds a tool to the lookup list as the given user and returns its id. */
 export async function apiAddTool(email: string, name: string) {
-  const { access } = await apiLogin(email);
+  const access = await apiAccess(email);
   return (await apiPost<{ id: number }>("/tools/", { name }, access)).id;
 }
 

@@ -57,6 +57,17 @@ def _lookup(model, **filters):
     return item
 
 
+def _place(item):
+    return {
+        "address": item["address"],
+        "city": item["city"],
+        "country": item["country"],
+        "latitude": Decimal(str(item["latitude"])),
+        "longitude": Decimal(str(item["longitude"])),
+        "is_origin": item.get("is_origin", False),
+    }
+
+
 def _craft_fields(item):
     category = _lookup(Category, slug=item["category"])
     return {
@@ -66,11 +77,8 @@ def _craft_fields(item):
         "culture": _lookup(Culture, name=item["culture"]),
         "tools": [_lookup(Tool, name=name) for name in item["tools"]],
         "materials": [_lookup(Material, name=name) for name in item["materials"]],
-        "address": item["address"],
-        "city": item["city"],
-        "country": item["country"],
-        "latitude": Decimal(str(item["latitude"])),
-        "longitude": Decimal(str(item["longitude"])),
+        # A sample in several places lists them; otherwise its own place is the only one.
+        "places": [_place(place) for place in item.get("places", [item])],
         "description": item["description"],
         "story": item.get("story", ""),
         "colors": item["colors"],

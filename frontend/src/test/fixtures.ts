@@ -39,6 +39,17 @@ export function makeCraftDetail(overrides: Partial<CraftDetail> = {}): CraftDeta
     country: "Türkiye",
     latitude: 39.42,
     longitude: 29.98,
+    places: [
+      {
+        id: 61,
+        address: "Cumhuriyet Caddesi, Kütahya",
+        city: "Kütahya",
+        country: "Türkiye",
+        latitude: 39.42,
+        longitude: 29.98,
+        is_origin: false,
+      },
+    ],
     media: [
       {
         id: 100,

@@ -17,8 +17,15 @@ def craft_url(craft):
 @pytest.fixture
 def payload():
     return craft_payload(
-        latitude=38.6812345,
-        longitude=29.4083471,
+        places=[
+            {
+                "address": "Uşak, Türkiye",
+                "city": "Uşak",
+                "country": "Türkiye",
+                "latitude": 38.6812345,
+                "longitude": 29.4083471,
+            }
+        ],
         attributes={
             "dimensions": [
                 {"type": "length", "value": 300, "unit": "cm"},
@@ -73,6 +80,7 @@ def test_coordinates_are_rounded_to_six_decimals(client_for, user, payload):
 
     assert data["latitude"] == 38.681235
     assert data["longitude"] == 29.408347
+    assert (data["places"][0]["latitude"], data["places"][0]["longitude"]) == (38.681235, 29.408347)
 
 
 def test_unverified_user_cannot_publish(client_for, unverified_user, payload):
@@ -88,7 +96,7 @@ def test_guest_cannot_publish(api_client, payload):
 
 
 @pytest.mark.parametrize(
-    "field", ["name", "category", "craft_type", "culture", "address", "latitude", "description"]
+    "field", ["name", "category", "craft_type", "culture", "places", "description"]
 )
 def test_required_fields(client_for, user, payload, field):
     payload.pop(field)
@@ -99,14 +107,16 @@ def test_required_fields(client_for, user, payload, field):
     assert field in response.json()["errors"]
 
 
-@pytest.mark.parametrize(("field", "value"), [("latitude", 91), ("longitude", -180.5)])
-def test_coordinates_must_be_on_the_map(client_for, user, payload, field, value):
-    payload[field] = value
+@pytest.mark.parametrize(
+    ("field", "value"), [("latitude", 91), ("longitude", -180.5), ("address", "")]
+)
+def test_each_place_is_checked(client_for, user, payload, field, value):
+    payload["places"][0][field] = value
 
     response = client_for(user).post(CRAFTS_URL, payload, format="json")
 
     assert response.status_code == 400
-    assert field in response.json()["errors"]
+    assert "places" in response.json()["errors"]
 
 
 def test_unknown_category_is_rejected(client_for, user, payload):
@@ -360,5 +370,5 @@ def test_items_hidden_later_still_show_on_the_craft(api_client, client_for, user
 def test_detail_query_count_is_fixed(api_client, django_assert_max_num_queries, payload):
     craft = CraftFactory()
 
-    with django_assert_max_num_queries(5):
+    with django_assert_max_num_queries(6):
         api_client.get(craft_url(craft))
