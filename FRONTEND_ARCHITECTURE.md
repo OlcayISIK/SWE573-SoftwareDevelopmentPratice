@@ -291,12 +291,12 @@ The craft form follows the craft data model:
 - **Adding to the lists:** each list has an "Add a new …" control that adds the item for everyone and picks it. Adding a name that already exists picks the existing item.
 - **Location:** the address with a "Pin address" button, which looks up the coordinates through the backend (`/geocode/search/`) and shows "Address not found." when nothing matches. Placing the pin on the map fills in the address (`/geocode/reverse/`). City and country come from the lookup.
 - **Tools and materials:** the items typical for the chosen craft type are offered as checkboxes, and any other item is found by typing its name, or added as a new one.
-- **Description:** one text covering what it is, how it is made, how to understand it, and its cultural relevance (FR-05).
+- **Description and story:** the description says what the craft is and how it is made. The optional story says how to understand it: its history, the meaning of its motifs, who makes it, and its role in the community (FR-05). The craft page shows the story in its own section, after the description.
 - **Colors:** up to 10 rows, each with a color picker, a code field, and an opacity slider. The code accepts hex (`#14a`, `#1e40af`, `#1e40af80`), `rgb()`/`rgba()`, `hsl()`/`hsla()`, and CSS color names, and the picker, code, and opacity stay in step. Colors are sent as `#rrggbb`, or `#rrggbbaa` when see-through, and shown on the craft page as swatches with their codes.
 - **Attributes:** optional dimension rows (measure, size, and unit, each measure once), weight, and distinguishing features, stored in the backend `attributes` field (FR-07).
 - **Media:** photos, video links, and documents (FR-06).
 
-Long forms save a draft in `localStorage`, so an author does not lose their work if the page reloads.
+Long forms save a draft in `localStorage`, so an author does not lose their work if the page reloads. Fields added to the form later start empty when an older draft is restored.
 
 The craft page shows a facts card with the category, craft type, culture (with its homeland), tools, materials, and place. Each one links to the list of crafts that share it.
 

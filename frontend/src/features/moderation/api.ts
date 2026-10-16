@@ -9,6 +9,7 @@ export type QueueStatus = "open" | "resolved" | "dismissed" | "all";
 export interface CraftTextChanges {
   name?: string;
   description?: string;
+  story?: string;
 }
 
 export const moderationApi = {

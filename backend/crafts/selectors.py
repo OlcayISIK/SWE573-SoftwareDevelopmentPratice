@@ -63,6 +63,7 @@ def visible_crafts(viewer=None):
 SEARCHED_FIELDS = [
     "name",
     "description",
+    "story",
     "craft_type__name",
     "category__name",
     "culture__name",

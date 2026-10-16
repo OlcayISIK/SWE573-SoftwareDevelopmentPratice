@@ -136,6 +136,12 @@ export function CraftDetailPage() {
             <h2 className="text-xl font-semibold">About this craft</h2>
             <p className="mt-3 whitespace-pre-line text-stone-800">{data.description}</p>
           </section>
+          {data.story && (
+            <section className="mt-10">
+              <h2 className="text-xl font-semibold">Story</h2>
+              <p className="mt-3 whitespace-pre-line text-stone-800">{data.story}</p>
+            </section>
+          )}
           <AttributeList attributes={data.attributes as CraftAttributes} colors={data.colors} />
           <Videos videos={videos} craftName={data.name} />
           <Documents documents={documents} />

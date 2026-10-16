@@ -37,8 +37,10 @@ function withCurrent<T extends Option>(options: T[] | undefined, current: Option
 }
 
 const DESCRIPTION_HINT =
-  "What it is, how it is made, how to understand it (motifs, symbols, details), and its " +
-  "cultural relevance: who makes it, its role in the community, and why it matters.";
+  "What the craft is and how it is made: its parts, materials, steps, and finish.";
+const STORY_HINT =
+  "How to understand it and why it matters: its history, the meaning of its motifs and " +
+  "symbols, who makes it, and its role in the community.";
 
 export function CraftFields({
   form,
@@ -202,13 +204,20 @@ export function CraftFields({
       </fieldset>
 
       <fieldset className="space-y-4">
-        <legend className="text-lg font-semibold">Description</legend>
+        <legend className="text-lg font-semibold">Description and story</legend>
         <TextAreaField
           label="About this craft"
           hint={DESCRIPTION_HINT}
-          rows={12}
+          rows={8}
           error={errors.description?.message}
           {...register("description")}
+        />
+        <TextAreaField
+          label="Story (optional)"
+          hint={STORY_HINT}
+          rows={8}
+          error={errors.story?.message}
+          {...register("story")}
         />
       </fieldset>
 

@@ -220,6 +220,7 @@ class CraftWriteSerializer(serializers.ModelSerializer):
             "latitude",
             "longitude",
             "description",
+            "story",
             "colors",
             "attributes",
         ]
@@ -456,6 +457,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
             "longitude",
             "media",
             "description",
+            "story",
             "colors",
             "attributes",
             "status",
