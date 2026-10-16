@@ -1,6 +1,6 @@
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
-from rest_framework import generics, serializers, status, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -24,6 +24,7 @@ from .serializers import (
     CraftTypeSerializer,
     CraftWriteSerializer,
     CultureSerializer,
+    FacetsSerializer,
     GeocodeReverseSerializer,
     GeocodeSearchSerializer,
     LinkedItemFilterSerializer,
@@ -186,11 +187,12 @@ class CraftViewSet(viewsets.GenericViewSet):
         pins = selectors.map_pins(request.user, **_filters(request, MapFilterSerializer))
         return Response(CraftPinSerializer(pins, many=True).data)
 
-    @extend_schema(responses=serializers.ListSerializer(child=serializers.CharField()))
-    @action(detail=False, methods=["get"], url_path="countries", pagination_class=None)
-    def countries(self, request):
-        """Countries that have crafts, for the country filter."""
-        return Response(list(selectors.craft_countries(request.user)))
+    @extend_schema(parameters=FILTER_PARAMETERS, responses=FacetsSerializer)
+    @action(detail=False, methods=["get"], url_path="facets", pagination_class=None)
+    def facets(self, request):
+        """The values each filter can take among the crafts the other filters find."""
+        facets = selectors.craft_facets(request.user, **_filters(request))
+        return Response(FacetsSerializer(facets).data)
 
     @extend_schema(request=CraftWriteSerializer, responses={201: CraftDetailSerializer})
     def create(self, request):

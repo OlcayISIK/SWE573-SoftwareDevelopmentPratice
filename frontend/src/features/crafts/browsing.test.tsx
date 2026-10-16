@@ -47,7 +47,7 @@ describe("craft list", () => {
     const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
     const { router } = renderRoute("/crafts");
 
-    await screen.findByRole("option", { name: "Ceramics" });
+    await screen.findByRole("option", { name: "Ceramics (2)" });
     await userEvent.selectOptions(screen.getByLabelText("Category"), "ceramics");
     await userEvent.type(screen.getByLabelText("Search"), "çini");
     await userEvent.click(screen.getByRole("button", { name: "Search" }));
@@ -63,17 +63,16 @@ describe("craft list", () => {
     const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
     const { router } = renderRoute("/crafts");
 
-    await screen.findByRole("option", { name: "Ceramics" });
-    expect(screen.getByLabelText("Craft type")).toBeDisabled();
+    await screen.findByRole("option", { name: "Ceramics (2)" });
     await userEvent.selectOptions(screen.getByLabelText("Category"), "ceramics");
     await userEvent.selectOptions(
       screen.getByLabelText("Craft type"),
-      await screen.findByRole("option", { name: "Tile" }),
+      await screen.findByRole("option", { name: "Tile (2)" }),
     );
     await userEvent.selectOptions(screen.getByLabelText("Culture"), "51");
     await userEvent.selectOptions(
       screen.getByLabelText("Country"),
-      await screen.findByRole("option", { name: "Türkiye" }),
+      await screen.findByRole("option", { name: "Türkiye (2)" }),
     );
 
     await waitFor(() =>
@@ -89,10 +88,58 @@ describe("craft list", () => {
     ]);
   });
 
+  test("filter lists only offer what the results have, with counts", async () => {
+    const asked: URLSearchParams[] = [];
+    server.use(
+      http.get(`${API}/crafts/facets/`, ({ request }) => {
+        asked.push(new URL(request.url).searchParams);
+        return ok({
+          categories: [{ slug: "textiles", name: "Textiles", count: 3 }],
+          craft_types: [{ id: 24, name: "Kilim", category: 2, count: 3 }],
+          cultures: [{ id: 51, name: "Turkish", count: 3 }],
+          countries: [{ name: "Türkiye", count: 3 }],
+        });
+      }),
+    );
+    renderRoute("/crafts?search=kilim");
+
+    const country = await screen.findByLabelText("Country");
+    expect(await within(country).findByRole("option", { name: "Türkiye (3)" })).toBeInTheDocument();
+    expect(within(country).queryByRole("option", { name: /Mexico/ })).not.toBeInTheDocument();
+    expect(
+      within(screen.getByLabelText("Craft type")).getByRole("option", { name: "Kilim (3)" }),
+    ).toBeInTheDocument();
+    expect(asked.at(-1)!.get("search")).toBe("kilim");
+  });
+
+  test("a chosen value stays listed when the results no longer have it", async () => {
+    server.use(
+      http.get(`${API}/crafts/facets/`, () =>
+        ok({ categories: [], craft_types: [], cultures: [], countries: [] }),
+      ),
+    );
+    renderRoute("/crafts?country=Peru&search=kilim");
+
+    expect(await screen.findByRole("option", { name: "Peru (0)" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Country")).toHaveValue("Peru");
+  });
+
+  test("an empty search says so and offers to clear it", async () => {
+    recordRequests("/crafts/", () => page([]));
+    const { router } = renderRoute("/crafts?search=kilim");
+
+    expect(await screen.findByText("No crafts match “kilim”.")).toBeInTheDocument();
+    // The filter bar has its own Clear filters button; this is the one in the message.
+    const buttons = screen.getAllByRole("button", { name: "Clear filters" });
+    await userEvent.click(buttons[buttons.length - 1]);
+    await waitFor(() => expect(router.state.location.search).toBe(""));
+  });
+
   test("a new category clears the craft type filter", async () => {
     const { router } = renderRoute("/crafts?category=ceramics&craft_type=21");
 
     await waitFor(() => expect(screen.getByLabelText("Craft type")).toHaveValue("21"));
+    await screen.findByRole("option", { name: "Textiles (1)" });
     await userEvent.selectOptions(screen.getByLabelText("Category"), "textiles");
 
     await waitFor(() => expect(router.state.location.search).toBe("?category=textiles"));
@@ -112,7 +159,7 @@ describe("craft list", () => {
     recordRequests("/crafts/", () => page([makeCraftListItem()], { page: 2, totalPages: 3 }));
     const { router } = renderRoute("/crafts?page=2");
 
-    await screen.findByRole("option", { name: "Ceramics" });
+    await screen.findByRole("option", { name: "Ceramics (2)" });
     await userEvent.selectOptions(screen.getByLabelText("Category"), "ceramics");
 
     await waitFor(() => expect(router.state.location.search).toBe("?category=ceramics"));
@@ -156,6 +203,14 @@ describe("map", () => {
     { id: 1, name: "Kütahya Çinisi", category: "ceramics", latitude: 39.42, longitude: 29.98 },
     { id: 2, name: "Uşak Halısı", category: "textiles", latitude: 38.68, longitude: 29.41 },
   ];
+
+  test("an empty search on the map says nothing matches", async () => {
+    server.use(http.get(`${API}/crafts/map/`, () => ok([])));
+    renderRoute("/?search=kilim");
+
+    expect(await screen.findByText("No crafts match “kilim”.")).toBeInTheDocument();
+    expect(screen.getByText("0 crafts")).toBeInTheDocument();
+  });
 
   test("shows pins and a preview card for the selected craft", async () => {
     recordRequests("/crafts/map/", () => pins);

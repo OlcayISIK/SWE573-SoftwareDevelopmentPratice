@@ -1,8 +1,10 @@
 import { useEffect, useId, useState } from "react";
 
-import { useCategories, useCountries, useCraftTypes, useCultures } from "../queries";
+import { useCategories, useCultures, useFacets } from "../queries";
 
-import type { CraftFilters } from "../types";
+import type { Category, CraftFilters, Facets } from "../types";
+
+import { FacetSelect } from "./FacetSelect";
 
 interface FilterBarProps {
   filters: CraftFilters;
@@ -11,15 +13,24 @@ interface FilterBarProps {
   hasFilters: boolean;
 }
 
-const fieldClass = "mt-1 block w-full rounded border border-stone-300 bg-white px-3 py-2";
+/** Craft types found in the results. A name used in two categories gets its category added. */
+function craftTypeOptions(facets: Facets | undefined, categories: Category[] | undefined) {
+  const types = facets?.craft_types ?? [];
+  const categoryName = (id: number) => categories?.find((item) => item.id === id)?.name;
+  const repeated = (name: string) => types.filter((item) => item.name === name).length > 1;
+  return types.map((item) => ({
+    value: String(item.id),
+    label: repeated(item.name) ? `${item.name}, ${categoryName(item.category)}` : item.name,
+    count: item.count,
+  }));
+}
 
 export function FilterBar({ filters, onChange, onClear, hasFilters }: FilterBarProps) {
   const id = useId();
   const categories = useCategories();
-  const categoryId = categories.data?.find((item) => item.slug === filters.category)?.id ?? null;
-  const craftTypes = useCraftTypes(categoryId);
   const cultures = useCultures();
-  const countries = useCountries();
+  const facets = useFacets(filters).data;
+  const craftTypes = craftTypeOptions(facets, categories.data);
   const [search, setSearch] = useState(filters.search ?? "");
   const [open, setOpen] = useState(false);
 
@@ -47,84 +58,53 @@ export function FilterBar({ filters, onChange, onClear, hasFilters }: FilterBarP
             onChange({ search: search.trim() || undefined });
           }}
         >
-          <div>
-            <label htmlFor={`${id}-category`} className="text-sm font-medium">
-              Category
-            </label>
-            <select
-              id={`${id}-category`}
-              className={fieldClass}
-              value={filters.category ?? ""}
-              onChange={(event) =>
-                // A craft type belongs to one category, so a new category clears it.
-                onChange({ category: event.target.value || undefined, craft_type: undefined })
-              }
-            >
-              <option value="">All categories</option>
-              {categories.data?.map((category) => (
-                <option key={category.id} value={category.slug}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor={`${id}-craft-type`} className="text-sm font-medium">
-              Craft type
-            </label>
-            <select
-              id={`${id}-craft-type`}
-              className={fieldClass}
-              disabled={!categoryId}
-              value={filters.craft_type ?? ""}
-              onChange={(event) =>
-                onChange({ craft_type: Number(event.target.value) || undefined })
-              }
-            >
-              <option value="">{categoryId ? "All craft types" : "Choose a category first"}</option>
-              {craftTypes.data?.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor={`${id}-culture`} className="text-sm font-medium">
-              Culture
-            </label>
-            <select
-              id={`${id}-culture`}
-              className={fieldClass}
-              value={filters.culture ?? ""}
-              onChange={(event) => onChange({ culture: Number(event.target.value) || undefined })}
-            >
-              <option value="">All cultures</option>
-              {cultures.data?.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor={`${id}-country`} className="text-sm font-medium">
-              Country
-            </label>
-            <select
-              id={`${id}-country`}
-              className={fieldClass}
-              value={filters.country ?? ""}
-              onChange={(event) => onChange({ country: event.target.value || undefined })}
-            >
-              <option value="">All countries</option>
-              {countries.data?.map((country) => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FacetSelect
+            id={`${id}-category`}
+            label="Category"
+            allLabel="All categories"
+            value={filters.category}
+            options={(facets?.categories ?? []).map((item) => ({
+              value: item.slug,
+              label: item.name,
+              count: item.count,
+            }))}
+            chosenLabel={categories.data?.find((item) => item.slug === filters.category)?.name}
+            // A craft type belongs to one category, so a new category clears it.
+            onChange={(category) => onChange({ category, craft_type: undefined })}
+          />
+          <FacetSelect
+            id={`${id}-craft-type`}
+            label="Craft type"
+            allLabel="All craft types"
+            value={filters.craft_type?.toString()}
+            options={craftTypes}
+            onChange={(value) => onChange({ craft_type: value ? Number(value) : undefined })}
+          />
+          <FacetSelect
+            id={`${id}-culture`}
+            label="Culture"
+            allLabel="All cultures"
+            value={filters.culture?.toString()}
+            options={(facets?.cultures ?? []).map((item) => ({
+              value: String(item.id),
+              label: item.name,
+              count: item.count,
+            }))}
+            chosenLabel={cultures.data?.find((item) => item.id === filters.culture)?.name}
+            onChange={(value) => onChange({ culture: value ? Number(value) : undefined })}
+          />
+          <FacetSelect
+            id={`${id}-country`}
+            label="Country"
+            allLabel="All countries"
+            value={filters.country}
+            options={(facets?.countries ?? []).map((item) => ({
+              value: item.name,
+              label: item.name,
+              count: item.count,
+            }))}
+            onChange={(country) => onChange({ country })}
+          />
           <div className="md:col-span-2 lg:col-span-4">
             <label htmlFor={`${id}-search`} className="text-sm font-medium">
               Search

@@ -301,15 +301,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/crafts/countries/": {
+    "/api/v1/crafts/facets/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Countries that have crafts, for the country filter. */
-        get: operations["v1_crafts_countries_list"];
+        /** @description The values each filter can take among the crafts the other filters find. */
+        get: operations["v1_crafts_facets_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -741,6 +741,15 @@ export interface components {
             slug: string;
             readonly user_added: boolean;
         };
+        CategoryFacet: {
+            slug: string;
+            name: string;
+            count: number;
+        };
+        CountryFacet: {
+            name: string;
+            count: number;
+        };
         CoverPhoto: {
             url: string;
             alt_text: string;
@@ -817,6 +826,12 @@ export interface components {
             category: number;
             readonly user_added: boolean;
         };
+        CraftTypeFacet: {
+            id: number;
+            name: string;
+            category: number;
+            count: number;
+        };
         CraftWriteRequest: {
             name: string;
             category: number;
@@ -842,6 +857,11 @@ export interface components {
             homeland?: string;
             readonly user_added: boolean;
         };
+        CultureFacet: {
+            id: number;
+            name: string;
+            count: number;
+        };
         Detail: {
             detail: string;
         };
@@ -865,6 +885,12 @@ export interface components {
         EmailRequest: {
             /** Format: email */
             email: string;
+        };
+        Facets: {
+            categories: components["schemas"]["CategoryFacet"][];
+            craft_types: components["schemas"]["CraftTypeFacet"][];
+            cultures: components["schemas"]["CultureFacet"][];
+            countries: components["schemas"]["CountryFacet"][];
         };
         FavoriteStatus: {
             favorited: boolean;
@@ -1969,9 +1995,20 @@ export interface operations {
             };
         };
     };
-    v1_crafts_countries_list: {
+    v1_crafts_facets_retrieve: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Category slug */
+                category?: string;
+                /** @description Country of the craft */
+                country?: string;
+                /** @description Craft type id */
+                craft_type?: number;
+                /** @description Culture id */
+                culture?: number;
+                /** @description Text search */
+                search?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1985,7 +2022,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         success: boolean;
-                        data: string[];
+                        data: components["schemas"]["Facets"];
                         message: string;
                     };
                 };

@@ -7,19 +7,19 @@ import { PeoplePanel } from "@/features/social/components/PeoplePanel";
 
 import { FilterBar } from "../components/FilterBar";
 import { PinPreview } from "../components/PinPreview";
-import { useCraftFilters } from "../hooks/useCraftFilters";
+import { noMatchMessage, useCraftFilters } from "../hooks/useCraftFilters";
 import { useCategories, useMapPins } from "../queries";
 import type { CraftPin } from "../types";
 
 const MapView = lazy(() => import("../components/map/MapView"));
 
-function PinList({ pins }: { pins: CraftPin[] }) {
+function PinList({ pins, emptyMessage }: { pins: CraftPin[]; emptyMessage: string }) {
   const categories = useCategories();
   const categoryName = (slug: string) =>
     categories.data?.find((category) => category.slug === slug)?.name ?? slug;
 
   if (pins.length === 0) {
-    return <p className="text-stone-700">No crafts match your filters.</p>;
+    return <p className="text-stone-700">{emptyMessage}</p>;
   }
   return (
     <ul className="divide-y divide-brand-100 rounded-lg border border-brand-100 bg-white">
@@ -91,13 +91,27 @@ export function MapPage() {
             </p>
           ) : showList ? (
             <section aria-label="Crafts as a list">
-              <PinList pins={pins.data} />
+              <PinList pins={pins.data} emptyMessage={noMatchMessage(filters)} />
             </section>
           ) : (
             <div className="relative aspect-[3/2] max-h-[80vh] min-h-[300px] w-full overflow-hidden rounded-lg border border-brand-100">
               <Suspense fallback={<PageLoader label="Loading the map" />}>
                 <MapView pins={pins.data} onSelect={select} />
               </Suspense>
+              {pins.data.length === 0 && hasFilters && (
+                <div className="absolute inset-x-4 top-4 z-[1000] mx-auto w-fit max-w-full rounded-lg border border-brand-100 bg-white px-4 py-3 shadow">
+                  <p>
+                    {noMatchMessage(filters)}{" "}
+                    <button
+                      type="button"
+                      className="font-medium text-brand-700 underline"
+                      onClick={clearFilters}
+                    >
+                      Clear filters
+                    </button>
+                  </p>
+                </div>
+              )}
               {selected !== null && (
                 <PinPreview craftId={selected} onClose={() => setSelected(null)} />
               )}

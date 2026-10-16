@@ -8,10 +8,11 @@ export const craftKeys = {
   lists: () => [...craftKeys.all, "list"] as const,
   list: (filters: CraftFilters) => [...craftKeys.lists(), filters] as const,
   pins: (filters: CraftFilters) => [...craftKeys.all, "pins", filters] as const,
+  facets: ({ page: _page, ...filters }: CraftFilters) =>
+    [...craftKeys.all, "facets", filters] as const,
   detail: (id: number) => [...craftKeys.all, "detail", id] as const,
   byUser: (userId: number, page: number) => [...craftKeys.all, "user", userId, page] as const,
   categories: ["reference", "categories"] as const,
-  countries: ["reference", "countries"] as const,
 };
 
 export const lookupKeys = {
@@ -120,11 +121,12 @@ export function useAllCraftTypes(enabled = true) {
   });
 }
 
-export function useCountries() {
+/** The values each filter can take among the current results, with counts. */
+export function useFacets(filters: CraftFilters) {
   return useQuery({
-    queryKey: craftKeys.countries,
-    queryFn: craftsApi.countries,
-    staleTime: 5 * 60_000,
+    queryKey: craftKeys.facets(filters),
+    queryFn: () => craftsApi.facets(filters),
+    placeholderData: keepPreviousData,
   });
 }
 

@@ -60,3 +60,8 @@ export function useCraftFilters() {
 
   return { filters, setFilters, clearFilters, hasFilters };
 }
+
+/** What to say when the filters find no crafts. */
+export function noMatchMessage(filters: CraftFilters) {
+  return filters.search ? `No crafts match “${filters.search}”.` : "No crafts match your filters.";
+}

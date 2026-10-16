@@ -3,7 +3,7 @@ import { PageLoader } from "@/components/PageLoader";
 
 import { CraftGrid } from "../components/CraftCard";
 import { FilterBar } from "../components/FilterBar";
-import { useCraftFilters } from "../hooks/useCraftFilters";
+import { noMatchMessage, useCraftFilters } from "../hooks/useCraftFilters";
 import { useCraftList } from "../queries";
 
 export function CraftListPage() {
@@ -28,7 +28,7 @@ export function CraftListPage() {
           </p>
         ) : crafts.data.items.length === 0 ? (
           <div className="mt-6 text-stone-700">
-            <p>{hasFilters ? "No crafts match your filters." : "No crafts have been added yet."}</p>
+            <p>{hasFilters ? noMatchMessage(filters) : "No crafts have been added yet."}</p>
             {hasFilters && (
               <button
                 type="button"

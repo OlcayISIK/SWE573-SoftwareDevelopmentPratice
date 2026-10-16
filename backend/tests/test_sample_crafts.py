@@ -68,7 +68,8 @@ def test_sample_crafts_show_on_the_map_and_filters(api_client):
     call_command("load_sample_crafts")
 
     pins = api_client.get("/api/v1/crafts/map/").json()["data"]
-    countries = api_client.get("/api/v1/crafts/countries/").json()["data"]
+    facets = api_client.get("/api/v1/crafts/facets/").json()["data"]
+    countries = [item["name"] for item in facets["countries"]]
 
     assert len(pins) == len(SAMPLES["crafts"])
     assert {"Türkiye", "Ghana", "Japan", "Mexico"} <= set(countries)

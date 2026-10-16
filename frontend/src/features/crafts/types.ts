@@ -11,6 +11,7 @@ export type CraftListItem = Schemas["CraftList"];
 export type CraftPin = Schemas["CraftPin"];
 export type CraftDetail = Schemas["CraftDetail"];
 export type CraftMedia = Schemas["Media"];
+export type Facets = Schemas["Facets"];
 
 export interface CraftFilters {
   category?: string;

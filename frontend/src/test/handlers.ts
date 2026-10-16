@@ -54,6 +54,26 @@ export function linkedList(items: Linked[], craftType: string | null) {
     .sort((a, b) => Number(b.typical) - Number(a.typical) || a.name.localeCompare(b.name));
 }
 
+/** Filter values with counts, as the facets endpoint returns them for the test crafts. */
+export const facets = {
+  categories: [
+    { slug: "ceramics", name: "Ceramics", count: 2 },
+    { slug: "textiles", name: "Textiles", count: 1 },
+  ],
+  craft_types: [
+    { id: 21, name: "Tile", category: 1, count: 2 },
+    { id: 23, name: "Carpet", category: 2, count: 1 },
+  ],
+  cultures: [
+    { id: 51, name: "Turkish", count: 2 },
+    { id: 52, name: "Zapotec", count: 1 },
+  ],
+  countries: [
+    { name: "Mexico", count: 1 },
+    { name: "Türkiye", count: 2 },
+  ],
+};
+
 export function emptyPage() {
   return { items: [], total: 0, page: 1, pageSize: 20, totalPages: 1 };
 }
@@ -80,7 +100,7 @@ export const defaultHandlers = [
       : ok(kutahya),
   ),
   http.get(`${API}/geocode/reverse/`, () => ok(kutahya)),
-  http.get(`${API}/crafts/countries/`, () => ok(["Mexico", "Türkiye"])),
+  http.get(`${API}/crafts/facets/`, () => ok(facets)),
   http.get(`${API}/crafts/map/`, () => ok([])),
   http.get(`${API}/crafts/`, () => ok(emptyPage())),
   http.get(`${API}/crafts/:id/favorite/`, () => ok({ favorited: false, favorites_count: 0 })),

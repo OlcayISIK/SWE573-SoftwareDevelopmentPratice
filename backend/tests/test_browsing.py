@@ -1,6 +1,6 @@
 import pytest
 
-from crafts.models import Category, Craft, CraftType, Culture
+from crafts.models import Category, Craft, CraftType, Culture, Material, Tool
 from tests.factories import CraftFactory, UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -114,16 +114,99 @@ def test_invalid_filter_is_rejected(api_client):
     assert "culture" in response.json()["errors"]
 
 
-def test_countries_with_crafts_are_listed_once(api_client):
-    CraftFactory(country="Türkiye")
+def test_search_matches_the_start_of_words(api_client, ceramics, textiles):
+    CraftFactory(name="Kütahya tiles", category=ceramics)
+    CraftFactory(
+        name="Felt rug",
+        category=textiles,
+        craft_type=craft_type(textiles, "Felt"),
+        description="Pressed wool rug.",
+    )
+
+    # "tile" is inside "Textiles", but it does not start a word there.
+    assert names(api_client.get(CRAFTS_URL, {"search": "tile"})) == {"Kütahya tiles"}
+    assert names(api_client.get(CRAFTS_URL, {"search": "TEXT"})) == {"Felt rug"}
+
+
+def test_every_search_word_must_match(api_client, textiles, zapotec):
+    kilim = craft_type(textiles, "Kilim")
+    CraftFactory(name="Anatolian kilim", category=textiles, craft_type=kilim)
+    CraftFactory(
+        name="Zapotec kilim", category=textiles, craft_type=kilim, culture=zapotec, country="Mexico"
+    )
+
+    assert names(api_client.get(CRAFTS_URL, {"search": "kilim mexico"})) == {"Zapotec kilim"}
+
+
+def test_search_looks_in_tools_and_materials(api_client):
+    craft = CraftFactory(name="Carpet")
+    craft.tools.add(Tool.objects.get(name="Knotting knife"))
+    craft.materials.add(Material.objects.get(name="Madder"))
+    CraftFactory(name="Other")
+
+    assert names(api_client.get(CRAFTS_URL, {"search": "knotting"})) == {"Carpet"}
+    assert names(api_client.get(CRAFTS_URL, {"search": "madder"})) == {"Carpet"}
+    # A craft with several matching tools is listed once.
+    craft.tools.add(Tool.objects.get(name="Knife"))
+    assert api_client.get(CRAFTS_URL, {"search": "kni"}).json()["data"]["total"] == 1
+
+
+def test_search_treats_special_characters_as_text(api_client):
+    CraftFactory(name="Tile (blue)")
+
+    assert api_client.get(CRAFTS_URL, {"search": "(blue"}).status_code == 200
+    assert names(api_client.get(CRAFTS_URL, {"search": "[*"})) == set()
+
+
+FACETS_URL = f"{CRAFTS_URL}facets/"
+
+
+def test_facets_only_offer_values_the_results_have(api_client, ceramics, textiles, zapotec):
+    kilim = craft_type(textiles, "Kilim")
+    CraftFactory(name="Uşak kilim", category=textiles, craft_type=kilim, country="Türkiye")
+    CraftFactory(name="Konya kilim", category=textiles, craft_type=kilim, country="Türkiye")
+    CraftFactory(
+        name="Oaxaca kilim", category=textiles, craft_type=kilim, culture=zapotec, country="Mexico"
+    )
+    CraftFactory(name="Tile", category=ceramics, country="Japan")
+    CraftFactory(
+        name="Hidden kilim",
+        category=textiles,
+        craft_type=kilim,
+        country="Peru",
+        status=Craft.Status.HIDDEN,
+    )
+
+    data = api_client.get(FACETS_URL, {"search": "kilim"}).json()["data"]
+
+    assert data["countries"] == [{"name": "Mexico", "count": 1}, {"name": "Türkiye", "count": 2}]
+    assert data["categories"] == [{"slug": "textiles", "name": "Textiles", "count": 3}]
+    assert data["craft_types"] == [
+        {"id": kilim.id, "name": "Kilim", "category": textiles.id, "count": 3}
+    ]
+    assert {item["name"]: item["count"] for item in data["cultures"]} == {
+        "Turkish": 2,
+        "Zapotec": 1,
+    }
+
+
+def test_a_facet_ignores_its_own_filter(api_client):
     CraftFactory(country="Türkiye")
     CraftFactory(country="Mexico")
-    CraftFactory(country="Peru", status=Craft.Status.HIDDEN)
-    CraftFactory(country="")
 
-    response = api_client.get(f"{CRAFTS_URL}countries/")
+    data = api_client.get(FACETS_URL, {"country": "Mexico"}).json()["data"]
 
-    assert response.json()["data"] == ["Mexico", "Türkiye"]
+    # Picking Mexico still offers Türkiye in the country list, but narrows the others.
+    assert [item["name"] for item in data["countries"]] == ["Mexico", "Türkiye"]
+    assert sum(item["count"] for item in data["categories"]) == 1
+
+
+def test_facets_with_no_results_are_empty(api_client):
+    CraftFactory()
+
+    data = api_client.get(FACETS_URL, {"search": "nothingmatches"}).json()["data"]
+
+    assert data == {"categories": [], "craft_types": [], "cultures": [], "countries": []}
 
 
 def test_list_query_count_does_not_grow_with_results(api_client, django_assert_max_num_queries):

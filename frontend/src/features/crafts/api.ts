@@ -11,6 +11,7 @@ import type {
   CraftPin,
   CraftType,
   Culture,
+  Facets,
   Material,
   Place,
   Tool,
@@ -57,7 +58,8 @@ export const craftsApi = {
   byUser: (userId: number, page = 1) =>
     api.get<Paginated<CraftListItem>>(`/users/${userId}/crafts/`, { params: { page } }),
   categories: () => api.get<Category[]>("/categories/"),
-  countries: () => api.get<string[]>("/crafts/countries/"),
+  facets: ({ page: _page, ...filters }: CraftFilters) =>
+    api.get<Facets>("/crafts/facets/", { params: filters }),
 };
 
 /** The lists the craft form picks from. Adding a name that exists returns the existing item. */
