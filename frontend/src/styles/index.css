@@ -1,31 +1,226 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/fraunces";
 
+/*
+ * "Sky, Sea and Earth": blues lead, and the colors of the land support them.
+ * `brand` is the ocean scale and `stone` a sea-slate scale, so every existing class follows.
+ */
 @theme {
-  --color-brand-50: #fdf6ec;
-  --color-brand-100: #f8e6cc;
-  --color-brand-200: #f0c995;
-  --color-brand-500: #c2662d;
-  --color-brand-600: #a8501f;
-  --color-brand-700: #8a3f18;
-  --color-brand-900: #4a2210;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-50: #f3f7fa;
+  --color-brand-100: #dcebf5;
+  --color-brand-200: #b9d5ea;
+  --color-brand-300: #8dbadb;
+  --color-brand-500: #2f74a8;
+  --color-brand-600: #24679a;
+  --color-brand-700: #1d5c8a;
+  --color-brand-800: #184e75;
+  --color-brand-900: #14425f;
+
+  --color-stone-50: #f6f9fb;
+  --color-stone-100: #edf2f6;
+  --color-stone-200: #dce5ec;
+  --color-stone-300: #c3d1dc;
+  --color-stone-400: #8fa3b4;
+  --color-stone-500: #5e7487;
+  --color-stone-600: #4a5f70;
+  --color-stone-700: #36495a;
+  --color-stone-800: #23384a;
+  --color-stone-900: #0e2233;
+  --color-stone-950: #08141f;
+
+  --color-mist: #f3f7fa;
+  --color-deep-sea: #0e2233;
+  --color-sky-wash: #dcebf5;
+  --color-lapis: #2b4a9a;
+  --color-lagoon: #17706f;
+  --color-lagoon-wash: #d6eceb;
+  --color-moss: #4c7444;
+  --color-moss-dark: #3b5d35;
+  --color-moss-wash: #e1ecdd;
+  --color-sand: #ede3d0;
+  --color-sand-light: #f7f1e6;
+  --color-clay: #b4532f;
+  --color-clay-wash: #f6e1d7;
+  --color-amber: #e5a73a;
+  --color-outline: #7c93a6;
+
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces Variable", "Fraunces", Georgia, serif;
+
+  --radius-sm: 0.625rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.25rem;
+
+  --shadow-sm: 0 1px 2px rgb(14 34 51 / 0.06), 0 1px 3px rgb(14 34 51 / 0.05);
+  --shadow: 0 2px 6px rgb(14 34 51 / 0.07), 0 1px 2px rgb(14 34 51 / 0.05);
+  --shadow-md: 0 6px 16px rgb(14 34 51 / 0.08), 0 2px 4px rgb(14 34 51 / 0.05);
+  --shadow-lg: 0 14px 34px rgb(14 34 51 / 0.12), 0 4px 10px rgb(14 34 51 / 0.06);
+  --shadow-xl: 0 24px 60px rgb(14 34 51 / 0.16);
+
+  --animate-fade-up: fade-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 0.25s ease-out both;
+  --animate-slide-up: slide-up 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-pop: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-drift: drift 60s linear infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes pop {
+    50% {
+      transform: scale(1.2);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: -400px 0;
+    }
+    to {
+      background-position: 400px 0;
+    }
+  }
+  @keyframes drift {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 640px 320px;
+    }
+  }
 }
 
 @layer base {
   html {
-    @apply bg-brand-50 text-stone-900 antialiased;
+    @apply bg-mist text-deep-sea antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.01em;
   }
 
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-brand-700;
+    @apply outline-2 outline-offset-2 outline-lapis;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--color-brand-700);
+  }
+
+  button,
+  a {
+    @apply transition-colors duration-150;
+  }
+  button:not(:disabled):active {
+    transform: scale(0.98);
+  }
+}
+
+/* Faint topographic lines, like a relief map. */
+@utility bg-contour {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='320' viewBox='0 0 640 320'%3E%3Cg fill='none' stroke='%23b9d5ea' stroke-width='1.2' opacity='.7'%3E%3Cpath d='M-20 60c80-40 160 30 240 0s160-60 240-20 120 50 200 20'/%3E%3Cpath d='M-20 100c90-35 170 35 250 5s150-55 230-15 130 45 200 15'/%3E%3Cpath d='M-20 140c100-30 180 40 260 10s140-50 220-10 140 40 200 10'/%3E%3Cpath d='M-20 200c70 30 150-20 230 10s170 40 250 0 110-40 200-5'/%3E%3Cpath d='M-20 240c80 25 160-25 240 5s160 45 240 5 120-35 200-5'/%3E%3Cpath d='M-20 280c90 20 170-30 250 0s150 50 230 10 130-30 200 0'/%3E%3Cellipse cx='470' cy='170' rx='60' ry='26'/%3E%3Cellipse cx='470' cy='170' rx='34' ry='13'/%3E%3Cellipse cx='120' cy='175' rx='44' ry='18'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 640px 320px;
+}
+
+/* A woven border, like the edge of a kilim: lozenges in ocean, lagoon, sand, and clay. */
+@utility woven-band {
+  height: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='8' viewBox='0 0 64 8'%3E%3Crect width='64' height='8' fill='%23ede3d0'/%3E%3Cpath d='M0 4 4 0 8 4 4 8Z' fill='%231d5c8a'/%3E%3Cpath d='M16 4 20 0 24 4 20 8Z' fill='%2317706f'/%3E%3Cpath d='M32 4 36 0 40 4 36 8Z' fill='%23b4532f'/%3E%3Cpath d='M48 4 52 0 56 4 52 8Z' fill='%2317706f'/%3E%3Cpath d='M10 4 12 2 14 4 12 6Z' fill='%231d5c8a'/%3E%3Cpath d='M26 4 28 2 30 4 28 6Z' fill='%23e5a73a'/%3E%3Cpath d='M42 4 44 2 46 4 44 6Z' fill='%231d5c8a'/%3E%3Cpath d='M58 4 60 2 62 4 60 6Z' fill='%23e5a73a'/%3E%3C/svg%3E");
+  background-size: 64px 8px;
+}
+
+@utility skeleton {
+  background: linear-gradient(90deg, #e6eef4 0%, #f3f7fa 40%, #e6eef4 80%);
+  background-size: 800px 100%;
+  @apply animate-shimmer rounded-sm;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-sm px-4 py-2 text-sm font-semibold transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60;
+}
+@utility btn-primary {
+  @apply btn bg-brand-700 text-white shadow-sm hover:bg-brand-900 hover:shadow-md;
+}
+@utility btn-secondary {
+  @apply btn border border-lapis/40 bg-white text-lapis hover:border-lapis hover:bg-sky-wash/60;
+}
+@utility btn-ghost {
+  @apply btn text-stone-700 hover:bg-sky-wash/70 hover:text-brand-900;
+}
+
+@utility card {
+  @apply rounded-lg border border-stone-200 bg-white shadow-sm;
+}
+
+/*
+ * Inputs get a border with 3:1 contrast and a lapis focus ring. These rules sit outside the
+ * layers, so they win over older border classes; inputs marked invalid keep their red border.
+ */
+input:not([type="checkbox"], [type="radio"], [type="color"], [type="range"], [type="file"]):not(
+    [aria-invalid="true"]
+  ),
+select:not([aria-invalid="true"]),
+textarea:not([aria-invalid="true"]) {
+  border-color: var(--color-outline);
+}
+input:not([type="checkbox"], [type="radio"], [type="color"], [type="range"], [type="file"]):focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-lapis);
+  box-shadow: 0 0 0 4px rgb(43 74 154 / 0.15);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
 /* Leaflet's own stylesheet loads later with the map, so these selectors are more specific. */
 
-/* Any space around the world reads as ocean (OpenStreetMap's water color). */
+/* Any space around the world reads as ocean, in the palette's sea blue. */
 div.leaflet-container {
-  background: #aad3df;
+  background: #b9d5ea;
+  font-family: var(--font-sans);
 }
 
 /*
@@ -36,4 +231,50 @@ div.leaflet-container {
   width: 256.5px !important;
   height: 256.5px !important;
   mix-blend-mode: normal;
+  /* A light cool tone, so land and sea match the palette. */
+  filter: saturate(0.75) hue-rotate(-6deg) brightness(1.03);
+}
+
+.leaflet-container .leaflet-control-zoom a {
+  color: var(--color-deep-sea);
+}
+
+/* Pins drop in with a small bounce. */
+.craft-pin {
+  animation: pin-drop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  filter: drop-shadow(0 3px 4px rgb(14 34 51 / 0.3));
+  transition: transform 0.15s ease-out;
+}
+.craft-pin:hover {
+  transform: translateY(-3px) scale(1.08);
+}
+@keyframes pin-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.craft-cluster {
+  @apply flex items-center justify-center rounded-full bg-white text-sm font-semibold text-deep-sea;
+  box-shadow:
+    0 0 0 4px var(--color-amber),
+    0 4px 12px rgb(14 34 51 / 0.25);
+  animation: pin-drop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* A section of a long form: a white card with its legend as the title. */
+@utility form-section {
+  @apply scroll-mt-28 rounded-xl bg-white p-5 shadow-sm ring-1 ring-stone-200 sm:p-7;
+
+  & > legend {
+    @apply float-left mb-5 w-full font-display text-2xl font-semibold text-deep-sea;
+  }
+  & > legend + * {
+    clear: both;
+  }
 }
