@@ -5,6 +5,7 @@ import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
 import { RequireAdmin, RequireAuth } from "@/features/auth/components/RouteGuards";
 
 import { AdminLayout } from "./layouts/AdminLayout";
+import { AuthLayout } from "./layouts/AuthLayout";
 import { MainLayout } from "./layouts/MainLayout";
 
 export const routes: RouteObject[] = [
@@ -128,30 +129,37 @@ export const routes: RouteObject[] = [
             ],
           },
           {
-            path: "login",
-            lazy: () =>
-              import("@/features/auth/pages/LoginPage").then((m) => ({ Component: m.LoginPage })),
-          },
-          {
-            path: "register",
-            lazy: () =>
-              import("@/features/auth/pages/RegisterPage").then((m) => ({
-                Component: m.RegisterPage,
-              })),
-          },
-          {
-            path: "verify-email",
-            lazy: () =>
-              import("@/features/auth/pages/VerifyEmailPage").then((m) => ({
-                Component: m.VerifyEmailPage,
-              })),
-          },
-          {
-            path: "password-reset",
-            lazy: () =>
-              import("@/features/auth/pages/PasswordResetPage").then((m) => ({
-                Component: m.PasswordResetPage,
-              })),
+            element: <AuthLayout />,
+            children: [
+              {
+                path: "login",
+                lazy: () =>
+                  import("@/features/auth/pages/LoginPage").then((m) => ({
+                    Component: m.LoginPage,
+                  })),
+              },
+              {
+                path: "register",
+                lazy: () =>
+                  import("@/features/auth/pages/RegisterPage").then((m) => ({
+                    Component: m.RegisterPage,
+                  })),
+              },
+              {
+                path: "verify-email",
+                lazy: () =>
+                  import("@/features/auth/pages/VerifyEmailPage").then((m) => ({
+                    Component: m.VerifyEmailPage,
+                  })),
+              },
+              {
+                path: "password-reset",
+                lazy: () =>
+                  import("@/features/auth/pages/PasswordResetPage").then((m) => ({
+                    Component: m.PasswordResetPage,
+                  })),
+              },
+            ],
           },
           { path: "*", element: <NotFoundPage /> },
         ],

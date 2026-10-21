@@ -20,7 +20,7 @@ function PeopleList({ entries, empty }: { entries: FollowEntry[]; empty: string 
         <li key={user.id}>
           <Link
             to={`/users/${user.id}`}
-            className="flex items-center gap-3 rounded p-1 hover:bg-brand-50"
+            className="flex items-center gap-3 rounded-sm p-1.5 transition-colors hover:bg-sky-wash/60"
           >
             <Avatar src={user.avatar} name={user.display_name} size={32} />
             <span className="min-w-0">
@@ -59,10 +59,16 @@ export function PeoplePanel() {
           Follow people whose crafts you like and get notified when they add new ones.
         </p>
         <div className="mt-3 flex flex-col gap-2 text-sm font-medium">
-          <Link to="/login" className="text-brand-700 underline">
+          <Link
+            to="/login"
+            className="font-medium text-brand-700 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-700"
+          >
             Log in to follow contributors
           </Link>
-          <Link to="/register" className="text-brand-700 underline">
+          <Link
+            to="/register"
+            className="font-medium text-brand-700 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-700"
+          >
             Create an account
           </Link>
         </div>

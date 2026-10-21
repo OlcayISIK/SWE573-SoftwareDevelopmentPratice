@@ -104,7 +104,7 @@ function ReviewForm({ report }: { report: ReportReview }) {
   return (
     <form
       noValidate
-      className="mt-8 space-y-6 rounded-lg border border-brand-100 bg-white p-6"
+      className="mt-8 space-y-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-stone-200"
       onSubmit={(event) => {
         event.preventDefault();
         if (!action) return setError("Choose an action.");
@@ -186,7 +186,7 @@ export function ReviewReportPage() {
         Back to reported crafts
       </Link>
       <h1 className="mt-3 text-3xl font-semibold">Report on “{data.craft.name}”</h1>
-      <dl className="mt-6 grid gap-x-6 gap-y-2 rounded-lg border border-brand-100 bg-white p-5 sm:grid-cols-[10rem_1fr]">
+      <dl className="mt-6 grid gap-x-6 gap-y-2 rounded-xl bg-white p-5 shadow-sm ring-1 ring-stone-200 sm:grid-cols-[10rem_1fr]">
         <dt className="font-medium">Reason</dt>
         <dd>{REASON_LABELS[data.reason as ReportReason]}</dd>
         <dt className="font-medium">Details</dt>
@@ -216,7 +216,7 @@ export function ReviewReportPage() {
           </h2>
           <ol className="mt-3 space-y-3">
             {data.actions.map((entry) => (
-              <li key={entry.id} className="rounded border border-brand-100 bg-white p-4">
+              <li key={entry.id} className="card p-4">
                 <p className="font-medium">
                   {ACTION_LABELS[entry.action as ReviewActionType]} by {entry.admin.display_name}
                 </p>

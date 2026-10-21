@@ -42,15 +42,22 @@ export function PublicProfilePage() {
   const isMe = auth.status === "authenticated" && auth.user.id === data.id;
 
   return (
-    <section className="mx-auto max-w-5xl px-4 py-8">
-      <header className="flex flex-wrap items-center gap-6">
-        <Avatar src={data.avatar} name={data.display_name} />
-        <div className="flex-1">
-          <h1 className="text-3xl font-semibold">{data.display_name}</h1>
+    <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <header className="relative flex flex-wrap items-center gap-6 overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-stone-200 sm:p-8">
+        <div aria-hidden="true" className="bg-contour absolute inset-0 opacity-50" />
+        <div aria-hidden="true" className="woven-band absolute inset-x-0 top-0" />
+        <div className="relative">
+          <Avatar src={data.avatar} name={data.display_name} />
+        </div>
+        <div className="relative flex-1">
+          <h1 className="text-4xl font-semibold">{data.display_name}</h1>
           {location && <p className="mt-1 text-stone-700">{location}</p>}
           {data.email && (
             <p className="mt-1">
-              <a href={`mailto:${data.email}`} className="text-brand-700 underline">
+              <a
+                href={`mailto:${data.email}`}
+                className="font-medium text-brand-700 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-700"
+              >
                 {data.email}
               </a>
             </p>
@@ -62,10 +69,7 @@ export function PublicProfilePage() {
         </div>
         <FollowButton userId={data.id} name={data.display_name} />
         {isMe && (
-          <Link
-            to="/me/settings"
-            className="rounded border border-stone-300 bg-white px-4 py-2 font-medium hover:bg-brand-100"
-          >
+          <Link to="/me/settings" className="btn-secondary">
             Edit profile
           </Link>
         )}

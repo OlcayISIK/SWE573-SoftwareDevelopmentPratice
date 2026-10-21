@@ -13,7 +13,7 @@ export function MyFavoritesPage() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-3xl font-semibold">Your favorites</h1>
+      <h1 className="text-4xl font-semibold">Your favorites</h1>
       {favorites.isPending ? (
         <PageLoader label="Loading favorites" />
       ) : favorites.isError ? (

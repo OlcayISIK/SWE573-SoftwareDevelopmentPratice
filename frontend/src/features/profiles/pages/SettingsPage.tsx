@@ -130,7 +130,7 @@ export function SettingsPage() {
 
   return (
     <section className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="text-3xl font-semibold">Profile and privacy</h1>
+      <h1 className="text-4xl font-semibold">Profile and privacy</h1>
       <div className="mt-8 space-y-10">
         <AvatarSettings user={user} />
         <form noValidate onSubmit={onSubmit} className="space-y-10">

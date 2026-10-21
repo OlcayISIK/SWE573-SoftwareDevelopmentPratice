@@ -34,7 +34,7 @@ export function RegisterPage() {
   if (registeredEmail && readyToLogIn) {
     return (
       <section className="mx-auto max-w-md px-4 py-12">
-        <h1 className="text-2xl font-semibold">Your account is ready</h1>
+        <h1 className="text-4xl font-semibold">Your account is ready</h1>
         <p className="mt-3 text-stone-700">
           Log in with <strong>{registeredEmail}</strong> to start adding crafts.
         </p>
@@ -48,7 +48,7 @@ export function RegisterPage() {
   if (registeredEmail) {
     return (
       <section className="mx-auto max-w-md px-4 py-12">
-        <h1 className="text-2xl font-semibold">Check your email</h1>
+        <h1 className="text-4xl font-semibold">Check your email</h1>
         <p className="mt-3 text-stone-700">
           We sent a verification link to <strong>{registeredEmail}</strong>. Open it to confirm your
           address. You can browse and log in now, and publish crafts once your email is verified.
@@ -85,7 +85,7 @@ export function RegisterPage() {
 
   return (
     <section className="mx-auto max-w-md px-4 py-12">
-      <h1 className="text-2xl font-semibold">Create an account</h1>
+      <h1 className="text-4xl font-semibold">Create an account</h1>
       <p className="mt-2 text-stone-700">
         An account lets you publish crafts, save favorites, and follow other contributors.
       </p>
@@ -125,7 +125,10 @@ export function RegisterPage() {
       </form>
       <p className="mt-6 text-sm">
         Already have an account?{" "}
-        <Link to="/login" className="text-brand-700 underline">
+        <Link
+          to="/login"
+          className="font-medium text-brand-700 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-700"
+        >
           Log in
         </Link>
       </p>

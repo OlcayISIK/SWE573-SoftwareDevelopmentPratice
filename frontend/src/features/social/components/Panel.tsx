@@ -13,10 +13,10 @@ export function Panel({
   return (
     <section
       aria-labelledby={headingId}
-      className="rounded-lg border border-brand-100 bg-white p-4 shadow-sm"
+      className="animate-fade-up rounded-xl bg-white p-5 shadow-sm ring-1 ring-stone-200"
     >
       <div className="flex items-baseline justify-between gap-2">
-        <h2 id={headingId} className="font-semibold">
+        <h2 id={headingId} className="text-lg font-semibold">
           {title}
         </h2>
         {action}

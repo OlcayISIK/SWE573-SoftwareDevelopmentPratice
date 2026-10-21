@@ -33,7 +33,7 @@ function RequestResetForm() {
 
   return (
     <>
-      <h1 className="text-2xl font-semibold">Reset your password</h1>
+      <h1 className="text-4xl font-semibold">Reset your password</h1>
       <p className="mt-2 text-stone-700">
         Enter your email address and we will send you a link to choose a new password.
       </p>
@@ -77,7 +77,7 @@ function ChooseNewPasswordForm({ uid, token }: { uid: string; token: string }) {
   if (done) {
     return (
       <>
-        <h1 className="text-2xl font-semibold">Password changed</h1>
+        <h1 className="text-4xl font-semibold">Password changed</h1>
         <FormAlert tone="success">
           Your password has been reset and you have been signed out everywhere.
         </FormAlert>
@@ -90,7 +90,7 @@ function ChooseNewPasswordForm({ uid, token }: { uid: string; token: string }) {
 
   return (
     <>
-      <h1 className="text-2xl font-semibold">Choose a new password</h1>
+      <h1 className="text-4xl font-semibold">Choose a new password</h1>
       <form noValidate onSubmit={onSubmit} className="mt-6 space-y-4">
         <FormAlert>{formError}</FormAlert>
         <TextField

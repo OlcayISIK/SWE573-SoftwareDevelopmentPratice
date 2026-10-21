@@ -19,27 +19,21 @@ export function MyProfilePage() {
       <header className="flex flex-wrap items-center gap-6">
         <Avatar src={user.avatar} name={user.display_name} />
         <div className="flex-1">
-          <h1 className="text-3xl font-semibold">{user.display_name}</h1>
+          <h1 className="text-4xl font-semibold">{user.display_name}</h1>
           {location && <p className="mt-1 text-stone-700">{location}</p>}
           <p className="mt-1 text-sm text-stone-600">{formatJoined(user.date_joined)}</p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link
-            to="/me/settings"
-            className="rounded bg-brand-700 px-4 py-2 font-medium text-white hover:bg-brand-900"
-          >
+          <Link to="/me/settings" className="btn-primary">
             Edit profile and privacy
           </Link>
-          <Link
-            to={`/users/${user.id}`}
-            className="rounded border border-stone-300 bg-white px-4 py-2 font-medium hover:bg-brand-100"
-          >
+          <Link to={`/users/${user.id}`} className="btn-secondary">
             View public profile
           </Link>
         </div>
       </header>
 
-      <dl className="mt-8 grid gap-x-6 gap-y-2 rounded-lg border border-brand-100 bg-white p-5 sm:grid-cols-[12rem_1fr]">
+      <dl className="mt-8 grid gap-x-6 gap-y-2 rounded-xl bg-white p-5 shadow-sm ring-1 ring-stone-200 sm:grid-cols-[12rem_1fr]">
         <dt className="font-medium">Email</dt>
         <dd>
           {user.email}{" "}

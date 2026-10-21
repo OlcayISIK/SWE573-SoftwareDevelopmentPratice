@@ -55,10 +55,16 @@ function message(notification: AppNotification): ReactNode {
 export function NotificationItem({ notification }: { notification: AppNotification }) {
   return (
     <li
-      className={`rounded border px-4 py-3 ${
-        notification.is_read ? "border-brand-100 bg-white" : "border-brand-200 bg-brand-100"
+      className={`animate-fade-up relative rounded-xl px-5 py-4 shadow-sm ring-1 transition-colors ${
+        notification.is_read ? "bg-white ring-stone-200" : "bg-sky-wash/70 ring-brand-200"
       }`}
     >
+      {!notification.is_read && (
+        <span
+          aria-hidden="true"
+          className="absolute left-2 top-5 h-1.5 w-1.5 rounded-full bg-brand-700"
+        />
+      )}
       <p className={notification.is_read ? "" : "font-medium"}>
         {!notification.is_read && <span className="sr-only">New: </span>}
         {message(notification)}

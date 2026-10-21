@@ -37,7 +37,7 @@ export function VerifyEmailPage() {
     <section className="mx-auto max-w-md px-4 py-12">
       {verification.isSuccess ? (
         <>
-          <h1 className="text-2xl font-semibold">Email verified</h1>
+          <h1 className="text-4xl font-semibold">Email verified</h1>
           <p className="mt-3 text-stone-700">
             Your email is confirmed. You can now publish crafts.
           </p>
@@ -50,7 +50,7 @@ export function VerifyEmailPage() {
         </>
       ) : (
         <>
-          <h1 className="text-2xl font-semibold">This link does not work</h1>
+          <h1 className="text-4xl font-semibold">This link does not work</h1>
           <p role="alert" className="mt-3 text-stone-700">
             The verification link is invalid or has expired. Request a new one below.
           </p>

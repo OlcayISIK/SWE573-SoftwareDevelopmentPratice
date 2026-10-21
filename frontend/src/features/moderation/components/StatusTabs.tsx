@@ -11,8 +11,10 @@ export function StatusTabs({ basePath, status }: { basePath: string; status: Que
           key={value}
           to={value === "open" ? basePath : `${basePath}?status=${value}`}
           aria-current={status === value ? "page" : undefined}
-          className={`rounded px-3 py-2 text-sm font-medium ${
-            status === value ? "bg-brand-700 text-white" : "bg-white hover:bg-brand-100"
+          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+            status === value
+              ? "bg-brand-700 text-white shadow-md"
+              : "bg-white text-stone-700 ring-1 ring-stone-200 hover:ring-brand-300"
           }`}
         >
           {label}

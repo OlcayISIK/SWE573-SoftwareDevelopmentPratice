@@ -95,7 +95,7 @@ function ReviewForm({ report }: { report: ItemReportReview }) {
   return (
     <form
       noValidate
-      className="mt-8 space-y-6 rounded-lg border border-brand-100 bg-white p-6"
+      className="mt-8 space-y-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-stone-200"
       onSubmit={(event) => {
         event.preventDefault();
         if (!action) return setError("Choose an action.");
@@ -218,7 +218,7 @@ export function ItemReviewPage() {
       <h1 className="mt-3 text-3xl font-semibold">
         Report on the {kindLabel.toLowerCase()} “{data.item_name}”
       </h1>
-      <dl className="mt-6 grid gap-x-6 gap-y-2 rounded-lg border border-brand-100 bg-white p-5 sm:grid-cols-[10rem_1fr]">
+      <dl className="mt-6 grid gap-x-6 gap-y-2 rounded-xl bg-white p-5 shadow-sm ring-1 ring-stone-200 sm:grid-cols-[10rem_1fr]">
         <dt className="font-medium">Kind</dt>
         <dd>{kindLabel}</dd>
         <dt className="font-medium">Item now</dt>
@@ -256,7 +256,7 @@ export function ItemReviewPage() {
           </h2>
           <ol className="mt-3 space-y-3">
             {data.actions.map((entry) => (
-              <li key={entry.id} className="rounded border border-brand-100 bg-white p-4">
+              <li key={entry.id} className="card p-4">
                 <p className="font-medium">
                   {ITEM_ACTION_LABELS[entry.action as ItemActionType]} by {entry.admin.display_name}
                 </p>
