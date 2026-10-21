@@ -14,6 +14,7 @@ import { applyServerErrors } from "@/lib/forms";
 import { toast } from "@/lib/toast";
 
 import { CraftFields } from "../form/CraftFields";
+import { FormProgress } from "../form/FormProgress";
 import { MediaPicker } from "../form/MediaPicker";
 import {
   CRAFT_FORM_FIELDS,
@@ -36,8 +37,11 @@ function MediaManager({ craft, canAdd }: { craft: CraftDetail; canAdd: boolean }
   const [removing, setRemoving] = useState<CraftMedia | null>(null);
 
   return (
-    <section aria-labelledby="manage-media-heading" className="mt-12 space-y-4">
-      <h2 id="manage-media-heading" className="text-lg font-semibold">
+    <section
+      aria-labelledby="manage-media-heading"
+      className="form-section mt-8 space-y-4 lg:ml-[17rem]"
+    >
+      <h2 id="manage-media-heading" className="text-2xl font-semibold">
         Photos, videos, and documents
       </h2>
       {craft.media.length === 0 ? (
@@ -125,16 +129,23 @@ function EditCraftForm({ craft }: { craft: CraftDetail }) {
   });
 
   return (
-    <form noValidate onSubmit={onSubmit} className="mt-8 space-y-10">
-      <FormAlert>{formError}</FormAlert>
-      <CraftFields form={form} craft={craft} />
-      <div className="flex gap-4">
-        <SubmitButton pending={form.formState.isSubmitting}>Save changes</SubmitButton>
-        <Link to={`/crafts/${craft.id}`} className="px-4 py-2 font-medium text-brand-700 underline">
-          Cancel
-        </Link>
-      </div>
-    </form>
+    <div className="mt-8 grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
+      <aside className="hidden lg:block">
+        <div className="sticky top-24">
+          <FormProgress form={form} />
+        </div>
+      </aside>
+      <form noValidate onSubmit={onSubmit} className="min-w-0 space-y-6">
+        <FormAlert>{formError}</FormAlert>
+        <CraftFields form={form} craft={craft} />
+        <div className="sticky bottom-0 z-[1040] -mx-1 flex items-center justify-end gap-3 rounded-t-xl border-t border-stone-200 bg-white/90 px-5 py-4 shadow-lg backdrop-blur">
+          <Link to={`/crafts/${craft.id}`} className="btn-ghost">
+            Cancel
+          </Link>
+          <SubmitButton pending={form.formState.isSubmitting}>Save changes</SubmitButton>
+        </div>
+      </form>
+    </div>
   );
 }
 
@@ -170,8 +181,9 @@ export function EditCraftPage() {
   }
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-3xl font-semibold">Edit “{craft.data.name}”</h1>
+    <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-lagoon">Edit a craft</p>
+      <h1 className="mt-2 text-4xl font-semibold">Edit “{craft.data.name}”</h1>
       <EditCraftForm craft={craft.data} />
       <MediaManager craft={craft.data} canAdd={isAuthor} />
     </section>

@@ -1,7 +1,7 @@
+import { EmptyState } from "@/components/EmptyState";
 import { Pagination } from "@/components/Pagination";
-import { PageLoader } from "@/components/PageLoader";
 
-import { CraftGrid } from "../components/CraftCard";
+import { CraftGrid, CraftGridSkeleton } from "../components/CraftCard";
 import { FilterBar } from "../components/FilterBar";
 import { noMatchMessage, useCraftFilters } from "../hooks/useCraftFilters";
 import { useCraftList } from "../queries";
@@ -17,36 +17,50 @@ export function CraftListPage() {
         onChange={setFilters}
         onClear={clearFilters}
         hasFilters={hasFilters}
+        heading={
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-lagoon">
+                Browse the collection
+              </p>
+              <h1 className="mt-2 text-3xl font-semibold text-deep-sea sm:text-4xl">Crafts</h1>
+            </div>
+            {crafts.data && crafts.data.items.length > 0 && (
+              <p className="text-sm font-medium text-stone-600">
+                {crafts.data.total} {crafts.data.total === 1 ? "craft" : "crafts"}
+              </p>
+            )}
+          </div>
+        }
       />
-      <section className="mx-auto max-w-6xl px-4 py-8" aria-busy={crafts.isFetching}>
-        <h1 className="text-2xl font-semibold">Crafts</h1>
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6" aria-busy={crafts.isFetching}>
         {crafts.isPending ? (
-          <PageLoader label="Loading crafts" />
+          <div role="status">
+            <span className="sr-only">Loading crafts…</span>
+            <CraftGridSkeleton />
+          </div>
         ) : crafts.isError ? (
-          <p role="alert" className="mt-6 text-stone-700">
+          <p role="alert" className="text-stone-700">
             Crafts could not be loaded.
           </p>
         ) : crafts.data.items.length === 0 ? (
-          <div className="mt-6 text-stone-700">
-            <p>{hasFilters ? noMatchMessage(filters) : "No crafts have been added yet."}</p>
-            {hasFilters && (
-              <button
-                type="button"
-                className="mt-2 font-medium text-brand-700 underline"
-                onClick={clearFilters}
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
+          <EmptyState
+            title={hasFilters ? noMatchMessage(filters) : "No crafts have been added yet."}
+            action={
+              hasFilters && (
+                <button type="button" className="btn-primary" onClick={clearFilters}>
+                  Clear filters
+                </button>
+              )
+            }
+          >
+            {hasFilters
+              ? "Try another word, or fewer filters."
+              : "Be the first to share a craft from your community."}
+          </EmptyState>
         ) : (
           <>
-            <p className="mt-1 text-sm text-stone-600">
-              {crafts.data.total} {crafts.data.total === 1 ? "craft" : "crafts"}
-            </p>
-            <div className="mt-6">
-              <CraftGrid crafts={crafts.data.items} />
-            </div>
+            <CraftGrid crafts={crafts.data.items} />
             <Pagination
               page={crafts.data.page}
               totalPages={crafts.data.totalPages}

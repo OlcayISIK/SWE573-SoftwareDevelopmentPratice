@@ -12,12 +12,12 @@ export function FormAlert({
   }
   const classes =
     tone === "error"
-      ? "border-red-300 bg-red-50 text-red-900"
-      : "border-green-300 bg-green-50 text-green-900";
+      ? "border-red-200 bg-red-50 text-red-900"
+      : "border-lagoon/30 bg-lagoon-wash text-lagoon";
   return (
     <div
       role={tone === "error" ? "alert" : "status"}
-      className={`rounded border p-3 text-sm ${classes}`}
+      className={`animate-fade-up rounded-sm border p-3 text-sm ${classes}`}
     >
       {children}
     </div>

@@ -715,6 +715,12 @@ export interface components {
          * @enum {string}
          */
         ActionEnum: "edit" | "hide" | "remove" | "dismiss";
+        AddCategoryRequest: {
+            name: string;
+            description?: string;
+            /** @default sparkles */
+            icon: components["schemas"]["IconEnum"];
+        };
         AddCraftTypeRequest: {
             name: string;
             description?: string;
@@ -724,10 +730,6 @@ export interface components {
             name: string;
             description?: string;
             homeland?: string;
-        };
-        AddItemRequest: {
-            name: string;
-            description?: string;
         };
         AddLinkedItemRequest: {
             name: string;
@@ -743,12 +745,14 @@ export interface components {
             readonly id: number;
             readonly name: string;
             readonly slug: string;
+            readonly icon: components["schemas"]["IconEnum"];
             readonly description: string;
             readonly user_added: boolean;
         };
         CategoryFacet: {
             slug: string;
             name: string;
+            icon: string;
             count: number;
         };
         CountryFacet: {
@@ -818,6 +822,7 @@ export interface components {
             place: number;
             name: string;
             category: string;
+            category_icon: string;
             /** Format: double */
             latitude: number;
             /** Format: double */
@@ -932,6 +937,34 @@ export interface components {
             /** Format: date-time */
             readonly since: string;
         };
+        /**
+         * @description * `spool` - spool
+         *     * `amphora` - amphora
+         *     * `glass-water` - glass-water
+         *     * `feather` - feather
+         *     * `mountain` - mountain
+         *     * `shopping-basket` - shopping-basket
+         *     * `axe` - axe
+         *     * `hammer` - hammer
+         *     * `gem` - gem
+         *     * `footprints` - footprints
+         *     * `paintbrush` - paintbrush
+         *     * `drum` - drum
+         *     * `scissors` - scissors
+         *     * `shirt` - shirt
+         *     * `leaf` - leaf
+         *     * `flower` - flower
+         *     * `shell` - shell
+         *     * `fish` - fish
+         *     * `bird` - bird
+         *     * `sun` - sun
+         *     * `flame` - flame
+         *     * `palette` - palette
+         *     * `wheat` - wheat
+         *     * `sparkles` - sparkles
+         * @enum {string}
+         */
+        IconEnum: "spool" | "amphora" | "glass-water" | "feather" | "mountain" | "shopping-basket" | "axe" | "hammer" | "gem" | "footprints" | "paintbrush" | "drum" | "scissors" | "shirt" | "leaf" | "flower" | "shell" | "fish" | "bird" | "sun" | "flame" | "palette" | "wheat" | "sparkles";
         ItemReport: {
             readonly id: number;
             readonly item_type: components["schemas"]["ItemTypeEnum"];
@@ -1636,9 +1669,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AddItemRequest"];
-                "multipart/form-data": components["schemas"]["AddItemRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["AddItemRequest"];
+                "application/json": components["schemas"]["AddCategoryRequest"];
+                "multipart/form-data": components["schemas"]["AddCategoryRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AddCategoryRequest"];
             };
         };
         responses: {

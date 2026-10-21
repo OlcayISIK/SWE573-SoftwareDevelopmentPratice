@@ -44,7 +44,7 @@ export function LoginPage() {
 
   return (
     <section className="mx-auto max-w-md px-4 py-12">
-      <h1 className="text-2xl font-semibold">Log in</h1>
+      <h1 className="text-4xl font-semibold">Log in</h1>
       <form noValidate onSubmit={onSubmit} className="mt-6 space-y-4">
         <FormAlert>{formError}</FormAlert>
         <TextField
@@ -66,7 +66,10 @@ export function LoginPage() {
         </SubmitButton>
       </form>
       <p className="mt-6 text-sm">
-        <Link to="/password-reset" className="text-brand-700 underline">
+        <Link
+          to="/password-reset"
+          className="font-medium text-brand-700 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-700"
+        >
           Forgot your password?
         </Link>
       </p>

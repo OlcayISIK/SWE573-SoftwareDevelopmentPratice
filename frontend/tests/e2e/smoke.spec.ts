@@ -19,7 +19,7 @@ test("deep links load directly thanks to the index.html fallback", async ({ page
   await page.goto("/crafts?category=ceramics");
 
   await expect(page.getByRole("heading", { level: 1, name: "Crafts" })).toBeVisible();
-  await expect(page.getByLabel("Category")).toHaveValue("ceramics");
+  await expect(page.getByRole("radio", { name: /^Ceramics/ })).toBeChecked();
 });
 
 test("unknown pages show the not found page", async ({ page }) => {

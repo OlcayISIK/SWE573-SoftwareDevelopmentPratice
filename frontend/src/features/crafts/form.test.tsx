@@ -22,10 +22,22 @@ function toastMessages() {
   return toast.getSnapshot().map((item) => item.message);
 }
 
-async function chooseCraftType(category = "1", craftType = "Tile") {
-  await userEvent.selectOptions(screen.getByLabelText("Category"), category);
-  const option = await screen.findByRole("option", { name: craftType });
-  await userEvent.selectOptions(screen.getByLabelText("Craft type"), option);
+/** Opens a list such as Category and picks an option by its name. */
+async function choose(label: string, option: string) {
+  await userEvent.click(await screen.findByRole("combobox", { name: label }));
+  await userEvent.click(await screen.findByRole("option", { name: option }));
+}
+
+async function chooseCraftType(category = "Ceramics", craftType = "Tile") {
+  await choose("Category", category);
+  await choose("Craft type", craftType);
+}
+
+/** The form is ready once the categories are loaded. */
+async function formReady() {
+  await userEvent.click(await screen.findByRole("combobox", { name: "Category" }));
+  await screen.findByRole("option", { name: "Ceramics" });
+  await userEvent.keyboard("{Escape}");
 }
 
 async function pinAddress(address = "Ulu Cami, Kütahya") {
@@ -34,11 +46,10 @@ async function pinAddress(address = "Ulu Cami, Kütahya") {
 }
 
 async function fillRequiredFields() {
-  await screen.findByRole("option", { name: "Ceramics" });
+  await formReady();
   await userEvent.type(screen.getByLabelText("Name"), "Kütahya Çinisi");
   await chooseCraftType();
-  await screen.findByRole("option", { name: "Turkish (Anatolia, Türkiye)" });
-  await userEvent.selectOptions(screen.getByLabelText("Culture"), "51");
+  await choose("Culture", "Turkish (Anatolia, Türkiye)");
   await pinAddress();
   await screen.findByText("Pinned at 39.41992, 29.98574.");
   await userEvent.type(screen.getByLabelText("About this craft"), "Glazed tiles.");
@@ -152,7 +163,7 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
 test("an address that cannot be found is reported and nothing is pinned", async () => {
   server.use(...signedIn());
   renderRoute("/crafts/new");
-  await screen.findByRole("option", { name: "Ceramics" });
+  await formReady();
 
   await pinAddress("nowhere at all");
 
@@ -192,15 +203,43 @@ test("placing the pin on the map fills in the address", async () => {
 test("changing the category clears the craft type and lists the types of the new one", async () => {
   server.use(...signedIn());
   renderRoute("/crafts/new");
-  await screen.findByRole("option", { name: "Ceramics" });
+  await formReady();
   expect(screen.getByLabelText("Craft type")).toBeDisabled();
 
-  await chooseCraftType("1", "Tile");
-  await userEvent.selectOptions(screen.getByLabelText("Category"), "2");
+  await chooseCraftType("Ceramics", "Tile");
+  await choose("Category", "Textiles");
 
-  expect(screen.getByLabelText("Craft type")).toHaveValue("");
+  const craftType = screen.getByRole("combobox", { name: "Craft type" });
+  expect(craftType).toHaveTextContent("Choose a craft type");
+  await userEvent.click(craftType);
   expect(await screen.findByRole("option", { name: "Carpet" })).toBeInTheDocument();
   expect(screen.queryByRole("option", { name: "Tile" })).not.toBeInTheDocument();
+});
+
+test("a new category is added with the icon the user picks", async () => {
+  server.use(...signedIn());
+  const bodies: unknown[] = [];
+  server.use(
+    http.post(`${API}/categories/`, async ({ request }) => {
+      const body = (await request.json()) as Record<string, string>;
+      bodies.push(body);
+      return ok({ id: 9, slug: "fish-skin", user_added: true, ...body }, { status: 201 });
+    }),
+  );
+  renderRoute("/crafts/new");
+  await formReady();
+
+  await userEvent.click(screen.getByRole("button", { name: "Add a new category" }));
+  const adding = screen.getByRole("group", { name: "Adding a category" });
+  await userEvent.type(within(adding).getByLabelText("New category"), "Fish skin");
+  const icons = within(adding).getByRole("group", { name: "Icon" });
+  expect(within(icons).getByRole("radio", { name: "Sparkles" })).toBeChecked();
+  await userEvent.click(within(icons).getByRole("radio", { name: "Fish" }));
+  await userEvent.click(within(adding).getByRole("button", { name: "Add category" }));
+
+  await waitFor(() =>
+    expect(bodies).toEqual([{ name: "Fish skin", description: "", icon: "fish" }]),
+  );
 });
 
 test("a missing craft type is added and chosen", async () => {
@@ -223,15 +262,16 @@ test("a missing craft type is added and chosen", async () => {
     }),
   );
   renderRoute("/crafts/new");
-  await screen.findByRole("option", { name: "Ceramics" });
-  await userEvent.selectOptions(screen.getByLabelText("Category"), "1");
+  await formReady();
+  await choose("Category", "Ceramics");
 
   await userEvent.click(screen.getByRole("button", { name: "Add a new craft type" }));
   await userEvent.type(screen.getByLabelText("New craft type"), "Lustreware");
   await userEvent.click(screen.getByRole("button", { name: "Add craft type" }));
 
-  await waitFor(() => expect(screen.getByLabelText("Craft type")).toHaveValue("99"));
-  expect(screen.getByRole("option", { name: "Lustreware" })).toBeInTheDocument();
+  await waitFor(() =>
+    expect(screen.getByRole("combobox", { name: "Craft type" })).toHaveTextContent("Lustreware"),
+  );
   expect(added[0]).toMatchObject({ name: "Lustreware", category: 1 });
 });
 
@@ -248,7 +288,7 @@ test("a tool that is not listed is added as a new tool for the craft type", asyn
     }),
   );
   renderRoute("/crafts/new");
-  await screen.findByRole("option", { name: "Ceramics" });
+  await formReady();
   await chooseCraftType();
 
   const tools = screen.getByRole("group", { name: "Tools (optional)" });
@@ -273,7 +313,7 @@ test("tools and materials have an add link like the other lists", async () => {
     }),
   );
   renderRoute("/crafts/new");
-  await screen.findByRole("option", { name: "Ceramics" });
+  await formReady();
   await chooseCraftType();
 
   const tools = screen.getByRole("group", { name: "Tools (optional)" });
@@ -296,10 +336,32 @@ test("tools and materials have an add link like the other lists", async () => {
   ]);
 });
 
+test("the lists show each option's description", async () => {
+  server.use(...signedIn());
+  renderRoute("/crafts/new");
+
+  await userEvent.click(await screen.findByRole("combobox", { name: "Category" }));
+  expect(await screen.findByRole("option", { name: "Ceramics" })).toHaveAccessibleDescription(
+    "Objects shaped from clay and hardened by firing.",
+  );
+  // The keys move through the options, and Escape closes the list.
+  await userEvent.keyboard("{ArrowDown}{Enter}");
+  expect(screen.getByRole("combobox", { name: "Category" })).toHaveTextContent("Textiles");
+  await choose("Craft type", "Carpet");
+
+  // Other tools are suggested while typing, each with its description.
+  const tools = screen.getByRole("group", { name: "Tools (optional)" });
+  await userEvent.type(within(tools).getByLabelText("Other tools"), "ki");
+  const kiln = await within(tools).findByRole("option", { name: "Kiln" });
+  expect(kiln).toHaveAccessibleDescription("An oven that fires clay, glaze or glass.");
+  await userEvent.click(kiln);
+  expect(within(tools).getByRole("button", { name: "Remove Kiln" })).toBeInTheDocument();
+});
+
 test("list items show their description on hover and focus", async () => {
   server.use(...signedIn());
   renderRoute("/crafts/new");
-  await screen.findByRole("option", { name: "Ceramics" });
+  await formReady();
   await chooseCraftType();
 
   // The chosen category and craft type are described under their lists.
@@ -570,7 +632,7 @@ describe("places", () => {
   test("removing the origin makes all places equal again", async () => {
     server.use(...signedIn());
     renderRoute("/crafts/new");
-    await screen.findByRole("option", { name: "Ceramics" });
+    await formReady();
 
     await userEvent.click(screen.getByRole("button", { name: "Add another place" }));
     await userEvent.click(screen.getByRole("button", { name: "Add another place" }));
@@ -594,7 +656,7 @@ describe("places", () => {
 test("the new craft page has no accessibility violations", async () => {
   server.use(...signedIn());
   const { container } = renderRoute("/crafts/new");
-  await screen.findByRole("option", { name: "Ceramics" });
+  await formReady();
 
   await expectNoA11yViolations(container);
 });
@@ -621,7 +683,9 @@ describe("editing", () => {
 
     const name = await screen.findByLabelText("Name");
     expect(name).toHaveValue("Kütahya Çinisi");
-    await waitFor(() => expect(screen.getByLabelText("Craft type")).toHaveValue("21"));
+    await waitFor(() =>
+      expect(screen.getByRole("combobox", { name: "Craft type" })).toHaveTextContent("Tile"),
+    );
     expect(screen.getByLabelText("Address")).toHaveValue("Cumhuriyet Caddesi, Kütahya");
     expect(screen.getByRole("button", { name: "Remove Kiln" })).toBeInTheDocument();
     expect(screen.getByLabelText("Color code")).toHaveValue("#1e40af80");
@@ -656,8 +720,10 @@ describe("editing", () => {
     );
     renderRoute("/crafts/1/edit");
 
-    await waitFor(() => expect(screen.getByLabelText("Craft type")).toHaveValue("77"));
-    expect(screen.getByLabelText("Culture")).toHaveValue("78");
+    await waitFor(() =>
+      expect(screen.getByRole("combobox", { name: "Craft type" })).toHaveTextContent("Old tile"),
+    );
+    expect(screen.getByRole("combobox", { name: "Culture" })).toHaveTextContent("Old culture");
   });
 
   test("other users cannot edit", async () => {

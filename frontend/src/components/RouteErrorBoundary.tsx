@@ -16,11 +16,7 @@ export function RouteErrorBoundary() {
         This page could not be displayed. Try again, or go back to the map.
       </p>
       <div className="mt-6 flex justify-center gap-4">
-        <button
-          type="button"
-          onClick={() => window.location.reload()}
-          className="rounded bg-brand-700 px-4 py-2 font-medium text-white hover:bg-brand-900"
-        >
+        <button type="button" onClick={() => window.location.reload()} className="btn-primary">
           Try again
         </button>
         <a href="/" className="px-4 py-2 font-medium text-brand-700 underline">

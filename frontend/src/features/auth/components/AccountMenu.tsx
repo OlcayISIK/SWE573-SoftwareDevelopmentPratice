@@ -15,16 +15,10 @@ export function AccountMenu() {
   if (auth.status === "guest") {
     return (
       <>
-        <Link
-          to="/register"
-          className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
-        >
+        <Link to="/register" className="btn-ghost font-medium">
           Register
         </Link>
-        <Link
-          to="/login"
-          className="rounded bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-900"
-        >
+        <Link to="/login" className="btn-secondary">
           Log in
         </Link>
       </>
@@ -34,29 +28,20 @@ export function AccountMenu() {
   return (
     <>
       {auth.user.role === "admin" && (
-        <Link
-          to="/admin/reports"
-          className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
-        >
+        <Link to="/admin/reports" className="btn-ghost font-medium">
           Review reports
         </Link>
       )}
       <NotificationBell />
-      <Link
-        to="/me/favorites"
-        className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
-      >
+      <Link to="/me/favorites" className="btn-ghost font-medium">
         Favorites
       </Link>
-      <Link
-        to="/me"
-        className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
-      >
+      <Link to="/me" className="btn-ghost font-medium">
         {auth.user.display_name}
       </Link>
       <button
         type="button"
-        className="rounded px-3 py-2 text-sm font-medium text-stone-700 hover:bg-brand-100"
+        className="btn-ghost font-medium"
         onClick={async () => {
           await auth.logout();
           navigate("/");

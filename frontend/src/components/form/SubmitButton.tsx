@@ -17,9 +17,15 @@ export function SubmitButton({
       type="submit"
       disabled={pending}
       aria-busy={pending || undefined}
-      className={`rounded bg-brand-700 px-4 py-2 font-medium text-white hover:bg-brand-900 disabled:opacity-60 ${className}`}
+      className={`btn-primary px-5 py-2.5 text-base ${className}`}
       {...button}
     >
+      {pending && (
+        <span
+          aria-hidden="true"
+          className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+        />
+      )}
       {pending ? pendingLabel : children}
     </button>
   );

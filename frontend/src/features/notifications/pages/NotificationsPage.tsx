@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/EmptyState";
 import { useEffect, useState } from "react";
 
 import { Pagination } from "@/components/Pagination";
@@ -22,7 +23,8 @@ export function NotificationsPage() {
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-3xl font-semibold">Notifications</h1>
+      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-lagoon">Your updates</p>
+      <h1 className="mt-2 text-4xl font-semibold">Notifications</h1>
       {notifications.isPending ? (
         <PageLoader label="Loading notifications" />
       ) : notifications.isError ? (
@@ -30,9 +32,11 @@ export function NotificationsPage() {
           Notifications could not be loaded.
         </p>
       ) : notifications.data.items.length === 0 ? (
-        <p className="mt-6 text-stone-700">
-          No notifications yet. Follow contributors and favorite crafts to hear about updates.
-        </p>
+        <div className="mt-6">
+          <EmptyState title="No notifications yet.">
+            Follow contributors and favorite crafts to hear about updates.
+          </EmptyState>
+        </div>
       ) : (
         <>
           <ul className="mt-6 space-y-3">

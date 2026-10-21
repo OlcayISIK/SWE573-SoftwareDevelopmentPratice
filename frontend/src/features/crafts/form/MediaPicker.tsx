@@ -72,9 +72,9 @@ export function MediaPicker({ onAdd }: { onAdd: (media: NewMedia) => void }) {
   };
 
   return (
-    <fieldset className="space-y-4 rounded border border-stone-300 p-4">
-      <legend className="px-1 font-medium">Add a photo, video, or document</legend>
-      <div role="radiogroup" aria-label="Media type" className="flex flex-wrap gap-4">
+    <fieldset className="space-y-4 rounded-xl border-2 border-dashed border-brand-200 bg-mist/60 p-5">
+      <legend className="px-2 font-semibold text-deep-sea">Add a photo, video, or document</legend>
+      <div role="radiogroup" aria-label="Media type" className="flex flex-wrap gap-2">
         {(
           [
             ["photo", "Photo"],
@@ -82,8 +82,12 @@ export function MediaPicker({ onAdd }: { onAdd: (media: NewMedia) => void }) {
             ["document", "PDF document"],
           ] as const
         ).map(([value, label]) => (
-          <label key={value} className="flex items-center gap-2">
+          <label
+            key={value}
+            className="relative flex cursor-pointer items-center gap-2 rounded-full border border-stone-200 bg-white px-3.5 py-1.5 text-sm font-medium transition-all hover:border-brand-300 has-[:checked]:border-brand-700 has-[:checked]:bg-brand-700 has-[:checked]:text-white has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-lapis"
+          >
             <input
+              className="absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none opacity-0"
               type="radio"
               name={`${id}-type`}
               value={value}
@@ -132,11 +136,7 @@ export function MediaPicker({ onAdd }: { onAdd: (media: NewMedia) => void }) {
         value={caption}
         onChange={(event) => setCaption(event.target.value)}
       />
-      <button
-        type="button"
-        className="rounded border border-brand-700 px-4 py-2 font-medium text-brand-700 hover:bg-brand-100"
-        onClick={add}
-      >
+      <button type="button" className="btn-primary" onClick={add}>
         Add to craft
       </button>
     </fieldset>

@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/EmptyState";
 import { Link } from "react-router";
 
 import { Pagination } from "@/components/Pagination";
@@ -16,7 +17,7 @@ export function ReviewQueuePage() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-3xl font-semibold">Reported crafts</h1>
+      <h1 className="text-4xl font-semibold">Reported crafts</h1>
       <StatusTabs basePath="/admin/reports" status={status} />
 
       {queue.isPending ? (
@@ -26,10 +27,12 @@ export function ReviewQueuePage() {
           Reports could not be loaded.
         </p>
       ) : queue.data.items.length === 0 ? (
-        <p className="mt-6 text-stone-700">No reports here.</p>
+        <div className="mt-6">
+          <EmptyState title="No reports here.">Nothing waits for review in this list.</EmptyState>
+        </div>
       ) : (
         <>
-          <div className="mt-6 overflow-x-auto rounded-lg border border-brand-100 bg-white">
+          <div className="mt-6 overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-stone-200">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">Reports, newest first</caption>
               <thead className="bg-brand-50">
@@ -53,7 +56,10 @@ export function ReviewQueuePage() {
               </thead>
               <tbody>
                 {queue.data.items.map((report) => (
-                  <tr key={report.id} className="border-t border-brand-100">
+                  <tr
+                    key={report.id}
+                    className="border-t border-stone-100 transition-colors hover:bg-sky-wash/30"
+                  >
                     <td className="px-4 py-3">
                       <Link to={`/admin/reports/${report.id}`} className="font-medium underline">
                         {report.craft.name}

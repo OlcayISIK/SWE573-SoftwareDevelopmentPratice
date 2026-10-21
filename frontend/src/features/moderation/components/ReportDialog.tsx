@@ -111,11 +111,7 @@ function ReportDialog<T extends string>({
               Thank you. {doneMessage}
             </p>
             <div className="mt-6 flex justify-end">
-              <button
-                type="button"
-                className="rounded bg-brand-700 px-4 py-2 font-medium text-white"
-                onClick={onClose}
-              >
+              <button type="button" className="btn-primary" onClick={onClose}>
                 Close
               </button>
             </div>
@@ -171,11 +167,7 @@ function ReportDialog<T extends string>({
               onChange={(event) => setNote(event.target.value)}
             />
             <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                className="rounded border border-stone-300 px-4 py-2 font-medium"
-                onClick={onClose}
-              >
+              <button type="button" className="btn-secondary" onClick={onClose}>
                 Cancel
               </button>
               <SubmitButton pending={pending} pendingLabel="Sending…">
@@ -203,7 +195,7 @@ export function ReportButton({ craftId, authorId }: { craftId: number; authorId:
     <>
       <button
         type="button"
-        className="rounded border border-stone-300 bg-white px-4 py-2 font-medium hover:bg-brand-100"
+        className="btn border border-stone-300 bg-white text-stone-800 hover:border-red-300 hover:text-red-800"
         onClick={() => setOpen(true)}
       >
         Report

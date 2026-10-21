@@ -13,6 +13,7 @@ import { toast } from "@/lib/toast";
 
 import { craftsApi, type NewMedia } from "../api";
 import { CraftFields } from "../form/CraftFields";
+import { FormProgress } from "../form/FormProgress";
 import { describeMedia } from "../form/describeMedia";
 import { MediaPicker } from "../form/MediaPicker";
 import {
@@ -104,23 +105,24 @@ function NewCraftForm() {
   });
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-3xl font-semibold">Add a craft</h1>
-      <p className="mt-2 text-stone-700">
+    <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-lagoon">Share a craft</p>
+      <h1 className="mt-2 text-4xl font-semibold">Add a craft</h1>
+      <p className="mt-2 max-w-2xl text-stone-700">
         Your craft is published right away. Other users can report content that is inaccurate or
         disrespectful.
       </p>
       {showDraftNotice && (
         <div
           role="status"
-          className="mt-6 flex items-center justify-between rounded bg-brand-100 p-3"
+          className="animate-fade-up mt-6 flex items-center justify-between gap-4 rounded-xl bg-sky-wash px-4 py-3 ring-1 ring-brand-200"
         >
           <p className="text-sm">
             We restored your unsaved draft. Media files are not kept in drafts.
           </p>
           <button
             type="button"
-            className="text-sm font-medium underline"
+            className="btn-secondary"
             onClick={() => {
               form.reset(emptyCraftForm);
               clearDraft();
@@ -131,59 +133,75 @@ function NewCraftForm() {
           </button>
         </div>
       )}
-      <form noValidate onSubmit={onSubmit} className="mt-8 space-y-10">
-        <FormAlert>{formError}</FormAlert>
-        <CraftFields form={form} />
+      <div className="mt-8 grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <FormProgress form={form} withMedia />
+          </div>
+        </aside>
+        <form noValidate onSubmit={onSubmit} className="min-w-0 space-y-6">
+          <FormAlert>{formError}</FormAlert>
+          <CraftFields form={form} />
 
-        <section aria-labelledby="media-heading" className="space-y-4">
-          <h2 id="media-heading" className="text-lg font-semibold">
-            Photos, videos, and documents
-          </h2>
-          {media.length > 0 && (
-            <ul className="space-y-2">
-              {media.map((item, index) => (
-                <li
-                  key={`${describeMedia(item)}-${index}`}
-                  className="flex items-center justify-between rounded border border-stone-300 bg-white px-3 py-2"
-                >
-                  <span>{describeMedia(item)}</span>
-                  <button
-                    type="button"
-                    className="text-sm font-medium text-red-800 underline"
-                    onClick={() => setMedia((current) => current.filter((_, i) => i !== index))}
+          <section
+            id="section-media"
+            aria-labelledby="media-heading"
+            className="form-section space-y-4"
+          >
+            <h2 id="media-heading" className="text-2xl font-semibold">
+              Photos, videos, and documents
+            </h2>
+            {media.length > 0 && (
+              <ul className="space-y-2">
+                {media.map((item, index) => (
+                  <li
+                    key={`${describeMedia(item)}-${index}`}
+                    className="animate-fade-up flex items-center justify-between rounded-sm bg-mist px-4 py-2.5 ring-1 ring-stone-200"
                   >
-                    Remove <span className="sr-only">{describeMedia(item)}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          <MediaPicker onAdd={(item) => setMedia((current) => [...current, item])} />
-        </section>
-
-        {uploads && uploads.length > 0 && (
-          <section aria-label="Upload progress" className="space-y-2">
-            {uploads.map((upload, index) => (
-              <div key={index}>
-                <p className="text-sm">
-                  {upload.label}:{" "}
-                  {upload.status === "failed" ? "upload failed" : `${upload.progress}%`}
-                </p>
-                <progress
-                  className="w-full"
-                  max={100}
-                  value={upload.progress}
-                  aria-label={`Uploading ${upload.label}`}
-                />
-              </div>
-            ))}
+                    <span>{describeMedia(item)}</span>
+                    <button
+                      type="button"
+                      className="text-sm font-medium text-red-800 underline"
+                      onClick={() => setMedia((current) => current.filter((_, i) => i !== index))}
+                    >
+                      Remove <span className="sr-only">{describeMedia(item)}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <MediaPicker onAdd={(item) => setMedia((current) => [...current, item])} />
           </section>
-        )}
 
-        <SubmitButton pending={form.formState.isSubmitting} pendingLabel="Publishing…">
-          Publish craft
-        </SubmitButton>
-      </form>
+          {uploads && uploads.length > 0 && (
+            <section aria-label="Upload progress" className="space-y-2">
+              {uploads.map((upload, index) => (
+                <div key={index}>
+                  <p className="text-sm">
+                    {upload.label}:{" "}
+                    {upload.status === "failed" ? "upload failed" : `${upload.progress}%`}
+                  </p>
+                  <progress
+                    className="w-full"
+                    max={100}
+                    value={upload.progress}
+                    aria-label={`Uploading ${upload.label}`}
+                  />
+                </div>
+              ))}
+            </section>
+          )}
+
+          <div className="sticky bottom-0 z-[1040] -mx-1 flex items-center justify-between gap-4 rounded-t-xl border-t border-stone-200 bg-white/90 px-5 py-4 shadow-lg backdrop-blur">
+            <p className="hidden text-sm text-stone-600 sm:block">
+              You can edit your craft at any time after publishing.
+            </p>
+            <SubmitButton pending={form.formState.isSubmitting} pendingLabel="Publishing…">
+              Publish craft
+            </SubmitButton>
+          </div>
+        </form>
+      </div>
     </section>
   );
 }

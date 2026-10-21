@@ -1,6 +1,8 @@
+import { ArrowRight, MapPin, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router";
 
+import { categoryStyle } from "../categoryStyle";
 import { placeName } from "../place";
 import { useCraft } from "../queries";
 
@@ -22,47 +24,58 @@ export function PinPreview({ craftId, onClose }: { craftId: number; onClose: () 
   return (
     <aside
       aria-label="Craft preview"
-      className="fixed inset-x-0 bottom-0 z-[1100] rounded-t-xl border border-brand-100 bg-white p-4 shadow-lg md:absolute md:inset-x-auto md:bottom-auto md:right-4 md:top-4 md:w-80 md:rounded-xl"
+      className="animate-slide-up fixed inset-x-0 bottom-0 z-[1100] overflow-hidden rounded-t-2xl bg-white shadow-xl ring-1 ring-stone-200 md:absolute md:inset-x-auto md:bottom-auto md:right-4 md:top-4 md:w-80 md:rounded-xl"
     >
-      <div className="flex justify-end">
-        <button
-          ref={closeRef}
-          type="button"
-          aria-label="Close preview"
-          className="rounded px-2 text-lg"
-          onClick={onClose}
-        >
-          ✕
-        </button>
-      </div>
+      <button
+        ref={closeRef}
+        type="button"
+        aria-label="Close preview"
+        className="absolute right-3 top-3 z-10 rounded-full bg-white/90 p-1.5 text-stone-700 shadow-md backdrop-blur hover:bg-white hover:text-deep-sea"
+        onClick={onClose}
+      >
+        <X aria-hidden="true" className="h-4 w-4" />
+      </button>
       {craft.isPending ? (
-        <p role="status">Loading…</p>
+        <div role="status" className="space-y-3 p-4">
+          <div className="skeleton h-40 w-full" />
+          <div className="skeleton h-5 w-2/3" />
+          <div className="skeleton h-4 w-1/2" />
+          <span className="sr-only">Loading…</span>
+        </div>
       ) : craft.isError ? (
-        <p role="alert">This craft could not be loaded.</p>
+        <p role="alert" className="p-4 pr-12">
+          This craft could not be loaded.
+        </p>
       ) : (
         <>
-          {photo?.file && (
+          {photo?.file ? (
             <img
               src={photo.file}
               alt={photo.alt_text}
               width={320}
               height={180}
-              className="mb-3 h-40 w-full rounded object-cover"
+              className="h-44 w-full object-cover"
             />
+          ) : (
+            <div className="h-4" />
           )}
-          <h2 className="text-lg font-semibold">{craft.data.name}</h2>
-          <p className="text-sm text-stone-700">
-            {craft.data.craft_type.name} · {craft.data.category.name}
-          </p>
-          <p className="text-sm text-stone-600">
-            {[craft.data.culture?.name, placeName(craft.data)].filter(Boolean).join(" · ")}
-          </p>
-          <Link
-            to={`/crafts/${craft.data.id}`}
-            className="mt-3 inline-block font-medium text-brand-700 underline"
-          >
-            View details
-          </Link>
+          <div className="p-4">
+            <p
+              className="text-xs font-semibold uppercase tracking-wider"
+              style={{ color: categoryStyle(craft.data.category.slug).color }}
+            >
+              {craft.data.craft_type.name} · {craft.data.category.name}
+            </p>
+            <h2 className="mt-1 pr-8 text-xl font-semibold">{craft.data.name}</h2>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-stone-600">
+              <MapPin aria-hidden="true" className="h-4 w-4 shrink-0" />
+              {[craft.data.culture?.name, placeName(craft.data)].filter(Boolean).join(" · ")}
+            </p>
+            <Link to={`/crafts/${craft.data.id}`} className="btn-primary mt-4 w-full">
+              View details
+              <ArrowRight aria-hidden="true" className="h-4 w-4" />
+            </Link>
+          </div>
         </>
       )}
     </aside>

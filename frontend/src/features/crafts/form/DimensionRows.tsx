@@ -87,11 +87,7 @@ export function DimensionRows({ form }: { form: UseFormReturn<CraftFormValues> }
         );
       })}
       {fields.length < DIMENSION_TYPES.length && (
-        <button
-          type="button"
-          className="rounded border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-brand-100"
-          onClick={addRow}
-        >
+        <button type="button" className="btn-secondary px-3 py-1.5" onClick={addRow}>
           Add a dimension
         </button>
       )}

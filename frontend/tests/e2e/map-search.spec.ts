@@ -16,7 +16,7 @@ test("a search shows every found craft on the map, even far apart", async ({ pag
 
   await page.goto(`/?search=${word}`);
 
-  await expect(page.getByText("2 crafts")).toBeVisible();
+  await expect(page.getByText("2 crafts", { exact: true })).toBeVisible();
   await expect(page.locator(".leaflet-marker-icon")).toHaveCount(2);
 });
 

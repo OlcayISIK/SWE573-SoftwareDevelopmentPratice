@@ -5,9 +5,11 @@ test("on mobile the filters open in a drawer and the map fills the screen", asyn
 
   const filtersButton = page.getByRole("button", { name: "Filters" });
   await expect(filtersButton).toBeVisible();
-  await expect(page.getByLabel("Category")).toBeHidden();
+  // Categories are chips that scroll sideways; the other filters open in a panel.
+  await expect(page.getByRole("radio", { name: "All categories" })).toBeChecked();
+  await expect(page.getByLabel("Craft type")).toBeHidden();
   await filtersButton.click();
-  await expect(page.getByLabel("Category")).toBeVisible();
+  await expect(page.getByLabel("Craft type")).toBeVisible();
   await expect(page.getByRole("button", { name: "Hide filters" })).toHaveAttribute(
     "aria-expanded",
     "true",

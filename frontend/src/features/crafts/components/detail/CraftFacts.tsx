@@ -10,7 +10,7 @@ import type { CraftDetail, NamedItem } from "../../types";
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <dt className="text-sm font-medium text-stone-600">{label}</dt>
+      <dt className="text-xs font-semibold uppercase tracking-wider text-stone-500">{label}</dt>
       <dd className="mt-0.5">{children}</dd>
     </div>
   );
@@ -18,7 +18,7 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
 
 function ItemList({ kind, items }: { kind: "tool" | "material"; items: NamedItem[] }) {
   return (
-    <ul className="flex flex-wrap gap-x-3 gap-y-1">
+    <ul className="flex flex-wrap gap-1.5">
       {items.map((item) => (
         <li key={item.id}>
           <Tooltip text={item.description}>
@@ -26,7 +26,7 @@ function ItemList({ kind, items }: { kind: "tool" | "material"; items: NamedItem
               // Crafts that use the item are found by searching for its name.
               <Link
                 to={`/crafts?search=${encodeURIComponent(item.name)}`}
-                className="underline"
+                className="inline-block rounded-full bg-moss-wash px-2.5 py-0.5 text-sm font-medium text-moss-dark transition-colors hover:bg-moss hover:text-white"
                 aria-describedby={describedBy}
               >
                 {item.name}
@@ -51,7 +51,7 @@ export function CraftFacts({ craft }: { craft: CraftDetail }) {
   return (
     <section
       aria-labelledby="facts-heading"
-      className="rounded-lg border border-brand-100 bg-white p-5"
+      className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-stone-200"
     >
       <h2 id="facts-heading" className="text-lg font-semibold">
         Craft facts

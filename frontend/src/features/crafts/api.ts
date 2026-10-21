@@ -70,8 +70,8 @@ export const lookupsApi = {
   materials: (craftType?: number) =>
     api.get<Material[]>("/materials/", { params: { craft_type: craftType } }),
   cultures: () => api.get<Culture[]>("/cultures/"),
-  addCategory: (name: string, description = "") =>
-    api.post<Category>("/categories/", { name, description }),
+  addCategory: (name: string, description = "", icon = "sparkles") =>
+    api.post<Category>("/categories/", { name, description, icon }),
   addCraftType: (name: string, category: number, description = "") =>
     api.post<CraftType>("/craft-types/", { name, category, description }),
   addTool: (name: string, craftType?: number, description = "") =>

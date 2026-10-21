@@ -1,3 +1,5 @@
+import { Heart } from "lucide-react";
+
 import { useAuth } from "@/features/auth/context";
 
 import { useFavoriteStatus, useToggleFavorite } from "../queries";
@@ -22,13 +24,17 @@ export function FavoriteButton({ craftId }: { craftId: number }) {
       aria-pressed={favorited}
       disabled={!status.data}
       onClick={() => toggle.mutate(!favorited)}
-      className={`inline-flex items-center gap-2 rounded border px-4 py-2 font-medium disabled:opacity-60 ${
+      className={`btn border ${
         favorited
-          ? "border-brand-700 bg-brand-700 text-white hover:bg-brand-900"
-          : "border-stone-300 bg-white hover:bg-brand-100"
+          ? "border-clay bg-clay-wash text-clay hover:bg-clay-wash/70"
+          : "border-stone-300 bg-white text-stone-800 hover:border-clay hover:text-clay"
       }`}
     >
-      <span aria-hidden="true">{favorited ? "♥" : "♡"}</span>
+      <Heart
+        key={String(favorited)}
+        aria-hidden="true"
+        className={`h-4 w-4 ${favorited ? "animate-pop fill-clay" : ""}`}
+      />
       {favorited ? "Favorited" : "Favorite"}
       <span className="text-sm opacity-80">
         ({count}

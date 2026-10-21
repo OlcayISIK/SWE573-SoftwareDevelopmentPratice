@@ -60,7 +60,7 @@ export function FavoritesPanel() {
             <li key={craft.id}>
               <Link
                 to={`/crafts/${craft.id}`}
-                className="flex items-center gap-3 rounded p-1 hover:bg-brand-50"
+                className="flex items-center gap-3 rounded-sm p-1.5 transition-colors hover:bg-sky-wash/60"
               >
                 {craft.cover_photo ? (
                   <img
