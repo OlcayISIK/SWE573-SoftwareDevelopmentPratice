@@ -16,12 +16,13 @@
 12. [Forms and Validation](#forms-and-validation)
 13. [Media Uploads](#media-uploads)
 14. [Notifications](#notifications)
-15. [Responsive Design and Accessibility](#responsive-design-and-accessibility)
-16. [Error Handling](#error-handling)
-17. [Testing Strategy](#testing-strategy)
-18. [Configuration](#configuration)
-19. [Deployment](#deployment)
-20. [Future Extensions](#future-extensions)
+15. [Visual Design](#visual-design)
+16. [Responsive Design and Accessibility](#responsive-design-and-accessibility)
+17. [Error Handling](#error-handling)
+18. [Testing Strategy](#testing-strategy)
+19. [Configuration](#configuration)
+20. [Deployment](#deployment)
+21. [Future Extensions](#future-extensions)
 
 ---
 
@@ -270,7 +271,7 @@ Users must verify their email before publishing. If an unverified user opens `/c
 - **Library:** Leaflet with react-leaflet and OpenStreetMap tiles. Leaflet is free, has no API key, and is enough for pins, zoom, and pan. The OpenStreetMap attribution is shown on the map, as its license requires.
 - **Data:** the map loads lightweight pins from `/crafts/map/` (craft id, place id, name, category, latitude, longitude): one per place, so a craft made in several places has a pin at each. The count and the list view show each craft once. Full craft data is loaded only when a pin is opened.
 - **Clustering:** nearby pins are grouped with Leaflet.markercluster, so the map stays readable and fast as the number of crafts grows (NFR-02).
-- **Filters:** category, craft type (cleared when the category changes), culture, country, and search update the URL and refetch the pins. Each list comes from `/crafts/facets/`, so it only offers values found with the other filters, with counts, for example "Türkiye (3)" after searching "kilim". A chosen value stays listed even when no results have it.
+- **Filters:** category, craft type (cleared when the category changes), culture, country, and search update the URL and refetch the pins. Categories are chips with their icon and count; the other filters open in a panel. Each list comes from `/crafts/facets/`, so it only offers values found with the other filters, with counts, for example "Türkiye (3)" after searching "kilim". A chosen value stays listed even when no results have it.
 - **No results:** when the filters find nothing, the map and the lists say so, for example "No crafts match “kilim”.", with a button to clear the filters.
 - **Pin details:** clicking a pin opens a preview card (photo, name, craft type, culture, and place) with a link to the craft details page. On mobile the preview opens as a bottom sheet.
 - **Picking a location:** each place in the craft form has a small map. The author types an address and pins it (the map moves to the found point), or clicks or drags the pin and the address is filled in from the point.
@@ -287,11 +288,12 @@ Forms use React Hook Form with Zod schemas.
 
 The craft form follows the craft data model:
 
-- **Basics:** name, category, craft type, and culture, each picked from a lookup list. The craft types follow the chosen category, and cultures show their homeland.
-- **Adding to the lists:** each list has an "Add a new …" control that adds the item for everyone and picks it, with an optional description. Adding a name that already exists picks the existing item.
+- **Basics:** name, category, craft type, and culture, each picked from a lookup list that shows each option's description; long lists can be filtered by typing. The craft types follow the chosen category, and cultures show their homeland.
+- **Layout:** each part of the form is a card, with a progress sidebar that marks the part in view and the finished ones, and a sticky bar for the Publish button.
+- **Adding to the lists:** each list has an "Add a new …" control that adds the item for everyone and picks it, with an optional description. A new category also gets an icon, picked from 24. Adding a name that already exists picks the existing item.
 - **Item descriptions:** the chosen category, craft type, and culture are described under their lists. Tools and materials show their description in a tooltip when the pointer is over them or they have focus, both as checkboxes and once chosen.
 - **Places:** one or more places (up to 10), each with its address and a "Pin address" button, which looks up the coordinates through the backend (`/geocode/search/`) and shows "Address not found." when nothing matches. Placing the pin on the map fills in the address (`/geocode/reverse/`). City and country come from the lookup. With more than one place, the author picks one as the origin or keeps "All places are equal". The craft page lists every place, marks the origin, and pins each one on its map.
-- **Tools and materials:** the items typical for the chosen craft type are offered as checkboxes, and any other item is found by typing its name, or added as a new one.
+- **Tools and materials:** the items typical for the chosen craft type are offered as chips, and any other item is found by typing its name, with suggestions that show each item's description, or added as a new one.
 - **Description and story:** the description says what the craft is and how it is made. The optional story says how to understand it: its history, the meaning of its motifs, who makes it, and its role in the community (FR-05). The craft page shows the story in its own section, after the description.
 - **Colors:** up to 10 rows, each with a color picker, a code field, and an opacity slider. The code accepts hex (`#14a`, `#1e40af`, `#1e40af80`), `rgb()`/`rgba()`, `hsl()`/`hsla()`, and CSS color names, and the picker, code, and opacity stay in step. Colors are sent as `#rrggbb`, or `#rrggbbaa` when see-through, and shown on the craft page as swatches with their codes.
 - **Attributes:** optional dimension rows (measure, amount, and unit, each measure once) and distinguishing features, stored in the backend `attributes` field (FR-07). The measures are sizes (height, width, depth, length, diameter, circumference, thickness), weight, and volume, and the unit list follows the chosen measure: mm, cm, m, in, ft for sizes; g, kg, oz, lb for weight; ml, l, fl oz for volume. The craft page shows sizes, weight, and volume as separate rows.
@@ -325,12 +327,25 @@ Items that users added to the lookup lists can be reported from the facts card, 
 
 ---
 
+## Visual Design
+
+The interface follows a "Sky, Sea and Earth" direction: blues lead, and the colors of the land support them in small doses. The main colors are mist `#F3F7FA` (page background), deep sea `#0E2233` (text), ocean `#1D5C8A` (buttons and pins), lapis `#2B4A9A` (links and focus), and lagoon `#17706F` (success and the origin badge), with moss `#4C7444`, sand `#EDE3D0`, clay `#B4532F`, and sun `#E5A73A` as accents.
+
+- **Tokens:** the colors are Tailwind theme tokens in `src/styles/index.css`. The `brand` scale is the ocean blue and `stone` a sea-slate scale, so every component follows the palette; named tokens such as `lagoon`, `moss`, `sand`, `clay`, and `amber` are used for accents. Every text pair meets WCAG AA.
+- **Type:** Fraunces for headings and craft names, Inter for everything else. Both are self-hosted with `@fontsource`, since the Content Security Policy only allows our own origin.
+- **Patterns:** faint contour lines (`bg-contour`) behind heroes and empty states, and a woven band (`woven-band`) under the header and above the story. Both are small inline SVGs.
+- **Shared pieces:** `btn-primary`, `btn-secondary`, `btn-ghost`, `card`, `skeleton`, and `form-section` utilities; `EmptyState`, `LogoMark`, `Tooltip`, and `DescribedSelect`, a dropdown whose options show their description, with the keyboard behavior of the ARIA combobox pattern.
+- **Categories:** each category has an icon, stored with the category and chosen from 24 when a user adds one, and a color for its badge and card stripe (`features/crafts/categoryStyle.ts`). Map pins are ocean-blue teardrops with the category icon inside, and clusters have a sun-colored ring.
+- **Motion:** short CSS animations: pages and cards fade up (cards one after another), cards lift on hover, pins drop in, dialogs, toasts, and the pin preview slide in, and skeletons shimmer while loading. All of it stops when the system asks for reduced motion. Animations use CSS rather than JavaScript, so tests see the final state right away.
+
+---
+
 ## Responsive Design and Accessibility
 
 ### Responsive design (NFR-03)
 
 - Mobile-first layouts with Tailwind breakpoints.
-- On mobile, the map fills the screen, filters open in a drawer, and pin previews open as bottom sheets.
+- On mobile, the menu opens from a button, the category chips scroll sideways, the other filters open in a panel, and pin previews open as bottom sheets.
 
 ### Accessibility (NFR-05)
 
