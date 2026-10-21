@@ -10,6 +10,8 @@ from core.validators import MB, validate_image_upload
 
 from .colors import HEX_COLOR
 from .models import (
+    CATEGORY_ICONS,
+    DEFAULT_CATEGORY_ICON,
     Category,
     Craft,
     CraftMedia,
@@ -46,7 +48,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ["id", "name", "slug", "description", "user_added"]
+        fields = ["id", "name", "slug", "icon", "description", "user_added"]
         read_only_fields = fields
 
 
@@ -114,6 +116,12 @@ class AddItemSerializer(serializers.Serializer):
 
     def validate_description(self, value):
         return clean_description(value)
+
+
+class AddCategorySerializer(AddItemSerializer):
+    icon = serializers.ChoiceField(
+        choices=CATEGORY_ICONS, required=False, default=DEFAULT_CATEGORY_ICON
+    )
 
 
 class AddCraftTypeSerializer(AddItemSerializer):
@@ -420,6 +428,7 @@ class MapFilterSerializer(CraftFilterSerializer):
 class CategoryFacetSerializer(serializers.Serializer):
     slug = serializers.CharField()
     name = serializers.CharField()
+    icon = serializers.CharField()
     count = serializers.IntegerField()
 
 
@@ -497,6 +506,7 @@ class CraftPinSerializer(serializers.Serializer):
     place = serializers.IntegerField(source="id", help_text="The place of this pin.")
     name = serializers.CharField(source="craft__name")
     category = serializers.CharField(source="craft__category__slug")
+    category_icon = serializers.CharField(source="craft__category__icon")
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
 

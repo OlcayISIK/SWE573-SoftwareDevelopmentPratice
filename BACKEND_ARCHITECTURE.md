@@ -177,7 +177,7 @@ All models inherit `core.BaseModel`, which adds `id`, `created_at`, and `updated
 ### crafts
 
 - **Lookup lists**: `Category`, `CraftType`, `Tool`, `Material`, and `Culture` share `name`, `description` (up to 300 characters, shown when a user hovers over or focuses the item), `is_hidden`, and `created_by` (FK User, nullable).
-  - **Category** adds `slug` (e.g., ceramics, textiles, woodwork, metalwork).
+  - **Category** adds `slug` (e.g., ceramics, textiles, woodwork, metalwork) and `icon`, one of a fixed set of 24 icon names (e.g., `spool`, `amphora`, `fish`) that the frontend draws on chips, cards, and map pins. Users pick the icon when they add a category, `sparkles` by default; any other name is rejected. A migration gave the seeded categories their icons. Category lists, filter counts, and map pins (`category_icon`) include the icon.
   - **CraftType** belongs to a `category` (e.g., Textiles has Carpet, Kilim, Felt).
   - **Tool** and **Material** are linked many-to-many to the craft types they are typical for, so the form can suggest them first. Any tool or material can still be picked for any craft.
   - **Culture** adds `homeland` (e.g., Diné (Navajo), Southwestern United States).

@@ -180,7 +180,9 @@ def test_facets_only_offer_values_the_results_have(api_client, ceramics, textile
     data = api_client.get(FACETS_URL, {"search": "kilim"}).json()["data"]
 
     assert data["countries"] == [{"name": "Mexico", "count": 1}, {"name": "Türkiye", "count": 2}]
-    assert data["categories"] == [{"slug": "textiles", "name": "Textiles", "count": 3}]
+    assert data["categories"] == [
+        {"slug": "textiles", "name": "Textiles", "icon": "spool", "count": 3}
+    ]
     assert data["craft_types"] == [
         {"id": kilim.id, "name": "Kilim", "category": textiles.id, "count": 3}
     ]
@@ -244,6 +246,7 @@ def test_map_pins_are_lightweight_and_unpaginated(api_client, ceramics):
             "place": craft.places.get().id,
             "name": craft.name,
             "category": "ceramics",
+            "category_icon": "amphora",
             "latitude": 39.4192,
             "longitude": 29.9833,
         }

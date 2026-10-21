@@ -43,8 +43,44 @@ def _unique_name(model_name, *fields):
     return models.UniqueConstraint(*fields, Lower("name"), name=f"unique_{model_name}_name_ci")
 
 
+# Icons a category can have, by the names the frontend draws them with.
+CATEGORY_ICONS = [
+    "spool",
+    "amphora",
+    "glass-water",
+    "feather",
+    "mountain",
+    "shopping-basket",
+    "axe",
+    "hammer",
+    "gem",
+    "footprints",
+    "paintbrush",
+    "drum",
+    "scissors",
+    "shirt",
+    "leaf",
+    "flower",
+    "shell",
+    "fish",
+    "bird",
+    "sun",
+    "flame",
+    "palette",
+    "wheat",
+    "sparkles",
+]
+DEFAULT_CATEGORY_ICON = "sparkles"
+
+
 class Category(LookupItem):
     slug = models.SlugField(max_length=90, unique=True)
+    # Shown on chips, cards, and map pins. Users pick it when they add a category.
+    icon = models.CharField(
+        max_length=20,
+        choices=[(name, name) for name in CATEGORY_ICONS],
+        default=DEFAULT_CATEGORY_ICON,
+    )
 
     class Meta(LookupItem.Meta):
         verbose_name_plural = "categories"
