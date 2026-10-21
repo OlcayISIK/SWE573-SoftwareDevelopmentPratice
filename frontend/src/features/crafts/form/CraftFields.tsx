@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
-import type { UseFormReturn } from "react-hook-form";
+import { Controller, type UseFormReturn } from "react-hook-form";
 
-import { SelectField } from "@/components/form/SelectField";
+import { DescribedSelect } from "@/components/form/DescribedSelect";
 import { TextAreaField } from "@/components/form/TextAreaField";
 import { TextField } from "@/components/form/TextField";
 
 import { lookupsApi } from "../api";
+import { categoryStyle } from "../categoryStyle";
 import {
   useAddLookup,
   useCategories,
@@ -52,6 +53,7 @@ export function CraftFields({
   craft?: CraftDetail;
 }) {
   const {
+    control,
     register,
     setValue,
     watch,
@@ -95,55 +97,72 @@ export function CraftFields({
   const chosenCategory = categories.data?.find((option) => String(option.id) === category);
   const chosenCulture = cultureOptions.find((option) => String(option.id) === culture);
 
-  // The selects below take their value from the form state, so an item added a moment ago
-  // shows as chosen as soon as its option is rendered.
+  // The lists below take their value from the form state, so an item added a moment ago
+  // shows as chosen as soon as it is listed.
   return (
-    <div className="space-y-10">
-      <fieldset className="space-y-4">
-        <legend className="text-lg font-semibold">Basics</legend>
+    <div className="space-y-6">
+      <fieldset id="section-basics" className="form-section space-y-4">
+        <legend>Basics</legend>
         <TextField label="Name" error={errors.name?.message} {...register("name")} />
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <SelectField
-              label="Category"
-              hint={chosenCategory?.description || undefined}
-              error={errors.category?.message}
-              {...register("category")}
-              value={category}
-            >
-              <option value="">Choose a category</option>
-              {categories.data?.map((option) => (
-                <option key={option.id} value={option.id} title={option.description}>
-                  {option.name}
-                </option>
-              ))}
-            </SelectField>
+            <Controller
+              control={control}
+              name="category"
+              render={({ field }) => (
+                <DescribedSelect
+                  ref={field.ref}
+                  label="Category"
+                  placeholder="Choose a category"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  hint={chosenCategory?.description || undefined}
+                  error={errors.category?.message}
+                  options={(categories.data ?? []).map((option) => {
+                    const { icon: Icon, color } = categoryStyle(option.slug, option.icon);
+                    return {
+                      value: String(option.id),
+                      label: option.name,
+                      description: option.description,
+                      icon: <Icon aria-hidden="true" className="h-4 w-4" style={{ color }} />,
+                    };
+                  })}
+                />
+              )}
+            />
             <AddItemInline
               noun="category"
-              onAdd={async (name, _homeland, description) => {
-                const added = await addCategory.mutateAsync([name, description]);
+              withIcon
+              onAdd={async (name, _homeland, description, icon) => {
+                const added = await addCategory.mutateAsync([name, description, icon]);
                 setValue("category", String(added.id), changed);
               }}
             />
           </div>
           <div>
-            <SelectField
-              label="Craft type"
-              disabled={!categoryId}
-              hint={chosenCraftType?.description || undefined}
-              error={errors.craft_type?.message}
-              {...register("craft_type")}
-              value={craftType}
-            >
-              <option value="">
-                {categoryId ? "Choose a craft type" : "Choose a category first"}
-              </option>
-              {craftTypeOptions.map((option) => (
-                <option key={option.id} value={option.id} title={option.description}>
-                  {option.name}
-                </option>
-              ))}
-            </SelectField>
+            <Controller
+              control={control}
+              name="craft_type"
+              render={({ field }) => (
+                <DescribedSelect
+                  ref={field.ref}
+                  label="Craft type"
+                  placeholder={categoryId ? "Choose a craft type" : "Choose a category first"}
+                  disabled={!categoryId}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  hint={chosenCraftType?.description || undefined}
+                  error={errors.craft_type?.message}
+                  options={craftTypeOptions.map((option) => ({
+                    value: String(option.id),
+                    label: option.name,
+                    description: option.description,
+                  }))}
+                />
+              )}
+            />
             <AddItemInline
               noun="craft type"
               disabled={!categoryId}
@@ -160,22 +179,30 @@ export function CraftFields({
           </div>
         </div>
         <div>
-          <SelectField
-            label="Culture"
-            hint={chosenCulture?.description || undefined}
-            error={errors.culture?.message}
-            {...register("culture")}
-            value={culture}
-          >
-            <option value="">Choose the culture it belongs to</option>
-            {cultureOptions.map((option) => (
-              <option key={option.id} value={option.id} title={option.description}>
-                {"homeland" in option && option.homeland
-                  ? `${option.name} (${option.homeland})`
-                  : option.name}
-              </option>
-            ))}
-          </SelectField>
+          <Controller
+            control={control}
+            name="culture"
+            render={({ field }) => (
+              <DescribedSelect
+                ref={field.ref}
+                label="Culture"
+                placeholder="Choose the culture it belongs to"
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                hint={chosenCulture?.description || undefined}
+                error={errors.culture?.message}
+                options={cultureOptions.map((option) => ({
+                  value: String(option.id),
+                  label:
+                    "homeland" in option && option.homeland
+                      ? `${option.name} (${option.homeland})`
+                      : option.name,
+                  description: option.description,
+                }))}
+              />
+            )}
+          />
           <AddItemInline
             noun="culture"
             withHomeland
@@ -189,8 +216,8 @@ export function CraftFields({
 
       <LocationPicker form={form} />
 
-      <fieldset className="space-y-6">
-        <legend className="text-lg font-semibold">Tools and materials</legend>
+      <fieldset id="section-tools" className="form-section space-y-6">
+        <legend>Tools and materials</legend>
         <ItemPicker
           label="Tools"
           noun="tool"
@@ -219,8 +246,8 @@ export function CraftFields({
         />
       </fieldset>
 
-      <fieldset className="space-y-4">
-        <legend className="text-lg font-semibold">Description and story</legend>
+      <fieldset id="section-description" className="form-section space-y-4">
+        <legend>Description and story</legend>
         <TextAreaField
           label="About this craft"
           hint={DESCRIPTION_HINT}
@@ -237,8 +264,8 @@ export function CraftFields({
         />
       </fieldset>
 
-      <fieldset className="space-y-6">
-        <legend className="text-lg font-semibold">Characteristics (optional)</legend>
+      <fieldset id="section-characteristics" className="form-section space-y-6">
+        <legend>Characteristics (optional)</legend>
         <p className="text-sm text-stone-600">Fill in only what applies to this craft.</p>
         <DimensionRows form={form} />
         <ColorRows form={form} />

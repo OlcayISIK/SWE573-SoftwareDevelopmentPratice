@@ -15,6 +15,9 @@ const LocationMap = lazy(() => import("../components/map/LocationMap"));
 
 const changed = { shouldValidate: true, shouldDirty: true };
 
+const ORIGIN_CHIP =
+  "relative flex w-fit cursor-pointer items-center gap-2 rounded-full border border-stone-200 bg-white px-3.5 py-1.5 text-sm font-medium transition-all hover:border-brand-300 has-[:checked]:border-lagoon has-[:checked]:bg-lagoon has-[:checked]:text-white has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-lapis [&_.text-stone-600]:has-[:checked]:text-white/80";
+
 interface PlaceFieldsProps {
   form: UseFormReturn<CraftFormValues>;
   index: number;
@@ -104,8 +107,16 @@ function PlaceFields({ form, index, onRemove }: PlaceFieldsProps) {
 
   const coordinateError = placeErrors?.latitude?.message ?? placeErrors?.longitude?.message;
   return (
-    <fieldset className="space-y-3 rounded border border-stone-200 p-4">
-      <legend className="px-1 font-medium">Place {index + 1}</legend>
+    <fieldset className="animate-fade-up space-y-3 rounded-xl bg-mist p-4 ring-1 ring-stone-200 [&>legend+*]:clear-both">
+      <legend className="float-left mb-2 flex w-full items-center gap-2 font-semibold text-deep-sea">
+        <span
+          aria-hidden="true"
+          className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-700 text-xs font-bold text-white"
+        >
+          {index + 1}
+        </span>
+        Place {index + 1}
+      </legend>
       <div className="flex flex-wrap items-start gap-3">
         <TextField
           label="Address"
@@ -124,7 +135,7 @@ function PlaceFields({ form, index, onRemove }: PlaceFieldsProps) {
         <button
           type="button"
           disabled={finding}
-          className="mt-6 rounded bg-brand-700 px-4 py-2 font-medium text-white hover:bg-brand-900 disabled:opacity-60"
+          className="btn-primary mt-6 h-[42px]"
           onClick={() => void pinAddress()}
         >
           {finding ? "Finding…" : "Pin address"}
@@ -148,7 +159,7 @@ function PlaceFields({ form, index, onRemove }: PlaceFieldsProps) {
       {onRemove && (
         <button
           type="button"
-          className="text-sm font-medium text-red-800 underline"
+          className="btn-ghost text-red-800 hover:bg-red-50 hover:text-red-900"
           onClick={onRemove}
         >
           Remove place {index + 1}
@@ -188,8 +199,8 @@ export function LocationPicker({ form }: { form: UseFormReturn<CraftFormValues> 
   };
 
   return (
-    <fieldset className="space-y-4">
-      <legend className="text-lg font-semibold">Places</legend>
+    <fieldset id="section-places" className="form-section space-y-4">
+      <legend>Places</legend>
       <p className="text-sm text-stone-600">
         Type the address where the craft comes from and pin it, or click the map to place the pin
         and the address is filled in for you. A craft made in several places can list each of them.
@@ -205,7 +216,7 @@ export function LocationPicker({ form }: { form: UseFormReturn<CraftFormValues> 
       {fields.length < MAX_PLACES && (
         <button
           type="button"
-          className="rounded border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-brand-100"
+          className="btn-secondary w-full border-dashed py-3"
           onClick={() => append({ ...emptyPlace })}
         >
           Add another place
@@ -215,9 +226,10 @@ export function LocationPicker({ form }: { form: UseFormReturn<CraftFormValues> 
 
       {fields.length > 1 && (
         <fieldset className="space-y-2">
-          <legend className="font-medium text-stone-800">Origin</legend>
-          <label className="flex items-center gap-2 text-sm">
+          <legend className="mb-2 font-semibold text-deep-sea">Origin</legend>
+          <label className={ORIGIN_CHIP}>
             <input
+              className="absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none opacity-0"
               type="radio"
               name="origin"
               checked={origin === ""}
@@ -226,8 +238,9 @@ export function LocationPicker({ form }: { form: UseFormReturn<CraftFormValues> 
             All places are equal
           </label>
           {places.map((place, index) => (
-            <label key={fields[index]?.id ?? index} className="flex items-center gap-2 text-sm">
+            <label key={fields[index]?.id ?? index} className={ORIGIN_CHIP}>
               <input
+                className="absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none opacity-0"
                 type="radio"
                 name="origin"
                 checked={origin === String(index)}

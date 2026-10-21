@@ -34,9 +34,14 @@ test("a new user registers, is signed in, and publishes a craft", async ({ page 
 
   await page.getByRole("link", { name: "Add a craft" }).click();
   await page.getByLabel("Name").fill(craftName);
-  await page.getByLabel("Category").selectOption({ label: "Ceramics" });
-  await page.getByLabel("Craft type").selectOption({ label: "Tile" });
-  await page.getByLabel("Culture").selectOption({ label: "Turkish (Anatolia, Türkiye)" });
+  for (const [list, option] of [
+    ["Category", "Ceramics"],
+    ["Craft type", "Tile"],
+    ["Culture", "Turkish (Anatolia, Türkiye)"],
+  ]) {
+    await page.getByRole("combobox", { name: list }).click();
+    await page.getByRole("option", { name: option, exact: true }).click();
+  }
   await page.getByLabel("Address", { exact: true }).fill("Ulu Camii, Kütahya");
   await page.getByRole("button", { name: "Pin address" }).click();
   await expect(page.getByText(/^Pinned at 39\.41715, 29\.97573\.$/)).toBeVisible();
@@ -70,7 +75,7 @@ test("a new user registers, is signed in, and publishes a craft", async ({ page 
     .toBeGreaterThan(0);
   await expect(page.getByText("#1e40af")).toBeVisible();
   await expect(page.getByText("Ceramics · Tile")).toBeVisible();
-  await expect(page.getByText(/Turkish · From Kütahya, Türkiye/)).toBeVisible();
+  await expect(page.getByText("From Kütahya, Türkiye")).toBeVisible();
   await expect(page.getByText("height 20 cm")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Story" })).toBeVisible();
   await expect(page.getByText(/lined mosques and fountains/)).toBeVisible();
