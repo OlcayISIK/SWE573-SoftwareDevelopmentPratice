@@ -67,7 +67,9 @@ test("shows the description, story, characteristics, culture, and location", asy
   expect(screen.getByText("Hand-painted glazed tiles.")).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "Story" })).toBeInTheDocument();
   expect(screen.getByText(/decorated mosques across the Ottoman lands/)).toBeInTheDocument();
-  expect(screen.getByText(/Turkish · From Kütahya, Türkiye/)).toBeInTheDocument();
+  const header = screen.getByRole("heading", { level: 1 }).closest("header")!;
+  expect(within(header).getByText("Turkish")).toBeInTheDocument();
+  expect(within(header).getByText("From Kütahya, Türkiye")).toBeInTheDocument();
 
   const characteristics = screen.getByRole("heading", { name: "Characteristics" }).parentElement!;
   expect(within(characteristics).getByText("height 20 cm, width 20 cm")).toBeInTheDocument();
