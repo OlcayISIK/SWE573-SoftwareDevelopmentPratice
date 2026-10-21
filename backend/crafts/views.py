@@ -11,9 +11,9 @@ from core.permissions import IsAuthorOrAdmin
 
 from . import geocoding, selectors, services
 from .serializers import (
+    AddCategorySerializer,
     AddCraftTypeSerializer,
     AddCultureSerializer,
-    AddItemSerializer,
     AddLinkedItemSerializer,
     CategorySerializer,
     CraftDetailSerializer,
@@ -91,10 +91,10 @@ def _lookup_schema(item_serializer, add_serializer, parameters=()):
     )
 
 
-@_lookup_schema(CategorySerializer, AddItemSerializer)
+@_lookup_schema(CategorySerializer, AddCategorySerializer)
 class CategoryListView(LookupListView):
     serializer_class = CategorySerializer
-    add_serializer_class = AddItemSerializer
+    add_serializer_class = AddCategorySerializer
     add = staticmethod(services.add_category)
 
     def get_queryset(self):

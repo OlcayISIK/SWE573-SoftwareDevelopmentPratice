@@ -211,6 +211,44 @@ def test_the_same_craft_type_name_can_exist_in_another_category(client_for, user
     assert CraftType.objects.filter(name="Carpet").count() == 2
 
 
+def test_every_seeded_category_has_its_own_icon(api_client):
+    categories = api_client.get("/api/v1/categories/").json()["data"]
+
+    icons = {item["slug"]: item["icon"] for item in categories}
+    assert icons["textiles"] == "spool"
+    assert icons["ceramics"] == "amphora"
+    assert "sparkles" not in icons.values()
+
+
+def test_users_choose_an_icon_for_the_categories_they_add(client_for, user):
+    client = client_for(user)
+
+    chosen = client.post(
+        "/api/v1/categories/", {"name": "Fish skin", "icon": "fish"}, format="json"
+    )
+    default = client.post("/api/v1/categories/", {"name": "Featherwork"}, format="json")
+
+    assert chosen.json()["data"]["icon"] == "fish"
+    assert default.json()["data"]["icon"] == "sparkles"
+
+
+def test_only_known_icons_can_be_chosen(client_for, user):
+    response = client_for(user).post(
+        "/api/v1/categories/", {"name": "Fish skin", "icon": "rocket"}, format="json"
+    )
+
+    assert response.status_code == 400
+    assert "icon" in response.json()["errors"]
+
+
+def test_adding_an_existing_category_keeps_its_icon(client_for, user):
+    response = client_for(user).post(
+        "/api/v1/categories/", {"name": "textiles", "icon": "fish"}, format="json"
+    )
+
+    assert response.json()["data"]["icon"] == "spool"
+
+
 def test_new_categories_get_a_unique_slug(client_for, user):
     client = client_for(user)
     Category.objects.create(name="Other", slug="feather-work")

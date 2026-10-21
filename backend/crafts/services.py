@@ -5,6 +5,7 @@ from core.exceptions import ConflictError, PermissionDeniedError, ValidationErro
 
 from . import signals
 from .models import (
+    DEFAULT_CATEGORY_ICON,
     Category,
     Craft,
     CraftColor,
@@ -205,11 +206,16 @@ def _unique_slug(name):
     return slug
 
 
-def add_category(*, user, name, description=""):
+def add_category(*, user, name, description="", icon=DEFAULT_CATEGORY_ICON):
     if Category.objects.filter(name__iexact=name).exists():
         return _add_lookup(Category, user=user, name=name)
     return _add_lookup(
-        Category, user=user, name=name, slug=_unique_slug(name), description=description
+        Category,
+        user=user,
+        name=name,
+        slug=_unique_slug(name),
+        description=description,
+        icon=icon,
     )
 
 

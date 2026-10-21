@@ -152,7 +152,12 @@ def craft_facets(viewer=None, **filters):
         ]
 
     return {
-        "categories": counted(found("category"), slug="category__slug", name="category__name"),
+        "categories": counted(
+            found("category"),
+            slug="category__slug",
+            name="category__name",
+            icon="category__icon",
+        ),
         "craft_types": counted(
             found("craft_type"),
             id="craft_type_id",
@@ -192,7 +197,13 @@ def map_pins(viewer=None, *, bbox=None, **filters):
         else:
             places = places.filter(Q(longitude__gte=west) | Q(longitude__lte=east))
     return places.order_by("-craft__created_at", "-craft_id", "order").values(
-        "id", "craft_id", "craft__name", "craft__category__slug", "latitude", "longitude"
+        "id",
+        "craft_id",
+        "craft__name",
+        "craft__category__slug",
+        "craft__category__icon",
+        "latitude",
+        "longitude",
     )
 
 
