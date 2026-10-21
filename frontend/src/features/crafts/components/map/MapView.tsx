@@ -9,7 +9,7 @@ import { MapContainer, useMap } from "react-leaflet";
 
 import type { CraftPin } from "../../types";
 
-import { pinIcon } from "./pinIcon";
+import { clusterIcon, pinIconFor } from "./pinIcon";
 import { FitWorld, WorldTiles } from "./world";
 import { singleWorldOptions } from "./worldOptions";
 
@@ -26,10 +26,14 @@ function ClusteredPins({ pins, onSelect }: Pick<MapViewProps, "pins" | "onSelect
   const map = useMap();
 
   useEffect(() => {
-    const cluster = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 50 });
+    const cluster = L.markerClusterGroup({
+      showCoverageOnHover: false,
+      maxClusterRadius: 50,
+      iconCreateFunction: clusterIcon,
+    });
     for (const pin of pins) {
       const marker = L.marker([pin.latitude, pin.longitude], {
-        icon: pinIcon,
+        icon: pinIconFor(pin.category, pin.category_icon),
         title: pin.name,
         alt: pin.name,
         keyboard: true,

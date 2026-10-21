@@ -47,8 +47,7 @@ describe("craft list", () => {
     const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
     const { router } = renderRoute("/crafts");
 
-    await screen.findByRole("option", { name: "Ceramics (2)" });
-    await userEvent.selectOptions(screen.getByLabelText("Category"), "ceramics");
+    await userEvent.click(await screen.findByRole("radio", { name: /^Ceramics/ }));
     await userEvent.type(screen.getByLabelText("Search"), "çini");
     await userEvent.click(screen.getByRole("button", { name: "Search" }));
 
@@ -63,8 +62,7 @@ describe("craft list", () => {
     const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
     const { router } = renderRoute("/crafts");
 
-    await screen.findByRole("option", { name: "Ceramics (2)" });
-    await userEvent.selectOptions(screen.getByLabelText("Category"), "ceramics");
+    await userEvent.click(await screen.findByRole("radio", { name: /^Ceramics/ }));
     await userEvent.selectOptions(
       screen.getByLabelText("Craft type"),
       await screen.findByRole("option", { name: "Tile (2)" }),
@@ -139,8 +137,7 @@ describe("craft list", () => {
     const { router } = renderRoute("/crafts?category=ceramics&craft_type=21");
 
     await waitFor(() => expect(screen.getByLabelText("Craft type")).toHaveValue("21"));
-    await screen.findByRole("option", { name: "Textiles (1)" });
-    await userEvent.selectOptions(screen.getByLabelText("Category"), "textiles");
+    await userEvent.click(await screen.findByRole("radio", { name: /^Textiles/ }));
 
     await waitFor(() => expect(router.state.location.search).toBe("?category=textiles"));
   });
@@ -152,15 +149,14 @@ describe("craft list", () => {
     expect(await screen.findByText("No crafts match your filters.")).toBeInTheDocument();
     expect(calls[0].get("category")).toBe("textiles");
     expect(calls[0].get("page")).toBe("2");
-    expect(screen.getByLabelText("Category")).toHaveValue("textiles");
+    expect(screen.getByRole("radio", { name: /^Textiles/ })).toBeChecked();
   });
 
   test("changing a filter goes back to the first page", async () => {
     recordRequests("/crafts/", () => page([makeCraftListItem()], { page: 2, totalPages: 3 }));
     const { router } = renderRoute("/crafts?page=2");
 
-    await screen.findByRole("option", { name: "Ceramics (2)" });
-    await userEvent.selectOptions(screen.getByLabelText("Category"), "ceramics");
+    await userEvent.click(await screen.findByRole("radio", { name: /^Ceramics/ }));
 
     await waitFor(() => expect(router.state.location.search).toBe("?category=ceramics"));
   });

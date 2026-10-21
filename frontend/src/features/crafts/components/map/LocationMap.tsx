@@ -34,7 +34,7 @@ export default function LocationMap({ position, target, onPick }: LocationMapPro
     <div
       role="region"
       aria-label="Pick the location on the map"
-      className="h-72 overflow-hidden rounded border border-stone-300"
+      className="h-72 overflow-hidden rounded-xl shadow-sm ring-1 ring-stone-300"
     >
       <MapContainer
         center={position ?? [20, 0]}

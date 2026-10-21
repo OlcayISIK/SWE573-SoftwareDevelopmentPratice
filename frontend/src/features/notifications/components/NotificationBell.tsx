@@ -8,11 +8,7 @@ export function NotificationBell() {
   const label = count === 0 ? "Notifications" : `Notifications, ${count} unread`;
 
   return (
-    <Link
-      to="/me/notifications"
-      aria-label={label}
-      className="relative rounded px-3 py-2 text-stone-700 hover:bg-brand-100"
-    >
+    <Link to="/me/notifications" aria-label={label} className="btn-ghost relative px-2.5">
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"
@@ -27,7 +23,7 @@ export function NotificationBell() {
       {count > 0 && (
         <span
           aria-hidden="true"
-          className="absolute -right-1 -top-1 min-w-5 rounded-full bg-red-700 px-1.5 text-center text-xs font-semibold text-white"
+          className="animate-pop absolute -right-0.5 -top-0.5 min-w-5 rounded-full bg-amber px-1.5 text-center text-xs font-bold text-deep-sea ring-2 ring-white"
         >
           {count > 99 ? "99+" : count}
         </span>

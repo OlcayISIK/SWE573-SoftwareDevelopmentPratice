@@ -9,6 +9,7 @@ export const categories: Category[] = [
     id: 1,
     name: "Ceramics",
     slug: "ceramics",
+    icon: "amphora",
     description: "Objects shaped from clay and hardened by firing.",
     user_added: false,
   },
@@ -16,6 +17,7 @@ export const categories: Category[] = [
     id: 2,
     name: "Textiles",
     slug: "textiles",
+    icon: "spool",
     description: "Cloth and objects made from fibres.",
     user_added: false,
   },
@@ -130,8 +132,8 @@ export function linkedList(items: Linked[], craftType: string | null) {
 /** Filter values with counts, as the facets endpoint returns them for the test crafts. */
 export const facets = {
   categories: [
-    { slug: "ceramics", name: "Ceramics", count: 2 },
-    { slug: "textiles", name: "Textiles", count: 1 },
+    { slug: "ceramics", name: "Ceramics", icon: "amphora", count: 2 },
+    { slug: "textiles", name: "Textiles", icon: "spool", count: 1 },
   ],
   craft_types: [
     { id: 21, name: "Tile", category: 1, count: 2 },
