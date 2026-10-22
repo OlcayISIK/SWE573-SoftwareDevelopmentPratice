@@ -151,6 +151,15 @@ def test_search_looks_in_tools_and_materials(api_client):
     assert api_client.get(CRAFTS_URL, {"search": "kni"}).json()["data"]["total"] == 1
 
 
+def test_search_looks_in_distinguishing_features(api_client):
+    CraftFactory(name="Tile", attributes={"distinguishing_features": "Floral border in cobalt"})
+    CraftFactory(name="Bowl", attributes={"distinguishing_features": "Geometric bands"})
+    CraftFactory(name="Plain", attributes={})
+
+    assert names(api_client.get(CRAFTS_URL, {"search": "floral"})) == {"Tile"}
+    assert names(api_client.get(CRAFTS_URL, {"search": "geometric band"})) == {"Bowl"}
+
+
 def test_search_treats_special_characters_as_text(api_client):
     CraftFactory(name="Tile (blue)")
 
