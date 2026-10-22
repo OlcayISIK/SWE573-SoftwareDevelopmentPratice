@@ -3,7 +3,15 @@ import { useSearchParams } from "react-router";
 
 import type { CraftFilters } from "../types";
 
-const FILTER_KEYS = ["category", "craft_type", "culture", "country", "search", "page"] as const;
+const FILTER_KEYS = [
+  "category",
+  "craft_type",
+  "culture",
+  "country",
+  "color",
+  "search",
+  "page",
+] as const;
 
 function positiveId(value: string | null) {
   const id = Number(value);
@@ -21,6 +29,7 @@ export function useCraftFilters() {
       craft_type: positiveId(params.get("craft_type")),
       culture: positiveId(params.get("culture")),
       country: params.get("country") || undefined,
+      color: params.get("color") || undefined,
       search: params.get("search") || undefined,
       page: Number.isInteger(page) && page > 1 ? page : undefined,
     };
@@ -55,7 +64,12 @@ export function useCraftFilters() {
   }, [setParams]);
 
   const hasFilters = Boolean(
-    filters.category || filters.craft_type || filters.culture || filters.country || filters.search,
+    filters.category ||
+    filters.craft_type ||
+    filters.culture ||
+    filters.country ||
+    filters.color ||
+    filters.search,
   );
 
   return { filters, setFilters, clearFilters, hasFilters };

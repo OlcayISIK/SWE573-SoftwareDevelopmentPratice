@@ -2,6 +2,7 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { type ReactNode, useEffect, useId, useState } from "react";
 
 import { categoryStyle } from "../categoryStyle";
+import { MAIN_COLORS } from "../mainColors";
 import { useCategories, useCultures, useFacets } from "../queries";
 import type { Category, CraftFilters, Facets } from "../types";
 
@@ -81,6 +82,75 @@ function CategoryChip({ name, checked, label, count, slug, icon, onSelect }: Chi
   );
 }
 
+/**
+ * Main colors as swatches. Only the colors the results have are offered, with counts; the chosen
+ * one stays listed so it can be cleared.
+ */
+function ColorFilter({
+  name,
+  value,
+  counts,
+  onChange,
+}: {
+  name: string;
+  value: string | undefined;
+  counts: { name: string; count: number }[];
+  onChange: (color: string | undefined) => void;
+}) {
+  const countOf = (color: string) => counts.find((item) => item.name === color)?.count ?? 0;
+  const shown = MAIN_COLORS.filter((color) => countOf(color.name) > 0 || color.name === value);
+  return (
+    <fieldset className="sm:col-span-3">
+      <legend className="text-sm font-semibold text-deep-sea">Main color</legend>
+      {shown.length === 0 ? (
+        <p className="mt-1 text-sm text-stone-600">No colors are listed for these crafts.</p>
+      ) : (
+        <div className="mt-2 flex flex-wrap gap-2">
+          <label className="relative flex cursor-pointer items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-sm font-medium transition-all hover:border-brand-300 has-[:checked]:border-brand-700 has-[:checked]:bg-brand-700 has-[:checked]:text-white has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-lapis">
+            <input
+              type="radio"
+              name={name}
+              checked={!value}
+              onChange={() => onChange(undefined)}
+              className="absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none opacity-0"
+            />
+            Any color
+          </label>
+          {shown.map((color) => (
+            <label
+              key={color.name}
+              className="relative flex cursor-pointer items-center gap-2 rounded-full border border-stone-200 bg-white py-1.5 pl-1.5 pr-3 text-sm font-medium transition-all hover:-translate-y-0.5 hover:border-brand-300 has-[:checked]:border-brand-700 has-[:checked]:bg-sky-wash has-[:checked]:text-brand-900 has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-lapis"
+            >
+              <input
+                type="radio"
+                name={name}
+                checked={value === color.name}
+                onChange={() => onChange(color.name)}
+                className="absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none opacity-0"
+              />
+              <span
+                aria-hidden="true"
+                className="h-5 w-5 rounded-full ring-1 ring-black/15"
+                style={{ backgroundColor: color.swatch }}
+              />
+              {color.label}
+              <span
+                aria-hidden="true"
+                className="rounded-full bg-stone-100 px-1.5 text-xs text-stone-600"
+              >
+                {countOf(color.name)}
+              </span>
+              <span className="sr-only">
+                , {countOf(color.name) === 1 ? "1 craft" : `${countOf(color.name)} crafts`}
+              </span>
+            </label>
+          ))}
+        </div>
+      )}
+    </fieldset>
+  );
+}
+
 export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: FilterBarProps) {
   const id = useId();
   const categories = useCategories();
@@ -88,7 +158,7 @@ export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: F
   const facets = useFacets(filters).data;
   const craftTypes = craftTypeOptions(facets, categories.data);
   const [search, setSearch] = useState(filters.search ?? "");
-  const moreFilters = [filters.craft_type, filters.culture, filters.country].filter(
+  const moreFilters = [filters.craft_type, filters.culture, filters.country, filters.color].filter(
     (value) => value !== undefined,
   ).length;
   const [open, setOpen] = useState(moreFilters > 0);
@@ -237,6 +307,12 @@ export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: F
                 count: item.count,
               }))}
               onChange={(country) => onChange({ country })}
+            />
+            <ColorFilter
+              name={`${id}-color`}
+              value={filters.color}
+              counts={facets?.colors ?? []}
+              onChange={(color) => onChange({ color })}
             />
           </div>
         </form>

@@ -755,6 +755,10 @@ export interface components {
             icon: string;
             count: number;
         };
+        ColorFacet: {
+            name: components["schemas"]["NameEnum"];
+            count: number;
+        };
         CountryFacet: {
             name: string;
             count: number;
@@ -917,6 +921,7 @@ export interface components {
             craft_types: components["schemas"]["CraftTypeFacet"][];
             cultures: components["schemas"]["CultureFacet"][];
             countries: components["schemas"]["CountryFacet"][];
+            colors: components["schemas"]["ColorFacet"][];
         };
         FavoriteStatus: {
             favorited: boolean;
@@ -1085,6 +1090,22 @@ export interface components {
             alt_text?: string;
             order?: number;
         };
+        /**
+         * @description * `red` - red
+         *     * `orange` - orange
+         *     * `yellow` - yellow
+         *     * `green` - green
+         *     * `turquoise` - turquoise
+         *     * `blue` - blue
+         *     * `purple` - purple
+         *     * `pink` - pink
+         *     * `brown` - brown
+         *     * `black` - black
+         *     * `white` - white
+         *     * `grey` - grey
+         * @enum {string}
+         */
+        NameEnum: "red" | "orange" | "yellow" | "green" | "turquoise" | "blue" | "purple" | "pink" | "brown" | "black" | "white" | "grey";
         /** @description A lookup item as shown on a craft. */
         NamedItem: {
             readonly id: number;
@@ -1773,6 +1794,8 @@ export interface operations {
             query?: {
                 /** @description Category slug */
                 category?: string;
+                /** @description Main color, such as red */
+                color?: string;
                 /** @description Country of the craft */
                 country?: string;
                 /** @description Craft type id */
@@ -2079,6 +2102,8 @@ export interface operations {
             query?: {
                 /** @description Category slug */
                 category?: string;
+                /** @description Main color, such as red */
+                color?: string;
                 /** @description Country of the craft */
                 country?: string;
                 /** @description Craft type id */
@@ -2115,6 +2140,8 @@ export interface operations {
                 bbox?: string;
                 /** @description Category slug */
                 category?: string;
+                /** @description Main color, such as red */
+                color?: string;
                 /** @description Country of the craft */
                 country?: string;
                 /** @description Craft type id */
@@ -2814,6 +2841,8 @@ export interface operations {
             query?: {
                 /** @description Category slug */
                 category?: string;
+                /** @description Main color, such as red */
+                color?: string;
                 /** @description Country of the craft */
                 country?: string;
                 /** @description Craft type id */

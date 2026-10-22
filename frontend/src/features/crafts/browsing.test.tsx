@@ -86,6 +86,21 @@ describe("craft list", () => {
     ]);
   });
 
+  test("a main color narrows the crafts to that color", async () => {
+    const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
+    const { router } = renderRoute("/crafts");
+
+    await userEvent.click(await screen.findByRole("button", { name: "Filters" }));
+    const colors = screen.getByRole("group", { name: "Main color" });
+    // Only the colors the results have are offered.
+    expect(within(colors).queryByRole("radio", { name: /^Green/ })).not.toBeInTheDocument();
+    await userEvent.click(await within(colors).findByRole("radio", { name: /^Red/ }));
+
+    await waitFor(() => expect(router.state.location.search).toBe("?color=red"));
+    expect(calls.at(-1)!.get("color")).toBe("red");
+    expect(within(colors).getByRole("radio", { name: /^Red/ })).toBeChecked();
+  });
+
   test("filter lists only offer what the results have, with counts", async () => {
     const asked: URLSearchParams[] = [];
     server.use(
