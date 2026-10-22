@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from core.exceptions import ConflictError, PermissionDeniedError, ValidationError
 
 from . import signals
+from .colors import main_color
 from .models import (
     DEFAULT_CATEGORY_ICON,
     Category,
@@ -69,7 +70,8 @@ def _set_colors(craft, colors):
     """Replaces the craft's colors, keeping the order they were given in."""
     craft.colors.all().delete()
     CraftColor.objects.bulk_create(
-        CraftColor(craft=craft, value=color, order=index) for index, color in enumerate(colors)
+        CraftColor(craft=craft, value=color, main_color=main_color(color), order=index)
+        for index, color in enumerate(colors)
     )
 
 

@@ -18,6 +18,8 @@ export interface CraftFilters {
   craft_type?: number;
   culture?: number;
   country?: string;
+  /** A main color, such as "red". */
+  color?: string;
   search?: string;
   page?: number;
 }

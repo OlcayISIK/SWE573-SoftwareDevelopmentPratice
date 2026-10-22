@@ -1,7 +1,11 @@
+from importlib import import_module
+
 import pytest
+from django.apps import apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
+from crafts.colors import main_color
 from crafts.models import Craft, CraftColor
 from tests.factories import CraftFactory, UserFactory
 from tests.payloads import craft_payload
@@ -98,3 +102,56 @@ def test_a_user_can_still_publish_after_colors(client_for):
 
     assert first["colors"] == [COBALT]
     assert second["colors"] == []
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("#b91c1c", "red"),
+        ("#e8a33d", "orange"),
+        ("#f1c40f", "yellow"),
+        ("#2f7d32", "green"),
+        ("#0e9aa7", "turquoise"),
+        ("#1e3a8a", "blue"),
+        ("#7e3fb5", "purple"),
+        ("#ffc0cb", "pink"),
+        ("#6b4a2b", "brown"),
+        ("#111111", "black"),
+        ("#f8f5ee", "white"),
+        ("#c0c0c0", "grey"),
+        # See-through colors are judged by their color, not their opacity.
+        ("#40e0d080", "turquoise"),
+    ],
+)
+def test_each_color_has_a_main_color(value, expected):
+    assert main_color(value) == expected
+
+
+def test_crafts_are_found_by_a_main_color_close_to_theirs(client_for, user, api_client):
+    client = client_for(user)
+    client.post(CRAFTS_URL, craft_payload(name="Madder rug", colors=["#9e2a2b"]), format="json")
+    client.post(CRAFTS_URL, craft_payload(name="Indigo rug", colors=["#1f2a4d"]), format="json")
+
+    found = api_client.get(CRAFTS_URL, {"color": "red"}).json()["data"]["items"]
+    colors = api_client.get(f"{CRAFTS_URL}facets/").json()["data"]["colors"]
+
+    assert [item["name"] for item in found] == ["Madder rug"]
+    # Main colors come in the order the filter shows them.
+    assert colors == [{"name": "red", "count": 1}, {"name": "blue", "count": 1}]
+
+
+def test_only_main_colors_can_be_filtered_by(api_client):
+    response = api_client.get(CRAFTS_URL, {"color": "#ff0000"})
+
+    assert response.status_code == 400
+    assert "color" in response.json()["errors"]
+
+
+def test_the_migration_gives_existing_colors_their_main_color():
+    craft = CraftFactory()
+    color = CraftColor.objects.create(craft=craft, value="#1e3a8a", main_color="grey")
+
+    import_module("crafts.migrations.0017_craftcolor_main_color").set_main_colors(apps, None)
+
+    color.refresh_from_db()
+    assert color.main_color == "blue"

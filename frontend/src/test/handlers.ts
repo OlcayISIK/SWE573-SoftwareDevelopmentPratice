@@ -147,6 +147,10 @@ export const facets = {
     { name: "Mexico", count: 1 },
     { name: "Türkiye", count: 2 },
   ],
+  colors: [
+    { name: "red", count: 1 },
+    { name: "blue", count: 2 },
+  ],
 };
 
 export function emptyPage() {
