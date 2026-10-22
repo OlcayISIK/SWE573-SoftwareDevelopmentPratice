@@ -35,6 +35,9 @@ SLOT_KEY = "geocoding:slot"
 CITY_KEYS = ["city", "town", "village", "hamlet", "municipality"]
 # Official English names that the map data does not use yet, by country code.
 COUNTRY_NAMES = {"tr": "Türkiye"}
+# A found area is at least this many degrees across (about 2 km), so a single building or a
+# small village still covers the crafts around it.
+MIN_AREA_DEGREES = 0.02
 
 
 def _take_slot():
@@ -61,15 +64,31 @@ def _fetch(path, params):
         raise ServiceUnavailableError(UNAVAILABLE) from exc
 
 
+def _area(result):
+    """The place's area as [west, south, east, north], widened when it is very small."""
+    south, north, west, east = (float(value) for value in result["boundingbox"])
+    pad_latitude = max(0, MIN_AREA_DEGREES - (north - south)) / 2
+    pad_longitude = max(0, MIN_AREA_DEGREES - (east - west)) / 2
+    return [
+        round(max(-180, west - pad_longitude), 6),
+        round(max(-90, south - pad_latitude), 6),
+        round(min(180, east + pad_longitude), 6),
+        round(min(90, north + pad_latitude), 6),
+    ]
+
+
 def _place(result):
     address = result.get("address", {})
-    return {
+    place = {
         "latitude": round(float(result["lat"]), 6),
         "longitude": round(float(result["lon"]), 6),
         "address": result.get("display_name", ""),
         "city": next((address[key] for key in CITY_KEYS if address.get(key)), ""),
         "country": COUNTRY_NAMES.get(address.get("country_code"), address.get("country", "")),
     }
+    if result.get("boundingbox"):
+        place["area"] = _area(result)
+    return place
 
 
 def _cached(key, lookup, not_found_message):
@@ -93,7 +112,8 @@ def search(query):
 
     # Addresses can be long and contain any character, so the cache key uses a hash.
     digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
-    return _cached(f"geocoding:search:{digest}", lookup, ADDRESS_NOT_FOUND)
+    # "v2": answers cached before areas were kept have none.
+    return _cached(f"geocoding:search:v2:{digest}", lookup, ADDRESS_NOT_FOUND)
 
 
 def reverse(latitude, longitude):

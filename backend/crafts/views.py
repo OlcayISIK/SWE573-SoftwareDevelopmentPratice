@@ -43,6 +43,9 @@ FILTER_PARAMETERS = [
     OpenApiParameter("country", OpenApiTypes.STR, description="Country of the craft"),
     OpenApiParameter("color", OpenApiTypes.STR, description="Main color, such as red"),
     OpenApiParameter("search", OpenApiTypes.STR, description="Text search"),
+    OpenApiParameter(
+        "area", OpenApiTypes.STR, description="Crafts with a place in west,south,east,north"
+    ),
 ]
 
 
@@ -264,6 +267,9 @@ class GeocodeView(APIView):
 
 @extend_schema(tags=["address lookup"])
 class GeocodeSearchView(GeocodeView):
+    # Anyone can look up a place to search crafts near it; the lookups stay rate limited.
+    permission_classes = [AllowAny]
+
     @extend_schema(parameters=[GeocodeSearchSerializer], responses=PlaceSerializer)
     def get(self, request):
         """Finds the coordinates of an address. Returns 404 when nothing matches."""

@@ -467,6 +467,17 @@ class AuthorSerializer(serializers.Serializer):
     display_name = serializers.CharField(source="profile.display_name", read_only=True)
 
 
+def parse_box(value):
+    """ "west,south,east,north" in degrees, checked to be on the map."""
+    try:
+        west, south, east, north = (float(part) for part in value.split(","))
+    except ValueError as exc:
+        raise serializers.ValidationError("Use four numbers: west,south,east,north.") from exc
+    if not (-90 <= south <= north <= 90 and -180 <= west <= 180 and -180 <= east <= 180):
+        raise serializers.ValidationError("The bounding box is outside the map.")
+    return west, south, east, north
+
+
 class CraftFilterSerializer(serializers.Serializer):
     category = serializers.SlugField(required=False)
     craft_type = serializers.IntegerField(required=False, min_value=1)
@@ -476,6 +487,13 @@ class CraftFilterSerializer(serializers.Serializer):
         choices=MAIN_COLORS, required=False, help_text="A main color, such as red."
     )
     search = serializers.CharField(required=False, max_length=100)
+    area = serializers.CharField(
+        required=False,
+        help_text="Only crafts with a place in this area: west,south,east,north in degrees.",
+    )
+
+    def validate_area(self, value):
+        return parse_box(value)
 
 
 class MapFilterSerializer(CraftFilterSerializer):
@@ -485,13 +503,7 @@ class MapFilterSerializer(CraftFilterSerializer):
     )
 
     def validate_bbox(self, value):
-        try:
-            west, south, east, north = (float(part) for part in value.split(","))
-        except ValueError as exc:
-            raise serializers.ValidationError("Use four numbers: west,south,east,north.") from exc
-        if not (-90 <= south <= north <= 90 and -180 <= west <= 180 and -180 <= east <= 180):
-            raise serializers.ValidationError("The bounding box is outside the map.")
-        return west, south, east, north
+        return parse_box(value)
 
 
 class CategoryFacetSerializer(serializers.Serializer):
@@ -645,3 +657,10 @@ class PlaceSerializer(serializers.Serializer):
     address = serializers.CharField()
     city = serializers.CharField(allow_blank=True)
     country = serializers.CharField(allow_blank=True)
+    area = serializers.ListField(
+        child=serializers.FloatField(),
+        min_length=4,
+        max_length=4,
+        required=False,
+        help_text="The place's area as west, south, east, north, for the area filter.",
+    )
