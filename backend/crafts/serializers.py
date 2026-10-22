@@ -8,7 +8,7 @@ from rest_framework import serializers
 
 from core.validators import MB, validate_image_upload
 
-from .colors import HEX_COLOR
+from .colors import HEX_COLOR, MAIN_COLORS
 from .models import (
     CATEGORY_ICONS,
     DEFAULT_CATEGORY_ICON,
@@ -406,6 +406,9 @@ class CraftFilterSerializer(serializers.Serializer):
     craft_type = serializers.IntegerField(required=False, min_value=1)
     culture = serializers.IntegerField(required=False, min_value=1)
     country = serializers.CharField(required=False, max_length=100)
+    color = serializers.ChoiceField(
+        choices=MAIN_COLORS, required=False, help_text="A main color, such as red."
+    )
     search = serializers.CharField(required=False, max_length=100)
 
 
@@ -450,11 +453,17 @@ class CountryFacetSerializer(serializers.Serializer):
     count = serializers.IntegerField()
 
 
+class ColorFacetSerializer(serializers.Serializer):
+    name = serializers.ChoiceField(choices=MAIN_COLORS)
+    count = serializers.IntegerField()
+
+
 class FacetsSerializer(serializers.Serializer):
     categories = CategoryFacetSerializer(many=True)
     craft_types = CraftTypeFacetSerializer(many=True)
     cultures = CultureFacetSerializer(many=True)
     countries = CountryFacetSerializer(many=True)
+    colors = ColorFacetSerializer(many=True)
 
 
 class CraftListSerializer(serializers.ModelSerializer):

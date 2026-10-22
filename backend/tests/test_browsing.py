@@ -217,7 +217,13 @@ def test_facets_with_no_results_are_empty(api_client):
 
     data = api_client.get(FACETS_URL, {"search": "nothingmatches"}).json()["data"]
 
-    assert data == {"categories": [], "craft_types": [], "cultures": [], "countries": []}
+    assert data == {
+        "categories": [],
+        "craft_types": [],
+        "cultures": [],
+        "countries": [],
+        "colors": [],
+    }
 
 
 def test_list_query_count_does_not_grow_with_results(api_client, django_assert_max_num_queries):

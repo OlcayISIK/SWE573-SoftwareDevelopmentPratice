@@ -4,9 +4,11 @@ from django.db.models import Count, Exists, OuterRef, Prefetch, Q, Value
 
 from core.exceptions import NotFoundError
 
+from .colors import MAIN_COLORS
 from .models import (
     Category,
     Craft,
+    CraftColor,
     CraftMedia,
     CraftPlace,
     CraftType,
@@ -109,6 +111,7 @@ def _apply_filters(
     craft_type=None,
     culture=None,
     country=None,
+    color=None,
     search=None,
 ):
     if category:
@@ -121,6 +124,11 @@ def _apply_filters(
         # Any of the craft's places can be in the country.
         crafts = crafts.filter(
             Exists(CraftPlace.objects.filter(craft=OuterRef("pk"), country__iexact=country))
+        )
+    if color:
+        # Any of the craft's colors can be close to the chosen main color.
+        crafts = crafts.filter(
+            Exists(CraftColor.objects.filter(craft=OuterRef("pk"), main_color=color))
         )
     if search:
         # Every word must match, so adding words narrows the results.
@@ -174,6 +182,15 @@ def craft_facets(viewer=None, **filters):
             CraftPlace.objects.filter(craft__in=found("country")).exclude(country=""),
             counting="craft",
             name="country",
+        ),
+        # A craft counts once for each main color it has.
+        "colors": sorted(
+            counted(
+                CraftColor.objects.filter(craft__in=found("color")),
+                counting="craft",
+                name="main_color",
+            ),
+            key=lambda item: MAIN_COLORS.index(item["name"]),
         ),
     }
 

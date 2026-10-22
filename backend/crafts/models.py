@@ -8,6 +8,8 @@ from django.db.models.functions import Lower
 
 from core.models import BaseModel, SoftDeleteModel
 
+from .colors import MAIN_COLORS
+
 
 class LookupItem(BaseModel):
     """
@@ -237,10 +239,13 @@ class CraftColor(BaseModel):
     craft = models.ForeignKey(Craft, on_delete=models.CASCADE, related_name="colors")
     # "#rrggbb", or "#rrggbbaa" when the color is see-through.
     value = models.CharField(max_length=9)
+    # The named main color it is closest to, such as "red", which the color filter matches.
+    main_color = models.CharField(max_length=10, choices=[(name, name) for name in MAIN_COLORS])
     order = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
         ordering = ["order", "id"]
+        indexes = [models.Index(fields=["main_color"], name="craft_color_main_color_idx")]
         constraints = [
             models.CheckConstraint(
                 condition=models.Q(value__regex=r"^#[0-9a-f]{6}([0-9a-f]{2})?$"),
