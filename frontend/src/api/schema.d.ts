@@ -772,6 +772,32 @@ export interface components {
             dimensions?: components["schemas"]["DimensionRequest"][];
             distinguishing_features?: string;
         };
+        /**
+         * @description When the craft was made: {"kind": "unknown"}, {"kind": "year", "year": -500, "circa": true}
+         *     for about 500 BC, or {"kind": "day", "day": "1923-03-12"}. Years before the common era are
+         *     negative, and there is no year 0.
+         */
+        CraftDate: {
+            kind: components["schemas"]["KindEnum"];
+            year?: number | null;
+            /** Format: date */
+            day?: string | null;
+            /** @default false */
+            circa: boolean;
+        };
+        /**
+         * @description When the craft was made: {"kind": "unknown"}, {"kind": "year", "year": -500, "circa": true}
+         *     for about 500 BC, or {"kind": "day", "day": "1923-03-12"}. Years before the common era are
+         *     negative, and there is no year 0.
+         */
+        CraftDateRequest: {
+            kind: components["schemas"]["KindEnum"];
+            year?: number | null;
+            /** Format: date */
+            day?: string | null;
+            /** @default false */
+            circa: boolean;
+        };
         CraftDetail: {
             readonly id: number;
             readonly name: string;
@@ -791,6 +817,7 @@ export interface components {
             readonly media: components["schemas"]["Media"][];
             readonly description: string;
             readonly story: string;
+            readonly date: components["schemas"]["CraftDate"];
             readonly colors: string[];
             readonly attributes: unknown;
             readonly status: components["schemas"]["CraftStatusEnum"];
@@ -873,6 +900,8 @@ export interface components {
             places: components["schemas"]["PlaceInputRequest"][];
             description: string;
             story?: string;
+            /** @description When the craft was made. */
+            date?: components["schemas"]["CraftDateRequest"];
             /** @description Colors as "#rrggbb", or "#rrggbbaa" when see-through. */
             colors?: string[];
             attributes?: components["schemas"]["CraftAttributesRequest"];
@@ -1044,6 +1073,13 @@ export interface components {
          * @enum {string}
          */
         ItemTypeEnum: "category" | "craft_type" | "tool" | "material" | "culture";
+        /**
+         * @description * `unknown` - Unknown
+         *     * `year` - Year
+         *     * `day` - Exact date
+         * @enum {string}
+         */
+        KindEnum: "unknown" | "year" | "day";
         LoginRequest: {
             email: string;
             password: string;
@@ -1212,6 +1248,8 @@ export interface components {
             places?: components["schemas"]["PlaceInputRequest"][];
             description?: string;
             story?: string;
+            /** @description When the craft was made. */
+            date?: components["schemas"]["CraftDateRequest"];
             /** @description Colors as "#rrggbb", or "#rrggbbaa" when see-through. */
             colors?: string[];
             attributes?: components["schemas"]["CraftAttributesRequest"];

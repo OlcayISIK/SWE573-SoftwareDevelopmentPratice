@@ -140,6 +140,7 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
     ],
     description: "Glazed tiles.",
     story: "Made for mosques.",
+    date: { kind: "unknown" },
     colors: ["#1e40af", "#40e0d0"],
     attributes: {
       dimensions: [{ type: "height", value: 20, unit: "cm" }],
@@ -401,6 +402,34 @@ test("the form validates required fields in the browser", async () => {
   expect(screen.getByText("Describe the craft.")).toBeInTheDocument();
   expect(screen.getByLabelText("Name")).toHaveFocus();
   expect(create).not.toHaveBeenCalled();
+});
+
+test("a year before the common era is sent as a negative year", async () => {
+  server.use(...signedIn());
+  const { created } = publishHandlers();
+  renderRoute("/crafts/new");
+  await fillRequiredFields();
+
+  await userEvent.click(screen.getByRole("radio", { name: "A year" }));
+  await userEvent.type(screen.getByLabelText("Year"), "500");
+  await userEvent.selectOptions(screen.getByLabelText("Era"), "bc");
+  await userEvent.click(screen.getByRole("checkbox", { name: "Approximate (circa)" }));
+  await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
+
+  await waitFor(() => expect(created).toHaveLength(1));
+  expect(created[0].date).toEqual({ kind: "year", year: -500, circa: true });
+});
+
+test("a date in the future is flagged", async () => {
+  server.use(...signedIn());
+  renderRoute("/crafts/new");
+  await formReady();
+
+  await userEvent.click(screen.getByRole("radio", { name: "A year" }));
+  await userEvent.type(screen.getByLabelText("Year"), "3000");
+  await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
+
+  expect(await screen.findByText("The year cannot be in the future.")).toBeInTheDocument();
 });
 
 test("each dimension can be entered once", async () => {

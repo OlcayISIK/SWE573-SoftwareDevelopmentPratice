@@ -1,4 +1,5 @@
 import { formatAmount, formatDimensions } from "./attributes";
+import { formatCraftDate } from "./craftDate";
 import { toEmbedUrl } from "./media";
 
 test.each([
@@ -34,4 +35,14 @@ test("weight and volume are shown in the unit they were entered in", () => {
   expect(formatAmount([...rows], "weight")).toBe("2.5 lb");
   expect(formatAmount([...rows], "volume")).toBe("16 fl oz");
   expect(formatAmount([rows[0]], "weight")).toBeNull();
+});
+
+test.each([
+  [{ kind: "year", year: -500, day: null, circa: false }, "500 BC"],
+  [{ kind: "year", year: 300, day: null, circa: true }, "c. AD 300"],
+  [{ kind: "year", year: 1850, day: null, circa: false }, "1850"],
+  [{ kind: "day", year: 1923, day: "1923-03-12", circa: false }, "12 March 1923"],
+  [{ kind: "unknown", year: null, day: null, circa: false }, null],
+] as const)("the date %o reads as %s", (date, expected) => {
+  expect(formatCraftDate(date)).toBe(expected);
 });

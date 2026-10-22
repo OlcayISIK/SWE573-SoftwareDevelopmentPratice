@@ -117,6 +117,47 @@ export const craftFormSchema = z.object({
         seen.add(hex);
       });
     }),
+  date: z
+    .object({
+      kind: z.enum(["unknown", "year", "day"]),
+      year: z.string(),
+      era: z.enum(["ad", "bc"]),
+      circa: z.boolean(),
+      day: z.string(),
+    })
+    .superRefine((date, context) => {
+      if (date.kind === "year") {
+        const year = Number(date.year.trim());
+        if (!date.year.trim() || !Number.isInteger(year) || year < 1) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["year"],
+            message: "Enter the year as a whole number, such as 500.",
+          });
+        } else if (date.era === "ad" && year > new Date().getFullYear()) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["year"],
+            message: "The year cannot be in the future.",
+          });
+        }
+      }
+      if (date.kind === "day") {
+        if (!date.day) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["day"],
+            message: "Enter the date.",
+          });
+        } else if (date.day > new Date().toISOString().slice(0, 10)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["day"],
+            message: "The date cannot be in the future.",
+          });
+        }
+      }
+    }),
   attributes: z.object({
     dimensions: z.array(dimension).superRefine((rows, context) => {
       const seen = new Set<DimensionType>();
@@ -159,6 +200,9 @@ export const CRAFT_FORM_FIELDS: readonly Path<CraftFormValues>[] = [
   ...PLACE_FIELDS,
   "description",
   "story",
+  "date",
+  "date.year",
+  "date.day",
   "colors",
   "attributes.dimensions",
   "attributes.distinguishing_features",
@@ -183,6 +227,7 @@ export const emptyCraftForm: CraftFormValues = {
   origin: "",
   description: "",
   story: "",
+  date: { kind: "unknown", year: "", era: "ad", circa: false, day: "" },
   colors: [],
   attributes: {
     dimensions: [],
@@ -209,8 +254,22 @@ export interface CraftPayload {
   }[];
   description: string;
   story: string;
+  date:
+    | { kind: "unknown" }
+    | { kind: "year"; year: number; circa: boolean }
+    | { kind: "day"; day: string };
   colors: string[];
   attributes: CraftAttributes;
+}
+
+/** Years before the common era are sent as negative numbers, so 500 BC is -500. */
+function toDatePayload(date: CraftFormValues["date"]): CraftPayload["date"] {
+  if (date.kind === "year") {
+    const year = Number(date.year.trim());
+    return { kind: "year", year: date.era === "bc" ? -year : year, circa: date.circa };
+  }
+  if (date.kind === "day") return { kind: "day", day: date.day };
+  return { kind: "unknown" };
 }
 
 export function toPayload(values: CraftFormValues): CraftPayload {
@@ -243,6 +302,7 @@ export function toPayload(values: CraftFormValues): CraftPayload {
     })),
     description: values.description.trim(),
     story: values.story.trim(),
+    date: toDatePayload(values.date),
     colors: values.colors.map((row) => toStoredColor(parseColor(row.code)!)),
     attributes: payloadAttributes,
   };
@@ -268,6 +328,13 @@ export function fromCraft(craft: CraftDetail): CraftFormValues {
     origin: String(craft.places.findIndex((row) => row.is_origin)).replace("-1", ""),
     description: craft.description,
     story: craft.story,
+    date: {
+      kind: craft.date.kind,
+      year: craft.date.year ? String(Math.abs(craft.date.year)) : "",
+      era: (craft.date.year ?? 0) < 0 ? "bc" : "ad",
+      circa: craft.date.circa,
+      day: craft.date.day ?? "",
+    },
     colors: craft.colors.map((code) => ({ code })),
     attributes: {
       dimensions: (attributes.dimensions ?? []).map((row) => ({
