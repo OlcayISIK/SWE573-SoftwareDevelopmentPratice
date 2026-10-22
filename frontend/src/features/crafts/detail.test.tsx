@@ -11,6 +11,7 @@ import { renderRoute } from "@/test/render";
 import { server } from "@/test/server";
 
 const richCraft = makeCraftDetail({
+  date: { kind: "year", year: -500, day: null, circa: true },
   story: "Tiles from Kütahya decorated mosques across the Ottoman lands.",
   attributes: {
     dimensions: [
@@ -67,6 +68,7 @@ test("shows the description, story, characteristics, culture, and location", asy
   expect(screen.getByText("Hand-painted glazed tiles.")).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "Story" })).toBeInTheDocument();
   expect(screen.getByText(/decorated mosques across the Ottoman lands/)).toBeInTheDocument();
+  expect(screen.getByText("c. 500 BC")).toBeInTheDocument();
   const header = screen.getByRole("heading", { level: 1 }).closest("header")!;
   expect(within(header).getByText("Turkish")).toBeInTheDocument();
   expect(within(header).getByText("From Kütahya, Türkiye")).toBeInTheDocument();

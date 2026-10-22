@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { Tooltip } from "@/components/Tooltip";
 import { ReportItemButton } from "@/features/moderation/components/ReportDialog";
 
+import { formatCraftDate } from "../../craftDate";
 import { placeName } from "../../place";
 import type { CraftDetail, NamedItem } from "../../types";
 
@@ -84,6 +85,9 @@ export function CraftFacts({ craft }: { craft: CraftDetail }) {
             )}
           </Tooltip>
           <ReportItemButton kind="craft_type" item={craftType} />
+        </Fact>
+        <Fact label="Date">
+          {formatCraftDate(craft.date) ?? <span className="text-stone-600">Unknown</span>}
         </Fact>
         {culture && (
           <Fact label="Culture">

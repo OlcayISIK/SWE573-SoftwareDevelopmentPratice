@@ -19,6 +19,7 @@ import type { CraftDetail } from "../types";
 
 import { AddItemInline } from "./AddItemInline";
 import { ColorRows } from "./ColorRows";
+import { DateFields } from "./DateFields";
 import { DimensionRows } from "./DimensionRows";
 import { ItemPicker } from "./ItemPicker";
 import { LocationPicker } from "./LocationPicker";
@@ -267,6 +268,7 @@ export function CraftFields({
       <fieldset id="section-characteristics" className="form-section space-y-6">
         <legend>Characteristics (optional)</legend>
         <p className="text-sm text-stone-600">Fill in only what applies to this craft.</p>
+        <DateFields form={form} />
         <DimensionRows form={form} />
         <ColorRows form={form} />
         <TextAreaField
