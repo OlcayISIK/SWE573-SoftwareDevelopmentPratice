@@ -76,6 +76,8 @@ SEARCHED_FIELDS = [
     "craft_type__name",
     "category__name",
     "culture__name",
+    # Patterns and motifs, such as "floral border" or "geometric".
+    "attributes__distinguishing_features",
 ]
 # Place fields a search looks in; a craft matches when any of its places does.
 SEARCHED_PLACE_FIELDS = ["address", "city", "country"]

@@ -140,7 +140,7 @@ export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: F
                 id={`${id}-search`}
                 type="search"
                 className="block h-14 w-full !rounded-xl !border-transparent bg-transparent pl-12 pr-32 text-base !shadow-none"
-                placeholder="Search by name, culture, place, tool, or material"
+                placeholder="Search by name, culture, place, material, or pattern"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
               />
