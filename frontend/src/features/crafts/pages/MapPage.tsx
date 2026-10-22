@@ -9,7 +9,7 @@ import { PeoplePanel } from "@/features/social/components/PeoplePanel";
 import { categoryStyle } from "../categoryStyle";
 import { FilterBar } from "../components/FilterBar";
 import { PinPreview } from "../components/PinPreview";
-import { noMatchMessage, useCraftFilters } from "../hooks/useCraftFilters";
+import { areaCorners, noMatchMessage, useCraftFilters } from "../hooks/useCraftFilters";
 import { useCategories, useMapPins } from "../queries";
 import type { CraftPin } from "../types";
 
@@ -130,7 +130,13 @@ export function MapPage() {
           ) : (
             <div className="relative aspect-[3/2] max-h-[80vh] min-h-[300px] w-full overflow-hidden rounded-xl shadow-lg ring-1 ring-stone-200">
               <Suspense fallback={<PageLoader label="Loading the map" />}>
-                <MapView pins={pins.data} onSelect={select} />
+                {/* A new place remounts the map, so it opens on that place's area. */}
+                <MapView
+                  key={filters.area ?? "world"}
+                  pins={pins.data}
+                  onSelect={select}
+                  fit={areaCorners(filters.area)}
+                />
               </Suspense>
               {pins.data.length === 0 && hasFilters && (
                 <div className="animate-fade-up absolute inset-x-4 top-4 z-[1000] mx-auto w-fit max-w-full rounded-xl bg-white px-5 py-3 shadow-lg ring-1 ring-stone-200">

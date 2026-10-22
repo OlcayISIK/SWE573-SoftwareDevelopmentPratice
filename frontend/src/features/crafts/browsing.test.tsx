@@ -86,6 +86,45 @@ describe("craft list", () => {
     ]);
   });
 
+  test("a place narrows the crafts to its area", async () => {
+    server.use(
+      http.get(`${API}/geocode/search/`, () =>
+        ok({
+          latitude: 40.99,
+          longitude: 29.03,
+          address: "Kadıköy, İstanbul, Türkiye",
+          city: "İstanbul",
+          country: "Türkiye",
+          area: [29.01, 40.95, 29.11, 41.01],
+        }),
+      ),
+    );
+    const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
+    const { router } = renderRoute("/crafts");
+
+    await userEvent.type(await screen.findByLabelText("Place"), "Kadıköy{Enter}");
+
+    await waitFor(() =>
+      expect(router.state.location.search).toBe(
+        "?place=Kad%C4%B1k%C3%B6y&area=29.01%2C40.95%2C29.11%2C41.01",
+      ),
+    );
+    await waitFor(() => expect(calls.at(-1)!.get("area")).toBe("29.01,40.95,29.11,41.01"));
+    expect(screen.getByText("Near Kadıköy")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Stop searching near Kadıköy" }));
+    await waitFor(() => expect(router.state.location.search).toBe(""));
+  });
+
+  test("a place that cannot be found says so", async () => {
+    renderRoute("/crafts");
+
+    await userEvent.type(await screen.findByLabelText("Place"), "nowhere at all");
+    await userEvent.click(screen.getByRole("button", { name: "Find" }));
+
+    expect(await screen.findByText("We could not find “nowhere at all”.")).toBeInTheDocument();
+  });
+
   test("a main color narrows the crafts to that color", async () => {
     const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
     const { router } = renderRoute("/crafts");

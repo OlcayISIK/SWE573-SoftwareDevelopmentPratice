@@ -21,5 +21,9 @@ export interface CraftFilters {
   /** A main color, such as "red". */
   color?: string;
   search?: string;
+  /** The place searched near, as the user typed it, such as "Kadıköy". */
+  place?: string;
+  /** That place's area as "west,south,east,north"; crafts with a place inside it are found. */
+  area?: string;
   page?: number;
 }

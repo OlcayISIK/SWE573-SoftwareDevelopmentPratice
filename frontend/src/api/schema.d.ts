@@ -1283,6 +1283,8 @@ export interface components {
             address: string;
             city: string;
             country: string;
+            /** @description The place's area as west, south, east, north, for the area filter. */
+            area?: number[];
         };
         /** @description Rejects keys that are not declared, so stored JSON stays predictable. */
         PlaceInputRequest: {
@@ -1830,6 +1832,8 @@ export interface operations {
     v1_crafts_list: {
         parameters: {
             query?: {
+                /** @description Crafts with a place in west,south,east,north */
+                area?: string;
                 /** @description Category slug */
                 category?: string;
                 /** @description Main color, such as red */
@@ -2138,6 +2142,8 @@ export interface operations {
     v1_crafts_facets_retrieve: {
         parameters: {
             query?: {
+                /** @description Crafts with a place in west,south,east,north */
+                area?: string;
                 /** @description Category slug */
                 category?: string;
                 /** @description Main color, such as red */
@@ -2174,6 +2180,8 @@ export interface operations {
     v1_crafts_map_list: {
         parameters: {
             query?: {
+                /** @description Crafts with a place in west,south,east,north */
+                area?: string;
                 /** @description Visible area: west,south,east,north */
                 bbox?: string;
                 /** @description Category slug */
@@ -2877,6 +2885,8 @@ export interface operations {
     v1_users_crafts_list: {
         parameters: {
             query?: {
+                /** @description Crafts with a place in west,south,east,north */
+                area?: string;
                 /** @description Category slug */
                 category?: string;
                 /** @description Main color, such as red */

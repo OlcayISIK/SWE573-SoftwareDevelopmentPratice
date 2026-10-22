@@ -1,6 +1,9 @@
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { MapPin, Search, SlidersHorizontal, X } from "lucide-react";
 import { type ReactNode, useEffect, useId, useState } from "react";
 
+import { toApiError } from "@/api/envelope";
+
+import { geocodeApi } from "../api";
 import { categoryStyle } from "../categoryStyle";
 import { MAIN_COLORS } from "../mainColors";
 import { useCategories, useCultures, useFacets } from "../queries";
@@ -151,6 +154,98 @@ function ColorFilter({
   );
 }
 
+/** Half the width of the area used when a place comes without one, about 1 km. */
+const POINT_AREA = 0.01;
+
+/**
+ * Finds crafts near a place: the place is looked up, and its area becomes the area filter.
+ * It sits inside the search form, so Enter here finds the place instead of submitting.
+ */
+function PlaceSearch({
+  id,
+  place,
+  onFind,
+}: {
+  id: string;
+  place: string | undefined;
+  onFind: (place: string, area: string) => void;
+}) {
+  const [text, setText] = useState(place ?? "");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => setText(place ?? ""), [place]);
+
+  const find = async () => {
+    const query = text.trim();
+    if (query.length < 2) {
+      setError("Enter a place to search near.");
+      return;
+    }
+    setPending(true);
+    setError(null);
+    try {
+      const found = await geocodeApi.search(query);
+      const area = found.area ?? [
+        found.longitude - POINT_AREA,
+        found.latitude - POINT_AREA,
+        found.longitude + POINT_AREA,
+        found.latitude + POINT_AREA,
+      ];
+      onFind(query, area.join(","));
+    } catch (failure) {
+      const apiError = toApiError(failure);
+      setError(apiError.status === 404 ? `We could not find “${query}”.` : apiError.message);
+    } finally {
+      setPending(false);
+    }
+  };
+
+  return (
+    <div className="min-w-0 flex-[1_1_18rem] sm:max-w-sm">
+      <label htmlFor={`${id}-place`} className="sr-only">
+        Place
+      </label>
+      <div className="relative flex items-center rounded-xl bg-white shadow-md ring-1 ring-stone-200 transition-shadow focus-within:shadow-lg focus-within:ring-2 focus-within:ring-lapis/40">
+        <MapPin
+          aria-hidden="true"
+          className="pointer-events-none absolute left-4 h-5 w-5 text-stone-500"
+        />
+        <input
+          id={`${id}-place`}
+          type="text"
+          autoComplete="off"
+          className="block h-14 w-full !rounded-xl !border-transparent bg-transparent pl-12 pr-24 text-base !shadow-none"
+          placeholder="Near a place, such as Kadıköy"
+          value={text}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${id}-place-error` : undefined}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              void find();
+            }
+          }}
+        />
+        <button
+          type="button"
+          disabled={pending}
+          className="btn-secondary absolute right-2 h-10 px-4"
+          onClick={() => void find()}
+        >
+          {pending ? "Finding…" : "Find"}
+        </button>
+      </div>
+      {error && (
+        <p id={`${id}-place-error`} role="alert" className="mt-1.5 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: FilterBarProps) {
   const id = useId();
   const categories = useCategories();
@@ -218,6 +313,11 @@ export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: F
                 Search
               </button>
             </div>
+            <PlaceSearch
+              id={id}
+              place={filters.place}
+              onFind={(place, area) => onChange({ place, area })}
+            />
             <button
               type="button"
               className={`btn h-14 px-5 ${open ? "bg-sky-wash text-brand-900" : "border border-stone-200 bg-white text-stone-800 hover:border-brand-300"}`}
@@ -236,6 +336,20 @@ export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: F
                 </span>
               )}
             </button>
+            {filters.place && (
+              <span className="flex h-10 items-center gap-1.5 rounded-full bg-sky-wash py-1 pl-3 pr-1 text-sm font-medium text-brand-900">
+                <MapPin aria-hidden="true" className="h-4 w-4" />
+                Near {filters.place}
+                <button
+                  type="button"
+                  aria-label={`Stop searching near ${filters.place}`}
+                  className="rounded-full p-1 hover:bg-white/70"
+                  onClick={() => onChange({ place: undefined, area: undefined })}
+                >
+                  <X aria-hidden="true" className="h-3.5 w-3.5" />
+                </button>
+              </span>
+            )}
             {hasFilters && (
               <button type="button" className="btn-ghost h-14" onClick={onClear}>
                 <X aria-hidden="true" className="h-4 w-4" />
