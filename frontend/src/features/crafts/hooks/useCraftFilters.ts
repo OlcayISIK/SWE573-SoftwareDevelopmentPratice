@@ -10,6 +10,8 @@ const FILTER_KEYS = [
   "country",
   "color",
   "search",
+  "place",
+  "area",
   "page",
 ] as const;
 
@@ -30,6 +32,8 @@ export function useCraftFilters() {
       culture: positiveId(params.get("culture")),
       country: params.get("country") || undefined,
       color: params.get("color") || undefined,
+      place: params.get("place") || undefined,
+      area: params.get("area") || undefined,
       search: params.get("search") || undefined,
       page: Number.isInteger(page) && page > 1 ? page : undefined,
     };
@@ -69,6 +73,7 @@ export function useCraftFilters() {
     filters.culture ||
     filters.country ||
     filters.color ||
+    filters.area ||
     filters.search,
   );
 
@@ -77,5 +82,19 @@ export function useCraftFilters() {
 
 /** What to say when the filters find no crafts. */
 export function noMatchMessage(filters: CraftFilters) {
-  return filters.search ? `No crafts match “${filters.search}”.` : "No crafts match your filters.";
+  if (filters.search) return `No crafts match “${filters.search}”.`;
+  if (filters.place) return `No crafts found near ${filters.place}.`;
+  return "No crafts match your filters.";
+}
+
+/** The searched area's corners as [south, west] and [north, east], for fitting the map. */
+export function areaCorners(area: string | undefined): [number, number][] | undefined {
+  const parts = area?.split(",").map(Number);
+  if (!parts || parts.length !== 4 || parts.some((part) => !Number.isFinite(part)))
+    return undefined;
+  const [west, south, east, north] = parts;
+  return [
+    [south, west],
+    [north, east],
+  ];
 }

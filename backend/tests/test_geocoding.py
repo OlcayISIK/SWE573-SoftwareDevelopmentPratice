@@ -195,8 +195,32 @@ def test_invalid_requests_are_rejected(client, nominatim, url, params, field):
     assert fake.requests == []
 
 
-def test_guests_cannot_look_up_addresses(api_client, nominatim):
+def test_guests_look_up_places_but_not_points(api_client, nominatim):
     nominatim([KUTAHYA])
 
-    assert api_client.get(SEARCH_URL, {"q": "Kütahya"}).status_code == 401
+    # Anyone can search crafts near a place; only authors place pins.
+    assert api_client.get(SEARCH_URL, {"q": "Kütahya"}).status_code == 200
     assert api_client.get(REVERSE_URL, {"lat": 1, "lng": 1}).status_code == 401
+
+
+def test_a_place_comes_with_its_area(client, nominatim):
+    kadikoy = {
+        **KUTAHYA,
+        "lat": "40.9903",
+        "lon": "29.0290",
+        "boundingbox": ["40.9500", "41.0100", "29.0100", "29.1100"],
+    }
+    nominatim([kadikoy])
+
+    data = client.get(SEARCH_URL, {"q": "Kadıköy"}).json()["data"]
+
+    assert data["area"] == [29.01, 40.95, 29.11, 41.01]
+
+
+def test_a_very_small_area_is_widened(client, nominatim):
+    building = {**KUTAHYA, "boundingbox": ["39.4199", "39.4200", "29.9857", "29.9858"]}
+    nominatim([building])
+
+    west, south, east, north = client.get(SEARCH_URL, {"q": "Ulu Cami"}).json()["data"]["area"]
+
+    assert round(east - west, 4) == round(north - south, 4) == 0.02

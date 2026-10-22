@@ -104,6 +104,15 @@ def _matches(word):
     return condition
 
 
+def _in_box(places, box):
+    """The places inside west, south, east, north; a box can cross the 180th meridian."""
+    west, south, east, north = box
+    places = places.filter(latitude__gte=south, latitude__lte=north)
+    if west <= east:
+        return places.filter(longitude__gte=west, longitude__lte=east)
+    return places.filter(Q(longitude__gte=west) | Q(longitude__lte=east))
+
+
 def _apply_filters(
     crafts,
     *,
@@ -113,6 +122,7 @@ def _apply_filters(
     country=None,
     color=None,
     search=None,
+    area=None,
 ):
     if category:
         crafts = crafts.filter(category__slug=category)
@@ -124,6 +134,11 @@ def _apply_filters(
         # Any of the craft's places can be in the country.
         crafts = crafts.filter(
             Exists(CraftPlace.objects.filter(craft=OuterRef("pk"), country__iexact=country))
+        )
+    if area:
+        # Any of the craft's places can be in the area.
+        crafts = crafts.filter(
+            Exists(_in_box(CraftPlace.objects.filter(craft=OuterRef("pk")), area))
         )
     if color:
         # Any of the craft's colors can be close to the chosen main color.
@@ -208,13 +223,10 @@ def map_pins(viewer=None, *, bbox=None, **filters):
     """A pin for every place of the crafts the filters find."""
     crafts = _apply_filters(visible_crafts(viewer), **filters)
     places = CraftPlace.objects.filter(craft__in=crafts)
-    if bbox:
-        west, south, east, north = bbox
-        places = places.filter(latitude__gte=south, latitude__lte=north)
-        if west <= east:
-            places = places.filter(longitude__gte=west, longitude__lte=east)
-        else:
-            places = places.filter(Q(longitude__gte=west) | Q(longitude__lte=east))
+    # Only the pins inside the chosen area and the visible part of the map.
+    for box in (filters.get("area"), bbox):
+        if box:
+            places = _in_box(places, box)
     return places.order_by("-craft__created_at", "-craft_id", "order").values(
         "id",
         "craft_id",
