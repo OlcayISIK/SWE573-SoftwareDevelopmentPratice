@@ -3,6 +3,7 @@ from pathlib import Path
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import URLValidator
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
@@ -255,6 +256,69 @@ class CraftPlaceSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+EARLIEST_YEAR = -10000
+
+
+class CraftDateSerializer(StrictSerializer):
+    """
+    When the craft was made: {"kind": "unknown"}, {"kind": "year", "year": -500, "circa": true}
+    for about 500 BC, or {"kind": "day", "day": "1923-03-12"}. Years before the common era are
+    negative, and there is no year 0.
+    """
+
+    kind = serializers.ChoiceField(choices=Craft.DateKind.choices)
+    year = serializers.IntegerField(required=False, allow_null=True, min_value=EARLIEST_YEAR)
+    day = serializers.DateField(required=False, allow_null=True)
+    circa = serializers.BooleanField(required=False, default=False)
+
+    def validate(self, attrs):
+        # A partial update does not enforce required nested fields, so the kind is checked here.
+        kind = attrs.get("kind")
+        if kind is None:
+            raise serializers.ValidationError({"kind": ["Choose the kind of date."]})
+        today = timezone.localdate()
+        if kind == Craft.DateKind.YEAR:
+            year = attrs.get("year")
+            if year is None:
+                raise serializers.ValidationError({"year": ["Enter the year."]})
+            if year == 0:
+                raise serializers.ValidationError(
+                    {"year": ["There is no year 0: use 1 BC or AD 1."]}
+                )
+            if year > today.year:
+                raise serializers.ValidationError({"year": ["The year cannot be in the future."]})
+            return {
+                "date_kind": kind,
+                "date_year": year,
+                "date_day": None,
+                "date_circa": attrs.get("circa", False),
+            }
+        if kind == Craft.DateKind.DAY:
+            day = attrs.get("day")
+            if day is None:
+                raise serializers.ValidationError({"day": ["Enter the date."]})
+            if day > today:
+                raise serializers.ValidationError({"day": ["The date cannot be in the future."]})
+            return {"date_kind": kind, "date_year": day.year, "date_day": day, "date_circa": False}
+        return {"date_kind": kind, "date_year": None, "date_day": None, "date_circa": False}
+
+
+@extend_schema_field(CraftDateSerializer)
+class CraftDateField(serializers.Field):
+    """Reads a craft's date fields as one date object."""
+
+    def __init__(self, **kwargs):
+        super().__init__(source="*", read_only=True, **kwargs)
+
+    def to_representation(self, craft):
+        return {
+            "kind": craft.date_kind,
+            "year": craft.date_year,
+            "day": craft.date_day.isoformat() if craft.date_day else None,
+            "circa": craft.date_circa,
+        }
+
+
 class CraftWriteSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=_visible(Category))
     craft_type = serializers.PrimaryKeyRelatedField(queryset=_visible(CraftType))
@@ -276,6 +340,7 @@ class CraftWriteSerializer(serializers.ModelSerializer):
         help_text='Colors as "#rrggbb", or "#rrggbbaa" when see-through.',
     )
     attributes = CraftAttributesSerializer(required=False)
+    date = CraftDateSerializer(required=False, help_text="When the craft was made.")
 
     class Meta:
         model = Craft
@@ -289,6 +354,7 @@ class CraftWriteSerializer(serializers.ModelSerializer):
             "places",
             "description",
             "story",
+            "date",
             "colors",
             "attributes",
         ]
@@ -532,6 +598,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
     longitude = serializers.FloatField(read_only=True)
     places = CraftPlaceSerializer(many=True, read_only=True)
     media = MediaSerializer(many=True, read_only=True)
+    date = CraftDateField()
 
     class Meta:
         model = Craft
@@ -552,6 +619,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
             "media",
             "description",
             "story",
+            "date",
             "colors",
             "attributes",
             "status",

@@ -160,6 +160,20 @@ class Craft(SoftDeleteModel):
     description = models.TextField()
     # How to understand it, its history and meaning, and its role in the community.
     story = models.TextField(blank=True)
+
+    class DateKind(models.TextChoices):
+        UNKNOWN = "unknown", "Unknown"
+        YEAR = "year", "Year"
+        DAY = "day", "Exact date"
+
+    # When the craft, or the piece shown, was made: unknown, a year, or an exact day. Years before
+    # the common era are negative, so -500 is 500 BC; there is no year 0. An exact day also keeps
+    # its year, so crafts can be compared by year whatever their kind of date.
+    date_kind = models.CharField(max_length=7, choices=DateKind.choices, default=DateKind.UNKNOWN)
+    date_year = models.IntegerField(null=True, blank=True)
+    date_day = models.DateField(null=True, blank=True)
+    # The year is approximate ("c. 1850").
+    date_circa = models.BooleanField(default=False)
     attributes = models.JSONField(default=dict, blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PUBLISHED)
     author = models.ForeignKey(
@@ -180,6 +194,15 @@ class Craft(SoftDeleteModel):
             models.CheckConstraint(
                 condition=models.Q(longitude__gte=-180, longitude__lte=180),
                 name="craft_longitude_range",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(date_kind="unknown", date_year=None, date_day=None)
+                    | models.Q(date_kind="year", date_year__isnull=False, date_day=None)
+                    | models.Q(date_kind="day", date_year__isnull=False, date_day__isnull=False)
+                )
+                & ~models.Q(date_year=0),
+                name="craft_date_matches_kind",
             ),
         ]
 

@@ -30,6 +30,7 @@ EDITABLE_FIELDS = {
     "places",
     "description",
     "story",
+    "date",
     "colors",
     "attributes",
 }
@@ -102,7 +103,9 @@ def publish_craft(*, author, data):
     related = {field: fields.pop(field, []) for field in MANY_TO_MANY_FIELDS}
     colors = fields.pop("colors", [])
     places = fields.pop("places")
-    craft = Craft.objects.create(author=author, **fields, **_main_place(places))
+    # The date arrives as craft fields already, see CraftDateSerializer.
+    date = fields.pop("date", {})
+    craft = Craft.objects.create(author=author, **fields, **date, **_main_place(places))
     for field, items in related.items():
         getattr(craft, field).set(items)
     _set_colors(craft, colors)
@@ -123,6 +126,9 @@ def update_craft(*, craft, actor, data):
             getattr(craft, field).set(value)
         elif field == "colors":
             _set_colors(craft, value)
+        elif field == "date":
+            for name, part in value.items():
+                setattr(craft, name, part)
         elif field == "places":
             _set_places(craft, value)
             for name, main in _main_place(value).items():
