@@ -47,6 +47,12 @@ class CrashView(APIView):
         raise RuntimeError("boom")
 
 
+class EchoView(APIView):
+    def post(self, request):
+        data = {key: value for key, value in request.data.items() if not hasattr(value, "read")}
+        return Response(data)
+
+
 urlpatterns = [
     path("ok/", OkView.as_view()),
     path("not-found/", NotFoundView.as_view()),
@@ -54,4 +60,5 @@ urlpatterns = [
     path("validation/", ValidationView.as_view()),
     path("paginated/", PaginatedView.as_view()),
     path("crash/", CrashView.as_view()),
+    path("echo/", EchoView.as_view()),
 ]

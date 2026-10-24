@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "accounts.User"
 
 MIDDLEWARE = [
+    "core.middleware.RequestLogMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -193,10 +194,25 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
+# Every request is logged by core.middleware.RequestLogMiddleware. LOG_FORMAT=json writes one
+# JSON line per record for a log service; text is easier to read in a terminal.
+REQUEST_LOG_BODY_LIMIT = env.int("REQUEST_LOG_BODY_LIMIT", default=2000)
+REQUEST_LOG_SKIP_PATHS = ["/api/v1/health/"]
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"simple": {"format": "{asctime} {levelname} {name}: {message}", "style": "{"}},
-    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "simple"}},
+    "formatters": {
+        "text": {"format": "{asctime} {levelname} {name}: {message}", "style": "{"},
+        "json": {"()": "core.logs.JsonFormatter"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": env("LOG_FORMAT", default="text"),
+        },
+    },
     "root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO")},
+    # The request log already records every 4xx and 5xx response.
+    "loggers": {"django.request": {"level": "ERROR"}},
 }
