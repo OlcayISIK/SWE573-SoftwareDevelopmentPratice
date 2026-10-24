@@ -99,6 +99,19 @@ def _add_photos(craft, photos):
             )
 
 
+def _restore_photos(craft, photos):
+    """
+    Puts back photo files that are missing from storage, for example on hosting without a
+    persistent disk, where uploaded files are gone after a redeploy but the database is kept.
+    """
+    by_order = {media.order: media for media in craft.media.filter(media_type="photo")}
+    for order, photo in enumerate(photos):
+        media = by_order.get(order)
+        if media and media.file and not media.file.storage.exists(media.file.name):
+            with open(SAMPLE_DATA / "photos" / photo["file"], "rb") as file:
+                media.file.storage.save(media.file.name, File(file))
+
+
 @transaction.atomic
 def load_samples():
     """Adds the sample crafts that are not there yet. Returns (added, already there)."""
@@ -108,7 +121,10 @@ def load_samples():
     for item in data["crafts"]:
         author = contributors[item["author"]]
         # Includes crafts deleted since, so removing a sample craft by hand keeps it removed.
-        if Craft.all_objects.filter(author=author, name=item["name"]).exists():
+        craft = Craft.all_objects.filter(author=author, name=item["name"]).first()
+        if craft is not None:
+            if not craft.is_deleted:
+                _restore_photos(craft, item["photos"])
             existing += 1
             continue
         craft = services.publish_craft(author=author, data=_craft_fields(item))
