@@ -15,3 +15,6 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SESSION_COOKIE_SECURE = env.bool("DJANGO_SECURE_COOKIES", default=True)
 CSRF_COOKIE_SECURE = SESSION_COOKIE_SECURE
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+
+# Production logs go to a log service, which reads one JSON object per line.
+LOGGING["handlers"]["console"]["formatter"] = env("LOG_FORMAT", default="json")  # noqa: F405
