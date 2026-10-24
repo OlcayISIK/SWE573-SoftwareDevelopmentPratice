@@ -134,6 +134,15 @@ def test_the_client_address_comes_from_the_proxy_header(api_client, request_logs
     assert record.client_ip == "203.0.113.7"
 
 
+@pytest.mark.urls("config.urls")
+def test_health_check_answers_and_is_not_logged(api_client, request_logs, db):
+    response = api_client.get("/api/v1/health/")
+
+    assert response.status_code == 200
+    assert response.json()["data"] == {"status": "ok"}
+    assert request_logs() == []
+
+
 def test_json_formatter_writes_extra_fields_and_errors():
     try:
         raise ValueError("boom")
