@@ -104,6 +104,16 @@ def test_loading_twice_adds_nothing():
     assert CraftMedia.objects.count() == photos
 
 
+def test_loading_again_restores_missing_photo_files():
+    call_command("load_sample_crafts")
+    media = CraftMedia.objects.filter(craft__name="Kütahya Çinisi").order_by("order").first()
+    media.file.storage.delete(media.file.name)
+
+    call_command("load_sample_crafts")
+
+    assert media.file.storage.exists(media.file.name)
+
+
 def test_sample_contributors_cannot_log_in(api_client):
     call_command("load_sample_crafts")
     user = User.objects.get(email=sample_email("anatolia"))
