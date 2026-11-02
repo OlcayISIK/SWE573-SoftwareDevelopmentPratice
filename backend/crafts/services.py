@@ -227,6 +227,19 @@ def delete_story(*, story, actor):
     story.delete()
 
 
+@transaction.atomic
+def hide_story(*, story, actor):
+    _ensure_admin(actor)
+    story.status = CraftStory.Status.HIDDEN
+    story.save(update_fields=["status", "updated_at"])
+
+
+@transaction.atomic
+def remove_story(*, story, actor):
+    _ensure_admin(actor)
+    story.delete()
+
+
 def _add_lookup(model, *, user, name, scope=None, **extra):
     """
     Adds a lookup item, or returns the existing one with the same name (ignoring case), so

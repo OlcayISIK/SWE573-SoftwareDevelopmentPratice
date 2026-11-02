@@ -191,6 +191,7 @@ SPECTACULAR_SETTINGS = {
         "ItemReportReasonEnum": "moderation.models.ItemReport.Reason",
         "ActionEnum": "moderation.models.ReviewAction.Action",
         "ItemReviewActionEnum": "moderation.models.ItemReviewAction.Action",
+        "StoryReviewActionEnum": "moderation.models.StoryReviewAction.Action",
     },
 }
 

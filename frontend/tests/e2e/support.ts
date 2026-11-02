@@ -126,6 +126,12 @@ export async function apiCreateCraft(email: string, name: string, extra: object 
   return craft.id;
 }
 
+/** Shares a story about a craft as the given user and returns its id. */
+export async function apiShareStory(email: string, craftId: number, text: string) {
+  const access = await apiAccess(email);
+  return (await apiPost<{ id: number }>(`/crafts/${craftId}/stories/`, { text }, access)).id;
+}
+
 /** Adds a tool to the lookup list as the given user and returns its id. */
 export async function apiAddTool(email: string, name: string) {
   const access = await apiAccess(email);

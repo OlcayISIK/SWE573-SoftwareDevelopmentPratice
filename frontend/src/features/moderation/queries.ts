@@ -3,7 +3,13 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { craftsApi, lookupsApi } from "@/features/crafts/api";
 import { craftKeys, lookupKeys } from "@/features/crafts/queries";
 
-import { itemModerationApi, moderationApi, type ItemKind, type QueueStatus } from "./api";
+import {
+  itemModerationApi,
+  moderationApi,
+  storyModerationApi,
+  type ItemKind,
+  type QueueStatus,
+} from "./api";
 
 export const moderationKeys = {
   all: ["moderation"] as const,
@@ -12,6 +18,9 @@ export const moderationKeys = {
   itemQueue: (status: QueueStatus, page: number) =>
     ["moderation", "item-queue", status, page] as const,
   itemDetail: (reportId: number) => ["moderation", "item-report", reportId] as const,
+  storyQueue: (status: QueueStatus, page: number) =>
+    ["moderation", "story-queue", status, page] as const,
+  storyDetail: (reportId: number) => ["moderation", "story-report", reportId] as const,
 };
 
 export function useReviewQueue(status: QueueStatus, page: number) {
@@ -72,6 +81,38 @@ export function useReviewItemReport(reportId: number) {
       return Promise.all([
         queryClient.invalidateQueries({ queryKey: moderationKeys.all }),
         queryClient.invalidateQueries({ queryKey: lookupKeys.all }),
+        queryClient.invalidateQueries({ queryKey: craftKeys.all }),
+      ]);
+    },
+  });
+}
+
+export function useStoryReviewQueue(status: QueueStatus, page: number) {
+  return useQuery({
+    queryKey: moderationKeys.storyQueue(status, page),
+    queryFn: () => storyModerationApi.queue(status, page),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useStoryReport(reportId: number | null) {
+  return useQuery({
+    queryKey: moderationKeys.storyDetail(reportId ?? 0),
+    queryFn: () => storyModerationApi.detail(reportId as number),
+    enabled: reportId !== null,
+  });
+}
+
+export function useReviewStoryReport(reportId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Parameters<typeof storyModerationApi.review>[1]) =>
+      storyModerationApi.review(reportId, body),
+    onSuccess: (report) => {
+      queryClient.setQueryData(moderationKeys.storyDetail(reportId), report);
+      // A hidden or removed story leaves its craft's story list.
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: moderationKeys.all }),
         queryClient.invalidateQueries({ queryKey: craftKeys.all }),
       ]);
     },

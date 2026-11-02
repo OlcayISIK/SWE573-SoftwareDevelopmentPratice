@@ -21,6 +21,10 @@ from .serializers import (
     ReportSerializer,
     ReviewActionCreateSerializer,
     ReviewQueueFilterSerializer,
+    StoryReportCreateSerializer,
+    StoryReportReviewSerializer,
+    StoryReportSerializer,
+    StoryReviewActionCreateSerializer,
 )
 
 
@@ -178,3 +182,69 @@ class ItemReviewActionView(APIView):
             admin=request.user, report_id=report_id, **serializer.validated_data
         )
         return Response(ItemReportReviewSerializer(selectors.get_item_report(report_id)).data)
+
+
+class ReportStoryView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_scope = "report"
+
+    @extend_schema(
+        request=StoryReportCreateSerializer,
+        responses={201: StoryReportSerializer},
+        tags=["moderation"],
+    )
+    def post(self, request, story_id):
+        """Reports a story another user shared about a craft."""
+        serializer = StoryReportCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        report = services.report_story(
+            reporter=request.user, story_id=story_id, **serializer.validated_data
+        )
+        return Response(StoryReportSerializer(report).data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(
+    tags=["moderation"],
+    parameters=[
+        OpenApiParameter(
+            "status",
+            OpenApiTypes.STR,
+            enum=["open", "resolved", "dismissed", "all"],
+            description="Defaults to open",
+        )
+    ],
+)
+class StoryReviewQueueView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+    serializer_class = StoryReportReviewSerializer
+
+    def get_queryset(self):
+        filters = ReviewQueueFilterSerializer(data=self.request.query_params)
+        filters.is_valid(raise_exception=True)
+        return selectors.story_review_queue(**filters.validated_data)
+
+
+class StoryReportDetailView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    @extend_schema(responses=StoryReportReviewSerializer, tags=["moderation"])
+    def get(self, request, report_id):
+        return Response(StoryReportReviewSerializer(selectors.get_story_report(report_id)).data)
+
+
+class StoryReviewActionView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    @extend_schema(
+        request=StoryReviewActionCreateSerializer,
+        responses=StoryReportReviewSerializer,
+        tags=["moderation"],
+    )
+    def post(self, request, report_id):
+        """Hides or removes the reported story, or dismisses the report."""
+        serializer = StoryReviewActionCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        services.review_story_report(
+            admin=request.user, report_id=report_id, **serializer.validated_data
+        )
+        return Response(StoryReportReviewSerializer(selectors.get_story_report(report_id)).data)

@@ -91,3 +91,25 @@ export const ACTION_LABELS: Record<ReviewActionType, string> = {
   remove: "Remove the craft",
   dismiss: "Dismiss the report",
 };
+
+export type StoryReportReview = Schemas["StoryReportReview"];
+export type StoryActionType = "hide" | "remove" | "dismiss";
+
+export const storyModerationApi = {
+  report: (storyId: number, body: { reason: ReportReason; note: string }) =>
+    api.post<Schemas["StoryReport"]>(`/stories/${storyId}/report/`, body),
+  queue: (status: QueueStatus, page: number) =>
+    api.get<Paginated<StoryReportReview>>("/moderation/story-reports/", {
+      params: { status, page },
+    }),
+  detail: (reportId: number) =>
+    api.get<StoryReportReview>(`/moderation/story-reports/${reportId}/`),
+  review: (reportId: number, body: { action: StoryActionType; reason: string }) =>
+    api.post<StoryReportReview>(`/moderation/story-reports/${reportId}/actions/`, body),
+};
+
+export const STORY_ACTION_LABELS: Record<StoryActionType, string> = {
+  hide: "Hide the story",
+  remove: "Remove the story",
+  dismiss: "Dismiss the report",
+};
