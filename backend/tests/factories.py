@@ -1,7 +1,7 @@
 import factory
 
 from accounts.models import User
-from crafts.models import Category, Craft, CraftPlace, CraftType, Culture
+from crafts.models import Category, Craft, CraftPlace, CraftStory, CraftType, Culture
 from moderation.models import Report
 
 DEFAULT_PASSWORD = "Str0ng-Passw0rd!"
@@ -63,6 +63,15 @@ class CraftFactory(factory.django.DjangoModelFactory):
         rows = extracted or [{field: getattr(craft, field) for field in fields}]
         for order, row in enumerate(rows):
             CraftPlace.objects.create(craft=craft, order=order, **row)
+
+
+class CraftStoryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CraftStory
+
+    craft = factory.SubFactory(CraftFactory)
+    author = factory.SubFactory(UserFactory)
+    text = "My grandmother wove these every winter; each motif was a wish for the family."
 
 
 class ReportFactory(factory.django.DjangoModelFactory):

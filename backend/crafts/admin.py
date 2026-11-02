@@ -6,6 +6,7 @@ from .models import (
     CraftColor,
     CraftMedia,
     CraftPlace,
+    CraftStory,
     CraftType,
     Culture,
     Material,
@@ -80,3 +81,12 @@ class CraftAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return Craft.all_objects.select_related("author", "category", "craft_type", "culture")
+
+
+@admin.register(CraftStory)
+class CraftStoryAdmin(admin.ModelAdmin):
+    list_display = ["craft", "author", "status", "is_deleted", "created_at"]
+    list_filter = ["status", "is_deleted"]
+    search_fields = ["text", "craft__name", "author__email"]
+    raw_id_fields = ["craft", "author"]
+    readonly_fields = ["created_at", "updated_at"]
