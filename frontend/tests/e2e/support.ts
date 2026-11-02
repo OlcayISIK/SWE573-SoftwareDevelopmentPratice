@@ -61,19 +61,27 @@ async function apiPost<T>(path: string, body: unknown, token?: string): Promise<
   return payload.data;
 }
 
+/**
+ * Tokens for a test user, made by Django directly. Logging in through the API is limited to 10
+ * a minute, which a full run would exceed; publish.spec.ts covers the real login form.
+ */
 export function apiLogin(email: string) {
-  return apiPost<{ access: string; refresh: string }>("/auth/token/", {
-    email,
-    password: PASSWORD,
-  });
+  const output = djangoShell(
+    [
+      "import json",
+      "from accounts.models import User",
+      "from rest_framework_simplejwt.tokens import RefreshToken",
+      `token = RefreshToken.for_user(User.objects.get(email="${email}"))`,
+      'print(json.dumps({"access": str(token.access_token), "refresh": str(token)}))',
+    ].join("; "),
+  );
+  const lastLine = output.trim().split("\n").at(-1)!;
+  return Promise.resolve(JSON.parse(lastLine) as { access: string; refresh: string });
 }
 
 const accessTokens = new Map<string, Promise<string>>();
 
-/**
- * An access token for API calls made as the user. Logging in is rate limited, so each user logs
- * in once per test file for these calls.
- */
+/** An access token for API calls made as the user, made once per user and test file. */
 function apiAccess(email: string) {
   if (!accessTokens.has(email)) {
     accessTokens.set(
