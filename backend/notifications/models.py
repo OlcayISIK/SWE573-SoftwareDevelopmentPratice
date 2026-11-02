@@ -9,6 +9,7 @@ class Notification(BaseModel):
         NEW_CRAFT_FROM_FOLLOWED = "new_craft_from_followed", "New craft from someone you follow"
         FAVORITE_UPDATED = "favorite_updated", "A favorited craft was updated"
         REPORT_RESOLVED = "report_resolved", "Your report was reviewed"
+        NEW_STORY = "new_story", "Someone shared a story about your craft"
 
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications"

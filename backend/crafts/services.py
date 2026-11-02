@@ -12,6 +12,7 @@ from .models import (
     CraftColor,
     CraftMedia,
     CraftPlace,
+    CraftStory,
     CraftType,
     Culture,
     Material,
@@ -42,6 +43,11 @@ ADMIN_ONLY = "Only admins can perform this action."
 AUTHOR_ONLY = "Only the author can add media to this craft."
 TOO_MANY_MEDIA = f"A craft can have at most {MAX_MEDIA_PER_CRAFT} media items."
 VERIFY_BEFORE_ADDING = "Verify your email address before adding new items."
+VERIFY_BEFORE_SHARING = "Verify your email address before sharing stories."
+AUTHOR_HAS_STORY_FIELD = "As the craft's author, tell your story in the craft's Story field."
+ONE_STORY_PER_CRAFT = "You have already shared a story about this craft. Edit it instead."
+STORY_HIDDEN = "Your story about this craft was hidden by an admin."
+NOT_ALLOWED_TO_EDIT_STORY = "Only the writer or an admin can change this story."
 REMOVED_BY_ADMIN = "{name} was removed by an admin. Choose another name."
 NAME_TAKEN = "{name} already exists. Merge into it instead."
 MERGE_SAME_KIND = "Choose another item of the same kind to merge into."
@@ -180,6 +186,45 @@ def add_media(*, craft, actor, data):
 def remove_media(*, media, actor):
     _ensure_can_edit(media.craft, actor)
     media.delete()
+
+
+@transaction.atomic
+def share_story(*, craft, author, text):
+    if not author.is_email_verified:
+        raise PermissionDeniedError(VERIFY_BEFORE_SHARING)
+    if craft.author_id == author.id:
+        raise PermissionDeniedError(AUTHOR_HAS_STORY_FIELD)
+    existing = CraftStory.objects.filter(craft=craft, author=author).first()
+    if existing is not None:
+        hidden = existing.status == CraftStory.Status.HIDDEN
+        raise ConflictError(STORY_HIDDEN if hidden else ONE_STORY_PER_CRAFT)
+    try:
+        with transaction.atomic():
+            story = CraftStory.objects.create(craft=craft, author=author, text=text)
+    except IntegrityError as exc:
+        # Another request from the same user shared a story first.
+        raise ConflictError(ONE_STORY_PER_CRAFT) from exc
+    signals.story_shared.send(sender=CraftStory, story=story)
+    return story
+
+
+def _ensure_can_edit_story(story, actor):
+    if story.author_id != actor.id and not actor.is_admin:
+        raise PermissionDeniedError(NOT_ALLOWED_TO_EDIT_STORY)
+
+
+@transaction.atomic
+def edit_story(*, story, actor, text):
+    _ensure_can_edit_story(story, actor)
+    story.text = text
+    story.save(update_fields=["text", "updated_at"])
+    return story
+
+
+@transaction.atomic
+def delete_story(*, story, actor):
+    _ensure_can_edit_story(story, actor)
+    story.delete()
 
 
 def _add_lookup(model, *, user, name, scope=None, **extra):

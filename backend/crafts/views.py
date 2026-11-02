@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.selectors import get_public_user
+from core.pagination import StandardPagination
 from core.permissions import IsAuthorOrAdmin
 
 from . import geocoding, selectors, services
@@ -33,6 +34,8 @@ from .serializers import (
     MediaSerializer,
     MediaUploadSerializer,
     PlaceSerializer,
+    StorySerializer,
+    StoryWriteSerializer,
     ToolSerializer,
 )
 
@@ -154,13 +157,24 @@ class CultureListView(LookupListView):
         return selectors.list_cultures()
 
 
+class StoryPagination(StandardPagination):
+    page_size = 10
+
+
 @extend_schema(tags=["crafts"])
 class CraftViewSet(viewsets.GenericViewSet):
     lookup_value_regex = r"\d+"
     serializer_class = CraftDetailSerializer
 
     def get_permissions(self):
-        if self.action in ("create", "upload_media", "delete_media"):
+        if self.action in (
+            "create",
+            "upload_media",
+            "delete_media",
+            "share_story",
+            "edit_story",
+            "delete_story",
+        ):
             return [IsAuthenticated()]
         if self.action in ("partial_update", "destroy"):
             return [IsAuthenticated(), IsAuthorOrAdmin()]
@@ -246,6 +260,41 @@ class CraftViewSet(viewsets.GenericViewSet):
         craft = selectors.get_visible_craft(pk, request.user)
         media = selectors.get_media(craft, media_id)
         services.remove_media(media=media, actor=request.user)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(responses=StorySerializer(many=True))
+    @action(detail=True, methods=["get"], url_path="stories", pagination_class=StoryPagination)
+    def stories(self, request, pk):
+        """Stories other users have shared about the craft, oldest first."""
+        craft = selectors.find_visible_craft(pk, request.user)
+        page = self.paginate_queryset(selectors.list_stories(craft))
+        return self.get_paginated_response(StorySerializer(page, many=True).data)
+
+    @extend_schema(request=StoryWriteSerializer, responses={201: StorySerializer})
+    @stories.mapping.post
+    def share_story(self, request, pk):
+        craft = selectors.find_visible_craft(pk, request.user)
+        serializer = StoryWriteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        story = services.share_story(craft=craft, author=request.user, **serializer.validated_data)
+        return Response(StorySerializer(story).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(request=StoryWriteSerializer, responses=StorySerializer)
+    @action(detail=True, methods=["patch"], url_path=r"stories/(?P<story_id>\d+)")
+    def edit_story(self, request, pk, story_id):
+        craft = selectors.find_visible_craft(pk, request.user)
+        story = selectors.get_story(craft, story_id, request.user)
+        serializer = StoryWriteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        services.edit_story(story=story, actor=request.user, **serializer.validated_data)
+        return Response(StorySerializer(story).data)
+
+    @extend_schema(responses={204: None})
+    @edit_story.mapping.delete
+    def delete_story(self, request, pk, story_id):
+        craft = selectors.find_visible_craft(pk, request.user)
+        story = selectors.get_story(craft, story_id, request.user)
+        services.delete_story(story=story, actor=request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

@@ -210,6 +210,41 @@ class Craft(SoftDeleteModel):
         return self.name
 
 
+MAX_STORY_LENGTH = 5000
+
+
+class CraftStory(SoftDeleteModel):
+    """A registered user's own story about a craft: what it means to them, how it is made where
+    they live, or its history. Each user has one story per craft, which they can edit."""
+
+    class Status(models.TextChoices):
+        PUBLISHED = "published", "Published"
+        HIDDEN = "hidden", "Hidden"
+
+    craft = models.ForeignKey(Craft, on_delete=models.CASCADE, related_name="stories")
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="craft_stories"
+    )
+    text = models.TextField(max_length=MAX_STORY_LENGTH)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PUBLISHED)
+
+    class Meta:
+        ordering = ["created_at", "id"]
+        indexes = [
+            models.Index(fields=["craft", "status", "is_deleted"], name="story_listing_idx"),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["craft", "author"],
+                condition=models.Q(is_deleted=False),
+                name="one_story_per_user_per_craft",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Story by {self.author_id} on {self.craft_id}"
+
+
 class CraftPlace(BaseModel):
     """
     A place where the craft is made or belongs. A craft has one or more; the author can mark one

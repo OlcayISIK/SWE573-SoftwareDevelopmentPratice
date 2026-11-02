@@ -1,7 +1,7 @@
 from django.dispatch import receiver
 
 from crafts.models import Craft
-from crafts.signals import craft_published, craft_updated
+from crafts.signals import craft_published, craft_updated, story_shared
 from moderation.signals import report_resolved
 from social.selectors import favoriter_ids, follower_ids
 
@@ -34,6 +34,17 @@ def notify_favoriters_of_update(sender, craft, actor, **kwargs):
         )
         for recipient_id in favoriter_ids(craft.pk)
         if recipient_id != actor.pk
+    )
+
+
+@receiver(story_shared, dispatch_uid="notify_author_of_story")
+def notify_author_of_story(sender, story, **kwargs):
+    Notification.objects.create(
+        recipient_id=story.craft.author_id,
+        type=Notification.Type.NEW_STORY,
+        craft_id=story.craft_id,
+        actor_id=story.author_id,
+        data={"story_id": story.pk},
     )
 
 

@@ -13,10 +13,12 @@ from .colors import HEX_COLOR, MAIN_COLORS
 from .models import (
     CATEGORY_ICONS,
     DEFAULT_CATEGORY_ICON,
+    MAX_STORY_LENGTH,
     Category,
     Craft,
     CraftMedia,
     CraftPlace,
+    CraftStory,
     CraftType,
     Culture,
     Material,
@@ -611,6 +613,9 @@ class CraftDetailSerializer(serializers.ModelSerializer):
     places = CraftPlaceSerializer(many=True, read_only=True)
     media = MediaSerializer(many=True, read_only=True)
     date = CraftDateField()
+    story_count = serializers.IntegerField(
+        read_only=True, help_text="How many stories other users have shared about the craft."
+    )
 
     class Meta:
         model = Craft
@@ -631,6 +636,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
             "media",
             "description",
             "story",
+            "story_count",
             "date",
             "colors",
             "attributes",
@@ -640,6 +646,19 @@ class CraftDetailSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = fields
+
+
+class StorySerializer(serializers.ModelSerializer):
+    author = AuthorSerializer(read_only=True)
+
+    class Meta:
+        model = CraftStory
+        fields = ["id", "text", "author", "created_at", "updated_at"]
+        read_only_fields = fields
+
+
+class StoryWriteSerializer(serializers.Serializer):
+    text = serializers.CharField(max_length=MAX_STORY_LENGTH)
 
 
 class GeocodeSearchSerializer(serializers.Serializer):

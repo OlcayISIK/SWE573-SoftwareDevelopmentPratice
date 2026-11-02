@@ -11,6 +11,7 @@ from .models import (
     CraftColor,
     CraftMedia,
     CraftPlace,
+    CraftStory,
     CraftType,
     Culture,
     Material,
@@ -19,6 +20,7 @@ from .models import (
 
 CRAFT_NOT_FOUND = "Craft not found."
 MEDIA_NOT_FOUND = "Media not found."
+STORY_NOT_FOUND = "Story not found."
 
 
 def _with_photos(crafts):
@@ -243,12 +245,48 @@ def get_visible_craft(craft_id, viewer=None):
         visible_crafts(viewer)
         .select_related("category", "craft_type", "culture", "author__profile")
         .prefetch_related("media", "tools", "materials", "colors", "places")
+        .annotate(story_count=_published_stories())
         .filter(pk=craft_id)
         .first()
     )
     if craft is None:
         raise NotFoundError(CRAFT_NOT_FOUND)
     return craft
+
+
+def find_visible_craft(craft_id, viewer=None):
+    """A visible craft without its related rows, for endpoints that only need to know it exists."""
+    craft = visible_crafts(viewer).filter(pk=craft_id).first()
+    if craft is None:
+        raise NotFoundError(CRAFT_NOT_FOUND)
+    return craft
+
+
+def _published_stories():
+    return Count(
+        "stories",
+        filter=Q(stories__status=CraftStory.Status.PUBLISHED, stories__is_deleted=False),
+        distinct=True,
+    )
+
+
+def list_stories(craft):
+    """The craft's published stories, oldest first, with their writers."""
+    return craft.stories.filter(status=CraftStory.Status.PUBLISHED).select_related(
+        "author__profile"
+    )
+
+
+def get_story(craft, story_id, viewer):
+    """A story of the craft. Hidden stories are found only by their writer and admins."""
+    story = craft.stories.select_related("author__profile").filter(pk=story_id).first()
+    if story is None or (
+        story.status != CraftStory.Status.PUBLISHED
+        and story.author_id != getattr(viewer, "id", None)
+        and not getattr(viewer, "is_admin", False)
+    ):
+        raise NotFoundError(STORY_NOT_FOUND)
+    return story
 
 
 def get_media(craft, media_id):
