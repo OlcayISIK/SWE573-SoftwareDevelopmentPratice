@@ -270,11 +270,12 @@ def _published_stories():
     )
 
 
-def list_stories(craft):
+def list_stories(craft, *, author_id=None):
     """The craft's published stories, oldest first, with their writers."""
-    return craft.stories.filter(status=CraftStory.Status.PUBLISHED).select_related(
-        "author__profile"
-    )
+    stories = craft.stories.filter(status=CraftStory.Status.PUBLISHED)
+    if author_id is not None:
+        stories = stories.filter(author_id=author_id)
+    return stories.select_related("author__profile")
 
 
 def get_story(craft, story_id, viewer):

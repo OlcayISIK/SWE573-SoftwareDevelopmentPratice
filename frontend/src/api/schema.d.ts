@@ -301,6 +301,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/crafts/{id}/stories/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Stories other users have shared about the craft, oldest first. */
+        get: operations["v1_crafts_stories_list"];
+        put?: never;
+        post: operations["v1_crafts_stories_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/crafts/{id}/stories/{story_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["v1_crafts_stories_destroy"];
+        options?: never;
+        head?: never;
+        patch: operations["v1_crafts_stories_partial_update"];
+        trace?: never;
+    };
     "/api/v1/crafts/facets/": {
         parameters: {
             query?: never;
@@ -384,6 +417,27 @@ export interface paths {
         };
         /** @description Finds the coordinates of an address. Returns 404 when nothing matches. */
         get: operations["v1_geocode_search_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/health/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description For the host's health checks: answers when the app and its database are up.
+         *
+         *     It is not logged or rate limited, since it is called every few seconds.
+         */
+        get: operations["v1_health_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -817,6 +871,8 @@ export interface components {
             readonly media: components["schemas"]["Media"][];
             readonly description: string;
             readonly story: string;
+            /** @description How many stories other users have shared about the craft. */
+            readonly story_count: number;
             readonly date: components["schemas"]["CraftDate"];
             readonly colors: string[];
             readonly attributes: unknown;
@@ -970,6 +1026,9 @@ export interface components {
             readonly user: components["schemas"]["PersonSummary"];
             /** Format: date-time */
             readonly since: string;
+        };
+        Health: {
+            status: string;
         };
         /**
          * @description * `spool` - spool
@@ -1171,9 +1230,10 @@ export interface components {
          * @description * `new_craft_from_followed` - New craft from someone you follow
          *     * `favorite_updated` - A favorited craft was updated
          *     * `report_resolved` - Your report was reviewed
+         *     * `new_story` - Someone shared a story about your craft
          * @enum {string}
          */
-        NotificationTypeEnum: "new_craft_from_followed" | "favorite_updated" | "report_resolved";
+        NotificationTypeEnum: "new_craft_from_followed" | "favorite_updated" | "report_resolved" | "new_story";
         OwnProfile: {
             readonly id: number;
             /** Format: email */
@@ -1232,6 +1292,13 @@ export interface components {
             pageSize: number;
             totalPages: number;
         };
+        PaginatedStoryList: {
+            items: components["schemas"]["Story"][];
+            total: number;
+            page: number;
+            pageSize: number;
+            totalPages: number;
+        };
         PasswordResetConfirmRequest: {
             uid: string;
             token: string;
@@ -1262,6 +1329,9 @@ export interface components {
             /** Format: binary */
             avatar?: string | null;
             show_email?: boolean;
+        };
+        PatchedStoryWriteRequest: {
+            text?: string;
         };
         Person: {
             readonly id: number;
@@ -1397,6 +1467,18 @@ export interface components {
          * @enum {string}
          */
         RoleEnum: "user" | "admin";
+        Story: {
+            readonly id: number;
+            readonly text: string;
+            readonly author: components["schemas"]["Author"];
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
+        };
+        StoryWriteRequest: {
+            text: string;
+        };
         TokenRefresh: {
             readonly access: string;
             refresh: string;
@@ -2139,6 +2221,122 @@ export interface operations {
             };
         };
     };
+    v1_crafts_stories_list: {
+        parameters: {
+            query?: {
+                /** @description Only the story written by this user. */
+                author?: number;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                pageSize?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["PaginatedStoryList"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_crafts_stories_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryWriteRequest"];
+                "multipart/form-data": components["schemas"]["StoryWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["StoryWriteRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Story"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_crafts_stories_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_crafts_stories_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                story_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedStoryWriteRequest"];
+                "multipart/form-data": components["schemas"]["PatchedStoryWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedStoryWriteRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Story"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
     v1_crafts_facets_retrieve: {
         parameters: {
             query?: {
@@ -2327,6 +2525,29 @@ export interface operations {
                     "application/json": {
                         success: boolean;
                         data: components["schemas"]["Place"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_health_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["Health"];
                         message: string;
                     };
                 };

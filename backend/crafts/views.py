@@ -34,6 +34,7 @@ from .serializers import (
     MediaSerializer,
     MediaUploadSerializer,
     PlaceSerializer,
+    StoryFilterSerializer,
     StorySerializer,
     StoryWriteSerializer,
     ToolSerializer,
@@ -262,12 +263,15 @@ class CraftViewSet(viewsets.GenericViewSet):
         services.remove_media(media=media, actor=request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @extend_schema(responses=StorySerializer(many=True))
+    @extend_schema(parameters=[StoryFilterSerializer], responses=StorySerializer(many=True))
     @action(detail=True, methods=["get"], url_path="stories", pagination_class=StoryPagination)
     def stories(self, request, pk):
         """Stories other users have shared about the craft, oldest first."""
         craft = selectors.find_visible_craft(pk, request.user)
-        page = self.paginate_queryset(selectors.list_stories(craft))
+        filters = StoryFilterSerializer(data=request.query_params)
+        filters.is_valid(raise_exception=True)
+        stories = selectors.list_stories(craft, author_id=filters.validated_data.get("author"))
+        page = self.paginate_queryset(stories)
         return self.get_paginated_response(StorySerializer(page, many=True).data)
 
     @extend_schema(request=StoryWriteSerializer, responses={201: StorySerializer})

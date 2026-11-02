@@ -63,6 +63,7 @@ export function makeCraftDetail(overrides: Partial<CraftDetail> = {}): CraftDeta
     ],
     description: "Hand-painted glazed tiles.",
     story: "",
+    story_count: 0,
     date: { kind: "unknown", year: null, day: null, circa: false },
     colors: [],
     attributes: {},

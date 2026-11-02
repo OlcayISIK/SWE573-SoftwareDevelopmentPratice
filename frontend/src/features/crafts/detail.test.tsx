@@ -66,7 +66,7 @@ test("shows the description, story, characteristics, culture, and location", asy
   expect(screen.getByText("Ceramics · Tile")).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "About this craft" })).toBeInTheDocument();
   expect(screen.getByText("Hand-painted glazed tiles.")).toBeInTheDocument();
-  expect(screen.getByRole("heading", { name: "Story" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Stories (1)" })).toBeInTheDocument();
   expect(screen.getByText(/decorated mosques across the Ottoman lands/)).toBeInTheDocument();
   expect(screen.getByText("c. 500 BC")).toBeInTheDocument();
   const header = screen.getByRole("heading", { level: 1 }).closest("header")!;
@@ -83,15 +83,16 @@ test("shows the description, story, characteristics, culture, and location", asy
   const aside = screen.getByRole("complementary", { name: "Facts and location" });
   expect(within(aside).getByText("Cumhuriyet Caddesi, Kütahya")).toBeInTheDocument();
   expect(await within(aside).findByRole("region", { name: "Map of crafts" })).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Ayşe" })).toHaveAttribute("href", "/users/7");
+  expect(within(header).getByRole("link", { name: "Ayşe" })).toHaveAttribute("href", "/users/7");
 });
 
-test("a craft without a story has no story section", async () => {
+test("a craft without a story shows no author story", async () => {
   serveCraft(makeCraftDetail());
   renderRoute("/crafts/1");
 
   expect(await screen.findByRole("heading", { name: "About this craft" })).toBeVisible();
-  expect(screen.queryByRole("heading", { name: "Story" })).not.toBeInTheDocument();
+  expect(await screen.findByText("No stories yet.")).toBeVisible();
+  expect(screen.queryByRole("button", { name: /Craft author/ })).not.toBeInTheDocument();
 });
 
 test("the gallery switches photos", async () => {

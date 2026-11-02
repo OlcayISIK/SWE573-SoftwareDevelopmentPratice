@@ -45,6 +45,16 @@ def test_stories_come_ten_to_a_page(api_client):
     assert len(second["items"]) == 2
 
 
+def test_the_list_can_be_narrowed_to_one_writer(api_client):
+    craft = CraftFactory()
+    CraftStoryFactory(craft=craft)
+    mine = CraftStoryFactory(craft=craft)
+
+    data = api_client.get(stories_url(craft), {"author": mine.author_id}).json()["data"]
+
+    assert [item["id"] for item in data["items"]] == [mine.pk]
+
+
 def test_hidden_and_deleted_stories_are_not_listed(api_client):
     craft = CraftFactory()
     shown = CraftStoryFactory(craft=craft)

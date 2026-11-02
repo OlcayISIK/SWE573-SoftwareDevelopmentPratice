@@ -47,6 +47,14 @@ function message(notification: AppNotification): ReactNode {
         `Your report was reviewed: ${outcome}.`
       );
     }
+    case "new_story":
+      return craftLink ? (
+        <>
+          {actor} shared a story about {craftLink}.
+        </>
+      ) : (
+        `${actor} shared a story about a craft that is no longer available.`
+      );
     default:
       return "You have a new notification.";
   }

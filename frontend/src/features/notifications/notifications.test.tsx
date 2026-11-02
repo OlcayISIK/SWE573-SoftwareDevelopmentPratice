@@ -77,6 +77,7 @@ test("each notification type reads naturally and links to visible crafts", async
             data: { action: "hide", report_status: "resolved" },
           }),
           makeNotification({ id: 4, craft: null as never, is_read: true }),
+          makeNotification({ id: 5, type: "new_story", data: { story_id: 9 } }),
         ]),
       ),
     ),
@@ -97,6 +98,7 @@ test("each notification type reads naturally and links to visible crafts", async
   );
   expect(items[3]).toHaveTextContent("Mehmet added a craft that is no longer available.");
   expect(within(items[3]).queryByRole("link")).not.toBeInTheDocument();
+  expect(items[4]).toHaveTextContent("New: Mehmet shared a story about Uşak Halısı.");
 });
 
 test("opening the list marks notifications as read and clears the bell", async () => {

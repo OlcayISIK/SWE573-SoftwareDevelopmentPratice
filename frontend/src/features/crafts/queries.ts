@@ -1,6 +1,12 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
-import { craftsApi, lookupsApi, type NewMedia } from "./api";
+import { craftsApi, lookupsApi, storiesApi, type NewMedia } from "./api";
 import type { CraftFilters } from "./types";
 
 export const craftKeys = {
@@ -12,6 +18,8 @@ export const craftKeys = {
     [...craftKeys.all, "facets", filters] as const,
   detail: (id: number) => [...craftKeys.all, "detail", id] as const,
   byUser: (userId: number, page: number) => [...craftKeys.all, "user", userId, page] as const,
+  stories: (id: number) => [...craftKeys.all, "stories", id] as const,
+  storyBy: (id: number, author: number) => [...craftKeys.stories(id), "by", author] as const,
   categories: ["reference", "categories"] as const,
 };
 
@@ -68,6 +76,50 @@ export function useUpdateCraft(id: number) {
       return queryClient.invalidateQueries({ queryKey: craftKeys.all });
     },
   });
+}
+
+/** The craft's stories, 10 at a time; `fetchNextPage` loads the next 10. */
+export function useStories(craftId: number) {
+  return useInfiniteQuery({
+    queryKey: craftKeys.stories(craftId),
+    queryFn: ({ pageParam }) => storiesApi.list(craftId, { page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (last) => (last.page < last.totalPages ? last.page + 1 : undefined),
+  });
+}
+
+/** The story `author` wrote about the craft, if any, wherever it is in the list. */
+export function useStoryBy(craftId: number, author: number | null) {
+  return useQuery({
+    queryKey: craftKeys.storyBy(craftId, author ?? 0),
+    queryFn: async () => (await storiesApi.list(craftId, { author: author! })).items[0] ?? null,
+    enabled: author !== null,
+  });
+}
+
+export function useStoryMutations(craftId: number) {
+  const queryClient = useQueryClient();
+  // The craft's story count changes too.
+  const refresh = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: craftKeys.stories(craftId) }),
+      queryClient.invalidateQueries({ queryKey: craftKeys.detail(craftId) }),
+    ]);
+  return {
+    share: useMutation({
+      mutationFn: (text: string) => storiesApi.share(craftId, text),
+      onSuccess: refresh,
+    }),
+    edit: useMutation({
+      mutationFn: ({ storyId, text }: { storyId: number; text: string }) =>
+        storiesApi.edit(craftId, storyId, text),
+      onSuccess: refresh,
+    }),
+    remove: useMutation({
+      mutationFn: (storyId: number) => storiesApi.remove(craftId, storyId),
+      onSuccess: refresh,
+    }),
+  };
 }
 
 export function useMediaMutations(craftId: number) {
