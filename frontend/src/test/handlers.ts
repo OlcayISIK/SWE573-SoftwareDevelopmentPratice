@@ -183,6 +183,7 @@ export const defaultHandlers = [
   http.get(`${API}/crafts/map/`, () => ok([])),
   http.get(`${API}/crafts/`, () => ok(emptyPage())),
   http.get(`${API}/crafts/:id/favorite/`, () => ok({ favorited: false, favorites_count: 0 })),
+  http.get(`${API}/crafts/:id/stories/`, () => ok(emptyPage())),
   http.get(`${API}/me/notifications/unread-count/`, () => ok({ count: 0 })),
   http.get(`${API}/me/favorites/`, () => ok(emptyPage())),
   http.get(`${API}/me/following/`, () => ok(emptyPage())),

@@ -1,11 +1,11 @@
 # Removes everything the end-to-end tests created: users named e2e-...@example.com and their
-# crafts, photos, reports, notifications, and added list items. Runs inside the backend
+# crafts, stories, photos, reports, notifications, and added list items. Runs inside the backend
 # container with `manage.py shell`. The e2e admin, sample crafts, and real accounts stay.
 from django.db import transaction
 from django.db.models import Q
 
 from accounts.models import User
-from crafts.models import LOOKUP_MODELS, Craft, CraftMedia
+from crafts.models import LOOKUP_MODELS, Craft, CraftMedia, CraftStory
 from moderation.models import ItemReport, ItemReviewAction, Report, ReviewAction
 from notifications.models import Notification
 
@@ -26,6 +26,7 @@ with transaction.atomic():
         if item.file:
             item.file.delete(save=False)
     media.hard_delete()
+    CraftStory.all_objects.filter(Q(author__in=users) | Q(craft__in=crafts)).hard_delete()
     crafts.hard_delete()
     for model in LOOKUP_MODELS.values():
         model.objects.filter(created_by__in=users).delete()

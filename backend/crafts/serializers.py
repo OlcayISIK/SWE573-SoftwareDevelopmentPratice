@@ -657,6 +657,12 @@ class StorySerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class StoryFilterSerializer(serializers.Serializer):
+    author = serializers.IntegerField(
+        required=False, min_value=1, help_text="Only the story written by this user."
+    )
+
+
 class StoryWriteSerializer(serializers.Serializer):
     text = serializers.CharField(max_length=MAX_STORY_LENGTH)
 

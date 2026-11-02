@@ -9,6 +9,7 @@ import type {
   CraftListItem,
   CraftMedia,
   CraftPin,
+  CraftStory,
   CraftType,
   Culture,
   Facets,
@@ -60,6 +61,18 @@ export const craftsApi = {
   categories: () => api.get<Category[]>("/categories/"),
   facets: ({ page: _page, ...filters }: CraftFilters) =>
     api.get<Facets>("/crafts/facets/", { params: filters }),
+};
+
+/** Stories other users share about a craft; the craft's author tells theirs in the craft. */
+export const storiesApi = {
+  list: (craftId: number, { page = 1, author }: { page?: number; author?: number } = {}) =>
+    api.get<Paginated<CraftStory>>(`/crafts/${craftId}/stories/`, { params: { page, author } }),
+  share: (craftId: number, text: string) =>
+    api.post<CraftStory>(`/crafts/${craftId}/stories/`, { text }),
+  edit: (craftId: number, storyId: number, text: string) =>
+    api.patch<CraftStory>(`/crafts/${craftId}/stories/${storyId}/`, { text }),
+  remove: (craftId: number, storyId: number) =>
+    api.delete(`/crafts/${craftId}/stories/${storyId}/`),
 };
 
 /** The lists the craft form picks from. Adding a name that exists returns the existing item. */

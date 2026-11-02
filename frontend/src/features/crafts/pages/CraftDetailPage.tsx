@@ -17,6 +17,7 @@ import { AttributeList } from "../components/detail/AttributeList";
 import { CraftFacts } from "../components/detail/CraftFacts";
 import { PhotoGallery } from "../components/detail/PhotoGallery";
 import { RichText } from "../components/detail/RichText";
+import { Stories } from "../components/detail/Stories";
 import { Documents, Videos } from "../components/detail/VideosAndDocuments";
 import { placeName } from "../place";
 import { useCraft, useDeleteCraft } from "../queries";
@@ -175,15 +176,7 @@ export function CraftDetailPage() {
             <h2 className="text-2xl font-semibold">About this craft</h2>
             <RichText text={data.description} className="mt-4 text-lg" />
           </section>
-          {data.story && (
-            <section className="mt-12 overflow-hidden rounded-xl bg-sand-light shadow-sm ring-1 ring-sand">
-              <div className="woven-band" aria-hidden="true" />
-              <div className="p-6 sm:p-8">
-                <h2 className="text-2xl font-semibold">Story</h2>
-                <RichText text={data.story} className="mt-4 text-lg" />
-              </div>
-            </section>
-          )}
+          <Stories craft={data} />
           <AttributeList attributes={data.attributes as CraftAttributes} colors={data.colors} />
           <Videos videos={videos} craftName={data.name} />
           <Documents documents={documents} />
