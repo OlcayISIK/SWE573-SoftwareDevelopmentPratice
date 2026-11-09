@@ -10,6 +10,12 @@ const REVIEW_OUTCOMES: Record<string, string> = {
   dismiss: "no change was needed",
 };
 
+const STORY_OUTCOMES: Record<string, string> = {
+  hide: "the story was hidden",
+  remove: "the story was removed",
+  dismiss: "no change was needed",
+};
+
 const timeFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" });
 
 function message(notification: AppNotification): ReactNode {
@@ -20,7 +26,7 @@ function message(notification: AppNotification): ReactNode {
       {craft.name}
     </Link>
   ) : null;
-  const data = (notification.data ?? {}) as { action?: string };
+  const data = (notification.data ?? {}) as { action?: string; subject?: string };
 
   switch (notification.type) {
     case "new_craft_from_followed":
@@ -38,6 +44,16 @@ function message(notification: AppNotification): ReactNode {
         "A craft you favorited was updated, but it is no longer available."
       );
     case "report_resolved": {
+      if (data.subject === "story") {
+        const outcome = STORY_OUTCOMES[data.action ?? ""] ?? "it was reviewed";
+        return craftLink ? (
+          <>
+            Your report on a story about {craftLink} was reviewed: {outcome}.
+          </>
+        ) : (
+          `Your report on a story was reviewed: ${outcome}.`
+        );
+      }
       const outcome = REVIEW_OUTCOMES[data.action ?? ""] ?? "it was reviewed";
       return craftLink ? (
         <>

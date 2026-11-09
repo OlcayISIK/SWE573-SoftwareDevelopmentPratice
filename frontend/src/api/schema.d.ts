@@ -679,6 +679,72 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/moderation/story-reports/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_moderation_story_reports_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/moderation/story-reports/{report_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_moderation_story_reports_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/moderation/story-reports/{report_id}/actions/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Hides or removes the reported story, or dismisses the report. */
+        post: operations["v1_moderation_story_reports_actions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stories/{story_id}/report/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Reports a story another user shared about a craft. */
+        post: operations["v1_stories_report_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tools/": {
         parameters: {
             query?: never;
@@ -1299,6 +1365,13 @@ export interface components {
             pageSize: number;
             totalPages: number;
         };
+        PaginatedStoryReportReviewList: {
+            items: components["schemas"]["StoryReportReview"][];
+            total: number;
+            page: number;
+            pageSize: number;
+            totalPages: number;
+        };
         PasswordResetConfirmRequest: {
             uid: string;
             token: string;
@@ -1445,6 +1518,14 @@ export interface components {
             readonly added_by: components["schemas"]["Person"] | null;
             readonly crafts_count: number;
         };
+        ReportedStory: {
+            readonly id: number;
+            readonly text: string;
+            readonly status: string;
+            readonly is_deleted: boolean;
+            readonly author: components["schemas"]["Person"];
+            readonly craft: components["schemas"]["StoryCraft"];
+        };
         ReviewAction: {
             readonly id: number;
             readonly action: components["schemas"]["ActionEnum"];
@@ -1476,6 +1557,54 @@ export interface components {
             /** Format: date-time */
             readonly updated_at: string;
         };
+        StoryCraft: {
+            readonly id: number;
+            readonly name: string;
+        };
+        StoryReport: {
+            readonly id: number;
+            readonly story: number;
+            readonly reason: components["schemas"]["ReasonEnum"];
+            readonly note: string;
+            readonly status: components["schemas"]["ReportStatusEnum"];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        StoryReportCreateRequest: {
+            reason: components["schemas"]["ReasonEnum"];
+            note?: string;
+        };
+        StoryReportReview: {
+            readonly id: number;
+            readonly story: components["schemas"]["ReportedStory"];
+            readonly reporter: components["schemas"]["Person"];
+            readonly reason: components["schemas"]["ReasonEnum"];
+            readonly note: string;
+            /** @default open */
+            readonly status: components["schemas"]["ReportStatusEnum"];
+            /** Format: date-time */
+            readonly created_at: string;
+            readonly actions: components["schemas"]["StoryReviewAction"][];
+        };
+        StoryReviewAction: {
+            readonly id: number;
+            readonly action: components["schemas"]["StoryReviewActionEnum"];
+            readonly reason: string;
+            readonly admin: components["schemas"]["Person"];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        StoryReviewActionCreateRequest: {
+            action: components["schemas"]["StoryReviewActionEnum"];
+            reason: string;
+        };
+        /**
+         * @description * `hide` - Hide
+         *     * `remove` - Remove
+         *     * `dismiss` - Dismiss
+         * @enum {string}
+         */
+        StoryReviewActionEnum: "hide" | "remove" | "dismiss";
         StoryWriteRequest: {
             text: string;
         };
@@ -3005,6 +3134,123 @@ export interface operations {
                     "application/json": {
                         success: boolean;
                         data: components["schemas"]["ReportReview"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_moderation_story_reports_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                pageSize?: number;
+                /** @description Defaults to open */
+                status?: "all" | "dismissed" | "open" | "resolved";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["PaginatedStoryReportReviewList"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_moderation_story_reports_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["StoryReportReview"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_moderation_story_reports_actions_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryReviewActionCreateRequest"];
+                "multipart/form-data": components["schemas"]["StoryReviewActionCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["StoryReviewActionCreateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["StoryReportReview"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_stories_report_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                story_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryReportCreateRequest"];
+                "multipart/form-data": components["schemas"]["StoryReportCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["StoryReportCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["StoryReport"];
                         message: string;
                     };
                 };

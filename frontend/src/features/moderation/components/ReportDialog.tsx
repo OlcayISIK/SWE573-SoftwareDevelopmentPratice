@@ -13,6 +13,7 @@ import {
   itemModerationApi,
   moderationApi,
   REASON_LABELS,
+  storyModerationApi,
   type ItemKind,
   type ItemReportReason,
   type ReportReason,
@@ -34,6 +35,24 @@ const CRAFT_REASONS: Reason<ReportReason>[] = [
     value: "inappropriate",
     label: REASON_LABELS.inappropriate,
     hint: "The content does not belong on this site.",
+  },
+  {
+    value: "disrespectful",
+    label: REASON_LABELS.disrespectful,
+    hint: "It misrepresents or stereotypes a culture or community.",
+  },
+];
+
+const STORY_REASONS: Reason<ReportReason>[] = [
+  {
+    value: "inaccurate",
+    label: REASON_LABELS.inaccurate,
+    hint: "The history or facts in the story are wrong.",
+  },
+  {
+    value: "inappropriate",
+    label: REASON_LABELS.inappropriate,
+    hint: "It is not about the craft, or does not belong on this site.",
   },
   {
     value: "disrespectful",
@@ -246,6 +265,31 @@ export function ReportItemButton({
           reasons={ITEM_REASONS}
           doneMessage="An admin will review it."
           onSend={(reason, note) => itemModerationApi.report(kind, item.id, { reason, note })}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
+  );
+}
+
+/** Reports a story another user shared. Only signed-in users other than the writer see it. */
+export function ReportStoryButton({ storyId, writer }: { storyId: number; writer: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        className="text-sm text-stone-600 underline hover:text-red-800"
+        onClick={() => setOpen(true)}
+      >
+        Report story <span className="sr-only">{`by ${writer}`}</span>
+      </button>
+      {open && (
+        <ReportDialog
+          title="Report this story"
+          reasons={STORY_REASONS}
+          doneMessage="An admin will review this story."
+          onSend={(reason, note) => storyModerationApi.report(storyId, { reason, note })}
           onClose={() => setOpen(false)}
         />
       )}

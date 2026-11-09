@@ -5,7 +5,7 @@ from django.db.models import Count, Q
 from core.exceptions import NotFoundError
 from crafts.models import LOOKUP_MODELS
 
-from .models import ItemReport, Report
+from .models import ItemReport, Report, StoryReport
 
 REPORT_NOT_FOUND = "Report not found."
 
@@ -68,3 +68,24 @@ def attach_items(reports):
     for report in reports:
         report.item = found.get((report.item_type, report.item_id))
     return reports
+
+
+def _with_story_details(reports):
+    # A removed story is soft deleted; the report still shows it.
+    return reports.select_related(
+        "story__craft", "story__author__profile", "reporter__profile"
+    ).prefetch_related("actions__admin__profile")
+
+
+def story_review_queue(*, status=Report.Status.OPEN):
+    reports = StoryReport.objects.all()
+    if status != "all":
+        reports = reports.filter(status=status)
+    return _with_story_details(reports)
+
+
+def get_story_report(report_id):
+    report = _with_story_details(StoryReport.objects.filter(pk=report_id)).first()
+    if report is None:
+        raise NotFoundError(REPORT_NOT_FOUND)
+    return report

@@ -278,6 +278,22 @@ def list_stories(craft, *, author_id=None):
     return stories.select_related("author__profile")
 
 
+def get_published_story(story_id, viewer=None):
+    """A published story of a craft the viewer can see."""
+    story = (
+        CraftStory.objects.filter(
+            pk=story_id,
+            status=CraftStory.Status.PUBLISHED,
+            craft__in=visible_crafts(viewer),
+        )
+        .select_related("craft")
+        .first()
+    )
+    if story is None:
+        raise NotFoundError(STORY_NOT_FOUND)
+    return story
+
+
 def get_story(craft, story_id, viewer):
     """A story of the craft. Hidden stories are found only by their writer and admins."""
     story = craft.stories.select_related("author__profile").filter(pk=story_id).first()

@@ -24,6 +24,9 @@ export function AdminLayout() {
           <NavLink to="/admin/item-reports" className={linkClass}>
             Reported items
           </NavLink>
+          <NavLink to="/admin/story-reports" className={linkClass}>
+            Reported stories
+          </NavLink>
         </nav>
       </div>
       <Outlet />

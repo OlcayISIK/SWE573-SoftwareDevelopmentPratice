@@ -3,10 +3,17 @@ from django.db import IntegrityError, transaction
 from core.exceptions import ConflictError, NotFoundError, PermissionDeniedError, ValidationError
 from crafts import services as craft_services
 from crafts.models import LOOKUP_MODELS
-from crafts.selectors import get_visible_craft
+from crafts.selectors import get_published_story, get_visible_craft
 
 from . import signals
-from .models import ItemReport, ItemReviewAction, Report, ReviewAction
+from .models import (
+    ItemReport,
+    ItemReviewAction,
+    Report,
+    ReviewAction,
+    StoryReport,
+    StoryReviewAction,
+)
 from .selectors import REPORT_NOT_FOUND
 
 ALREADY_REPORTED = "You have already reported this craft. It is under review."
@@ -19,6 +26,8 @@ SEEDED_ITEM = "Only items added by users can be reported."
 OWN_ITEM = "You cannot report an item you added."
 ITEM_ALREADY_REPORTED = "You have already reported this item. It is under review."
 ITEM_GONE = "This item no longer exists. Dismiss the report instead."
+OWN_STORY = "You cannot report your own story."
+STORY_ALREADY_REPORTED = "You have already reported this story. It is under review."
 
 
 def report_craft(*, reporter, craft_id, reason, note=""):
@@ -164,5 +173,62 @@ def review_item_report(
         closed.save(update_fields=["status", "updated_at"])
         ItemReviewAction.objects.create(
             report=closed, admin=admin, action=action, reason=reason, details=details
+        )
+    return report
+
+
+def report_story(*, reporter, story_id, reason, note=""):
+    story = get_published_story(story_id, reporter)
+    if story.author_id == reporter.id:
+        raise ValidationError(OWN_STORY)
+    open_reports = StoryReport.objects.filter(
+        story=story, reporter=reporter, status=Report.Status.OPEN
+    )
+    if open_reports.exists():
+        raise ConflictError(STORY_ALREADY_REPORTED)
+
+    try:
+        with transaction.atomic():
+            return StoryReport.objects.create(
+                story=story, reporter=reporter, reason=reason, note=note
+            )
+    except IntegrityError as exc:
+        raise ConflictError(STORY_ALREADY_REPORTED) from exc
+
+
+@transaction.atomic
+def review_story_report(*, admin, report_id, action, reason):
+    if not admin.is_admin:
+        raise PermissionDeniedError(ADMIN_ONLY)
+    report = StoryReport.objects.select_for_update().filter(pk=report_id).first()
+    if report is None:
+        raise NotFoundError(REPORT_NOT_FOUND)
+    if report.status != Report.Status.OPEN:
+        raise ConflictError(ALREADY_REVIEWED)
+
+    closing = [report]
+    if action in (StoryReviewAction.Action.HIDE, StoryReviewAction.Action.REMOVE):
+        if action == StoryReviewAction.Action.HIDE:
+            craft_services.hide_story(story=report.story, actor=admin)
+        else:
+            craft_services.remove_story(story=report.story, actor=admin)
+        # The story is gone from public view, so every other open report on it is settled too.
+        closing += list(
+            StoryReport.objects.select_for_update()
+            .filter(story_id=report.story_id, status=Report.Status.OPEN)
+            .exclude(pk=report.pk)
+        )
+
+    new_status = (
+        Report.Status.DISMISSED
+        if action == StoryReviewAction.Action.DISMISS
+        else Report.Status.RESOLVED
+    )
+    for closed in closing:
+        closed.status = new_status
+        closed.save(update_fields=["status", "updated_at"])
+        StoryReviewAction.objects.create(report=closed, admin=admin, action=action, reason=reason)
+        signals.story_report_resolved.send(
+            sender=StoryReport, report=closed, admin=admin, action=action
         )
     return report

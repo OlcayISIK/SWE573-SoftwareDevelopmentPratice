@@ -3,7 +3,14 @@ from rest_framework import serializers
 
 from crafts.serializers import clean_description, clean_lookup_name
 
-from .models import ItemReport, ItemReviewAction, Report, ReviewAction
+from .models import (
+    ItemReport,
+    ItemReviewAction,
+    Report,
+    ReviewAction,
+    StoryReport,
+    StoryReviewAction,
+)
 
 
 class ReportCreateSerializer(serializers.ModelSerializer):
@@ -163,3 +170,55 @@ class ItemReviewActionCreateSerializer(serializers.Serializer):
         if action == ItemReviewAction.Action.MERGE and "merge_into" not in attrs:
             raise serializers.ValidationError({"merge_into": ["Choose the item to merge into."]})
         return attrs
+
+
+class StoryReportCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StoryReport
+        fields = ["reason", "note"]
+
+
+class StoryReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StoryReport
+        fields = ["id", "story", "reason", "note", "status", "created_at"]
+        read_only_fields = fields
+
+
+class StoryCraftSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(read_only=True)
+
+
+class ReportedStorySerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    text = serializers.CharField(read_only=True)
+    status = serializers.CharField(read_only=True)
+    is_deleted = serializers.BooleanField(read_only=True)
+    author = PersonSerializer(read_only=True)
+    craft = StoryCraftSerializer(read_only=True)
+
+
+class StoryReviewActionSerializer(serializers.ModelSerializer):
+    admin = PersonSerializer(read_only=True)
+
+    class Meta:
+        model = StoryReviewAction
+        fields = ["id", "action", "reason", "admin", "created_at"]
+        read_only_fields = fields
+
+
+class StoryReportReviewSerializer(serializers.ModelSerializer):
+    story = ReportedStorySerializer(read_only=True)
+    reporter = PersonSerializer(read_only=True)
+    actions = StoryReviewActionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = StoryReport
+        fields = ["id", "story", "reporter", "reason", "note", "status", "created_at", "actions"]
+        read_only_fields = fields
+
+
+class StoryReviewActionCreateSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(choices=StoryReviewAction.Action.choices)
+    reason = serializers.CharField(max_length=1000)

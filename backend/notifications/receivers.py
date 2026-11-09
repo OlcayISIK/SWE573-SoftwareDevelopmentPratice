@@ -2,7 +2,7 @@ from django.dispatch import receiver
 
 from crafts.models import Craft
 from crafts.signals import craft_published, craft_updated, story_shared
-from moderation.signals import report_resolved
+from moderation.signals import report_resolved, story_report_resolved
 from social.selectors import favoriter_ids, follower_ids
 
 from .models import Notification
@@ -56,4 +56,20 @@ def notify_reporter(sender, report, admin, action, **kwargs):
         craft_id=report.craft_id,
         actor=admin,
         data={"report_id": report.pk, "action": action, "report_status": report.status},
+    )
+
+
+@receiver(story_report_resolved, dispatch_uid="notify_story_reporter")
+def notify_story_reporter(sender, report, admin, action, **kwargs):
+    Notification.objects.create(
+        recipient_id=report.reporter_id,
+        type=Notification.Type.REPORT_RESOLVED,
+        craft_id=report.story.craft_id,
+        actor=admin,
+        data={
+            "story_report_id": report.pk,
+            "subject": "story",
+            "action": action,
+            "report_status": report.status,
+        },
     )

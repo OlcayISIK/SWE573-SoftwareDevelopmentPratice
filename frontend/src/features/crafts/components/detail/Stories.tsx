@@ -7,6 +7,7 @@ import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { FormAlert } from "@/components/form/FormAlert";
 import { TextAreaField } from "@/components/form/TextAreaField";
 import { useAuth } from "@/features/auth/context";
+import { ReportStoryButton } from "@/features/moderation/components/ReportDialog";
 import { SignInPrompt } from "@/features/social/components/SignInPrompt";
 import { toast } from "@/lib/toast";
 
@@ -233,18 +234,29 @@ function StoryActions({ craftId, story }: { craftId: number; story: CraftStory }
   );
 }
 
-function StoryBody({ entry, actions }: { entry: Entry; actions?: ReactNode }) {
+function StoryBody({
+  entry,
+  actions,
+  report,
+}: {
+  entry: Entry;
+  actions?: ReactNode;
+  report?: ReactNode;
+}) {
   return (
     <>
       <RichText text={entry.text} className="text-lg" />
-      <p className="mt-4 font-sans text-sm text-stone-600">
-        Shared by{" "}
-        <Link
-          to={`/users/${entry.writer.id}`}
-          className="font-medium text-brand-700 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-700"
-        >
-          {entry.writer.display_name}
-        </Link>
+      <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-sans text-sm text-stone-600">
+        <span>
+          Shared by{" "}
+          <Link
+            to={`/users/${entry.writer.id}`}
+            className="font-medium text-brand-700 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-700"
+          >
+            {entry.writer.display_name}
+          </Link>
+        </span>
+        {report}
       </p>
       {actions}
     </>
@@ -308,6 +320,9 @@ export function Stories({ craft }: { craft: CraftDetail }) {
 
   const canManage = (story: CraftStory) =>
     viewer !== null && (viewer.id === story.author.id || viewer.role === "admin");
+  // Admins change stories directly; other signed-in users report them.
+  const canReport = (story: CraftStory) =>
+    viewer !== null && viewer.id !== story.author.id && viewer.role !== "admin";
   const fromStory = (story: CraftStory, badge?: string): Entry => ({
     key: `story-${story.id}`,
     writer: story.author,
@@ -363,6 +378,14 @@ export function Stories({ craft }: { craft: CraftDetail }) {
                 actions={
                   entry.story && canManage(entry.story) ? (
                     <StoryActions craftId={craft.id} story={entry.story} />
+                  ) : undefined
+                }
+                report={
+                  entry.story && canReport(entry.story) ? (
+                    <ReportStoryButton
+                      storyId={entry.story.id}
+                      writer={entry.writer.display_name}
+                    />
                   ) : undefined
                 }
               />

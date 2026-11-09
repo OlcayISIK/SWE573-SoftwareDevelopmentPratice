@@ -3,7 +3,14 @@ from django.contrib import admin, messages
 from core.exceptions import DomainError
 
 from . import services
-from .models import ItemReport, ItemReviewAction, Report, ReviewAction
+from .models import (
+    ItemReport,
+    ItemReviewAction,
+    Report,
+    ReviewAction,
+    StoryReport,
+    StoryReviewAction,
+)
 
 ADMIN_REVIEW_REASON = "Reviewed in the Django admin."
 
@@ -105,3 +112,26 @@ class ItemReportAdmin(admin.ModelAdmin):
     @admin.action(description="Dismiss the reports")
     def dismiss_reports(self, request, queryset):
         self._review(request, queryset, ItemReviewAction.Action.DISMISS)
+
+
+class StoryReviewActionInline(admin.TabularInline):
+    model = StoryReviewAction
+    extra = 0
+    can_delete = False
+    fields = ["action", "reason", "admin", "created_at"]
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(StoryReport)
+class StoryReportAdmin(admin.ModelAdmin):
+    """Story reports are reviewed in the app; here they can be looked up."""
+
+    list_display = ["id", "story", "reporter", "reason", "status", "created_at"]
+    list_filter = ["status", "reason"]
+    search_fields = ["story__text", "reporter__email", "note"]
+    raw_id_fields = ["story", "reporter"]
+    readonly_fields = ["status", "created_at", "updated_at"]
+    inlines = [StoryReviewActionInline]

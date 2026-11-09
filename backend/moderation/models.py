@@ -126,3 +126,51 @@ class ItemReviewAction(BaseModel):
 
     def __str__(self):
         return f"{self.get_action_display()} on item report {self.report_id}"
+
+
+class StoryReport(BaseModel):
+    """A report on a story a user shared about a craft."""
+
+    story = models.ForeignKey("crafts.CraftStory", on_delete=models.PROTECT, related_name="reports")
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="story_reports"
+    )
+    reason = models.CharField(max_length=20, choices=Report.Reason.choices)
+    note = models.TextField(max_length=1000, blank=True)
+    status = models.CharField(
+        max_length=10, choices=Report.Status.choices, default=Report.Status.OPEN
+    )
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        indexes = [models.Index(fields=["status"], name="story_report_status_idx")]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["story", "reporter"],
+                condition=models.Q(status="open"),
+                name="unique_open_story_report_per_user",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.get_reason_display()} report on story {self.story_id}"
+
+
+class StoryReviewAction(BaseModel):
+    class Action(models.TextChoices):
+        HIDE = "hide", "Hide"
+        REMOVE = "remove", "Remove"
+        DISMISS = "dismiss", "Dismiss"
+
+    report = models.ForeignKey(StoryReport, on_delete=models.PROTECT, related_name="actions")
+    admin = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="story_review_actions"
+    )
+    action = models.CharField(max_length=10, choices=Action.choices)
+    reason = models.TextField(max_length=1000)
+
+    class Meta:
+        ordering = ["created_at", "id"]
+
+    def __str__(self):
+        return f"{self.get_action_display()} on story report {self.report_id}"

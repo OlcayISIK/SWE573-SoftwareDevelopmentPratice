@@ -6,7 +6,14 @@ from django.db.models import Q
 
 from accounts.models import User
 from crafts.models import LOOKUP_MODELS, Craft, CraftMedia, CraftStory
-from moderation.models import ItemReport, ItemReviewAction, Report, ReviewAction
+from moderation.models import (
+    ItemReport,
+    ItemReviewAction,
+    Report,
+    ReviewAction,
+    StoryReport,
+    StoryReviewAction,
+)
 from notifications.models import Notification
 
 with transaction.atomic():
@@ -26,7 +33,11 @@ with transaction.atomic():
         if item.file:
             item.file.delete(save=False)
     media.hard_delete()
-    CraftStory.all_objects.filter(Q(author__in=users) | Q(craft__in=crafts)).hard_delete()
+    stories = CraftStory.all_objects.filter(Q(author__in=users) | Q(craft__in=crafts))
+    story_reports = StoryReport.objects.filter(Q(reporter__in=users) | Q(story__in=stories))
+    StoryReviewAction.objects.filter(report__in=story_reports).delete()
+    story_reports.delete()
+    stories.hard_delete()
     crafts.hard_delete()
     for model in LOOKUP_MODELS.values():
         model.objects.filter(created_by__in=users).delete()

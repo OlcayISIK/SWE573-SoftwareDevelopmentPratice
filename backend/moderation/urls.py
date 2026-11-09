@@ -9,6 +9,7 @@ urlpatterns = [
         views.ReportItemView.as_view(),
         name="report-item",
     ),
+    path("stories/<int:story_id>/report/", views.ReportStoryView.as_view(), name="report-story"),
     path("moderation/reports/", views.ReviewQueueView.as_view(), name="review-queue"),
     path(
         "moderation/reports/<int:report_id>/",
@@ -30,5 +31,18 @@ urlpatterns = [
         "moderation/item-reports/<int:report_id>/actions/",
         views.ItemReviewActionView.as_view(),
         name="item-review-action",
+    ),
+    path(
+        "moderation/story-reports/", views.StoryReviewQueueView.as_view(), name="story-review-queue"
+    ),
+    path(
+        "moderation/story-reports/<int:report_id>/",
+        views.StoryReportDetailView.as_view(),
+        name="story-report-detail",
+    ),
+    path(
+        "moderation/story-reports/<int:report_id>/actions/",
+        views.StoryReviewActionView.as_view(),
+        name="story-review-action",
     ),
 ]
