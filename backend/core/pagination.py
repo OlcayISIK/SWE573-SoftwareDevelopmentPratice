@@ -23,11 +23,12 @@ class StandardPagination(PageNumberPagination):
         return {
             "type": "object",
             "required": ["items", "total", "page", "pageSize", "totalPages"],
+            # The example values let documented list examples show a whole page of one item.
             "properties": {
                 "items": schema,
-                "total": {"type": "integer"},
-                "page": {"type": "integer"},
-                "pageSize": {"type": "integer"},
-                "totalPages": {"type": "integer"},
+                "total": {"type": "integer", "example": 1},
+                "page": {"type": "integer", "example": 1},
+                "pageSize": {"type": "integer", "example": self.page_size},
+                "totalPages": {"type": "integer", "example": 1},
             },
         }

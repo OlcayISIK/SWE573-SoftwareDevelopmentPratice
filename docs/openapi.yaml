@@ -1,0 +1,5533 @@
+openapi: 3.0.3
+info:
+  title: Indigenous Crafts API
+  version: 1.0.0
+  description: REST API for the Indigenous Crafts interactive world map.
+paths:
+  /api/v1/{items}/{item_id}/report/:
+    post:
+      operationId: v1_report_create
+      description: Reports a category, craft type, tool, material, or culture added
+        by another user.
+      parameters:
+      - in: path
+        name: item_id
+        schema:
+          type: string
+          pattern: ^[0-9]+$
+        required: true
+      - in: path
+        name: items
+        schema:
+          type: string
+          pattern: ^categories|craft-types|tools|materials|cultures$
+        required: true
+      tags:
+      - moderation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemReportCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ItemReportCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ItemReportCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/ItemReport'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/auth/logout/:
+    post:
+      operationId: v1_auth_logout_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/password-reset/:
+    post:
+      operationId: v1_auth_password_reset_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Detail'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/auth/password-reset/confirm/:
+    post:
+      operationId: v1_auth_password_reset_confirm_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Detail'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/auth/register/:
+    post:
+      operationId: v1_auth_register_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Account'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/auth/token/:
+    post:
+      operationId: v1_auth_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              LogIn:
+                value:
+                  email: ayse@example.com
+                  password: tulip-kiln-cobalt-1575
+                summary: Email and password
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/TokenPair'
+                  message:
+                    type: string
+              examples:
+                Tokens:
+                  value:
+                    success: true
+                    data:
+                      refresh: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsInVzZXJfaWQiOjd9.c2lnbmF0dXJl
+                      access: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwidXNlcl9pZCI6Nywicm9sZSI6InVzZXIifQ.c2lnbmF0dXJl
+                    message: OK
+                  summary: A 15-minute access token and a 7-day refresh token
+                  description: 'Send the access token as `Authorization: Bearer <access>`.
+                    Exchange the refresh token at `/auth/token/refresh/`; each refresh
+                    token works once.'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                WrongEmailOrPassword:
+                  value:
+                    success: false
+                    data: null
+                    message: No active account found with the given credentials
+                    errors: {}
+                  summary: No active account found with the given credentials
+          description: Wrong email or password
+  /api/v1/auth/token/refresh/:
+    post:
+      operationId: v1_auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/TokenRefresh'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/auth/verify-email/:
+    post:
+      operationId: v1_auth_verify_email_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Account'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/auth/verify-email/resend/:
+    post:
+      operationId: v1_auth_verify_email_resend_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Detail'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/categories/:
+    get:
+      operationId: v1_categories_list
+      description: |-
+        A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+        adding a name that already exists returns the existing item with 200 instead of 201.
+      tags:
+      - reference data
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+                  message:
+                    type: string
+          description: ''
+    post:
+      operationId: v1_categories_create
+      description: |-
+        A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+        adding a name that already exists returns the existing item with 200 instead of 201.
+      tags:
+      - reference data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCategoryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddCategoryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddCategoryRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Category'
+                  message:
+                    type: string
+          description: ''
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Category'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/craft-types/:
+    get:
+      operationId: v1_craft_types_list
+      description: |-
+        A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+        adding a name that already exists returns the existing item with 200 instead of 201.
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: integer
+        description: Category id
+      tags:
+      - reference data
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CraftType'
+                  message:
+                    type: string
+          description: ''
+    post:
+      operationId: v1_craft_types_create
+      description: |-
+        A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+        adding a name that already exists returns the existing item with 200 instead of 201.
+      tags:
+      - reference data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCraftTypeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddCraftTypeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddCraftTypeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/CraftType'
+                  message:
+                    type: string
+          description: ''
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/CraftType'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/crafts/:
+    get:
+      operationId: v1_crafts_list
+      parameters:
+      - in: query
+        name: area
+        schema:
+          type: string
+        description: Crafts with a place in west,south,east,north
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: Category slug
+      - in: query
+        name: color
+        schema:
+          type: string
+        description: Main color, such as red
+      - in: query
+        name: country
+        schema:
+          type: string
+        description: Country of the craft
+      - in: query
+        name: craft_type
+        schema:
+          type: integer
+        description: Craft type id
+      - in: query
+        name: culture
+        schema:
+          type: integer
+        description: Culture id
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Text search
+      tags:
+      - crafts
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedCraftListList'
+                  message:
+                    type: string
+              examples:
+                SearchForKilim:
+                  value:
+                    success: true
+                    data:
+                      items:
+                      - id: 33
+                        name: Shirvan kilim
+                        category:
+                          id: 2
+                          name: Textiles
+                          slug: textiles
+                          icon: spool
+                          description: Cloth and objects made from fibres by spinning,
+                            weaving, knotting, felting, dyeing or stitching.
+                          user_added: false
+                        craft_type:
+                          id: 7
+                          name: Kilim
+                          description: A flat-woven rug without pile, its pattern
+                            made by the coloured weft threads.
+                          user_added: false
+                        culture:
+                          id: 29
+                          name: Azerbaijani
+                          homeland: Azerbaijan and northwestern Iran
+                          description: A Turkic people of the South Caucasus and northwestern
+                            Iran, known for carpets, silk and metalwork.
+                          user_added: false
+                        city: Shamakhi
+                        country: Azerbaijan
+                        latitude: 40.63412
+                        longitude: 48.63834
+                        cover_photo:
+                          url: https://indigenous-crafts-api.onrender.com/media/crafts/33/4f401e1855b44ed8b10c506636eadfb8.jpg
+                          alt_text: 'Kilim in progress on an upright loom: a white
+                            ground with red and dark blue motifs, with balls of yarn
+                            hanging from the weave'
+                        status: published
+                        author:
+                          id: 4
+                          display_name: Sample Contributor (Asia)
+                        created_at: '2026-10-24T20:40:10.735951Z'
+                      total: 1
+                      page: 1
+                      pageSize: 20
+                      totalPages: 1
+                    message: OK
+                  summary: GET /api/v1/crafts/?search=kilim
+                  description: Every word must start a word in the craft's fields,
+                    tools, materials, or places. Filters such as `category=textiles`
+                    or `color=blue` combine with the search.
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                UnknownMainColor:
+                  value:
+                    success: false
+                    data: null
+                    message: Validation failed.
+                    errors:
+                      color:
+                      - '"violet" is not a valid choice.'
+                  summary: GET /api/v1/crafts/?color=violet
+          description: A filter is invalid
+    post:
+      operationId: v1_crafts_create
+      tags:
+      - crafts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraftWriteRequest'
+            examples:
+              PublishACraft:
+                value:
+                  name: İznik tile
+                  category: 1
+                  craft_type: 2
+                  tools:
+                  - 7
+                  - 2
+                  - 8
+                  materials:
+                  - 1
+                  - 6
+                  - 3
+                  - 5
+                  culture: 25
+                  places:
+                  - address: İznik, Bursa, Türkiye
+                    city: İznik
+                    country: Türkiye
+                    latitude: 40.429444
+                    longitude: 29.721111
+                    is_origin: true
+                  - address: Kütahya, Türkiye
+                    city: Kütahya
+                    country: Türkiye
+                    latitude: 39.41991
+                    longitude: 29.98579
+                  description: Fritware tiles painted under a clear glaze. The design
+                    is pounced onto the white slip through a pricked paper stencil,
+                    outlined in dark paint, filled with cobalt blue, turquoise, and
+                    a raised red, then glazed and fired.
+                  story: İznik tiles cover the walls of Ottoman mosques and palaces.
+                    Their tulips, carnations, and saz leaves stand for paradise gardens,
+                    and workshops in Kütahya keep the technique alive.
+                  date:
+                    kind: year
+                    year: 1575
+                    circa: true
+                  colors:
+                  - '#1e3a8a'
+                  - '#0e9aa7'
+                  - '#b91c1c'
+                  - '#f8f5ee'
+                  attributes:
+                    dimensions:
+                    - type: height
+                      value: 25
+                      unit: cm
+                    - type: width
+                      value: 25
+                      unit: cm
+                    distinguishing_features: Raised tomato-red under a clear glaze
+                summary: An İznik tile made in two places, with its origin, date,
+                  colors, and size
+                description: Ids come from the lookup lists (`/categories/`, `/craft-types/`,
+                  `/tools/`, `/materials/`, `/cultures/`). Needs a signed-in user
+                  with a verified email.
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CraftWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CraftWriteRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/CraftDetail'
+                  message:
+                    type: string
+              examples:
+                PublishedCraft:
+                  value:
+                    success: true
+                    data:
+                      id: 37
+                      name: İznik tile
+                      category:
+                        id: 1
+                        name: Ceramics
+                        slug: ceramics
+                        icon: amphora
+                        description: Objects shaped from clay and hardened by firing,
+                          from everyday pottery to tiles, porcelain and figurines.
+                        user_added: false
+                      craft_type:
+                        id: 2
+                        name: Tile
+                        description: A flat piece of fired clay, usually glazed and
+                          painted, used to cover walls, floors or roofs.
+                        user_added: false
+                      tools:
+                      - id: 7
+                        name: Brush
+                        description: Bristles on a handle, used to paint, glaze or
+                          spread liquids.
+                        user_added: false
+                      - id: 2
+                        name: Kiln
+                        description: An oven that fires clay, glaze or glass at high
+                          temperatures.
+                        user_added: false
+                      - id: 8
+                        name: Pounce stencil
+                        description: A pricked paper pattern; charcoal dust patted
+                          through its holes transfers the design to a surface.
+                        user_added: false
+                      materials:
+                      - id: 1
+                        name: Clay
+                        description: Fine earth that is soft when wet and hardens
+                          when fired.
+                        user_added: false
+                      - id: 6
+                        name: Cobalt oxide
+                        description: A mineral pigment that gives a deep blue under
+                          glaze.
+                        user_added: false
+                      - id: 3
+                        name: Glaze
+                        description: A glassy coating fused onto ceramics in the kiln.
+                        user_added: false
+                      - id: 5
+                        name: Quartz
+                        description: A hard mineral; ground quartz adds silica to
+                          clay bodies and glazes.
+                        user_added: false
+                      culture:
+                        id: 25
+                        name: Turkish
+                        homeland: Anatolia, Türkiye
+                        description: The people of Türkiye, whose crafts include tiles,
+                          carpets, kilims, marbling and calligraphy.
+                        user_added: false
+                      address: İznik, Bursa, Türkiye
+                      city: İznik
+                      country: Türkiye
+                      latitude: 40.429444
+                      longitude: 29.721111
+                      places:
+                      - id: 41
+                        address: İznik, Bursa, Türkiye
+                        city: İznik
+                        country: Türkiye
+                        latitude: 40.429444
+                        longitude: 29.721111
+                        is_origin: true
+                      - id: 42
+                        address: Kütahya, Türkiye
+                        city: Kütahya
+                        country: Türkiye
+                        latitude: 39.41991
+                        longitude: 29.98579
+                        is_origin: false
+                      media: []
+                      description: Fritware tiles painted under a clear glaze. The
+                        design is pounced onto the white slip through a pricked paper
+                        stencil, outlined in dark paint, filled with cobalt blue,
+                        turquoise, and a raised red, then glazed and fired.
+                      story: İznik tiles cover the walls of Ottoman mosques and palaces.
+                        Their tulips, carnations, and saz leaves stand for paradise
+                        gardens, and workshops in Kütahya keep the technique alive.
+                      story_count: 0
+                      date:
+                        kind: year
+                        year: 1575
+                        day: null
+                        circa: true
+                      colors:
+                      - '#1e3a8a'
+                      - '#0e9aa7'
+                      - '#b91c1c'
+                      - '#f8f5ee'
+                      attributes:
+                        dimensions:
+                        - type: height
+                          unit: cm
+                          value: 25
+                        - type: width
+                          unit: cm
+                          value: 25
+                        distinguishing_features: Raised tomato-red under a clear glaze
+                      status: published
+                      author:
+                        id: 7
+                        display_name: Ayşe
+                      created_at: '2026-11-23T10:15:42.518204Z'
+                      updated_at: '2026-11-23T10:15:42.518231Z'
+                    message: OK
+                  summary: The new craft, as GET /api/v1/crafts/{id}/ returns it
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                MissingPlaces:
+                  value:
+                    success: false
+                    data: null
+                    message: Validation failed.
+                    errors:
+                      places:
+                      - This field is required.
+                  summary: Each invalid field is listed with its messages
+          description: A field is invalid
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                NotSignedIn:
+                  value:
+                    success: false
+                    data: null
+                    message: Authentication credentials were not provided.
+                    errors: {}
+                  summary: Authentication credentials were not provided.
+          description: Not signed in
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                EmailNotVerified:
+                  value:
+                    success: false
+                    data: null
+                    message: Verify your email address before publishing crafts.
+                    errors: {}
+                  summary: Verify your email address before publishing crafts.
+          description: The email is not verified
+  /api/v1/crafts/{craft_id}/favorite/:
+    get:
+      operationId: v1_crafts_favorite_retrieve
+      parameters:
+      - in: path
+        name: craft_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/FavoriteStatus'
+                  message:
+                    type: string
+          description: ''
+    post:
+      operationId: v1_crafts_favorite_create
+      parameters:
+      - in: path
+        name: craft_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/FavoriteStatus'
+                  message:
+                    type: string
+          description: ''
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/FavoriteStatus'
+                  message:
+                    type: string
+          description: ''
+    delete:
+      operationId: v1_crafts_favorite_destroy
+      parameters:
+      - in: path
+        name: craft_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/crafts/{craft_id}/report/:
+    post:
+      operationId: v1_crafts_report_create
+      parameters:
+      - in: path
+        name: craft_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportCreateRequest'
+            examples:
+              ReportACraft:
+                value:
+                  reason: inaccurate
+                  note: The photo shows an İznik tile, not one from Kütahya.
+                summary: Report another user's craft as inaccurate, with an optional
+                  note
+                description: '`reason` is `inaccurate`, `inappropriate`, or `disrespectful`.'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReportCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReportCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Report'
+                  message:
+                    type: string
+              examples:
+                OpenReport:
+                  value:
+                    success: true
+                    data:
+                      id: 5
+                      craft: 1
+                      reason: inaccurate
+                      note: The photo shows an İznik tile, not one from Kütahya.
+                      status: open
+                      created_at: '2026-11-23T10:30:12.904417Z'
+                    message: OK
+                  summary: Open report
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                NotSignedIn:
+                  value:
+                    success: false
+                    data: null
+                    message: Authentication credentials were not provided.
+                    errors: {}
+                  summary: Authentication credentials were not provided.
+          description: Not signed in
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                Unknown,Hidden,OrRemovedCraft:
+                  value:
+                    success: false
+                    data: null
+                    message: Craft not found.
+                    errors: {}
+                  summary: Craft not found.
+          description: No craft the user may see
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                AlreadyReported:
+                  value:
+                    success: false
+                    data: null
+                    message: You have already reported this craft. It is under review.
+                    errors: {}
+                  summary: One open report per user per craft
+          description: The user's earlier report on this craft is still open
+  /api/v1/crafts/{id}/:
+    get:
+      operationId: v1_crafts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - crafts
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/CraftDetail'
+                  message:
+                    type: string
+              examples:
+                ACraft:
+                  value:
+                    success: true
+                    data:
+                      id: 1
+                      name: Kütahya Çinisi
+                      category:
+                        id: 1
+                        name: Ceramics
+                        slug: ceramics
+                        icon: amphora
+                        description: Objects shaped from clay and hardened by firing,
+                          from everyday pottery to tiles, porcelain and figurines.
+                        user_added: false
+                      craft_type:
+                        id: 2
+                        name: Tile
+                        description: A flat piece of fired clay, usually glazed and
+                          painted, used to cover walls, floors or roofs.
+                        user_added: false
+                      tools:
+                      - id: 7
+                        name: Brush
+                        description: Bristles on a handle, used to paint, glaze or
+                          spread liquids.
+                        user_added: false
+                      - id: 2
+                        name: Kiln
+                        description: An oven that fires clay, glaze or glass at high
+                          temperatures.
+                        user_added: false
+                      - id: 8
+                        name: Pounce stencil
+                        description: A pricked paper pattern; charcoal dust patted
+                          through its holes transfers the design to a surface.
+                        user_added: false
+                      materials:
+                      - id: 1
+                        name: Clay
+                        description: Fine earth that is soft when wet and hardens
+                          when fired.
+                        user_added: false
+                      - id: 6
+                        name: Cobalt oxide
+                        description: A mineral pigment that gives a deep blue under
+                          glaze.
+                        user_added: false
+                      - id: 3
+                        name: Glaze
+                        description: A glassy coating fused onto ceramics in the kiln.
+                        user_added: false
+                      - id: 5
+                        name: Quartz
+                        description: A hard mineral; ground quartz adds silica to
+                          clay bodies and glazes.
+                        user_added: false
+                      culture:
+                        id: 25
+                        name: Turkish
+                        homeland: Anatolia, Türkiye
+                        description: The people of Türkiye, whose crafts include tiles,
+                          carpets, kilims, marbling and calligraphy.
+                        user_added: false
+                      address: Kütahya, Türkiye
+                      city: Kütahya
+                      country: Türkiye
+                      latitude: 39.41991
+                      longitude: 29.98579
+                      places:
+                      - id: 1
+                        address: Kütahya, Türkiye
+                        city: Kütahya
+                        country: Türkiye
+                        latitude: 39.41991
+                        longitude: 29.98579
+                        is_origin: false
+                      media:
+                      - id: 1
+                        media_type: photo
+                        file: https://indigenous-crafts-api.onrender.com/media/crafts/1/e76293f935fc41a88448f4d3775cc9c8.jpg
+                        url: ''
+                        caption: 'Tile at the Kütahya Ceramics Museum. Photo: Dosseman,
+                          CC BY-SA 4.0, Wikimedia Commons'
+                        alt_text: Glazed tile with large blue, green, and red floral
+                          scrolls on a white ground
+                        order: 0
+                      description: Glazed tiles and vessels from Kütahya in western
+                        Anatolia, a center of ceramic production since at least the
+                        14th century.
+                      story: Kütahya tiles line mosques, fountains, and homes across
+                        Anatolia.
+                      story_count: 0
+                      date:
+                        kind: unknown
+                        year: null
+                        day: null
+                        circa: false
+                      colors:
+                      - '#1e3a8a'
+                      - '#0e9aa7'
+                      - '#2f7d32'
+                      - '#b91c1c'
+                      - '#f8f5ee'
+                      attributes:
+                        dimensions:
+                        - type: height
+                          unit: cm
+                          value: 20
+                        - type: width
+                          unit: cm
+                          value: 20
+                        - type: thickness
+                          unit: cm
+                          value: 1
+                      status: published
+                      author:
+                        id: 1
+                        display_name: Sample Contributor (Anatolia)
+                      created_at: '2026-10-24T20:40:06.324421Z'
+                      updated_at: '2026-10-24T20:40:06.324439Z'
+                    message: OK
+                  summary: GET /api/v1/crafts/1/
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                Unknown,Hidden,OrRemovedCraft:
+                  value:
+                    success: false
+                    data: null
+                    message: Craft not found.
+                    errors: {}
+                  summary: Craft not found.
+          description: No craft the viewer may see
+    patch:
+      operationId: v1_crafts_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - crafts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCraftWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCraftWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCraftWriteRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/CraftDetail'
+                  message:
+                    type: string
+          description: ''
+    delete:
+      operationId: v1_crafts_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - crafts
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/crafts/{id}/media/:
+    post:
+      operationId: v1_crafts_media_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - crafts
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MediaUploadRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Media'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/crafts/{id}/media/{media_id}/:
+    delete:
+      operationId: v1_crafts_media_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: media_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - crafts
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/crafts/{id}/stories/:
+    get:
+      operationId: v1_crafts_stories_list
+      description: Stories other users have shared about the craft, oldest first.
+      parameters:
+      - in: query
+        name: author
+        schema:
+          type: integer
+          minimum: 1
+        description: Only the story written by this user.
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - crafts
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedStoryList'
+                  message:
+                    type: string
+          description: ''
+    post:
+      operationId: v1_crafts_stories_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - crafts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoryWriteRequest'
+            examples:
+              ShareAStory:
+                value:
+                  text: My grandmother painted tiles like these in a Kütahya workshop.
+                    She pounced each design through the same paper stencil for forty
+                    years, and the red was always the hardest part.
+                summary: A user's own story about a craft they did not publish
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StoryWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StoryWriteRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Story'
+                  message:
+                    type: string
+              examples:
+                SharedStory:
+                  value:
+                    success: true
+                    data:
+                      id: 12
+                      text: My grandmother painted tiles like these in a Kütahya workshop.
+                        She pounced each design through the same paper stencil for
+                        forty years, and the red was always the hardest part.
+                      author:
+                        id: 9
+                        display_name: Mehmet
+                      created_at: '2026-11-23T10:21:07.334512Z'
+                      updated_at: '2026-11-23T10:21:07.334540Z'
+                    message: OK
+                  summary: Shared story
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                NotSignedIn:
+                  value:
+                    success: false
+                    data: null
+                    message: Authentication credentials were not provided.
+                    errors: {}
+                  summary: Authentication credentials were not provided.
+          description: Not signed in
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                TheCraft'sAuthor:
+                  value:
+                    success: false
+                    data: null
+                    message: As the craft's author, tell your story in the craft's
+                      Story field.
+                    errors: {}
+                  summary: As the craft's author, tell your story in the craft's Story
+                    field.
+          description: The user is the craft's author
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                Unknown,Hidden,OrRemovedCraft:
+                  value:
+                    success: false
+                    data: null
+                    message: Craft not found.
+                    errors: {}
+                  summary: Craft not found.
+          description: No craft the viewer may see
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                SecondStoryOnTheSameCraft:
+                  value:
+                    success: false
+                    data: null
+                    message: You have already shared a story about this craft. Edit
+                      it instead.
+                    errors: {}
+                  summary: You have already shared a story about this craft. Edit
+                    it instead.
+          description: The user already shared a story about this craft
+  /api/v1/crafts/{id}/stories/{story_id}/:
+    patch:
+      operationId: v1_crafts_stories_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: story_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - crafts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStoryWriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStoryWriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStoryWriteRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Story'
+                  message:
+                    type: string
+          description: ''
+    delete:
+      operationId: v1_crafts_stories_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: story_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - crafts
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/crafts/facets/:
+    get:
+      operationId: v1_crafts_facets_retrieve
+      description: The values each filter can take among the crafts the other filters
+        find.
+      parameters:
+      - in: query
+        name: area
+        schema:
+          type: string
+        description: Crafts with a place in west,south,east,north
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: Category slug
+      - in: query
+        name: color
+        schema:
+          type: string
+        description: Main color, such as red
+      - in: query
+        name: country
+        schema:
+          type: string
+        description: Country of the craft
+      - in: query
+        name: craft_type
+        schema:
+          type: integer
+        description: Craft type id
+      - in: query
+        name: culture
+        schema:
+          type: integer
+        description: Culture id
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Text search
+      tags:
+      - crafts
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Facets'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/crafts/map/:
+    get:
+      operationId: v1_crafts_map_list
+      parameters:
+      - in: query
+        name: area
+        schema:
+          type: string
+        description: Crafts with a place in west,south,east,north
+      - in: query
+        name: bbox
+        schema:
+          type: string
+        description: 'Visible area: west,south,east,north'
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: Category slug
+      - in: query
+        name: color
+        schema:
+          type: string
+        description: Main color, such as red
+      - in: query
+        name: country
+        schema:
+          type: string
+        description: Country of the craft
+      - in: query
+        name: craft_type
+        schema:
+          type: integer
+        description: Craft type id
+      - in: query
+        name: culture
+        schema:
+          type: integer
+        description: Culture id
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Text search
+      tags:
+      - crafts
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CraftPin'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/cultures/:
+    get:
+      operationId: v1_cultures_list
+      description: |-
+        A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+        adding a name that already exists returns the existing item with 200 instead of 201.
+      tags:
+      - reference data
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Culture'
+                  message:
+                    type: string
+          description: ''
+    post:
+      operationId: v1_cultures_create
+      description: |-
+        A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+        adding a name that already exists returns the existing item with 200 instead of 201.
+      tags:
+      - reference data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCultureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddCultureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddCultureRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Culture'
+                  message:
+                    type: string
+          description: ''
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Culture'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/geocode/reverse/:
+    get:
+      operationId: v1_geocode_reverse_retrieve
+      description: Finds the address at a point. Returns 404 when there is none, for
+        example at sea.
+      parameters:
+      - in: query
+        name: lat
+        schema:
+          type: number
+          format: double
+          maximum: 90
+          minimum: -90
+        required: true
+      - in: query
+        name: lng
+        schema:
+          type: number
+          format: double
+          maximum: 180
+          minimum: -180
+        required: true
+      tags:
+      - address lookup
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Place'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/geocode/search/:
+    get:
+      operationId: v1_geocode_search_retrieve
+      description: Finds the coordinates of an address. Returns 404 when nothing matches.
+      parameters:
+      - in: query
+        name: q
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 255
+        description: The address to look up.
+        required: true
+      tags:
+      - address lookup
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Place'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/health/:
+    get:
+      operationId: v1_health_retrieve
+      description: |-
+        For the host's health checks: answers when the app and its database are up.
+
+        It is not logged or rate limited, since it is called every few seconds.
+      tags:
+      - health
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Health'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/materials/:
+    get:
+      operationId: v1_materials_list
+      description: |-
+        A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+        adding a name that already exists returns the existing item with 200 instead of 201.
+      parameters:
+      - in: query
+        name: craft_type
+        schema:
+          type: integer
+        description: List the items typical for this craft type first
+      tags:
+      - reference data
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Material'
+                  message:
+                    type: string
+          description: ''
+    post:
+      operationId: v1_materials_create
+      description: |-
+        A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+        adding a name that already exists returns the existing item with 200 instead of 201.
+      tags:
+      - reference data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddLinkedItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddLinkedItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddLinkedItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Material'
+                  message:
+                    type: string
+          description: ''
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Material'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/me/:
+    get:
+      operationId: v1_me_retrieve
+      tags:
+      - profiles
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/OwnProfile'
+                  message:
+                    type: string
+          description: ''
+    patch:
+      operationId: v1_me_partial_update
+      tags:
+      - profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileUpdateRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/OwnProfile'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/me/favorites/:
+    get:
+      operationId: v1_me_favorites_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedCraftListList'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/me/followers/:
+    get:
+      operationId: v1_me_followers_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedFollowerEntryList'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/me/following/:
+    get:
+      operationId: v1_me_following_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedFollowingEntryList'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/me/notifications/:
+    get:
+      operationId: v1_me_notifications_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: unread
+        schema:
+          type: boolean
+        description: Only unread
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedNotificationList'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/me/notifications/read/:
+    post:
+      operationId: v1_me_notifications_read_create
+      tags:
+      - notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkReadRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MarkReadRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MarkReadRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/MarkReadResult'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/me/notifications/unread-count/:
+    get:
+      operationId: v1_me_notifications_unread_count_retrieve
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/UnreadCount'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/moderation/item-reports/:
+    get:
+      operationId: v1_moderation_item_reports_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - all
+          - dismissed
+          - open
+          - resolved
+        description: Defaults to open
+      tags:
+      - moderation
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedItemReportReviewList'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/moderation/item-reports/{report_id}/:
+    get:
+      operationId: v1_moderation_item_reports_retrieve
+      parameters:
+      - in: path
+        name: report_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/ItemReportReview'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/moderation/item-reports/{report_id}/actions/:
+    post:
+      operationId: v1_moderation_item_reports_actions_create
+      description: Edits, hides, or merges the reported item, or dismisses the report.
+      parameters:
+      - in: path
+        name: report_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemReviewActionCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ItemReviewActionCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ItemReviewActionCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/ItemReportReview'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/moderation/reports/:
+    get:
+      operationId: v1_moderation_reports_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - all
+          - dismissed
+          - open
+          - resolved
+        description: Defaults to open
+      tags:
+      - moderation
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedReportReviewList'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/moderation/reports/{report_id}/:
+    get:
+      operationId: v1_moderation_reports_retrieve
+      parameters:
+      - in: path
+        name: report_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/ReportReview'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/moderation/reports/{report_id}/actions/:
+    post:
+      operationId: v1_moderation_reports_actions_create
+      parameters:
+      - in: path
+        name: report_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewActionCreateRequest'
+            examples:
+              HideTheCraft:
+                value:
+                  action: hide
+                  reason: The photo shows a different craft. Hidden until the author
+                    replaces it.
+                summary: Hide a reported craft, with the reason for the record
+                description: '`action` is `edit` (with `changes`), `hide`, `remove`,
+                  or `dismiss`. Hiding or removing also closes the other open reports
+                  on the craft.'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewActionCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewActionCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/ReportReview'
+                  message:
+                    type: string
+              examples:
+                ReviewedReport:
+                  value:
+                    success: true
+                    data:
+                      id: 5
+                      craft:
+                        id: 1
+                        name: Kütahya Çinisi
+                        status: hidden
+                        is_deleted: false
+                        author:
+                          id: 1
+                          display_name: Sample Contributor (Anatolia)
+                      reporter:
+                        id: 9
+                        display_name: Mehmet
+                      reason: inaccurate
+                      note: The photo shows an İznik tile, not one from Kütahya.
+                      status: resolved
+                      created_at: '2026-11-23T10:30:12.904417Z'
+                      actions:
+                      - id: 3
+                        action: hide
+                        reason: The photo shows a different craft. Hidden until the
+                          author replaces it.
+                        admin:
+                          id: 2
+                          display_name: Moderator
+                        created_at: '2026-11-23T11:02:48.117093Z'
+                    message: OK
+                  summary: The report, now resolved, with its review history
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                NotAnAdmin:
+                  value:
+                    success: false
+                    data: null
+                    message: You do not have permission to perform this action.
+                    errors: {}
+                  summary: You do not have permission to perform this action.
+          description: The user is not an admin
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                AlreadyReviewed:
+                  value:
+                    success: false
+                    data: null
+                    message: This report has already been reviewed.
+                    errors: {}
+                  summary: This report has already been reviewed.
+          description: The report was already reviewed
+  /api/v1/moderation/story-reports/:
+    get:
+      operationId: v1_moderation_story_reports_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - all
+          - dismissed
+          - open
+          - resolved
+        description: Defaults to open
+      tags:
+      - moderation
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedStoryReportReviewList'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/moderation/story-reports/{report_id}/:
+    get:
+      operationId: v1_moderation_story_reports_retrieve
+      parameters:
+      - in: path
+        name: report_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StoryReportReview'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/moderation/story-reports/{report_id}/actions/:
+    post:
+      operationId: v1_moderation_story_reports_actions_create
+      description: Hides or removes the reported story, or dismisses the report.
+      parameters:
+      - in: path
+        name: report_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoryReviewActionCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StoryReviewActionCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StoryReviewActionCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StoryReportReview'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/stories/{story_id}/report/:
+    post:
+      operationId: v1_stories_report_create
+      description: Reports a story another user shared about a craft.
+      parameters:
+      - in: path
+        name: story_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoryReportCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StoryReportCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StoryReportCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StoryReport'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/tools/:
+    get:
+      operationId: v1_tools_list
+      description: |-
+        A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+        adding a name that already exists returns the existing item with 200 instead of 201.
+      parameters:
+      - in: query
+        name: craft_type
+        schema:
+          type: integer
+        description: List the items typical for this craft type first
+      tags:
+      - reference data
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tool'
+                  message:
+                    type: string
+          description: ''
+    post:
+      operationId: v1_tools_create
+      description: |-
+        A lookup list for the craft form. Anyone can read it; registered users can add to it, and
+        adding a name that already exists returns the existing item with 200 instead of 201.
+      tags:
+      - reference data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddLinkedItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddLinkedItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddLinkedItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Tool'
+                  message:
+                    type: string
+          description: ''
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Tool'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/users/{user_id}/:
+    get:
+      operationId: v1_users_retrieve
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - profiles
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PublicProfile'
+                  message:
+                    type: string
+              examples:
+                APublicProfile:
+                  value:
+                    success: true
+                    data:
+                      id: 1
+                      display_name: Sample Contributor (Anatolia)
+                      bio: ''
+                      city: Kütahya
+                      country: Türkiye
+                      avatar: null
+                      email: null
+                      date_joined: '2026-10-24T20:40:06.133714Z'
+                    message: OK
+                  summary: GET /api/v1/users/1/
+                  description: '`email` is `null` unless the user chose to show it.'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                UnknownOrDeactivatedUser:
+                  value:
+                    success: false
+                    data: null
+                    message: This profile is unavailable.
+                    errors: {}
+                  summary: This profile is unavailable.
+          description: Unknown or deactivated user
+  /api/v1/users/{user_id}/crafts/:
+    get:
+      operationId: v1_users_crafts_list
+      parameters:
+      - in: query
+        name: area
+        schema:
+          type: string
+        description: Crafts with a place in west,south,east,north
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: Category slug
+      - in: query
+        name: color
+        schema:
+          type: string
+        description: Main color, such as red
+      - in: query
+        name: country
+        schema:
+          type: string
+        description: Country of the craft
+      - in: query
+        name: craft_type
+        schema:
+          type: integer
+        description: Craft type id
+      - in: query
+        name: culture
+        schema:
+          type: integer
+        description: Culture id
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Text search
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - crafts
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedCraftListList'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/users/{user_id}/follow/:
+    get:
+      operationId: v1_users_follow_retrieve
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/FollowStatus'
+                  message:
+                    type: string
+          description: ''
+    post:
+      operationId: v1_users_follow_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/FollowStatus'
+                  message:
+                    type: string
+          description: ''
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/FollowStatus'
+                  message:
+                    type: string
+          description: ''
+    delete:
+      operationId: v1_users_follow_destroy
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        is_email_verified:
+          type: boolean
+      required:
+      - email
+      - id
+    ActionEnum:
+      enum:
+      - edit
+      - hide
+      - remove
+      - dismiss
+      type: string
+      description: |-
+        * `edit` - Edit
+        * `hide` - Hide
+        * `remove` - Remove
+        * `dismiss` - Dismiss
+    AddCategoryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+        description:
+          type: string
+          maxLength: 300
+        icon:
+          allOf:
+          - $ref: '#/components/schemas/IconEnum'
+          default: sparkles
+      required:
+      - name
+    AddCraftTypeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+        description:
+          type: string
+          maxLength: 300
+        category:
+          type: integer
+      required:
+      - category
+      - name
+    AddCultureRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+        description:
+          type: string
+          maxLength: 300
+        homeland:
+          type: string
+          maxLength: 120
+      required:
+      - name
+    AddLinkedItemRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+        description:
+          type: string
+          maxLength: 300
+        craft_type:
+          type: integer
+          description: Craft type the item is typical for.
+      required:
+      - name
+    Author:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+      required:
+      - display_name
+      - id
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        icon:
+          allOf:
+          - $ref: '#/components/schemas/IconEnum'
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        user_added:
+          type: boolean
+          readOnly: true
+      required:
+      - description
+      - icon
+      - id
+      - name
+      - slug
+      - user_added
+    CategoryFacet:
+      type: object
+      properties:
+        slug:
+          type: string
+        name:
+          type: string
+        icon:
+          type: string
+        count:
+          type: integer
+      required:
+      - count
+      - icon
+      - name
+      - slug
+    ColorFacet:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/NameEnum'
+        count:
+          type: integer
+      required:
+      - count
+      - name
+    CountryFacet:
+      type: object
+      properties:
+        name:
+          type: string
+        count:
+          type: integer
+      required:
+      - count
+      - name
+    CoverPhoto:
+      type: object
+      properties:
+        url:
+          type: string
+        alt_text:
+          type: string
+      required:
+      - alt_text
+      - url
+    CraftAttributesRequest:
+      type: object
+      description: Rejects keys that are not declared, so stored JSON stays predictable.
+      properties:
+        dimensions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DimensionRequest'
+        distinguishing_features:
+          type: string
+          maxLength: 1000
+    CraftDate:
+      type: object
+      description: |-
+        When the craft was made: {"kind": "unknown"}, {"kind": "year", "year": -500, "circa": true}
+        for about 500 BC, or {"kind": "day", "day": "1923-03-12"}. Years before the common era are
+        negative, and there is no year 0.
+      properties:
+        kind:
+          $ref: '#/components/schemas/KindEnum'
+        year:
+          type: integer
+          minimum: -10000
+          nullable: true
+        day:
+          type: string
+          format: date
+          nullable: true
+        circa:
+          type: boolean
+          default: false
+      required:
+      - kind
+    CraftDateRequest:
+      type: object
+      description: |-
+        When the craft was made: {"kind": "unknown"}, {"kind": "year", "year": -500, "circa": true}
+        for about 500 BC, or {"kind": "day", "day": "1923-03-12"}. Years before the common era are
+        negative, and there is no year 0.
+      properties:
+        kind:
+          $ref: '#/components/schemas/KindEnum'
+        year:
+          type: integer
+          minimum: -10000
+          nullable: true
+        day:
+          type: string
+          format: date
+          nullable: true
+        circa:
+          type: boolean
+          default: false
+      required:
+      - kind
+    CraftDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/Category'
+          readOnly: true
+        craft_type:
+          allOf:
+          - $ref: '#/components/schemas/NamedItem'
+          readOnly: true
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedItem'
+          readOnly: true
+        materials:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedItem'
+          readOnly: true
+        culture:
+          allOf:
+          - $ref: '#/components/schemas/Culture'
+          readOnly: true
+          nullable: true
+        address:
+          type: string
+          readOnly: true
+        city:
+          type: string
+          readOnly: true
+        country:
+          type: string
+          readOnly: true
+        latitude:
+          type: number
+          format: double
+          readOnly: true
+        longitude:
+          type: number
+          format: double
+          readOnly: true
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraftPlace'
+          readOnly: true
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        story:
+          type: string
+          readOnly: true
+        story_count:
+          type: integer
+          readOnly: true
+          description: How many stories other users have shared about the craft.
+        date:
+          allOf:
+          - $ref: '#/components/schemas/CraftDate'
+          readOnly: true
+        colors:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        attributes:
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CraftStatusEnum'
+          readOnly: true
+        author:
+          allOf:
+          - $ref: '#/components/schemas/Author'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - address
+      - attributes
+      - author
+      - category
+      - city
+      - colors
+      - country
+      - craft_type
+      - created_at
+      - culture
+      - date
+      - description
+      - id
+      - latitude
+      - longitude
+      - materials
+      - media
+      - name
+      - places
+      - status
+      - story
+      - story_count
+      - tools
+      - updated_at
+    CraftList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/Category'
+          readOnly: true
+        craft_type:
+          allOf:
+          - $ref: '#/components/schemas/NamedItem'
+          readOnly: true
+        culture:
+          allOf:
+          - $ref: '#/components/schemas/Culture'
+          readOnly: true
+          nullable: true
+        city:
+          type: string
+          readOnly: true
+        country:
+          type: string
+          readOnly: true
+        latitude:
+          type: number
+          format: double
+          readOnly: true
+        longitude:
+          type: number
+          format: double
+          readOnly: true
+        cover_photo:
+          allOf:
+          - $ref: '#/components/schemas/CoverPhoto'
+          nullable: true
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CraftStatusEnum'
+          readOnly: true
+        author:
+          allOf:
+          - $ref: '#/components/schemas/Author'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author
+      - category
+      - city
+      - country
+      - cover_photo
+      - craft_type
+      - created_at
+      - culture
+      - id
+      - latitude
+      - longitude
+      - name
+      - status
+    CraftPin:
+      type: object
+      description: A pin for one place of a craft; a craft in several places has several
+        pins.
+      properties:
+        id:
+          type: integer
+          description: The craft.
+        place:
+          type: integer
+          description: The place of this pin.
+        name:
+          type: string
+        category:
+          type: string
+        category_icon:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+      required:
+      - category
+      - category_icon
+      - id
+      - latitude
+      - longitude
+      - name
+      - place
+    CraftPlace:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        address:
+          type: string
+          readOnly: true
+        city:
+          type: string
+          readOnly: true
+        country:
+          type: string
+          readOnly: true
+        latitude:
+          type: number
+          format: double
+          readOnly: true
+        longitude:
+          type: number
+          format: double
+          readOnly: true
+        is_origin:
+          type: boolean
+          readOnly: true
+      required:
+      - address
+      - city
+      - country
+      - id
+      - is_origin
+      - latitude
+      - longitude
+    CraftStatusEnum:
+      enum:
+      - published
+      - hidden
+      type: string
+      description: |-
+        * `published` - Published
+        * `hidden` - Hidden
+    CraftType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        category:
+          type: integer
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        user_added:
+          type: boolean
+          readOnly: true
+      required:
+      - category
+      - description
+      - id
+      - name
+      - user_added
+    CraftTypeFacet:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category:
+          type: integer
+        count:
+          type: integer
+      required:
+      - category
+      - count
+      - id
+      - name
+    CraftWriteRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        category:
+          type: integer
+        craft_type:
+          type: integer
+        tools:
+          type: array
+          items:
+            type: integer
+        materials:
+          type: array
+          items:
+            type: integer
+        culture:
+          type: integer
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlaceInputRequest'
+          description: Where the craft is made or belongs. Mark at most one as the
+            origin.
+        description:
+          type: string
+          minLength: 1
+        story:
+          type: string
+        date:
+          allOf:
+          - $ref: '#/components/schemas/CraftDateRequest'
+          description: When the craft was made.
+        colors:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 9
+          description: Colors as "#rrggbb", or "#rrggbbaa" when see-through.
+          maxItems: 10
+        attributes:
+          $ref: '#/components/schemas/CraftAttributesRequest'
+      required:
+      - category
+      - craft_type
+      - culture
+      - description
+      - name
+      - places
+    Culture:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        homeland:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        user_added:
+          type: boolean
+          readOnly: true
+      required:
+      - description
+      - homeland
+      - id
+      - name
+      - user_added
+    CultureFacet:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        count:
+          type: integer
+      required:
+      - count
+      - id
+      - name
+    Detail:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    DimensionRequest:
+      type: object
+      description: Rejects keys that are not declared, so stored JSON stays predictable.
+      properties:
+        type:
+          $ref: '#/components/schemas/DimensionTypeEnum'
+        value:
+          type: number
+          format: double
+          maximum: 100000
+          minimum: 0.01
+        unit:
+          $ref: '#/components/schemas/UnitEnum'
+      required:
+      - type
+      - unit
+      - value
+    DimensionTypeEnum:
+      enum:
+      - height
+      - width
+      - depth
+      - length
+      - diameter
+      - circumference
+      - thickness
+      - weight
+      - volume
+      type: string
+      description: |-
+        * `height` - height
+        * `width` - width
+        * `depth` - depth
+        * `length` - length
+        * `diameter` - diameter
+        * `circumference` - circumference
+        * `thickness` - thickness
+        * `weight` - weight
+        * `volume` - volume
+    EmailRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    ErrorEnvelope:
+      type: object
+      description: The body of every error response.
+      properties:
+        success:
+          type: boolean
+          default: false
+        data:
+          nullable: true
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties: {}
+          description: Messages for each field that failed, if any.
+      required:
+      - errors
+      - message
+    Facets:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryFacet'
+        craft_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraftTypeFacet'
+        cultures:
+          type: array
+          items:
+            $ref: '#/components/schemas/CultureFacet'
+        countries:
+          type: array
+          items:
+            $ref: '#/components/schemas/CountryFacet'
+        colors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ColorFacet'
+      required:
+      - categories
+      - colors
+      - countries
+      - craft_types
+      - cultures
+    FavoriteStatus:
+      type: object
+      properties:
+        favorited:
+          type: boolean
+        favorites_count:
+          type: integer
+      required:
+      - favorited
+      - favorites_count
+    FollowStatus:
+      type: object
+      properties:
+        following:
+          type: boolean
+        followers_count:
+          type: integer
+        following_count:
+          type: integer
+      required:
+      - followers_count
+      - following
+      - following_count
+    FollowerEntry:
+      type: object
+      properties:
+        user:
+          allOf:
+          - $ref: '#/components/schemas/PersonSummary'
+          readOnly: true
+        since:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - since
+      - user
+    FollowingEntry:
+      type: object
+      properties:
+        user:
+          allOf:
+          - $ref: '#/components/schemas/PersonSummary'
+          readOnly: true
+        since:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - since
+      - user
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    IconEnum:
+      enum:
+      - spool
+      - amphora
+      - glass-water
+      - feather
+      - mountain
+      - shopping-basket
+      - axe
+      - hammer
+      - gem
+      - footprints
+      - paintbrush
+      - drum
+      - scissors
+      - shirt
+      - leaf
+      - flower
+      - shell
+      - fish
+      - bird
+      - sun
+      - flame
+      - palette
+      - wheat
+      - sparkles
+      type: string
+      description: |-
+        * `spool` - spool
+        * `amphora` - amphora
+        * `glass-water` - glass-water
+        * `feather` - feather
+        * `mountain` - mountain
+        * `shopping-basket` - shopping-basket
+        * `axe` - axe
+        * `hammer` - hammer
+        * `gem` - gem
+        * `footprints` - footprints
+        * `paintbrush` - paintbrush
+        * `drum` - drum
+        * `scissors` - scissors
+        * `shirt` - shirt
+        * `leaf` - leaf
+        * `flower` - flower
+        * `shell` - shell
+        * `fish` - fish
+        * `bird` - bird
+        * `sun` - sun
+        * `flame` - flame
+        * `palette` - palette
+        * `wheat` - wheat
+        * `sparkles` - sparkles
+    ItemReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item_type:
+          allOf:
+          - $ref: '#/components/schemas/ItemTypeEnum'
+          readOnly: true
+        item_id:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ItemReportReasonEnum'
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ReportStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - item_id
+      - item_name
+      - item_type
+      - note
+      - reason
+      - status
+    ItemReportCreateRequest:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/ItemReportReasonEnum'
+        note:
+          type: string
+          maxLength: 1000
+      required:
+      - reason
+    ItemReportReasonEnum:
+      enum:
+      - duplicate
+      - inaccurate
+      - inappropriate
+      type: string
+      description: |-
+        * `duplicate` - Duplicate
+        * `inaccurate` - Inaccurate
+        * `inappropriate` - Inappropriate
+    ItemReportReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item_type:
+          allOf:
+          - $ref: '#/components/schemas/ItemTypeEnum'
+          readOnly: true
+        item_id:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        item:
+          allOf:
+          - $ref: '#/components/schemas/ReportedItem'
+          nullable: true
+          readOnly: true
+          description: The reported item as it is now, or null if it was merged away.
+        reporter:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ItemReportReasonEnum'
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ReportStatusEnum'
+          readOnly: true
+          default: open
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemReviewAction'
+          readOnly: true
+      required:
+      - actions
+      - created_at
+      - id
+      - item
+      - item_id
+      - item_name
+      - item_type
+      - note
+      - reason
+      - reporter
+      - status
+    ItemReviewAction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ItemReviewActionEnum'
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        details:
+          readOnly: true
+        admin:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - admin
+      - created_at
+      - details
+      - id
+      - reason
+    ItemReviewActionCreateRequest:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ItemReviewActionEnum'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        name:
+          type: string
+          minLength: 1
+          description: The new name.
+          maxLength: 80
+        description:
+          type: string
+          description: The new description.
+          maxLength: 300
+        merge_into:
+          type: integer
+          minimum: 1
+          description: Id of the item of the same kind to merge into. Required to
+            merge.
+      required:
+      - action
+      - reason
+    ItemReviewActionEnum:
+      enum:
+      - edit
+      - hide
+      - merge
+      - dismiss
+      type: string
+      description: |-
+        * `edit` - Edit
+        * `hide` - Hide
+        * `merge` - Merge
+        * `dismiss` - Dismiss
+    ItemTypeEnum:
+      enum:
+      - category
+      - craft_type
+      - tool
+      - material
+      - culture
+      type: string
+      description: |-
+        * `category` - Category
+        * `craft_type` - Craft type
+        * `tool` - Tool
+        * `material` - Material
+        * `culture` - Culture
+    KindEnum:
+      enum:
+      - unknown
+      - year
+      - day
+      type: string
+      description: |-
+        * `unknown` - Unknown
+        * `year` - Year
+        * `day` - Exact date
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    MarkReadRequest:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          description: Notifications to mark as read. Leave out to mark all as read.
+    MarkReadResult:
+      type: object
+      properties:
+        updated:
+          type: integer
+      required:
+      - updated
+    Material:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        typical:
+          type: boolean
+          readOnly: true
+          description: Typical for the craft type given in the request.
+        user_added:
+          type: boolean
+          readOnly: true
+      required:
+      - description
+      - id
+      - name
+      - typical
+      - user_added
+    Media:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        media_type:
+          allOf:
+          - $ref: '#/components/schemas/MediaTypeEnum'
+          readOnly: true
+        file:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        caption:
+          type: string
+          readOnly: true
+        alt_text:
+          type: string
+          readOnly: true
+        order:
+          type: integer
+          readOnly: true
+      required:
+      - alt_text
+      - caption
+      - file
+      - id
+      - media_type
+      - order
+      - url
+    MediaTypeEnum:
+      enum:
+      - photo
+      - video
+      - document
+      type: string
+      description: |-
+        * `photo` - Photo
+        * `video` - Video link
+        * `document` - Document
+    MediaUploadRequest:
+      type: object
+      properties:
+        media_type:
+          $ref: '#/components/schemas/MediaTypeEnum'
+        file:
+          type: string
+          format: binary
+        url:
+          oneOf:
+          - type: string
+            format: uri
+          - type: string
+            maxLength: 0
+        caption:
+          type: string
+          maxLength: 200
+        alt_text:
+          type: string
+          maxLength: 250
+        order:
+          type: integer
+          maximum: 32767
+          minimum: 0
+      required:
+      - media_type
+    NameEnum:
+      enum:
+      - red
+      - orange
+      - yellow
+      - green
+      - turquoise
+      - blue
+      - purple
+      - pink
+      - brown
+      - black
+      - white
+      - grey
+      type: string
+      description: |-
+        * `red` - red
+        * `orange` - orange
+        * `yellow` - yellow
+        * `green` - green
+        * `turquoise` - turquoise
+        * `blue` - blue
+        * `purple` - purple
+        * `pink` - pink
+        * `brown` - brown
+        * `black` - black
+        * `white` - white
+        * `grey` - grey
+    NamedItem:
+      type: object
+      description: A lookup item as shown on a craft.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        user_added:
+          type: boolean
+          readOnly: true
+      required:
+      - description
+      - id
+      - name
+      - user_added
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/NotificationTypeEnum'
+          readOnly: true
+        is_read:
+          type: boolean
+          readOnly: true
+        actor:
+          allOf:
+          - $ref: '#/components/schemas/NotificationActor'
+          readOnly: true
+          nullable: true
+        craft:
+          allOf:
+          - $ref: '#/components/schemas/NotificationCraft'
+          nullable: true
+          readOnly: true
+        data:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor
+      - craft
+      - created_at
+      - data
+      - id
+      - is_read
+      - type
+    NotificationActor:
+      type: object
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+      required:
+      - display_name
+      - id
+    NotificationCraft:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+      - id
+      - name
+    NotificationTypeEnum:
+      enum:
+      - new_craft_from_followed
+      - favorite_updated
+      - report_resolved
+      - new_story
+      type: string
+      description: |-
+        * `new_craft_from_followed` - New craft from someone you follow
+        * `favorite_updated` - A favorited craft was updated
+        * `report_resolved` - Your report was reviewed
+        * `new_story` - Someone shared a story about your craft
+    OwnProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+        is_email_verified:
+          type: boolean
+          readOnly: true
+        display_name:
+          type: string
+        bio:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        avatar:
+          type: string
+          format: uri
+        show_email:
+          type: boolean
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - avatar
+      - bio
+      - city
+      - country
+      - date_joined
+      - display_name
+      - email
+      - id
+      - is_email_verified
+      - role
+      - show_email
+    PaginatedCraftListList:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - pageSize
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraftList'
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 1
+    PaginatedFollowerEntryList:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - pageSize
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FollowerEntry'
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 1
+    PaginatedFollowingEntryList:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - pageSize
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FollowingEntry'
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 1
+    PaginatedItemReportReviewList:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - pageSize
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemReportReview'
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 1
+    PaginatedNotificationList:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - pageSize
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 1
+    PaginatedReportReviewList:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - pageSize
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportReview'
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 1
+    PaginatedStoryList:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - pageSize
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Story'
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 10
+        totalPages:
+          type: integer
+          example: 1
+    PaginatedStoryReportReviewList:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - pageSize
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoryReportReview'
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 1
+    PasswordResetConfirmRequest:
+      type: object
+      properties:
+        uid:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 128
+      required:
+      - new_password
+      - token
+      - uid
+    PatchedCraftWriteRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        category:
+          type: integer
+        craft_type:
+          type: integer
+        tools:
+          type: array
+          items:
+            type: integer
+        materials:
+          type: array
+          items:
+            type: integer
+        culture:
+          type: integer
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlaceInputRequest'
+          description: Where the craft is made or belongs. Mark at most one as the
+            origin.
+        description:
+          type: string
+          minLength: 1
+        story:
+          type: string
+        date:
+          allOf:
+          - $ref: '#/components/schemas/CraftDateRequest'
+          description: When the craft was made.
+        colors:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 9
+          description: Colors as "#rrggbb", or "#rrggbbaa" when see-through.
+          maxItems: 10
+        attributes:
+          $ref: '#/components/schemas/CraftAttributesRequest'
+    PatchedProfileUpdateRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 80
+        bio:
+          type: string
+          maxLength: 1000
+        city:
+          type: string
+          maxLength: 100
+        country:
+          type: string
+          maxLength: 100
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+        show_email:
+          type: boolean
+    PatchedStoryWriteRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 5000
+    Person:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+      required:
+      - display_name
+      - id
+    PersonSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        city:
+          type: string
+          readOnly: true
+        country:
+          type: string
+          readOnly: true
+      required:
+      - avatar
+      - city
+      - country
+      - display_name
+      - id
+    Place:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        address:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        area:
+          type: array
+          items:
+            type: number
+            format: double
+          description: The place's area as west, south, east, north, for the area
+            filter.
+          maxItems: 4
+          minItems: 4
+      required:
+      - address
+      - city
+      - country
+      - latitude
+      - longitude
+    PlaceInputRequest:
+      type: object
+      description: Rejects keys that are not declared, so stored JSON stays predictable.
+      properties:
+        address:
+          type: string
+          minLength: 1
+          maxLength: 255
+        city:
+          type: string
+          default: ''
+          maxLength: 100
+        country:
+          type: string
+          default: ''
+          maxLength: 100
+        latitude:
+          type: number
+          format: double
+          maximum: 90
+          minimum: -90
+        longitude:
+          type: number
+          format: double
+          maximum: 180
+          minimum: -180
+        is_origin:
+          type: boolean
+          default: false
+      required:
+      - address
+      - latitude
+      - longitude
+    PublicProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        bio:
+          type: string
+          readOnly: true
+        city:
+          type: string
+          readOnly: true
+        country:
+          type: string
+          readOnly: true
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        email:
+          type: string
+          nullable: true
+          readOnly: true
+        date_joined:
+          type: string
+          format: date-time
+      required:
+      - avatar
+      - bio
+      - city
+      - country
+      - display_name
+      - email
+      - id
+    ReasonEnum:
+      enum:
+      - inaccurate
+      - inappropriate
+      - disrespectful
+      type: string
+      description: |-
+        * `inaccurate` - Inaccurate
+        * `inappropriate` - Inappropriate
+        * `disrespectful` - Disrespectful
+    RefreshTokenRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 128
+        display_name:
+          type: string
+          maxLength: 80
+      required:
+      - email
+      - password
+    Report:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        craft:
+          type: integer
+          readOnly: true
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ReasonEnum'
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ReportStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - craft
+      - created_at
+      - id
+      - note
+      - reason
+      - status
+    ReportCreateRequest:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/ReasonEnum'
+        note:
+          type: string
+          maxLength: 1000
+      required:
+      - reason
+    ReportReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        craft:
+          allOf:
+          - $ref: '#/components/schemas/ReportedCraft'
+          readOnly: true
+        reporter:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ReasonEnum'
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ReportStatusEnum'
+          readOnly: true
+          default: open
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewAction'
+          readOnly: true
+      required:
+      - actions
+      - craft
+      - created_at
+      - id
+      - note
+      - reason
+      - reporter
+      - status
+    ReportStatusEnum:
+      enum:
+      - open
+      - resolved
+      - dismissed
+      type: string
+      description: |-
+        * `open` - Open
+        * `resolved` - Resolved
+        * `dismissed` - Dismissed
+    ReportedCraft:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        is_deleted:
+          type: boolean
+          readOnly: true
+        author:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+      required:
+      - author
+      - id
+      - is_deleted
+      - name
+      - status
+    ReportedItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        is_hidden:
+          type: boolean
+          readOnly: true
+        added_by:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+          nullable: true
+        crafts_count:
+          type: integer
+          readOnly: true
+      required:
+      - added_by
+      - crafts_count
+      - description
+      - id
+      - is_hidden
+      - name
+    ReportedStory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        text:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        is_deleted:
+          type: boolean
+          readOnly: true
+        author:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+        craft:
+          allOf:
+          - $ref: '#/components/schemas/StoryCraft'
+          readOnly: true
+      required:
+      - author
+      - craft
+      - id
+      - is_deleted
+      - status
+      - text
+    ReviewAction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        admin:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - admin
+      - created_at
+      - id
+      - reason
+    ReviewActionCreateRequest:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        changes:
+          type: object
+          additionalProperties: {}
+          description: Craft fields to change. Required when the action is `edit`.
+      required:
+      - action
+      - reason
+    RoleEnum:
+      enum:
+      - user
+      - admin
+      type: string
+      description: |-
+        * `user` - Registered user
+        * `admin` - Admin
+    Story:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        text:
+          type: string
+          readOnly: true
+        author:
+          allOf:
+          - $ref: '#/components/schemas/Author'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author
+      - created_at
+      - id
+      - text
+      - updated_at
+    StoryCraft:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - name
+    StoryReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        story:
+          type: integer
+          readOnly: true
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ReasonEnum'
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ReportStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - note
+      - reason
+      - status
+      - story
+    StoryReportCreateRequest:
+      type: object
+      properties:
+        reason:
+          $ref: '#/components/schemas/ReasonEnum'
+        note:
+          type: string
+          maxLength: 1000
+      required:
+      - reason
+    StoryReportReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        story:
+          allOf:
+          - $ref: '#/components/schemas/ReportedStory'
+          readOnly: true
+        reporter:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/ReasonEnum'
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ReportStatusEnum'
+          readOnly: true
+          default: open
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoryReviewAction'
+          readOnly: true
+      required:
+      - actions
+      - created_at
+      - id
+      - note
+      - reason
+      - reporter
+      - status
+      - story
+    StoryReviewAction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        action:
+          allOf:
+          - $ref: '#/components/schemas/StoryReviewActionEnum'
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        admin:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - admin
+      - created_at
+      - id
+      - reason
+    StoryReviewActionCreateRequest:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/StoryReviewActionEnum'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+      required:
+      - action
+      - reason
+    StoryReviewActionEnum:
+      enum:
+      - hide
+      - remove
+      - dismiss
+      type: string
+      description: |-
+        * `hide` - Hide
+        * `remove` - Remove
+        * `dismiss` - Dismiss
+    StoryWriteRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 5000
+      required:
+      - text
+    TokenPair:
+      type: object
+      properties:
+        refresh:
+          type: string
+        access:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    Tool:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        typical:
+          type: boolean
+          readOnly: true
+          description: Typical for the craft type given in the request.
+        user_added:
+          type: boolean
+          readOnly: true
+      required:
+      - description
+      - id
+      - name
+      - typical
+      - user_added
+    UnitEnum:
+      enum:
+      - mm
+      - cm
+      - m
+      - in
+      - ft
+      - g
+      - kg
+      - oz
+      - lb
+      - ml
+      - l
+      - fl oz
+      type: string
+      description: |-
+        * `mm` - mm
+        * `cm` - cm
+        * `m` - m
+        * `in` - in
+        * `ft` - ft
+        * `g` - g
+        * `kg` - kg
+        * `oz` - oz
+        * `lb` - lb
+        * `ml` - ml
+        * `l` - l
+        * `fl oz` - fl oz
+    UnreadCount:
+      type: object
+      properties:
+        count:
+          type: integer
+      required:
+      - count
+    VerifyEmailRequest:
+      type: object
+      properties:
+        uid:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+      required:
+      - token
+      - uid
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

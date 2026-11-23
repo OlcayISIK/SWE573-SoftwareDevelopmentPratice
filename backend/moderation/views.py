@@ -7,9 +7,11 @@ from rest_framework.views import APIView
 
 from core.exceptions import ValidationError
 from core.permissions import IsAdmin
+from core.schema import error_response
+from crafts.examples import CRAFT_NOT_FOUND, NOT_SIGNED_IN
 from crafts.serializers import CraftWriteSerializer
 
-from . import selectors, services
+from . import examples, selectors, services
 from .models import ReviewAction
 from .serializers import (
     ItemReportCreateSerializer,
@@ -33,7 +35,18 @@ class ReportCraftView(APIView):
     throttle_scope = "report"
 
     @extend_schema(
-        request=ReportCreateSerializer, responses={201: ReportSerializer}, tags=["moderation"]
+        request=ReportCreateSerializer,
+        responses={
+            201: ReportSerializer,
+            401: error_response("Not signed in", NOT_SIGNED_IN),
+            404: error_response("No craft the user may see", CRAFT_NOT_FOUND),
+            409: error_response(
+                "The user's earlier report on this craft is still open",
+                examples.report_create_errors["twice"],
+            ),
+        },
+        examples=examples.report_create,
+        tags=["moderation"],
     )
     def post(self, request, craft_id):
         serializer = ReportCreateSerializer(data=request.data)
@@ -77,7 +90,14 @@ class ReviewActionView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
 
     @extend_schema(
-        request=ReviewActionCreateSerializer, responses=ReportReviewSerializer, tags=["moderation"]
+        request=ReviewActionCreateSerializer,
+        responses={
+            200: ReportReviewSerializer,
+            403: error_response("The user is not an admin", examples.review_errors["not_admin"]),
+            409: error_response("The report was already reviewed", examples.review_errors["twice"]),
+        },
+        examples=examples.review,
+        tags=["moderation"],
     )
     def post(self, request, report_id):
         serializer = ReviewActionCreateSerializer(data=request.data)

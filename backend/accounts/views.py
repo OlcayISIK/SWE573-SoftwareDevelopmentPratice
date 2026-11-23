@@ -1,11 +1,13 @@
-from drf_spectacular.utils import extend_schema
-from rest_framework import status
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from . import selectors, services
+from core.schema import error_response
+
+from . import examples, selectors, services
 from .serializers import (
     AccountSerializer,
     DetailSerializer,
@@ -58,7 +60,18 @@ class ResendVerificationView(APIView):
         return Response({"detail": RESEND_MESSAGE})
 
 
-@extend_schema(tags=["auth"])
+@extend_schema(
+    request=LoginSerializer,
+    responses={
+        200: inline_serializer(
+            "TokenPair",
+            fields={"refresh": serializers.CharField(), "access": serializers.CharField()},
+        ),
+        401: error_response("Wrong email or password", examples.login_errors["wrong"]),
+    },
+    examples=examples.login,
+    tags=["auth"],
+)
 class LoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
     throttle_scope = "login"
@@ -120,7 +133,16 @@ class MeView(APIView):
 
 
 class PublicProfileView(APIView):
-    @extend_schema(responses=PublicProfileSerializer, tags=["profiles"])
+    @extend_schema(
+        responses={
+            200: PublicProfileSerializer,
+            404: error_response(
+                "Unknown or deactivated user", examples.profile_errors["unavailable"]
+            ),
+        },
+        examples=examples.profile,
+        tags=["profiles"],
+    )
     def get(self, request, user_id):
         user = selectors.get_public_user(user_id)
         return Response(PublicProfileSerializer(user, context={"request": request}).data)
