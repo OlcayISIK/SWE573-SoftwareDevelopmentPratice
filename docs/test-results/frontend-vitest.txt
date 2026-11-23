@@ -1,0 +1,551 @@
+
+> indigenous-crafts-frontend@0.1.0 test:coverage
+> vitest run --reporter=verbose --coverage
+
+
+ RUN  v3.2.7 /home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend
+      Coverage enabled with v8
+
+stderr | src/features/crafts/browsing.test.tsx > craft list > shows crafts from all users with cover photos
+No `HydrateFallback` element provided to render during initial hydration
+
+stderr | src/features/crafts/form.test.tsx > guests are sent to log in first
+No `HydrateFallback` element provided to render during initial hydration
+
+stderr | src/features/moderation/moderation.test.tsx > reporting > a registered user reports a craft
+No `HydrateFallback` element provided to render during initial hydration
+
+ ✓ src/features/crafts/form.test.tsx > guests are sent to log in first 334ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > shows crafts from all users with cover photos 392ms
+ ✓ src/features/crafts/form.test.tsx > unverified users are asked to verify their email 173ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > filters are sent to the API and kept in the URL 412ms
+ ✓ src/features/moderation/moderation.test.tsx > reporting > a registered user reports a craft 853ms
+ ✓ src/features/moderation/moderation.test.tsx > reporting > a reason is required 239ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > craft type, culture, and country filters are sent to the API 441ms
+ ✓ src/features/moderation/moderation.test.tsx > reporting > a second open report is explained 261ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > a place narrows the crafts to its area 216ms
+ ✓ src/features/moderation/moderation.test.tsx > reporting > authors cannot report their own craft 157ms
+ ✓ src/features/moderation/moderation.test.tsx > reporting > guests are asked to log in to report 86ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > a place that cannot be found says so 162ms
+ ✓ src/features/moderation/moderation.test.tsx > admin review > regular users cannot open the review queue 78ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > a main color narrows the crafts to that color 187ms
+ ✓ src/features/moderation/moderation.test.tsx > admin review > admins see open reports and can filter by status 145ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > filter lists only offer what the results have, with counts 85ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > a chosen value stays listed when the results no longer have it 59ms
+ ✓ src/features/moderation/moderation.test.tsx > admin review > hiding a reported craft records the decision 239ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > an empty search says so and offers to clear it 124ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > a new category clears the craft type filter 170ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > filters from a shared link are applied on load 110ms
+ ✓ src/features/moderation/moderation.test.tsx > admin review > editing sends only the changed fields 336ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > changing a filter goes back to the first page 130ms
+ ✓ src/features/moderation/moderation.test.tsx > admin review > removing asks for confirmation first 191ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > pagination moves between pages 137ms
+ ✓ src/features/moderation/moderation.test.tsx > admin review > an action and a reason are required 112ms
+ ✓ src/features/moderation/moderation.test.tsx > admin review > the review page has no accessibility violations 226ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > clearing filters shows everything again 116ms
+ ✓ src/features/moderation/moderation.test.tsx > item review > admins see reported items with who added them and how many crafts use them 98ms
+ ✓ src/features/crafts/browsing.test.tsx > craft list > the craft list has no accessibility violations 385ms
+ ✓ src/features/moderation/moderation.test.tsx > item review > editing sends only what changed 209ms
+ ✓ src/features/crafts/browsing.test.tsx > map > an empty search on the map says nothing matches 140ms
+ ✓ src/features/crafts/browsing.test.tsx > map > shows pins and a preview card for the selected craft 168ms
+ ✓ src/features/crafts/browsing.test.tsx > map > map filters come from the URL 72ms
+ ✓ src/features/moderation/moderation.test.tsx > item review > editing the description alone sends the description 334ms
+ ✓ src/features/crafts/browsing.test.tsx > map > every map view can be shown as an accessible list 151ms
+ ✓ src/features/moderation/moderation.test.tsx > item review > merging asks for confirmation and names the crafts that move 231ms
+ ✓ src/features/moderation/moderation.test.tsx > item review > craft types to merge into show their category 93ms
+ ✓ src/features/crafts/browsing.test.tsx > map > a craft in several places is counted and listed once 77ms
+ ✓ src/features/moderation/moderation.test.tsx > item review > a report on an item that was merged away can only be dismissed 48ms
+ ✓ src/features/moderation/moderation.test.tsx > item review > the review history shows what changed 57ms
+ ✓ src/features/crafts/browsing.test.tsx > map > the list view has no accessibility violations 298ms
+ ✓ src/features/moderation/moderation.test.tsx > item review > the item review page has no accessibility violations 165ms
+ ✓ src/features/crafts/form.test.tsx > publishing a craft with tools, materials, a dimension, a photo and a video 4380ms
+stderr | src/features/crafts/stories.test.tsx > the author's story comes first and open, and other stories are closed
+No `HydrateFallback` element provided to render during initial hydration
+
+stderr | src/features/crafts/detail.test.tsx > shows the description, story, characteristics, culture, and location
+No `HydrateFallback` element provided to render during initial hydration
+
+ ✓ src/features/crafts/form.test.tsx > an address that cannot be found is reported and nothing is pinned 472ms
+ ✓ src/features/crafts/form.test.tsx > placing the pin on the map fills in the address 263ms
+ ✓ src/features/crafts/stories.test.tsx > the author's story comes first and open, and other stories are closed 372ms
+ ✓ src/features/crafts/stories.test.tsx > opening a story shows all of it and a link to its writer 169ms
+ ✓ src/features/crafts/detail.test.tsx > shows the description, story, characteristics, culture, and location 613ms
+ ✓ src/features/crafts/stories.test.tsx > headers open and close with the keyboard 125ms
+ ✓ src/features/crafts/detail.test.tsx > a craft without a story shows no author story 110ms
+ ✓ src/features/crafts/form.test.tsx > changing the category clears the craft type and lists the types of the new one 528ms
+ ✓ src/features/crafts/stories.test.tsx > long stories show a short preview in the closed header 123ms
+ ✓ src/features/crafts/detail.test.tsx > the gallery switches photos 149ms
+ ✓ src/features/crafts/detail.test.tsx > videos are embedded and documents are linked 99ms
+ ✓ src/features/crafts/detail.test.tsx > missing or removed crafts show a not found page 39ms
+ ✓ src/features/crafts/stories.test.tsx > more than ten stories load with Show more stories 371ms
+ ✓ src/features/crafts/stories.test.tsx > a craft without stories says so and invites guests to log in 90ms
+ ✓ src/features/crafts/detail.test.tsx > guests and other users do not see edit or delete 190ms
+ ✓ src/features/crafts/form.test.tsx > a new category is added with the icon the user picks 606ms
+ ✓ src/features/crafts/detail.test.tsx > admins can manage any craft 173ms
+ ✓ src/features/crafts/stories.test.tsx > a signed-in user shares a story 398ms
+ ✓ src/features/crafts/detail.test.tsx > the author deletes a craft after confirming 287ms
+ ✓ src/features/crafts/detail.test.tsx > cancelling the delete dialog keeps the craft 176ms
+ ✓ src/features/crafts/stories.test.tsx > an empty story is not sent 221ms
+ ✓ src/features/crafts/form.test.tsx > a missing craft type is added and chosen 628ms
+ ✓ src/features/crafts/stories.test.tsx > a refused story shows the server's reason 240ms
+stderr | src/features/crafts/detail.test.tsx > the detail page has no accessibility violations
+Error: Not implemented: HTMLCanvasElement.prototype.getContext (without installing the canvas npm package)
+    at module.exports (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
+    at HTMLCanvasElementImpl.getContext (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/jsdom/lib/jsdom/living/nodes/HTMLCanvasElement-impl.js:42:5)
+    at HTMLCanvasElement.getContext (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/jsdom/lib/jsdom/living/generated/HTMLCanvasElement.js:131:58)
+    at /home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:21249:49
+    at Object.get (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:15329:23)
+    at _isIconLigature (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:21248:41)
+    at /home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:21338:37
+    at Array.map (<anonymous>)
+    at visibleVirtual (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:21332:35)
+    at /home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:21347:18 undefined
+
+stderr | src/features/crafts/detail.test.tsx > the detail page has no accessibility violations
+An update to Stories inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/features/crafts/detail.test.tsx > authors see that their hidden craft was hidden by a moderator 94ms
+ ✓ src/features/crafts/detail.test.tsx > the detail page has no accessibility violations 419ms
+ ✓ src/features/crafts/detail.test.tsx > the facts link to crafts that share them 88ms
+ ✓ src/features/crafts/detail.test.tsx > a craft in several places lists them and marks the origin 44ms
+ ✓ src/features/crafts/detail.test.tsx > the facts describe their items on hover and focus 65ms
+ ✓ src/features/crafts/form.test.tsx > a tool that is not listed is added as a new tool for the craft type 575ms
+ ✓ src/features/crafts/stories.test.tsx > the writer finds their own story first, and edits and deletes it 555ms
+ ✓ src/features/crafts/stories.test.tsx > other users cannot edit or delete a story 174ms
+ ✓ src/features/crafts/detail.test.tsx > reporting items users added > a signed-in user reports a tool another user added 344ms
+ ✓ src/features/crafts/detail.test.tsx > reporting items users added > seeded items have no report button, and guests see none 43ms
+ ✓ src/features/crafts/stories.test.tsx > the craft's author is not offered to share a story 165ms
+ ✓ src/features/crafts/stories.test.tsx > unverified users are asked to verify their email first 111ms
+ ✓ src/features/crafts/detail.test.tsx > reporting items users added > the reason a report is refused is shown 243ms
+ ✓ src/features/crafts/form.test.tsx > tools and materials have an add link like the other lists 711ms
+stderr | src/features/crafts/stories.test.tsx > the stories have no accessibility violations
+Error: Not implemented: HTMLCanvasElement.prototype.getContext (without installing the canvas npm package)
+    at module.exports (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
+    at HTMLCanvasElementImpl.getContext (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/jsdom/lib/jsdom/living/nodes/HTMLCanvasElement-impl.js:42:5)
+    at HTMLCanvasElement.getContext (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/jsdom/lib/jsdom/living/generated/HTMLCanvasElement.js:131:58)
+    at /home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:21249:49
+    at Object.get (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:15329:23)
+    at _isIconLigature (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:21248:41)
+    at /home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:21338:37
+    at Array.map (<anonymous>)
+    at visibleVirtual (/home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:21332:35)
+    at /home/runner/work/SWE573-SoftwareDevelopmentPratice/SWE573-SoftwareDevelopmentPratice/frontend/node_modules/axe-core/axe.js:21347:18 undefined
+
+ ✓ src/features/crafts/stories.test.tsx > the stories have no accessibility violations 460ms
+ ✓ src/features/crafts/stories.test.tsx > stories that cannot be loaded say so 94ms
+ ✓ src/features/crafts/form.test.tsx > the lists show each option's description 365ms
+ ✓ src/features/crafts/form.test.tsx > list items show their description on hover and focus 420ms
+ ✓ src/features/crafts/form.test.tsx > the form validates required fields in the browser 211ms
+stderr | src/features/moderation/storyReports.test.tsx > reporting a story > a signed-in user reports a story
+No `HydrateFallback` element provided to render during initial hydration
+
+stderr | src/features/auth/auth.test.tsx > guests see a log in link
+No `HydrateFallback` element provided to render during initial hydration
+
+ ✓ src/features/moderation/storyReports.test.tsx > reporting a story > a signed-in user reports a story 673ms
+ ✓ src/features/auth/auth.test.tsx > guests see a log in link 254ms
+ ✓ src/features/auth/auth.test.tsx > a stored session is restored on load 68ms
+ ✓ src/features/auth/auth.test.tsx > an expired stored session falls back to guest 116ms
+ ✓ src/features/moderation/storyReports.test.tsx > reporting a story > writers, admins, and guests are not offered to report a story 476ms
+ ✓ src/features/auth/auth.test.tsx > logging in stores the session and returns to the requested page 307ms
+ ✓ src/features/moderation/storyReports.test.tsx > reviewing story reports > the queue lists reported stories with their craft and writer 123ms
+ ✓ src/features/auth/auth.test.tsx > wrong credentials show a form error 189ms
+ ✓ src/features/moderation/storyReports.test.tsx > reviewing story reports > an admin hides a reported story with a reason 246ms
+ ✓ src/features/auth/auth.test.tsx > the login form validates before submitting 54ms
+ ✓ src/features/crafts/form.test.tsx > a year before the common era is sent as a negative year 1761ms
+ ✓ src/features/moderation/storyReports.test.tsx > reviewing story reports > removing a story asks for confirmation first 217ms
+stderr | src/features/auth/auth.test.tsx > an expired session signs the user out and explains why
+An update to AuthProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Toaster inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/features/auth/auth.test.tsx > logging out ends the session 229ms
+ ✓ src/features/moderation/storyReports.test.tsx > reviewing story reports > a review needs an action and a reason 147ms
+ ✓ src/features/moderation/storyReports.test.tsx > reviewing story reports > a removed story still shows in its report 58ms
+ ✓ src/features/moderation/storyReports.test.tsx > reviewing story reports > an unknown report is not found 52ms
+ ✓ src/features/auth/auth.test.tsx > an expired session signs the user out and explains why 198ms
+ ✓ src/features/auth/auth.test.tsx > admin pages refuse regular users 29ms
+ ✓ src/features/auth/auth.test.tsx > admin pages open for admins 32ms
+ ✓ src/features/auth/auth.test.tsx > signed-in users visiting the login page are sent on 29ms
+ ✓ src/features/auth/auth.test.tsx > only same-site next paths are followed (/crafts/3) 0ms
+ ✓ src/features/auth/auth.test.tsx > only same-site next paths are followed (//evil.example.com) 0ms
+ ✓ src/features/auth/auth.test.tsx > only same-site next paths are followed (https://evil.example.com) 0ms
+ ✓ src/features/auth/auth.test.tsx > only same-site next paths are followed (null) 0ms
+ ✓ src/features/crafts/form.test.tsx > a date in the future is flagged 496ms
+ ✓ src/features/auth/auth.test.tsx > password reset request shows the same message for any email 135ms
+ ✓ src/features/moderation/storyReports.test.tsx > reviewing story reports > the story review page has no accessibility violations 213ms
+ ✓ src/features/auth/auth.test.tsx > choosing a new password from the email link 207ms
+ ✓ src/features/auth/auth.test.tsx > server password rules are shown next to the field 141ms
+ ✓ src/features/crafts/form.test.tsx > each dimension can be entered once 390ms
+ ✓ src/features/auth/auth.test.tsx > an invalid reset link is explained 197ms
+ ✓ src/features/crafts/form.test.tsx > a weight or volume row offers the units of its kind 317ms
+ ✓ src/features/crafts/form.test.tsx > colors > the picker, the code, and the opacity stay in step 360ms
+stderr | src/features/profiles/profiles.test.tsx > a public profile shows the general location and the user's crafts
+No `HydrateFallback` element provided to render during initial hydration
+
+ ✓ src/features/profiles/profiles.test.tsx > a public profile shows the general location and the user's crafts 341ms
+ ✓ src/features/profiles/profiles.test.tsx > the email is shown only when the user chose to show it 65ms
+ ✓ src/features/profiles/profiles.test.tsx > unavailable profiles show a clear message 32ms
+stderr | src/features/auth/registration.test.tsx > guests see a register link
+No `HydrateFallback` element provided to render during initial hydration
+
+ ✓ src/features/profiles/profiles.test.tsx > the own profile page shows private details and links to settings 74ms
+ ✓ src/features/crafts/form.test.tsx > colors > codes that are not colors, and the same color twice, are flagged 897ms
+ ✓ src/features/profiles/profiles.test.tsx > the header links the user's name to their profile 167ms
+ ✓ src/features/auth/registration.test.tsx > guests see a register link 247ms
+ ✓ src/features/profiles/profiles.test.tsx > saving profile and privacy settings 273ms
+ ✓ src/features/profiles/profiles.test.tsx > server errors are shown next to the field 69ms
+ ✓ src/features/profiles/profiles.test.tsx > uploading and removing a profile photo 124ms
+ ✓ src/features/auth/registration.test.tsx > registering asks the user to check their email 429ms
+ ✓ src/features/crafts/form.test.tsx > colors > up to 10 colors can be added 606ms
+stderr | src/features/profiles/profiles.test.tsx > the settings page has no accessibility violations
+An update to NotificationBell inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/features/profiles/profiles.test.tsx > profile pages require login 30ms
+ ✓ src/features/profiles/profiles.test.tsx > the settings page has no accessibility violations 182ms
+ ✓ src/features/auth/registration.test.tsx > server errors appear next to the matching fields 333ms
+ ✓ src/features/auth/registration.test.tsx > passwords must match before submitting 256ms
+ ✓ src/features/auth/registration.test.tsx > the registration page has no accessibility violations 202ms
+ ✓ src/features/auth/registration.test.tsx > opening the verification link confirms the email 53ms
+ ✓ src/features/auth/registration.test.tsx > a signed-in user is updated after verifying 96ms
+ ✓ src/features/auth/registration.test.tsx > an invalid verification link offers a new email 149ms
+ ✓ src/features/auth/registration.test.tsx > a verification page without a token explains what to do 23ms
+stderr | src/features/social/social.test.tsx > favoriting updates the button before the server answers
+No `HydrateFallback` element provided to render during initial hydration
+
+ ✓ src/features/auth/registration.test.tsx > when the server verifies new accounts, the user is signed straight in 312ms
+ ✓ src/features/crafts/form.test.tsx > server errors on dimensions appear with the dimensions 1448ms
+ ✓ src/features/auth/registration.test.tsx > if signing in after registration fails, the user is sent to log in 297ms
+ ✓ src/features/crafts/form.test.tsx > photos need alt text and an allowed format 220ms
+ ✓ src/features/social/social.test.tsx > favoriting updates the button before the server answers 436ms
+ ✓ src/features/social/social.test.tsx > a rejected favorite rolls back and explains why 192ms
+ ✓ src/features/social/social.test.tsx > unfavoriting sends a delete 163ms
+ ✓ src/features/social/social.test.tsx > guests are asked to log in and come back 97ms
+ ✓ src/features/social/social.test.tsx > following a user from their profile 124ms
+ ✓ src/features/social/social.test.tsx > users do not see a follow button on their own profile 66ms
+ ✓ src/features/social/social.test.tsx > guests see a log in prompt instead of follow 54ms
+ ✓ src/features/social/social.test.tsx > the favorites page lists saved crafts 67ms
+ ✓ src/features/social/social.test.tsx > an empty favorites page points to the map 52ms
+stderr | src/features/notifications/notifications.test.tsx > guests do not see the bell
+No `HydrateFallback` element provided to render during initial hydration
+
+ ✓ src/features/crafts/form.test.tsx > failed uploads send the author to the edit page 1569ms
+ ✓ src/features/notifications/notifications.test.tsx > guests do not see the bell 257ms
+ ✓ src/api/client.test.ts > unwraps the response envelope 47ms
+ ✓ src/api/client.test.ts > sends the access token 8ms
+ ✓ src/api/client.test.ts > turns error envelopes into ApiError with flattened field errors 8ms
+ ✓ src/api/client.test.ts > network failures become ApiError with status 0 4ms
+ ✓ src/api/client.test.ts > an expired access token is refreshed once and the request retried 16ms
+ ✓ src/api/client.test.ts > concurrent 401 responses share a single refresh call 49ms
+ ✓ src/api/client.test.ts > a rejected refresh ends the session 10ms
+ ✓ src/api/client.test.ts > a refresh that fails on the network keeps the session 9ms
+ ✓ src/api/client.test.ts > auth endpoints do not trigger a refresh 5ms
+ ✓ src/api/client.test.ts > without a refresh token a 401 is returned as is 5ms
+ ✓ src/features/notifications/notifications.test.tsx > the bell shows the unread count 290ms
+ ✓ src/features/notifications/notifications.test.tsx > the unread count is refreshed every minute 181ms
+ ✓ src/features/notifications/notifications.test.tsx > each notification type reads naturally and links to visible crafts 86ms
+ ✓ src/features/notifications/notifications.test.tsx > opening the list marks notifications as read and clears the bell 45ms
+ ✓ src/features/notifications/notifications.test.tsx > an empty list explains how to get notifications 35ms
+ ✓ src/features/notifications/notifications.test.tsx > the notifications page has no accessibility violations 136ms
+ ✓ src/features/crafts/form.test.tsx > a draft survives a reload and can be discarded 992ms
+ ✓ src/features/crafts/form.test.tsx > a draft saved before the story field existed still loads 0ms
+ ✓ src/features/crafts/form.test.tsx > drafts from the old form are dropped 124ms
+stderr | src/features/social/panels.test.tsx > guests see prompts beside the map
+No `HydrateFallback` element provided to render during initial hydration
+
+ ✓ src/features/crafts/helpers.test.ts > embed url for https://www.youtube.com/watch?v=abc123 3ms
+ ✓ src/features/crafts/helpers.test.ts > embed url for https://youtu.be/abc123 1ms
+ ✓ src/features/crafts/helpers.test.ts > embed url for https://m.youtube.com/shorts/x_Y-9 0ms
+ ✓ src/features/crafts/helpers.test.ts > embed url for https://vimeo.com/76979871 0ms
+ ✓ src/features/crafts/helpers.test.ts > embed url for https://example.com/video.mp4 0ms
+ ✓ src/features/crafts/helpers.test.ts > embed url for not a url 0ms
+ ✓ src/features/crafts/helpers.test.ts > embed url for https://www.youtube.com/ 0ms
+ ✓ src/features/crafts/helpers.test.ts > sizes are listed in the order they were entered, each with its unit 0ms
+ ✓ src/features/crafts/helpers.test.ts > weight and volume are shown in the unit they were entered in 0ms
+ ✓ src/features/crafts/helpers.test.ts > the date { kind: 'year', year: -500, day: null, circa: false } reads as 500 BC 0ms
+ ✓ src/features/crafts/helpers.test.ts > the date { kind: 'year', year: 300, day: null, circa: true } reads as c. AD 300 0ms
+ ✓ src/features/crafts/helpers.test.ts > the date { kind: 'year', year: 1850, day: null, circa: false } reads as 1850 0ms
+ ✓ src/features/crafts/helpers.test.ts > the date { kind: 'day', year: 1923, day: '1923-03-12', circa: false } reads as 12 March 1923 0ms
+ ✓ src/features/crafts/helpers.test.ts > the date { kind: 'unknown', year: null, day: null, circa: false } reads as null 0ms
+ ✓ src/features/social/panels.test.tsx > guests see prompts beside the map 242ms
+ ✓ src/features/social/panels.test.tsx > signed-in users see who they follow, their followers, and their favorites 248ms
+ ✓ src/features/social/panels.test.tsx > empty panels explain how to fill them 168ms
+ ✓ src/features/crafts/components/map/MapView.test.tsx > the real Leaflet map loads the cluster plugin and selects pins 423ms
+ ✓ src/features/crafts/components/map/MapView.test.tsx > the world is shown once: no tile is drawn twice 22ms
+ ✓ src/features/crafts/form.test.tsx > places > a craft made in several places names one as the origin 1733ms
+ ✓ src/features/crafts/components/map/world.test.tsx > the world fills the width of the map with no empty space at the sides 92ms
+ ✓ src/features/crafts/components/map/world.test.tsx > in a 1600x600 box the world is 1600px across at the furthest zoom 30ms
+ ✓ src/features/crafts/components/map/world.test.tsx > in a 700x350 box the world is 700px across at the furthest zoom 19ms
+ ✓ src/features/crafts/components/map/world.test.tsx > in a 400x600 box the world is 600px across at the furthest zoom 23ms
+ ✓ src/features/crafts/form.test.tsx > places > removing the origin makes all places equal again 711ms
+ ✓ src/features/crafts/components/map/markerCluster.test.ts > markers too far apart to cluster are still drawn at a fractional zoom 75ms
+ ✓ src/features/crafts/components/map/markerCluster.test.ts > markers close together are drawn as one cluster 9ms
+stderr | src/lib/errors.test.tsx > toaster shows errors with a retry action
+An update to Toaster inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/lib/errors.test.tsx > shows a toast for errors the user cannot fix (ApiError: offline) 2ms
+ ✓ src/lib/errors.test.tsx > shows a toast for errors the user cannot fix (ApiError: throttled) 0ms
+ ✓ src/lib/errors.test.tsx > shows a toast for errors the user cannot fix (ApiError: down) 0ms
+ ✓ src/lib/errors.test.tsx > leaves 400 errors to the page 1ms
+ ✓ src/lib/errors.test.tsx > leaves 401 errors to the page 0ms
+ ✓ src/lib/errors.test.tsx > leaves 403 errors to the page 0ms
+ ✓ src/lib/errors.test.tsx > leaves 404 errors to the page 0ms
+ ✓ src/lib/errors.test.tsx > toaster shows errors with a retry action 150ms
+ ✓ src/lib/errors.test.tsx > the same message is not shown twice 1ms
+ ✓ src/features/crafts/form.test.tsx > the new craft page has no accessibility violations 598ms
+ ✓ src/features/crafts/colors.test.ts > #1e40af is stored as #1e40af 2ms
+ ✓ src/features/crafts/colors.test.ts > #1E40AF is stored as #1e40af 0ms
+ ✓ src/features/crafts/colors.test.ts > 1e40af is stored as #1e40af 0ms
+ ✓ src/features/crafts/colors.test.ts > #14a is stored as #1144aa 0ms
+ ✓ src/features/crafts/colors.test.ts > #14a8 is stored as #1144aa88 0ms
+ ✓ src/features/crafts/colors.test.ts > #1e40af80 is stored as #1e40af80 0ms
+ ✓ src/features/crafts/colors.test.ts > #1e40afff is stored as #1e40af 0ms
+ ✓ src/features/crafts/colors.test.ts > rgb(30, 64, 175) is stored as #1e40af 0ms
+ ✓ src/features/crafts/colors.test.ts > rgb(30 64 175) is stored as #1e40af 0ms
+ ✓ src/features/crafts/colors.test.ts > RGB(30,64,175) is stored as #1e40af 0ms
+ ✓ src/features/crafts/colors.test.ts > rgba(30, 64, 175, 0.5) is stored as #1e40af80 0ms
+ ✓ src/features/crafts/colors.test.ts > rgb(30 64 175 / 50%) is stored as #1e40af80 0ms
+ ✓ src/features/crafts/colors.test.ts > rgb(100%, 0%, 0%) is stored as #ff0000 0ms
+ ✓ src/features/crafts/colors.test.ts > rgb(300, -5, 0) is stored as #ff0000 0ms
+ ✓ src/features/crafts/colors.test.ts > hsl(0, 100%, 50%) is stored as #ff0000 0ms
+ ✓ src/features/crafts/colors.test.ts > hsl(120 100% 25%) is stored as #008000 0ms
+ ✓ src/features/crafts/colors.test.ts > hsl(0.5turn 100% 50%) is stored as #00ffff 0ms
+ ✓ src/features/crafts/colors.test.ts > hsla(240, 100%, 50%, 0.25) is stored as #0000ff40 0ms
+ ✓ src/features/crafts/colors.test.ts > turquoise is stored as #40e0d0 0ms
+ ✓ src/features/crafts/colors.test.ts >   Navy  is stored as #000080 0ms
+ ✓ src/features/crafts/colors.test.ts > rebeccapurple is stored as #663399 0ms
+ ✓ src/features/crafts/colors.test.ts > "" is not a color 0ms
+ ✓ src/features/crafts/colors.test.ts > "blue-ish" is not a color 0ms
+ ✓ src/features/crafts/colors.test.ts > "#12" is not a color 0ms
+ ✓ src/features/crafts/colors.test.ts > "#12345" is not a color 0ms
+ ✓ src/features/crafts/colors.test.ts > "#1234567" is not a color 0ms
+ ✓ src/features/crafts/colors.test.ts > "rgb(1, 2)" is not a color 0ms
+ ✓ src/features/crafts/colors.test.ts > "hsl(0, 100, 50)" is not a color 0ms
+ ✓ src/features/crafts/colors.test.ts > "red;" is not a color 0ms
+ ✓ src/features/crafts/colors.test.ts > alpha is kept between 0 and 1 0ms
+ ✓ src/features/crafts/form.test.tsx > editing > the author edits a craft 765ms
+ ✓ src/features/crafts/form/useDraft.test.ts > the draft is saved once the author pauses typing 20ms
+ ✓ src/features/crafts/form/useDraft.test.ts > clearing the draft right after typing cancels the waiting save 3ms
+ ✓ src/features/crafts/form.test.tsx > editing > a craft type or culture an admin hid stays chosen when editing 146ms
+ ✓ src/features/crafts/form.test.tsx > editing > other users cannot edit 52ms
+ ✓ src/features/crafts/form.test.tsx > editing > the author removes a media item after confirming 247ms
+ ✓ src/features/crafts/form.test.tsx > editing > admins can edit but not add media to someone else's craft 139ms
+ ✓ src/features/crafts/form.test.tsx > photos and documents are sent as multipart form data, videos as JSON 1ms
+stderr | src/app/app.test.tsx > home page renders the map inside the main layout
+No `HydrateFallback` element provided to render during initial hydration
+
+ ✓ src/app/app.test.tsx > home page renders the map inside the main layout 212ms
+ ✓ src/app/app.test.tsx > unknown routes show the not found page 23ms
+ ✓ src/app/app.test.tsx > home page has no accessibility violations 604ms
+
+ Test Files  21 passed (21)
+      Tests  252 passed (252)
+   Start at  11:16:20
+   Duration  26.10s (transform 1.01s, setup 4.15s, collect 6.38s, tests 51.37s, environment 6.67s, prepare 1.30s)
+
+ % Coverage report from v8
+
+=============================== Coverage summary ===============================
+Statements   : 93.74% ( 8105/8646 )
+Branches     : 87.19% ( 1804/2069 )
+Functions    : 91.75% ( 590/643 )
+Lines        : 93.74% ( 8105/8646 )
+================================================================================
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   93.74 |    87.19 |   91.75 |   93.74 |                   
+ api               |      96 |       88 |   95.65 |      96 |                   
+  client.ts        |   97.56 |    96.87 |     100 |   97.56 | 24-25             
+  envelope.ts      |   98.14 |    83.87 |     100 |   98.14 | 66                
+  session.ts       |   89.74 |    72.72 |   85.71 |   89.74 | 15-16,34,43       
+  types.ts         |       0 |        0 |       0 |       0 |                   
+ app               |   89.15 |    97.61 |   95.45 |   89.15 |                   
+  providers.tsx    |     100 |      100 |     100 |     100 |                   
+  queryClient.ts   |       0 |        0 |       0 |       0 | 1-26              
+  router.tsx       |     100 |      100 |     100 |     100 |                   
+ app/layouts       |   92.59 |     82.6 |   88.88 |   92.59 |                   
+  AdminLayout.tsx  |     100 |      100 |     100 |     100 |                   
+  AuthLayout.tsx   |     100 |      100 |     100 |     100 |                   
+  MainLayout.tsx   |   88.52 |    76.47 |   83.33 |   88.52 | 106-123           
+ components        |    89.1 |     92.1 |   76.47 |    89.1 |                   
+  ...irmDialog.tsx |   83.82 |    72.72 |     100 |   83.82 | 39-49             
+  EmptyState.tsx   |     100 |      100 |     100 |     100 |                   
+  LogoMark.tsx     |     100 |      100 |     100 |     100 |                   
+  NotFoundPage.tsx |     100 |      100 |     100 |     100 |                   
+  PageLoader.tsx   |     100 |      100 |     100 |     100 |                   
+  Pagination.tsx   |     100 |      100 |   66.66 |     100 |                   
+  ...rBoundary.tsx |      15 |      100 |       0 |      15 | 6-28              
+  Toaster.tsx      |     100 |      100 |   66.66 |     100 |                   
+  Tooltip.tsx      |     100 |      100 |      75 |     100 |                   
+ components/form   |   87.46 |    84.25 |   88.88 |   87.46 |                   
+  ...bedSelect.tsx |   80.28 |    77.21 |   84.61 |   80.28 | ...72,197-218,231 
+  FormAlert.tsx    |     100 |      100 |     100 |     100 |                   
+  SelectField.tsx  |   91.89 |    81.81 |     100 |   91.89 | 38-40             
+  SubmitButton.tsx |     100 |      100 |     100 |     100 |                   
+  ...AreaField.tsx |     100 |      100 |     100 |     100 |                   
+  TextField.tsx    |     100 |      100 |     100 |     100 |                   
+ features/auth     |    98.4 |    97.22 |     100 |    98.4 |                   
+  AuthProvider.tsx |     100 |      100 |     100 |     100 |                   
+  api.ts           |     100 |      100 |     100 |     100 |                   
+  context.ts       |   83.33 |    85.71 |     100 |   83.33 | 21-22             
+  schemas.ts       |     100 |      100 |     100 |     100 |                   
+  types.ts         |       0 |        0 |       0 |       0 |                   
+ ...uth/components |   96.33 |       92 |     100 |   96.33 |                   
+  AccountMenu.tsx  |     100 |      100 |     100 |     100 |                   
+  ...ification.tsx |     100 |      100 |     100 |     100 |                   
+  RouteGuards.tsx  |    87.5 |    84.61 |     100 |    87.5 | 16-17,27-28       
+ ...res/auth/pages |   99.41 |    89.83 |     100 |   99.41 |                   
+  LoginPage.tsx    |    97.1 |     87.5 |     100 |    97.1 | 40-41             
+  ...ResetPage.tsx |     100 |    86.66 |     100 |     100 | 46,107            
+  RegisterPage.tsx |     100 |    88.23 |     100 |     100 | 97,112            
+  ...EmailPage.tsx |     100 |    94.73 |     100 |     100 | 57                
+ features/crafts   |   98.19 |    97.75 |      96 |   98.19 |                   
+  api.ts           |   98.59 |      100 |   96.42 |   98.59 | 95                
+  attributes.ts    |     100 |      100 |     100 |     100 |                   
+  categoryStyle.ts |     100 |      100 |     100 |     100 |                   
+  colors.ts        |     100 |      100 |     100 |     100 |                   
+  craftDate.ts     |     100 |    93.33 |     100 |     100 | 17                
+  mainColors.ts    |   88.23 |      100 |       0 |   88.23 | 20-21             
+  media.ts         |     100 |     87.5 |     100 |     100 | 13,22             
+  place.ts         |     100 |      100 |     100 |     100 |                   
+  queries.ts       |    95.6 |     98.3 |   96.22 |    95.6 | 131,168-174       
+  types.ts         |       0 |        0 |       0 |       0 |                   
+ ...fts/components |    97.6 |    88.72 |    90.9 |    97.6 |                   
+  CraftCard.tsx    |   97.43 |     87.5 |     100 |   97.43 | 55-57             
+  FacetSelect.tsx  |     100 |    88.88 |     100 |     100 | 45                
+  FilterBar.tsx    |   97.72 |    89.42 |      88 |   97.72 | 182-184,190-194   
+  PinPreview.tsx   |   95.58 |    81.81 |     100 |   95.58 | 46-48,60          
+  Swatch.tsx       |     100 |      100 |     100 |     100 |                   
+ ...ponents/detail |      86 |    90.38 |   86.04 |      86 |                   
+  ...ibuteList.tsx |     100 |      100 |     100 |     100 |                   
+  CraftFacts.tsx   |   99.11 |    93.33 |     100 |   99.11 | 135               
+  PhotoGallery.tsx |    42.1 |    66.66 |      40 |    42.1 | ...05-111,173-178 
+  RichText.tsx     |      70 |       50 |     100 |      70 | 13-18             
+  Stories.tsx      |    99.7 |    96.03 |   88.46 |    99.7 | 150               
+  ...Documents.tsx |   88.88 |    66.66 |     100 |   88.88 | 34-41             
+ ...components/map |   70.86 |       75 |   78.57 |   70.86 |                   
+  LocationMap.tsx  |       0 |        0 |       0 |       0 | 1-65              
+  MapView.tsx      |     100 |      100 |     100 |     100 |                   
+  leafletSetup.ts  |     100 |      100 |     100 |     100 |                   
+  markerCluster.ts |     100 |      100 |     100 |     100 |                   
+  pinIcon.ts       |   77.14 |      100 |      75 |   77.14 | 44-51             
+  world.tsx        |   84.93 |    58.33 |   83.33 |   84.93 | ...77-78,82,84-89 
+  worldOptions.ts  |     100 |      100 |     100 |     100 |                   
+ ...es/crafts/form |   93.42 |    83.54 |   91.91 |   93.42 |                   
+  ...temInline.tsx |   88.32 |     82.6 |      90 |   88.32 | ...,91-93,112-119 
+  ColorRows.tsx    |   96.38 |     82.6 |   83.33 |   96.38 | 94-96             
+  CraftFields.tsx  |   98.73 |    89.65 |   91.66 |   98.73 | 211-213           
+  DateFields.tsx   |   87.09 |       80 |     100 |   87.09 | 68-75             
+  ...nsionRows.tsx |     100 |    88.46 |   83.33 |     100 | 23,28,70          
+  FormProgress.tsx |     100 |      100 |     100 |     100 |                   
+  ItemPicker.tsx   |   90.29 |    79.45 |      90 |   90.29 | ...85-287,298-300 
+  ...ionPicker.tsx |   92.92 |    81.63 |   92.85 |   92.92 | ...97-105,130-132 
+  MediaPicker.tsx  |   94.35 |    68.57 |   88.88 |   94.35 | 22-23,34-37,70    
+  describeMedia.ts |     100 |       75 |     100 |     100 | 5                 
+  schema.ts        |   90.52 |    83.92 |     100 |   90.52 | ...46-159,285-286 
+  useDraft.ts      |   89.47 |    76.92 |     100 |   89.47 | 22-23,32,45       
+ ...s/crafts/hooks |   92.94 |     87.5 |     100 |   92.94 |                   
+  ...aftFilters.ts |   92.94 |     87.5 |     100 |   92.94 | 95-100            
+ ...s/crafts/pages |   96.13 |       88 |   84.37 |   96.13 |                   
+  ...etailPage.tsx |      98 |    94.59 |      75 |      98 | 101-106           
+  ...tListPage.tsx |   96.66 |    93.75 |     100 |   96.66 | 43-45             
+  ...CraftPage.tsx |   89.54 |    65.38 |   77.77 |   89.54 | ...60-161,166-171 
+  MapPage.tsx      |   97.08 |    91.17 |     100 |   97.08 | 29-30,123-125     
+  NewCraftPage.tsx |   98.85 |    91.89 |   85.71 |   98.85 | 212-213           
+ ...res/moderation |   98.55 |    87.03 |     100 |   98.55 |                   
+  api.ts           |     100 |      100 |     100 |     100 |                   
+  queries.ts       |   97.69 |    83.33 |     100 |   97.69 | 125,141,143       
+ ...ion/components |     100 |    97.87 |   83.33 |     100 |                   
+  ReportDialog.tsx |     100 |    97.43 |   82.35 |     100 | 108               
+  StatusTabs.tsx   |     100 |      100 |     100 |     100 |                   
+ ...deration/hooks |      75 |      100 |      50 |      75 |                   
+  ...ueueParams.ts |      75 |      100 |      50 |      75 | 19-23             
+ ...deration/pages |   94.74 |    78.45 |   84.44 |   94.74 |                   
+  ...eviewPage.tsx |   94.89 |    76.62 |   86.66 |   94.89 | ...00-201,204-209 
+  ...QueuePage.tsx |    93.9 |       50 |     100 |    93.9 | 32-34,36-38       
+  ...QueuePage.tsx |   97.14 |    85.71 |     100 |   97.14 | 26-28             
+  ...eportPage.tsx |   92.34 |    80.85 |   78.57 |   92.34 | ...72,175-180,203 
+  ...eviewPage.tsx |   97.43 |    90.62 |   81.81 |   97.43 | 113-118           
+  ...QueuePage.tsx |   93.75 |     62.5 |     100 |   93.75 | 32-34,36-38       
+ .../notifications |     100 |     90.9 |     100 |     100 |                   
+  api.ts           |     100 |       75 |     100 |     100 | 11                
+  queries.ts       |     100 |      100 |     100 |     100 |                   
+ ...ons/components |   95.23 |    66.66 |     100 |   95.23 |                   
+  ...ationBell.tsx |     100 |    85.71 |     100 |     100 | 28                
+  ...ationItem.tsx |   93.67 |    62.06 |     100 |   93.67 | 44,54,63,72,75    
+ ...ications/pages |   95.12 |     92.3 |     100 |   95.12 |                   
+  ...tionsPage.tsx |   95.12 |     92.3 |     100 |   95.12 | 31-33             
+ features/profiles |   90.47 |    81.81 |   81.81 |   90.47 |                   
+  api.ts           |   63.63 |      100 |      50 |   63.63 | 19-22             
+  format.ts        |     100 |    66.66 |     100 |     100 | 9                 
+  queries.ts       |     100 |    83.33 |     100 |     100 | 14                
+ ...les/components |   96.55 |    83.33 |     100 |   96.55 |                   
+  Avatar.tsx       |     100 |    83.33 |     100 |     100 | 37                
+  UserCrafts.tsx   |    92.3 |    83.33 |     100 |    92.3 | 20-22             
+ ...profiles/pages |   96.38 |    61.36 |   88.88 |   96.38 |                   
+  ...ofilePage.tsx |   95.55 |    16.66 |     100 |   95.55 | 12-13             
+  ...ofilePage.tsx |   94.02 |    86.66 |     100 |   94.02 | 33-38             
+  SettingsPage.tsx |   97.57 |    56.52 |   85.71 |   97.57 | 60,105,110-111    
+ features/social   |     100 |    94.73 |   96.87 |     100 |                   
+  api.ts           |     100 |      100 |   88.88 |     100 |                   
+  queries.ts       |     100 |    93.33 |     100 |     100 | 120,124           
+ ...ial/components |   97.95 |    94.52 |     100 |   97.95 |                   
+  ...iteButton.tsx |     100 |      100 |     100 |     100 |                   
+  ...itesPanel.tsx |   95.45 |     87.5 |     100 |   95.45 | 18-19,75          
+  FollowButton.tsx |     100 |    94.73 |     100 |     100 | 15                
+  Panel.tsx        |     100 |      100 |     100 |     100 |                   
+  PeoplePanel.tsx  |   97.26 |       95 |     100 |   97.26 | 52-53             
+  SignInPrompt.tsx |     100 |      100 |     100 |     100 |                   
+ ...s/social/pages |    93.1 |    83.33 |     100 |    93.1 |                   
+  ...ritesPage.tsx |    93.1 |    83.33 |     100 |    93.1 | 20-22             
+ lib               |   97.64 |    96.87 |     100 |   97.64 |                   
+  config.ts        |     100 |      100 |     100 |     100 |                   
+  errors.ts        |     100 |      100 |     100 |     100 |                   
+  forms.ts         |      92 |     87.5 |     100 |      92 | 23-24             
+  toast.ts         |     100 |      100 |     100 |     100 |                   
+-------------------|---------|----------|---------|---------|-------------------
