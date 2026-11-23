@@ -123,8 +123,6 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Tests
         working-directory: frontend
-        env:
-          NO_COLOR: "1"
         run: |
           mkdir -p ../test-reports
           npx playwright test 2>&1 | tee ../test-reports/e2e-playwright.txt

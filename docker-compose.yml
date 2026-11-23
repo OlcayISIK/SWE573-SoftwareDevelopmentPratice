@@ -17,7 +17,7 @@ services:
     build: ./backend
     environment:
       DJANGO_SECRET_KEY: local-compose-secret-key
-      JWT_SIGNING_KEY: local-compose-jwt-signing-key
+      JWT_SIGNING_KEY: local-compose-jwt-signing-key-for-development-only
       DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
       EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
       AUTO_VERIFY_EMAIL: "true"
