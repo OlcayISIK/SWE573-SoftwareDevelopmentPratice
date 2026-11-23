@@ -52,8 +52,20 @@ jobs:
         run: python manage.py makemigrations --check --dry-run
         env:
           DJANGO_SETTINGS_MODULE: config.settings.test
+      # Verbose output and coverage are kept as the run's test report.
       - name: Tests
-        run: pytest -q
+        run: |
+          mkdir -p ../test-reports
+          coverage run -m pytest -o addopts="" -v --color=no --durations=10 2>&1 \
+            | tee ../test-reports/backend-pytest.txt
+          coverage report 2>&1 | tee ../test-reports/backend-coverage.txt
+      - name: Keep the test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-report
+          path: test-reports
+          retention-days: 90
 
   frontend:
     name: Frontend tests
@@ -75,7 +87,18 @@ jobs:
           npm run format:check
           npm run typecheck
       - name: Tests
-        run: npm test
+        env:
+          NO_COLOR: "1"
+        run: |
+          mkdir -p ../test-reports
+          npm run test:coverage 2>&1 | tee ../test-reports/frontend-vitest.txt
+      - name: Keep the test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-report
+          path: test-reports
+          retention-days: 90
       - name: Production build
         run: npm run build
 
@@ -100,7 +123,16 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Tests
         working-directory: frontend
-        run: npx playwright test
+        run: |
+          mkdir -p ../test-reports
+          npx playwright test 2>&1 | tee ../test-reports/e2e-playwright.txt
+      - name: Keep the test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-report
+          path: test-reports
+          retention-days: 90
       - name: Keep the traces of failed tests
         if: failure()
         uses: actions/upload-artifact@v4

@@ -27,6 +27,19 @@ export default defineConfig(({ mode }) => {
       setupFiles: ["./src/test/setup.ts"],
       css: false,
       include: ["src/**/*.test.{ts,tsx}"],
+      // `npm run test:coverage`: line coverage of the application code, not of the tests.
+      coverage: {
+        provider: "v8",
+        include: ["src/**/*.{ts,tsx}"],
+        exclude: [
+          "src/**/*.test.{ts,tsx}",
+          "src/test/**",
+          "src/api/schema.d.ts",
+          "src/vite-env.d.ts",
+          "src/main.tsx",
+        ],
+        reporter: ["text-summary", "text"],
+      },
     },
   };
 });

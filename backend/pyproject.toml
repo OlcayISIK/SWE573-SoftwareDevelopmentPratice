@@ -22,6 +22,7 @@ dev = [
     "pytest>=8.3",
     "pytest-django>=4.10",
     "factory-boy>=3.3",
+    "coverage>=7.6",
     "ruff>=0.11",
     "import-linter>=2.1",
 ]
@@ -38,6 +39,15 @@ DJANGO_SETTINGS_MODULE = "config.settings.test"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-q"
+
+# coverage run -m pytest, then coverage report: statements of the application code.
+[tool.coverage.run]
+source = ["."]
+omit = ["tests/*", "*/migrations/*", "manage.py", "config/wsgi.py", ".venv/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
 
 [tool.ruff]
 line-length = 100
