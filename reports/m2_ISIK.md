@@ -45,10 +45,10 @@ Everything is in the repository or its [wiki](https://github.com/OlcayISIK/SWE57
 
 ## Requirements status
 
-Of 32 functional requirements, 27 are completed (documented, tested, and deployed), 1 is partial, and 4 are not started; of 12 non-functional requirements, 11 are completed and 1 is partial. The details and links are on the [Requirement Status](https://github.com/OlcayISIK/SWE573-SoftwareDevelopmentPratice/wiki/Requirement-Status) page.
+Of 30 functional requirements, 27 are completed (documented, tested, and deployed), 1 is partial, and 2 are not started; of 12 non-functional requirements, 11 are completed and 1 is partial. The details and links are on the [Requirement Status](https://github.com/OlcayISIK/SWE573-SoftwareDevelopmentPratice/wiki/Requirement-Status) page.
 
 - **Partial:** FR-02, because the deployment has no email service, so it verifies new accounts automatically and sends no verification or reset emails (both flows are tested); NFR-01, because the user tests did not time how long it takes to find a first craft.
-- **Not started:** FR-20, the optional AI assistance layer (deferred); FR-30 to FR-32, the endangered status, audio recordings, and side-by-side comparison (Won't in this release).
+- **Not started:** FR-20, the optional AI assistance layer (deferred); FR-30, the living or endangered status of a craft (Won't in this release).
 
 ## Testing
 
