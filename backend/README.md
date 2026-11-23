@@ -10,7 +10,7 @@ From the repository root:
 docker compose up --build
 ```
 
-- API: http://localhost:8000/api/v1/
+- API: http://localhost:8000/api/v1/crafts/ (every endpoint is under `/api/v1/`)
 - Swagger UI: http://localhost:8000/api/docs/
 - Django admin: http://localhost:8000/admin/
 
