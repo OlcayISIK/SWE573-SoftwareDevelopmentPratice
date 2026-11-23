@@ -246,7 +246,8 @@ function StoryBody({
   return (
     <>
       <RichText text={entry.text} className="text-lg" />
-      <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-sans text-sm text-stone-600">
+      {/* A div, not a p: the report control opens a dialog with headings and paragraphs. */}
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-sans text-sm text-stone-600">
         <span>
           Shared by{" "}
           <Link
@@ -257,7 +258,7 @@ function StoryBody({
           </Link>
         </span>
         {report}
-      </p>
+      </div>
       {actions}
     </>
   );

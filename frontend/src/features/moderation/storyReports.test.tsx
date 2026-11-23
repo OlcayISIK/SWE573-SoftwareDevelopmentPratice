@@ -78,6 +78,8 @@ describe("reporting a story", () => {
     await storyLoaded();
     await userEvent.click(screen.getByRole("button", { name: "Report story by Mehmet Kaya" }));
     const dialog = screen.getByRole("dialog", { name: "Report this story" });
+    // The dialog holds headings and paragraphs, so it must not sit inside a paragraph.
+    expect(dialog.closest("p")).toBeNull();
     await userEvent.click(within(dialog).getByRole("radio", { name: /Inappropriate/ }));
     await userEvent.type(within(dialog).getByLabelText("Details (optional)"), "Off topic.");
     await userEvent.click(within(dialog).getByRole("button", { name: "Send report" }));

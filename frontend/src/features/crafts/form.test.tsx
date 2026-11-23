@@ -407,7 +407,7 @@ test("the form validates required fields in the browser", async () => {
 test("a year before the common era is sent as a negative year", async () => {
   server.use(...signedIn());
   const { created } = publishHandlers();
-  renderRoute("/crafts/new");
+  const { router } = renderRoute("/crafts/new");
   await fillRequiredFields();
 
   await userEvent.click(screen.getByRole("radio", { name: "A year" }));
@@ -418,6 +418,8 @@ test("a year before the common era is sent as a negative year", async () => {
 
   await waitFor(() => expect(created).toHaveLength(1));
   expect(created[0].date).toEqual({ kind: "year", year: -500, circa: true });
+  // Wait for the new craft's page, so its request does not leak into the next test.
+  await waitFor(() => expect(router.state.location.pathname).toBe("/crafts/42"));
 });
 
 test("a date in the future is flagged", async () => {
