@@ -6,15 +6,16 @@ This document covers all use of AI in the Indigenous Crafts project since Milest
 
 ## Summary for the report
 
-I used one AI tool, Claude Code (Anthropic's Claude, working in the repository from VS Code), for three kinds of work: code generation, document generation, and report generation. Code is mixed by area: overall I wrote about 60% of the application code myself, and about 40% was drafted with AI from tasks I specified. Documents and reports (the updated SRS, the design documents, the test plan and results, the installation and user documentation, the milestone review, and the individual contributions) were drafted with AI from the code, the tests, and the issue history, then reviewed, corrected, and approved by me. In every case I set the task and its details and limits, made the decisions, and checked the output: every change went through a pull request that I reviewed and that had to pass 725 automated tests, and documents were checked against the code, the tests, and the live site. These checks caught several AI mistakes, listed under Limitations below. The requirements elicitation, the user tests, and all decisions on scope and priorities were done by me without AI.
+I used one AI tool, Claude Code (Anthropic's Claude, working in the repository from VS Code), for three kinds of work: code generation, document generation, and report generation. Code is mixed by area: overall I wrote about 60% of the application code myself, and about 40% was drafted with AI from tasks I specified. Documents and reports (the updated SRS, the design documents, the test plan and results, the installation and user documentation, the milestone review, and the individual contributions) were drafted with AI from the code, the tests, and the issue history, then reviewed, corrected, and approved by me. In every case I set the task and its details and limits, made the decisions, and checked the output: every change went through a pull request that I reviewed and that had to pass 725 automated tests, and documents were checked against the code, the tests, and the live site. These checks caught several AI mistakes, listed under Limitations below. The interviews, the questionnaire, the user tests, and all decisions on scope and priorities were done by me without AI. Before Milestone 1, the research for the document analysis also used Claude, ChatGPT, and Gemini (NotebookLM), with each tool's answers cross-checked against another.
 
 ## Tool
 
 | | |
 |---|---|
 | **Tool** | Claude Code: Anthropic's Claude models, used from VS Code with access to the repository, the terminal, and the GitHub command line |
-| **Other AI tools** | None (no ChatGPT, GitHub Copilot, or other assistants) |
+| **Other AI tools since Milestone 1** | None (no ChatGPT, GitHub Copilot, or other assistants) |
 | **Period** | 4 October to 23 November 2026 |
+| **Before Milestone 1** | For the document analysis of existing craft resources (issue #6, 1 October 2026), Claude, ChatGPT, and Gemini (NotebookLM) were used to find sources and answer research questions; each tool's answers were checked against another tool's, and the findings were written up by me |
 
 ## How I worked with AI
 
@@ -37,7 +38,8 @@ I used one AI tool, Claude Code (Anthropic's Claude, working in the repository f
 | Test plan and results | Drafted the document and its tables from the verbose CI reports | High for the text | The figures are read from the reports; the user test section was written only from my own account of the tests |
 | Installation and user documentation | Ran the installation from a fresh clone and drafted the instructions and the updated user guide | High for the text | I checked the steps and the measured figures, and the problems the run found were fixed in the documents |
 | Reports (requirement status, milestone review, individual contributions, the summary in the final report) | Drafted the reports from GitHub data, the tests, and the documents | High for the text | I checked the figures against GitHub, set the plan's dates to the course deadlines, and approved each report |
-| Requirements elicitation, user tests, project decisions | Not used | None | Done by me: interviews, questionnaire, document analysis, the user test sessions, and every decision on scope |
+| Document analysis (before Milestone 1) | Claude, ChatGPT, and Gemini (NotebookLM) found sources on UNESCO's and the V&A's records and answered research questions | Medium | Each tool's answers were cross-checked against another tool; I reviewed the sources and wrote the findings in issue #6 |
+| Interviews, questionnaire, user tests, project decisions | Not used | None | Done by me: the interviews and questionnaire with people, the user test sessions, and every decision on scope and priorities |
 
 ## Limitations observed, and how my checks caught them
 
