@@ -14,15 +14,16 @@
 10. [Authorization in the UI](#authorization-in-the-ui)
 11. [Map](#map)
 12. [Forms and Validation](#forms-and-validation)
-13. [Media Uploads](#media-uploads)
-14. [Notifications](#notifications)
-15. [Visual Design](#visual-design)
-16. [Responsive Design and Accessibility](#responsive-design-and-accessibility)
-17. [Error Handling](#error-handling)
-18. [Testing Strategy](#testing-strategy)
-19. [Configuration](#configuration)
-20. [Deployment](#deployment)
-21. [Future Extensions](#future-extensions)
+13. [Craft Page and Moderation](#craft-page-and-moderation)
+14. [Media Uploads](#media-uploads)
+15. [Notifications](#notifications)
+16. [Visual Design](#visual-design)
+17. [Responsive Design and Accessibility](#responsive-design-and-accessibility)
+18. [Error Handling](#error-handling)
+19. [Testing Strategy](#testing-strategy)
+20. [Configuration](#configuration)
+21. [Deployment](#deployment)
+22. [Future Extensions](#future-extensions)
 
 ---
 
@@ -46,20 +47,22 @@ Design goals:
 | -------------------- | ------------------------------------------------- |
 | Language             | TypeScript                                        |
 | UI library           | React 19                                          |
-| Build tool           | Vite                                              |
-| Routing              | React Router                                      |
+| Build tool           | Vite 6                                            |
+| Routing              | React Router 7 (lazy routes)                      |
 | Server state         | TanStack Query                                    |
 | Client state         | React context (auth session only)                 |
 | HTTP client          | Axios                                             |
 | Forms and validation | React Hook Form + Zod                             |
 | Map                  | Leaflet + react-leaflet, OpenStreetMap tiles      |
 | Marker clustering    | Leaflet.markercluster                             |
-| Styling              | Tailwind CSS                                      |
+| Styling              | Tailwind CSS 4                                    |
+| Icons and fonts      | lucide-react; Fraunces and Inter via @fontsource  |
+| Animation            | CSS animations; Motion for the sliding navigation underline |
 | API types            | openapi-typescript (generated from the backend schema) |
-| Testing              | Vitest + React Testing Library + MSW              |
-| End-to-end testing   | Playwright                                        |
-| Linting and format   | ESLint + Prettier                                 |
-| Serving              | Nginx (static files in a Docker container)        |
+| Testing              | Vitest + React Testing Library + MSW + axe-core   |
+| End-to-end testing   | Playwright (desktop Chrome, Pixel 7)              |
+| Linting and format   | ESLint (with jsx-a11y) + Prettier                 |
+| Serving              | Render static site in production; Nginx in a Docker container locally and in CI |
 
 ---
 
@@ -67,7 +70,7 @@ Design goals:
 
 The frontend is a client-rendered SPA organized by feature. Each feature folder owns its pages, components, API calls, and types, which mirrors the backend modules (`accounts`, `crafts`, `moderation`, `social`, `notifications`).
 
-Server-side rendering (for example, Next.js) is intentionally not used. The content does not need search engine indexing for the course scope, and an SPA served as static files keeps deployment to one simple container.
+Server-side rendering (for example, Next.js) is intentionally not used. The content does not need search engine indexing for the course scope, and an SPA served as static files keeps deployment simple: a static site in production, one Nginx container locally.
 
 ---
 
@@ -80,30 +83,35 @@ frontend/
 ├── package.json
 ├── .env.example
 ├── Dockerfile
-├── nginx.conf
+├── nginx/
+│   └── default.conf.template   # Nginx config: SPA fallback, caching, security headers
+├── playwright.config.ts
 ├── src/
 │   ├── main.tsx                # Entry point: providers and router
 │   ├── app/
 │   │   ├── router.tsx          # Route definitions
-│   │   ├── providers.tsx       # QueryClient, AuthProvider
-│   │   └── layouts/            # MainLayout, AdminLayout
+│   │   ├── providers.tsx       # QueryClient, AuthProvider, Toaster
+│   │   ├── queryClient.ts      # TanStack Query defaults
+│   │   └── layouts/            # MainLayout, AuthLayout, AdminLayout
 │   ├── api/
 │   │   ├── client.ts           # Axios instance, interceptors, token refresh
-│   │   ├── envelope.ts         # Unwraps the backend response envelope
+│   │   ├── envelope.ts         # Unwraps the backend response envelope, ApiError
+│   │   ├── session.ts          # Access token in memory, refresh token in localStorage
+│   │   ├── types.ts            # Shared shapes such as Paginated<T>
 │   │   └── schema.d.ts         # Generated API types (openapi-typescript)
 │   ├── features/
-│   │   ├── auth/               # Register, login, verify email, password reset
-│   │   ├── crafts/             # Map, craft list, craft details, craft form
+│   │   ├── auth/               # Register, login, verify email, password reset, route guards
+│   │   ├── crafts/             # Map, craft list, filters, craft details, stories, craft form
 │   │   ├── profiles/           # Public profile, own profile and privacy settings
-│   │   ├── social/             # Favorite and follow buttons, favorites list
-│   │   ├── moderation/         # Report dialogs, admin review of crafts and items
+│   │   ├── social/             # Favorite and follow buttons, favorites and people panels
+│   │   ├── moderation/         # Report dialogs, admin review of crafts, items, and stories
 │   │   └── notifications/      # Notification bell and list
-│   ├── components/             # Shared UI: Button, Modal, Pagination, EmptyState
-│   ├── hooks/                  # Shared hooks
-│   ├── lib/                    # Helpers: formatting, constants
-│   └── styles/
+│   ├── components/             # Shared UI: Pagination, EmptyState, Tooltip, ConfirmDialog, Toaster, form fields
+│   ├── lib/                    # Config, error mapping, form helpers, toasts
+│   ├── styles/                 # Tailwind theme tokens and shared utilities
+│   └── test/                   # Test setup, MSW server and handlers, fixtures, render helper
 └── tests/
-    └── e2e/                    # Playwright tests
+    └── e2e/                    # Playwright tests, with setup and cleanup of test data
 ```
 
 Every feature folder uses the same layout:
@@ -113,7 +121,8 @@ features/<feature>/
 ├── api.ts             # Functions that call the backend
 ├── queries.ts         # TanStack Query hooks (useCraft, usePublishCraft, ...)
 ├── types.ts           # Feature types, based on the generated API types
-├── schemas.ts         # Zod schemas for forms (if any)
+├── schemas.ts         # Zod schemas for forms (if any; the craft form keeps its own in form/)
+├── hooks/             # Feature hooks, such as useCraftFilters (if any)
 ├── components/        # Components used only by this feature
 └── pages/             # Route-level components
 ```
@@ -136,7 +145,7 @@ pages  →  components  →  queries  →  api  →  api/client
 | API        | HTTP calls for one feature, map request and response types | Hold state                    |
 | API client | Base URL, auth header, token refresh, envelope unwrapping | Know about features            |
 
-Features may use shared `components`, `hooks`, and `lib`. A feature may use another feature's exported components (for example, `crafts` shows the `FavoriteButton` from `social`), but never another feature's `api.ts` directly.
+Features may use shared `components` and `lib`. A feature may use another feature's exported components (for example, `crafts` shows the `FavoriteButton` from `social`, and the craft page's stories use the `ReportStoryButton` from `moderation`), but never another feature's `api.ts` directly.
 
 ---
 
@@ -162,16 +171,18 @@ Features may use shared `components`, `hooks`, and `lib`. A feature may use anot
 | `/admin/reports/:id`          | Review a craft report         | Admin           | FR-12           |
 | `/admin/item-reports`         | Reported lookup items         | Admin           | FR-11, FR-12    |
 | `/admin/item-reports/:id`     | Review an item report         | Admin           | FR-12           |
+| `/admin/story-reports`        | Reported stories              | Admin           | FR-11, FR-12    |
+| `/admin/story-reports/:id`    | Review a story report         | Admin           | FR-12           |
 | `*`                           | Not found                     | Public          |                 |
 
-Routes are lazy-loaded with `React.lazy`, so the map library and the admin screens are only downloaded when needed.
+Every page is lazy-loaded through React Router's `lazy` route option, so the map library and the admin screens are only downloaded when needed. Guest pages (`/login`, `/register`, `/verify-email`, `/password-reset`) use `AuthLayout`, the admin pages use `AdminLayout`, and every other page uses `MainLayout`.
 
 Protected routes are wrapped in route guards:
 
 - `RequireAuth` redirects guests to `/login` and returns them to the original page after login.
 - `RequireAdmin` shows a "not authorized" page to non-admin users.
 
-Map filters and list filters (category, craft type, culture, country, search, page) are kept in the URL query string, so filtered views can be shared and the back button works.
+Map filters and list filters (category, craft type, culture, country, main color, search, the place searched near and its area, page) are kept in the URL query string by the `useCraftFilters` hook, so filtered views can be shared and the back button works.
 
 ---
 
@@ -213,7 +224,7 @@ The backend wraps every response:
 
 `api/envelope.ts` returns `data` on success and throws an `ApiError` (with `status`, `message`, and field `errors`) on failure. Feature code receives plain data and never handles the envelope itself.
 
-Paginated endpoints return `items`, `total`, `page`, `pageSize`, and `totalPages` inside `data`. A shared `usePaginatedQuery` helper and `Pagination` component work with this shape.
+Paginated endpoints return `items`, `total`, `page`, `pageSize`, and `totalPages` inside `data`. The shared `Paginated<T>` type (`api/types.ts`) and the `Pagination` component work with this shape; list queries keep the previous page on screen while the next one loads (`keepPreviousData`).
 
 ### Types
 
@@ -258,7 +269,10 @@ The UI hides or disables actions the user is not allowed to take, but this is on
 | Publish button                | Signed-in users (prompts guests to sign in) |
 | Favorite, follow, report      | Signed-in users (prompts guests to sign in) |
 | Edit and delete on a craft    | The author and admins     |
-| Admin menu and review queue   | Admins                    |
+| Share a story                 | Signed-in users other than the craft's author (prompts guests to sign in) |
+| Edit and delete on a story    | The writer and admins     |
+| Report a story                | Signed-in users other than the writer; admins act on it directly |
+| Admin menu and review queues (crafts, items, stories) | Admins |
 
 The user's role is read from the `/me/` response, not decoded from the JWT, so it always matches what the backend uses.
 
@@ -271,7 +285,8 @@ Users must verify their email before publishing. If an unverified user opens `/c
 - **Library:** Leaflet with react-leaflet and OpenStreetMap tiles. Leaflet is free, has no API key, and is enough for pins, zoom, and pan. The OpenStreetMap attribution is shown on the map, as its license requires.
 - **Data:** the map loads lightweight pins from `/crafts/map/` (craft id, place id, name, category, latitude, longitude): one per place, so a craft made in several places has a pin at each. The count and the list view show each craft once. Full craft data is loaded only when a pin is opened.
 - **Clustering:** nearby pins are grouped with Leaflet.markercluster, so the map stays readable and fast as the number of crafts grows (NFR-02).
-- **Filters:** category, craft type (cleared when the category changes), culture, country, and search update the URL and refetch the pins. Categories are chips with their icon and count; the other filters open in a panel. Each list comes from `/crafts/facets/`, so it only offers values found with the other filters, with counts, for example "Türkiye (3)" after searching "kilim". A chosen value stays listed even when no results have it.
+- **Filters:** category, craft type (cleared when the category changes), culture, country, main color (shown as swatches), and search update the URL and refetch the pins. Categories are chips with their icon and count; the other filters open in a panel. Each list comes from `/crafts/facets/`, so it only offers values found with the other filters, with counts, for example "Türkiye (3)" after searching "kilim". A chosen value stays listed even when no results have it.
+- **Search near a place:** the user types a place; the frontend looks it up through `/geocode/search/`, moves the map to it, and filters by its `area`. The place is shown as a chip that removes the filter.
 - **No results:** when the filters find nothing, the map and the lists say so, for example "No crafts match “kilim”.", with a button to clear the filters.
 - **Pin details:** clicking a pin opens a preview card (photo, name, craft type, culture, and place) with a link to the craft details page. On mobile the preview opens as a bottom sheet.
 - **Picking a location:** each place in the craft form has a small map. The author types an address and pins it (the map moves to the found point), or clicks or drags the pin and the address is filled in from the point.
@@ -301,9 +316,29 @@ The craft form follows the craft data model:
 
 Long forms save a draft in `localStorage`, so an author does not lose their work if the page reloads. Fields added to the form later start empty when an older draft is restored.
 
+---
+
+## Craft Page and Moderation
+
+### Facts card
+
 The craft page shows a facts card with the category, craft type, culture (with its homeland), tools, materials, and place. Each one links to the list of crafts that share it (for tools and materials, a search for the name), and shows the item's description in a tooltip on hover and focus.
 
 The shared `Tooltip` component links the text to its target with `aria-describedby`, stays open while the pointer moves onto the text, and closes with Escape.
+
+### Stories
+
+The craft page's Stories section (`components/detail/Stories.tsx`) is an accordion. The craft author's story (the craft's own `story` field) comes first and open; then the viewer's own story; then everyone else's, closed, each with the writer's name, the date, and a preview in its header.
+
+- A signed-in user who is not the craft's author can share one story (up to 5,000 characters), then edit it or delete it after confirming. Guests see a prompt to log in.
+- The writer and admins can edit or delete a story. Other signed-in users can report it as inaccurate, inappropriate, or disrespectful.
+- Admins review reported stories under "Reported stories" and hide, remove, or dismiss them.
+
+### Reports on crafts
+
+Signed-in users other than the author report a craft from its page as inaccurate, inappropriate, or disrespectful. Admins work through "Reported crafts": a queue filtered by status (open, resolved, dismissed, all), and a review page with the report, the craft, and its review history, where they edit, hide, remove, or dismiss with a reason.
+
+### Reports on list items
 
 Items that users added to the lookup lists can be reported from the facts card, with their own reasons (duplicate, inaccurate, inappropriate). Admins review them under "Reported items": the page shows who added the item and how many crafts use it, and offers edit (the name or the description), hide, merge into another item of the same kind (confirmed first, since it moves the crafts and deletes the item), or dismiss.
 
@@ -321,8 +356,9 @@ Items that users added to the lookup lists can be reported from the facts card, 
 
 ## Notifications
 
-- The notification bell shows the unread count, refreshed by polling `/me/notifications/` every 60 seconds while the tab is visible (TanStack Query `refetchInterval`, paused in background tabs).
+- The notification bell shows the unread count, refreshed by polling `/me/notifications/unread-count/` every 60 seconds while the tab is visible (TanStack Query `refetchInterval`, paused in background tabs).
 - Opening the notification list marks the notifications as read.
+- Each type has its own text and link: a new craft from someone you follow, an update to a favorited craft, a reviewed report on a craft or a story, and a new story on your craft. (Reviews of list-item reports send no notification.)
 - If a notification's craft was hidden or removed, the backend returns `craft` as `null`, and the UI shows the notification without a link.
 
 ---
@@ -336,7 +372,7 @@ The interface follows a "Sky, Sea and Earth" direction: blues lead, and the colo
 - **Patterns:** faint contour lines (`bg-contour`) behind heroes and empty states, and a woven band (`woven-band`) under the header and above the story. Both are small inline SVGs.
 - **Shared pieces:** `btn-primary`, `btn-secondary`, `btn-ghost`, `card`, `skeleton`, and `form-section` utilities; `EmptyState`, `LogoMark`, `Tooltip`, and `DescribedSelect`, a dropdown whose options show their description, with the keyboard behavior of the ARIA combobox pattern.
 - **Categories:** each category has an icon, stored with the category and chosen from 24 when a user adds one, and a color for its badge and card stripe (`features/crafts/categoryStyle.ts`). Map pins are ocean-blue teardrops with the category icon inside, and clusters have a sun-colored ring.
-- **Motion:** short CSS animations: pages and cards fade up (cards one after another), cards lift on hover, pins drop in, dialogs, toasts, and the pin preview slide in, and skeletons shimmer while loading. All of it stops when the system asks for reduced motion. Animations use CSS rather than JavaScript, so tests see the final state right away.
+- **Motion:** short CSS animations: pages and cards fade up (cards one after another), cards lift on hover, pins drop in, dialogs, toasts, and the pin preview slide in, and skeletons shimmer while loading. All of it stops when the system asks for reduced motion. Animations use CSS rather than JavaScript, so tests see the final state right away. The one exception is the underline under the active navigation link, which slides between links with the Motion library.
 
 ---
 
@@ -379,9 +415,9 @@ The interface follows a "Sky, Sea and Earth" direction: blues lead, and the colo
 | ----------- | ---------------------------------------------------------- | ------------------------------ |
 | Unit        | Helpers, Zod schemas, envelope handling                    | Vitest                         |
 | Component   | Components and pages with mocked API responses             | React Testing Library + MSW    |
-| End-to-end  | Key flows against the real backend: register, publish, report, admin hide, report and merge an added tool | Playwright      |
+| End-to-end  | Key flows against the production build in Docker: register and publish, search across far-apart places, pins for every place, report and admin hide, report and merge an added tool, share and report a story, mobile layout, security headers, deep links | Playwright      |
 
-The token refresh flow, including the single-flight behavior, has dedicated tests. Route guards and role-based UI (guest, registered user, admin) are tested at the component level.
+There are 252 component and unit tests (`npm test`) and 11 end-to-end tests (`npm run test:e2e`, desktop Chrome and a Pixel 7 profile). The token refresh flow, including the single-flight behavior, has dedicated tests. Route guards and role-based UI (guest, registered user, admin) are tested at the component level. The end-to-end tests remove their test users and data after each run.
 
 ---
 
@@ -390,8 +426,9 @@ The token refresh flow, including the single-flight behavior, has dedicated test
 Configuration comes from Vite environment variables, which are built into the static files at build time.
 
 ```env
-VITE_API_BASE_URL=https://api.example.com/api/v1
+VITE_API_BASE_URL=https://api.example.com/api/v1    # default: /api/v1
 VITE_MAP_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png
+VITE_PROXY_TARGET=http://localhost:8000              # dev server only: where /api is proxied
 ```
 
 Because these values end up in the browser, they must never contain secrets. A `.env.example` file documents the variables.
@@ -400,12 +437,13 @@ Because these values end up in the browser, they must never contain secrets. A `
 
 ## Deployment
 
-- **Build:** `npm run build` produces static files in `dist/`.
-- **Image:** multi-stage Docker build. The build stage uses a Node image to install dependencies and build; the runtime stage is a small Nginx image that serves `dist/`.
-- **Routing:** Nginx falls back to `index.html` for unknown paths, so React Router handles deep links such as `/crafts/12`.
+- **Build:** `npm run build` type-checks and produces static files in `dist/`.
+- **Production:** a Render static site builds from `frontend/` (`npm ci && npm run build`) and publishes `dist/`, with `VITE_API_BASE_URL` pointing to the backend. Render rewrites `/*` to `/index.html` and sends the security headers: Content-Security-Policy (only our own origin, the API, the map tiles, and the YouTube and Vimeo players are allowed), X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and HSTS. The GitHub Actions pipeline deploys it from `main` after every test passes.
+- **Image:** multi-stage Docker build, used by Docker Compose and the end-to-end tests. The build stage uses a Node 22 image to install dependencies and build; the runtime stage is an unprivileged Nginx image that serves `dist/`.
+- **Routing:** both Nginx and Render fall back to `index.html` for unknown paths, so React Router handles deep links such as `/crafts/12`.
 - **Caching:** hashed asset files are cached long-term; `index.html` is not cached, so users get new releases immediately.
-- **Security headers:** Nginx sets a Content Security Policy and other security headers.
-- **Local development:** Docker Compose runs the frontend alongside the backend and database. During development, the Vite dev server proxies `/api` to the backend to avoid CORS issues.
+- **Security headers:** Nginx sets the same Content Security Policy and security headers as production, except HSTS, which only applies over HTTPS; an end-to-end test checks them.
+- **Local development:** Docker Compose runs the frontend alongside the backend and database (the map at `http://localhost:5173`). With `npm run dev`, the Vite dev server proxies `/api` to the backend (`VITE_PROXY_TARGET`) to avoid CORS issues.
 
 ---
 
