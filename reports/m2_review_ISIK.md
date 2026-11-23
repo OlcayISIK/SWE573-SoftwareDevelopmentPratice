@@ -11,13 +11,13 @@
 - The deployment has no email service: new accounts are verified automatically, and verification and password-reset emails are not sent (FR-02 is partial).
 - Files uploaded on the deployment are lost when the backend redeploys, because the free host has no persistent disk; the sample photos are restored automatically.
 - Whether a first-time user finds a craft within 30 seconds (NFR-01) has not been measured.
-- Not built: the AI assistance layer (FR-20), the endangered status, audio recordings, and side-by-side comparison (FR-30 to FR-32).
+- Not built: the AI assistance layer (FR-20) and the living or endangered status of a craft (FR-30).
 
-**What changed since Milestone 1.** The requirements grew from 20 to 32 functional and from 8 to 12 non-functional requirements: 16 modified, 16 added, none removed. The data model became structured (shared lists, several places per craft, colors, dates), stories were added, and request logging, a health check, documented API examples, and a CI/CD pipeline were built. Since Milestone 1: 70 merged pull requests, 725 automated tests, and one round of user tests.
+**What changed since Milestone 1.** The requirements grew from 20 to 30 functional and from 8 to 12 non-functional requirements: 16 modified, 14 added, none removed. The data model became structured (shared lists, several places per craft, colors, dates), stories were added, and request logging, a health check, documented API examples, and a CI/CD pipeline were built. Since Milestone 1: 70 merged pull requests, 725 automated tests, and one round of user tests.
 
 ## 2. Requirements addressed, with evidence links
 
-Every requirement, with links to its documentation, code, tests, and deployed feature, is on the wiki page [Requirement Status](https://github.com/OlcayISIK/SWE573-SoftwareDevelopmentPratice/wiki/Requirement-Status). Completed means documented, tested, and deployed: 27 of 32 functional and 11 of 12 non-functional requirements.
+Every requirement, with links to its documentation, code, tests, and deployed feature, is on the wiki page [Requirement Status](https://github.com/OlcayISIK/SWE573-SoftwareDevelopmentPratice/wiki/Requirement-Status). Completed means documented, tested, and deployed: 27 of 30 functional and 11 of 12 non-functional requirements.
 
 | Area | Requirements | Evidence |
 |---|---|---|
@@ -36,8 +36,7 @@ Every requirement, with links to its documentation, code, tests, and deployed fe
 |---|---|---|
 | FR-20 AI assistance layer | Deferred | Optional in the SRS draft and not needed for the core workflow; specified separately in issue [#24](https://github.com/OlcayISIK/SWE573-SoftwareDevelopmentPratice/issues/24) for a later version |
 | FR-30 Living or endangered status | Won't in this release | Ranked third in the questionnaire, but a reliable status needs authoritative sources such as UNESCO's lists and curator review, not a value any contributor can set; it is the first item of future work |
-| FR-31 Audio recordings | Won't in this release | Ranked last of the features in the questionnaire (issue #5), and not needed for the core workflow |
-| FR-32 Side-by-side comparison | Won't in this release | A "nice to have" in the interviews; shared lists and filters already show the same technique or material across cultures |
+| Audio recordings and side-by-side comparison | Not adopted as requirements | Raised in the interviews (issue #4), but the two lowest-ranked features in the questionnaire (issue #5: comparison sixth and audio last of seven), and not needed for the core workflow; shared lists and filters already show the same technique or material across cultures |
 | FR-02 email part | Partial | Implemented and tested; the deployment has no email provider yet |
 | NFR-01 30-second target | Partial | The user tests showed the task is completed without help, but did not time it |
 
