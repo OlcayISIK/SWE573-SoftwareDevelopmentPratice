@@ -8,11 +8,11 @@ From the repository root, `docker compose up --build` starts the database, the b
 
 ## Run locally
 
-Requires Node.js 22+ and the backend running at http://localhost:8000.
+Requires Node.js 20 or newer (22 or 24 recommended) and the backend running at http://localhost:8000. All steps are on the wiki page [Installation](https://github.com/OlcayISIK/SWE573-SoftwareDevelopmentPratice/wiki/Installation).
 
 ```
 cd frontend
-npm install
+npm ci
 cp .env.example .env
 npm run dev
 ```
