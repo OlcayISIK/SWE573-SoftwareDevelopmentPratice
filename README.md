@@ -35,3 +35,4 @@ The system requirements, installing without Docker, running the tests, and troub
 - [Milestones](https://github.com/OlcayISIK/SWE573-SoftwareDevelopmentPratice/milestones) – Backend / Frontend, due 2026-12-12
 - [Project board](https://github.com/users/OlcayISIK/projects/2) – roadmap and work-in-progress status
 - [Wiki](https://github.com/OlcayISIK/SWE573-SoftwareDevelopmentPratice/wiki) – deliverables, architecture, installation, testing, and requirement status
+- [AI_USAGE.md](AI_USAGE.md) – how AI was used in the project, and how its output was checked
