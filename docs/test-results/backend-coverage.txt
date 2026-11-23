@@ -1,0 +1,81 @@
+Name                                               Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------
+accounts/__init__.py                                   0      0   100%
+accounts/admin.py                                     26      0   100%
+accounts/apps.py                                       3      0   100%
+accounts/examples.py                                   9      0   100%
+accounts/models.py                                    60      7    88%   16, 28-32, 83
+accounts/selectors.py                                 16      0   100%
+accounts/serializers.py                               64      0   100%
+accounts/services.py                                 102      5    95%   73-74, 103, 146-147
+accounts/tokens.py                                    15      0   100%
+accounts/urls.py                                       3      0   100%
+accounts/views.py                                     81      0   100%
+config/__init__.py                                     0      0   100%
+config/settings/__init__.py                            0      0   100%
+config/settings/base.py                               50      1    98%   10
+config/settings/development.py                         6      6     0%   1-7
+config/settings/production.py                         12     12     0%   1-20
+config/settings/test.py                               10      0   100%
+config/urls.py                                         9      1    89%   22
+core/__init__.py                                       0      0   100%
+core/apps.py                                           3      0   100%
+core/exceptions.py                                    46      2    96%   50, 61
+core/logs.py                                          11      0   100%
+core/middleware.py                                    96      6    94%   49-50, 57, 127, 147, 153
+core/models.py                                        27      1    96%   41
+core/pagination.py                                    11      0   100%
+core/permissions.py                                   12      1    92%   17
+core/renderers.py                                     14      1    93%   9
+core/schema.py                                        27      1    96%   19
+core/validators.py                                    16      0   100%
+core/views.py                                         13      0   100%
+crafts/__init__.py                                     0      0   100%
+crafts/admin.py                                       56      3    95%   23, 39, 83
+crafts/apps.py                                         3      0   100%
+crafts/colors.py                                      22      1    95%   55
+crafts/examples.py                                    30      0   100%
+crafts/geocoding.py                                   71      1    99%   48
+crafts/management/__init__.py                          0      0   100%
+crafts/management/commands/__init__.py                 0      0   100%
+crafts/management/commands/load_sample_crafts.py      19      2    89%   29-30
+crafts/models.py                                     143      5    97%   37, 245, 291, 315, 354
+crafts/samples.py                                     75      0   100%
+crafts/selectors.py                                  128      1    99%   312
+crafts/serializers.py                                386      4    99%   222, 280, 371, 426
+crafts/services.py                                   247      8    97%   71, 204-206, 257-261, 320
+crafts/signals.py                                      4      0   100%
+crafts/urls.py                                         6      0   100%
+crafts/views.py                                      196      0   100%
+moderation/__init__.py                                 0      0   100%
+moderation/admin.py                                   90     16    82%   26, 62, 66, 77, 92-106, 110, 114, 125
+moderation/apps.py                                     3      0   100%
+moderation/examples.py                                10      0   100%
+moderation/models.py                                 101      5    95%   59, 105, 128, 156, 176
+moderation/selectors.py                               53      3    94%   29, 47, 90
+moderation/serializers.py                            129      0   100%
+moderation/services.py                               149     10    93%   43-44, 118-119, 148, 151, 195-196, 202, 205
+moderation/signals.py                                  3      0   100%
+moderation/urls.py                                     3      0   100%
+moderation/views.py                                  116      1    99%   186
+notifications/__init__.py                              0      0   100%
+notifications/admin.py                                 7      0   100%
+notifications/apps.py                                  5      0   100%
+notifications/models.py                               20      1    95%   38
+notifications/receivers.py                            23      1    96%   27
+notifications/selectors.py                            14      0   100%
+notifications/serializers.py                          30      0   100%
+notifications/services.py                              7      0   100%
+notifications/urls.py                                  3      0   100%
+notifications/views.py                                32      0   100%
+social/__init__.py                                     0      0   100%
+social/admin.py                                       10      0   100%
+social/apps.py                                         3      0   100%
+social/models.py                                      17      2    88%   19, 39
+social/selectors.py                                   21      0   100%
+social/serializers.py                                 20      0   100%
+social/services.py                                    19      0   100%
+social/urls.py                                         3      0   100%
+social/views.py                                       59      0   100%
+--------------------------------------------------------------------------------
+TOTAL                                               3078    108    96%

@@ -1,0 +1,16 @@
+
+Running 11 tests using 1 worker
+
+  ✓   1 [desktop] › tests/e2e/item-reports.spec.ts:5:1 › a tool a user added is reported and an admin merges it into the seeded one (8.5s)
+  ✓   2 [desktop] › tests/e2e/map-search.spec.ts:5:1 › a search shows every found craft on the map, even far apart (3.8s)
+  ✓   3 [desktop] › tests/e2e/map-search.spec.ts:23:1 › a craft made in several places has a pin in each (3.8s)
+  ✓   4 [desktop] › tests/e2e/moderation.spec.ts:5:1 › a reported craft is hidden by an admin and the reporter is notified (11.3s)
+  ✓   5 [desktop] › tests/e2e/publish.spec.ts:5:1 › a new user registers, is signed in, and publishes a craft (10.9s)
+  ✓   6 [desktop] › tests/e2e/smoke.spec.ts:3:1 › the production build serves the map with security headers and no console errors (811ms)
+  ✓   7 [desktop] › tests/e2e/smoke.spec.ts:18:1 › deep links load directly thanks to the index.html fallback (349ms)
+  ✓   8 [desktop] › tests/e2e/smoke.spec.ts:25:1 › unknown pages show the not found page (276ms)
+  ✓   9 [desktop] › tests/e2e/stories.spec.ts:5:1 › a user shares a story, readers open it, and the craft's author is notified (9.4s)
+  ✓  10 [desktop] › tests/e2e/stories.spec.ts:49:1 › a reported story is hidden by an admin and the reporter is notified (13.8s)
+  ✓  11 [mobile] › tests/e2e/responsive.spec.ts:3:1 › on mobile the filters open in a drawer and the map fills the screen (1.4s)
+
+  11 passed (1.2m)
