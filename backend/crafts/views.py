@@ -9,8 +9,9 @@ from rest_framework.views import APIView
 from accounts.selectors import get_public_user
 from core.pagination import StandardPagination
 from core.permissions import IsAuthorOrAdmin
+from core.schema import error_response
 
-from . import geocoding, selectors, services
+from . import examples, geocoding, selectors, services
 from .serializers import (
     AddCategorySerializer,
     AddCraftTypeSerializer,
@@ -185,7 +186,14 @@ class CraftViewSet(viewsets.GenericViewSet):
         craft = selectors.get_visible_craft(craft_id, self.request.user)
         return CraftDetailSerializer(craft, context={"request": self.request}).data
 
-    @extend_schema(parameters=FILTER_PARAMETERS, responses=CraftListSerializer(many=True))
+    @extend_schema(
+        parameters=FILTER_PARAMETERS,
+        responses={
+            200: CraftListSerializer(many=True),
+            400: error_response("A filter is invalid", examples.craft_list_errors["filter"]),
+        },
+        examples=examples.craft_list,
+    )
     def list(self, request):
         crafts = selectors.browse_crafts(request.user, **_filters(request))
         page = self.paginate_queryset(crafts)
@@ -213,14 +221,31 @@ class CraftViewSet(viewsets.GenericViewSet):
         facets = selectors.craft_facets(request.user, **_filters(request))
         return Response(FacetsSerializer(facets).data)
 
-    @extend_schema(request=CraftWriteSerializer, responses={201: CraftDetailSerializer})
+    @extend_schema(
+        request=CraftWriteSerializer,
+        responses={
+            201: CraftDetailSerializer,
+            400: error_response("A field is invalid", examples.craft_create_errors["invalid"]),
+            401: error_response("Not signed in", examples.NOT_SIGNED_IN),
+            403: error_response(
+                "The email is not verified", examples.craft_create_errors["unverified"]
+            ),
+        },
+        examples=examples.craft_create,
+    )
     def create(self, request):
         serializer = CraftWriteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         craft = services.publish_craft(author=request.user, data=serializer.validated_data)
         return Response(self._detail(craft.pk), status=status.HTTP_201_CREATED)
 
-    @extend_schema(responses=CraftDetailSerializer)
+    @extend_schema(
+        responses={
+            200: CraftDetailSerializer,
+            404: error_response("No craft the viewer may see", examples.CRAFT_NOT_FOUND),
+        },
+        examples=examples.craft_detail,
+    )
     def retrieve(self, request, pk):
         return Response(self._detail(pk))
 
@@ -274,7 +299,22 @@ class CraftViewSet(viewsets.GenericViewSet):
         page = self.paginate_queryset(stories)
         return self.get_paginated_response(StorySerializer(page, many=True).data)
 
-    @extend_schema(request=StoryWriteSerializer, responses={201: StorySerializer})
+    @extend_schema(
+        request=StoryWriteSerializer,
+        responses={
+            201: StorySerializer,
+            401: error_response("Not signed in", examples.NOT_SIGNED_IN),
+            403: error_response(
+                "The user is the craft's author", examples.story_create_errors["author"]
+            ),
+            404: error_response("No craft the viewer may see", examples.CRAFT_NOT_FOUND),
+            409: error_response(
+                "The user already shared a story about this craft",
+                examples.story_create_errors["twice"],
+            ),
+        },
+        examples=examples.story_create,
+    )
     @stories.mapping.post
     def share_story(self, request, pk):
         craft = selectors.find_visible_craft(pk, request.user)
