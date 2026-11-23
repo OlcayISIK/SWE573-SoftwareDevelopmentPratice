@@ -297,7 +297,7 @@ All endpoints are under `/api/v1/`. List endpoints are paginated, except the ref
 | GET    | `/crafts/`                             | Public          | List crafts (filter by category, craft type, culture, country, main color, area, search) |
 | GET    | `/crafts/map/`                         | Public          | Lightweight pins for the map, one per place of each craft (same filters, plus `bbox=west,south,east,north`) |
 | GET    | `/crafts/facets/`                      | Public          | For each filter, the values the other filters' results have, with counts |
-| GET    | `/geocode/search/?q=`                  | Registered user | Coordinates, address, city, and country for an address (404 if not found) |
+| GET    | `/geocode/search/?q=`                  | Public          | Coordinates, address, city, country, and area for an address or place (404 if not found); public so guests can search near a place |
 | GET    | `/geocode/reverse/?lat=&lng=`          | Registered user | Address at a point, for a pin placed on the map (404 if none) |
 | GET    | `/crafts/{id}/`                        | Public          | Craft details                         |
 | POST   | `/crafts/`                             | Registered user | Publish a craft                       |
