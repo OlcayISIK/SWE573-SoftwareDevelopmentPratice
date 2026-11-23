@@ -3,7 +3,7 @@ This repository was created for the SWE573 – Software Development Practice cou
 
 ## Project: Interactive World Map of Indigenous Handmade Crafts
 
-An interactive web-based world map that pinpoints handmade/indigenous craft items by geographic origin. Clicking a pin shows what the craft is, how it's made, the materials used, the culture/community behind it, and its current status (thriving, endangered, or extinct).
+An interactive web-based world map that pinpoints handmade/indigenous craft items by geographic origin. Clicking a pin shows what the craft is, how it's made, its tools and materials, the culture/community and the places behind it, and the stories people share about it. Anyone can search and filter crafts by category, culture, country, color, or place; registered users publish crafts, share stories, favorite crafts, follow contributors, and report problem content, which admins review.
 
 **Problem it addresses:** existing resources on indigenous crafts are scattered across academic papers, museum archives, and isolated blog posts. This project provides a single, visual, explorable, geography-anchored resource for discovering crafts contextually.
 
