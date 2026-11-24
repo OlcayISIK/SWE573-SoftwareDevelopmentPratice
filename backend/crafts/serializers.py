@@ -46,32 +46,46 @@ DIMENSION_UNITS = {
 DIMENSION_TYPES = list(DIMENSION_UNITS)
 
 
-class CategorySerializer(serializers.ModelSerializer):
+# Tells the signed-in user which items they added, since they cannot report those. A comment,
+# not a docstring, so the schema does not take it as each serializer's description.
+class AddedByMeMixin(serializers.Serializer):
+    added_by_me = serializers.SerializerMethodField(
+        help_text=(
+            "True when the signed-in user added the item. Users cannot report their own items."
+        )
+    )
+
+    def get_added_by_me(self, item) -> bool:
+        user = getattr(self.context.get("request"), "user", None)
+        return bool(user and user.is_authenticated and item.created_by_id == user.id)
+
+
+class CategorySerializer(AddedByMeMixin, serializers.ModelSerializer):
     user_added = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Category
-        fields = ["id", "name", "slug", "icon", "description", "user_added"]
+        fields = ["id", "name", "slug", "icon", "description", "user_added", "added_by_me"]
         read_only_fields = fields
 
 
-class CraftTypeSerializer(serializers.ModelSerializer):
+class CraftTypeSerializer(AddedByMeMixin, serializers.ModelSerializer):
     user_added = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = CraftType
-        fields = ["id", "name", "category", "description", "user_added"]
+        fields = ["id", "name", "category", "description", "user_added", "added_by_me"]
         read_only_fields = fields
 
 
-class LinkedItemSerializer(serializers.ModelSerializer):
+class LinkedItemSerializer(AddedByMeMixin, serializers.ModelSerializer):
     typical = serializers.SerializerMethodField(
         help_text="Typical for the craft type given in the request."
     )
     user_added = serializers.BooleanField(read_only=True)
 
     class Meta:
-        fields = ["id", "name", "description", "typical", "user_added"]
+        fields = ["id", "name", "description", "typical", "user_added", "added_by_me"]
         read_only_fields = fields
 
     def get_typical(self, item) -> bool:
@@ -88,12 +102,12 @@ class MaterialSerializer(LinkedItemSerializer):
         model = Material
 
 
-class CultureSerializer(serializers.ModelSerializer):
+class CultureSerializer(AddedByMeMixin, serializers.ModelSerializer):
     user_added = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Culture
-        fields = ["id", "name", "homeland", "description", "user_added"]
+        fields = ["id", "name", "homeland", "description", "user_added", "added_by_me"]
         read_only_fields = fields
 
 
@@ -151,7 +165,7 @@ class LinkedItemFilterSerializer(serializers.Serializer):
     craft_type = serializers.IntegerField(required=False, min_value=1)
 
 
-class NamedItemSerializer(serializers.Serializer):
+class NamedItemSerializer(AddedByMeMixin, serializers.Serializer):
     """A lookup item as shown on a craft."""
 
     id = serializers.IntegerField(read_only=True)

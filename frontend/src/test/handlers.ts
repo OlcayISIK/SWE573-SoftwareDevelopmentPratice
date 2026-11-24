@@ -12,6 +12,7 @@ export const categories: Category[] = [
     icon: "amphora",
     description: "Objects shaped from clay and hardened by firing.",
     user_added: false,
+    added_by_me: false,
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ export const categories: Category[] = [
     icon: "spool",
     description: "Cloth and objects made from fibres.",
     user_added: false,
+    added_by_me: false,
   },
 ];
 
@@ -30,6 +32,7 @@ export const craftTypes: CraftType[] = [
     category: 1,
     description: "A flat piece of fired clay, usually glazed and painted.",
     user_added: false,
+    added_by_me: false,
   },
   {
     id: 22,
@@ -37,6 +40,7 @@ export const craftTypes: CraftType[] = [
     category: 1,
     description: "Vessels shaped from clay and fired.",
     user_added: false,
+    added_by_me: false,
   },
   {
     id: 23,
@@ -44,6 +48,7 @@ export const craftTypes: CraftType[] = [
     category: 2,
     description: "A pile rug made by tying rows of knots.",
     user_added: false,
+    added_by_me: false,
   },
   {
     id: 24,
@@ -51,6 +56,7 @@ export const craftTypes: CraftType[] = [
     category: 2,
     description: "A flat-woven rug without pile.",
     user_added: false,
+    added_by_me: false,
   },
 ];
 
@@ -61,6 +67,7 @@ export const cultures: Culture[] = [
     homeland: "Anatolia, Türkiye",
     description: "The people of Türkiye.",
     user_added: false,
+    added_by_me: false,
   },
   {
     id: 52,
@@ -68,6 +75,7 @@ export const cultures: Culture[] = [
     homeland: "Oaxaca, Mexico",
     description: "An Indigenous people of Oaxaca, Mexico.",
     user_added: false,
+    added_by_me: false,
   },
 ];
 
@@ -79,18 +87,21 @@ export const tools: Linked[] = [
     name: "Brush",
     description: "Bristles on a handle, used to paint or glaze.",
     user_added: false,
+    added_by_me: false,
   },
   {
     id: 32,
     name: "Kiln",
     description: "An oven that fires clay, glaze or glass.",
     user_added: false,
+    added_by_me: false,
   },
   {
     id: 33,
     name: "Loom",
     description: "A frame that holds warp threads taut for weaving.",
     user_added: false,
+    added_by_me: false,
   },
 ];
 
@@ -100,14 +111,22 @@ export const materials: Linked[] = [
     name: "Clay",
     description: "Fine earth that is soft when wet and hardens when fired.",
     user_added: false,
+    added_by_me: false,
   },
   {
     id: 42,
     name: "Glaze",
     description: "A glassy coating fused onto ceramics in the kiln.",
     user_added: false,
+    added_by_me: false,
   },
-  { id: 43, name: "Wool", description: "Fibre shorn from sheep.", user_added: false },
+  {
+    id: 43,
+    name: "Wool",
+    description: "Fibre shorn from sheep.",
+    user_added: false,
+    added_by_me: false,
+  },
 ];
 
 /** Which tools and materials are typical for each craft type. */

@@ -66,6 +66,7 @@ def test_verified_user_publishes_craft_without_approval(client_for, user, payloa
         "name": "Carpet",
         "description": "A pile rug made by tying rows of knots around the warp threads of a loom.",
         "user_added": False,
+        "added_by_me": False,
     }
     assert [tool["name"] for tool in data["tools"]] == ["Knotting knife", "Loom"]
     assert [material["name"] for material in data["materials"]] == ["Madder", "Wool"]

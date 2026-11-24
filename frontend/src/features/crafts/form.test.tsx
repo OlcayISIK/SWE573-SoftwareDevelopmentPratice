@@ -224,7 +224,10 @@ test("a new category is added with the icon the user picks", async () => {
     http.post(`${API}/categories/`, async ({ request }) => {
       const body = (await request.json()) as Record<string, string>;
       bodies.push(body);
-      return ok({ id: 9, slug: "fish-skin", user_added: true, ...body }, { status: 201 });
+      return ok(
+        { id: 9, slug: "fish-skin", user_added: true, added_by_me: false, ...body },
+        { status: 201 },
+      );
     }),
   );
   renderRoute("/crafts/new");
@@ -257,7 +260,7 @@ test("a missing craft type is added and chosen", async () => {
         category: number;
         description: string;
       };
-      const item = { id: 99, ...body, user_added: true };
+      const item = { id: 99, ...body, user_added: true, added_by_me: false };
       added.push(item);
       return ok(item, { status: 201 });
     }),
@@ -283,7 +286,7 @@ test("a tool that is not listed is added as a new tool for the craft type", asyn
     http.post(`${API}/tools/`, async ({ request }) => {
       bodies.push(await request.json());
       return ok(
-        { id: 98, name: "Spinning wheel", typical: true, user_added: true },
+        { id: 98, name: "Spinning wheel", typical: true, user_added: true, added_by_me: false },
         { status: 201 },
       );
     }),
@@ -310,7 +313,10 @@ test("tools and materials have an add link like the other lists", async () => {
   server.use(
     http.post(`${API}/materials/`, async ({ request }) => {
       bodies.push(await request.json());
-      return ok({ id: 97, name: "Kermes dye", typical: true, user_added: true }, { status: 201 });
+      return ok(
+        { id: 97, name: "Kermes dye", typical: true, user_added: true, added_by_me: false },
+        { status: 201 },
+      );
     }),
   );
   renderRoute("/crafts/new");
@@ -742,8 +748,21 @@ describe("editing", () => {
 
   test("a craft type or culture an admin hid stays chosen when editing", async () => {
     const hidden = makeCraftDetail({
-      craft_type: { id: 77, name: "Old tile", description: "", user_added: true },
-      culture: { id: 78, name: "Old culture", homeland: "", description: "", user_added: true },
+      craft_type: {
+        id: 77,
+        name: "Old tile",
+        description: "",
+        user_added: true,
+        added_by_me: false,
+      },
+      culture: {
+        id: 78,
+        name: "Old culture",
+        homeland: "",
+        description: "",
+        user_added: true,
+        added_by_me: false,
+      },
     });
     server.use(
       ...signedIn(makeUser({ id: 7 })),
@@ -755,6 +774,64 @@ describe("editing", () => {
       expect(screen.getByRole("combobox", { name: "Craft type" })).toHaveTextContent("Old tile"),
     );
     expect(screen.getByRole("combobox", { name: "Culture" })).toHaveTextContent("Old culture");
+  });
+
+  test("items other users added are reported from the form, but not your own", async () => {
+    const wheel = {
+      id: 98,
+      name: "Spinning wheel",
+      description: "",
+      user_added: true,
+      added_by_me: false,
+    };
+    const added = makeCraftDetail({
+      craft_type: { id: 77, name: "My tile", description: "", user_added: true, added_by_me: true },
+      culture: {
+        id: 78,
+        name: "Test culture",
+        homeland: "",
+        description: "",
+        user_added: true,
+        added_by_me: false,
+      },
+      tools: [wheel],
+    });
+    const reports: unknown[] = [];
+    const patched = vi.fn();
+    server.use(
+      ...signedIn(makeUser({ id: 7 })),
+      http.get(`${API}/crafts/1/`, () => ok(added)),
+      http.get(`${API}/tools/`, () => ok([{ ...wheel, typical: false }])),
+      http.patch(`${API}/crafts/1/`, () => {
+        patched();
+        return ok(added);
+      }),
+      http.post(`${API}/cultures/78/report/`, async ({ request }) => {
+        reports.push(await request.json());
+        return ok({ id: 4, status: "open" }, { status: 201 });
+      }),
+    );
+    renderRoute("/crafts/1/edit");
+
+    await waitFor(() =>
+      expect(screen.getByRole("combobox", { name: "Culture" })).toHaveTextContent("Test culture"),
+    );
+    expect(
+      screen.queryByRole("button", { name: /Report this craft type/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: "Report tool Spinning wheel" }),
+    ).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Report this culture Test culture" }));
+    const dialog = screen.getByRole("dialog", { name: "Report the culture “Test culture”" });
+    await userEvent.click(within(dialog).getByRole("radio", { name: /Inappropriate/ }));
+    await userEvent.click(within(dialog).getByRole("button", { name: "Send report" }));
+
+    expect(await within(dialog).findByRole("status")).toHaveTextContent("An admin will review it.");
+    expect(reports).toEqual([{ reason: "inappropriate", note: "" }]);
+    // Sending the report does not save the craft.
+    expect(patched).not.toHaveBeenCalled();
   });
 
   test("other users cannot edit", async () => {

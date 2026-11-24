@@ -19,6 +19,7 @@ CERAMICS = {
         "porcelain and figurines."
     ),
     "user_added": False,
+    "added_by_me": False,
 }
 TILE = {
     "id": 2,
@@ -28,6 +29,7 @@ TILE = {
         "roofs."
     ),
     "user_added": False,
+    "added_by_me": False,
 }
 TEXTILES = {
     "id": 2,
@@ -39,12 +41,14 @@ TEXTILES = {
         "stitching."
     ),
     "user_added": False,
+    "added_by_me": False,
 }
 KILIM = {
     "id": 7,
     "name": "Kilim",
     "description": "A flat-woven rug without pile, its pattern made by the coloured weft threads.",
     "user_added": False,
+    "added_by_me": False,
 }
 TURKISH = {
     "id": 25,
@@ -55,6 +59,7 @@ TURKISH = {
         "calligraphy."
     ),
     "user_added": False,
+    "added_by_me": False,
 }
 TOOLS = [
     {
@@ -62,12 +67,14 @@ TOOLS = [
         "name": "Brush",
         "description": "Bristles on a handle, used to paint, glaze or spread liquids.",
         "user_added": False,
+        "added_by_me": False,
     },
     {
         "id": 2,
         "name": "Kiln",
         "description": "An oven that fires clay, glaze or glass at high temperatures.",
         "user_added": False,
+        "added_by_me": False,
     },
     {
         "id": 8,
@@ -77,6 +84,7 @@ TOOLS = [
             "design to a surface."
         ),
         "user_added": False,
+        "added_by_me": False,
     },
 ]
 MATERIALS = [
@@ -85,24 +93,28 @@ MATERIALS = [
         "name": "Clay",
         "description": "Fine earth that is soft when wet and hardens when fired.",
         "user_added": False,
+        "added_by_me": False,
     },
     {
         "id": 6,
         "name": "Cobalt oxide",
         "description": "A mineral pigment that gives a deep blue under glaze.",
         "user_added": False,
+        "added_by_me": False,
     },
     {
         "id": 3,
         "name": "Glaze",
         "description": "A glassy coating fused onto ceramics in the kiln.",
         "user_added": False,
+        "added_by_me": False,
     },
     {
         "id": 5,
         "name": "Quartz",
         "description": "A hard mineral; ground quartz adds silica to clay bodies and glazes.",
         "user_added": False,
+        "added_by_me": False,
     },
 ]
 
@@ -252,6 +264,7 @@ CRAFT_LIST_ITEM = {
             "and metalwork."
         ),
         "user_added": False,
+        "added_by_me": False,
     },
     "city": "Shamakhi",
     "country": "Azerbaijan",

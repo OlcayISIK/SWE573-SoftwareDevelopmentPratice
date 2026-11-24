@@ -136,6 +136,20 @@ def test_registered_users_add_items_that_everyone_sees(client_for, user, api_cli
     assert "Spinning wheel" in names(api_client.get("/api/v1/tools/"))
 
 
+def test_only_the_user_who_added_an_item_sees_it_as_their_own(client_for, user, api_client):
+    from tests.factories import UserFactory
+
+    client_for(user).post("/api/v1/cultures/", {"name": "Test culture"}, format="json")
+
+    def added_by_me(client):
+        items = client.get("/api/v1/cultures/").json()["data"]
+        return next(item["added_by_me"] for item in items if item["name"] == "Test culture")
+
+    assert added_by_me(client_for(user)) is True
+    assert added_by_me(client_for(UserFactory())) is False
+    assert added_by_me(api_client) is False
+
+
 def test_adding_an_existing_name_reuses_it(client_for, user):
     response = client_for(user).post("/api/v1/tools/", {"name": "  loom "}, format="json")
 

@@ -868,6 +868,8 @@ export interface components {
             readonly icon: components["schemas"]["IconEnum"];
             readonly description: string;
             readonly user_added: boolean;
+            /** @description True when the signed-in user added the item. Users cannot report their own items. */
+            readonly added_by_me: boolean;
         };
         CategoryFacet: {
             slug: string;
@@ -1004,6 +1006,8 @@ export interface components {
             readonly category: number;
             readonly description: string;
             readonly user_added: boolean;
+            /** @description True when the signed-in user added the item. Users cannot report their own items. */
+            readonly added_by_me: boolean;
         };
         CraftTypeFacet: {
             id: number;
@@ -1034,6 +1038,8 @@ export interface components {
             readonly homeland: string;
             readonly description: string;
             readonly user_added: boolean;
+            /** @description True when the signed-in user added the item. Users cannot report their own items. */
+            readonly added_by_me: boolean;
         };
         CultureFacet: {
             id: number;
@@ -1066,6 +1072,17 @@ export interface components {
         EmailRequest: {
             /** Format: email */
             email: string;
+        };
+        /** @description The body of every error response. */
+        ErrorEnvelope: {
+            /** @default false */
+            success: boolean;
+            data?: unknown;
+            message: string;
+            /** @description Messages for each field that failed, if any. */
+            errors: {
+                [key: string]: unknown;
+            };
         };
         Facets: {
             categories: components["schemas"]["CategoryFacet"][];
@@ -1223,6 +1240,8 @@ export interface components {
             /** @description Typical for the craft type given in the request. */
             readonly typical: boolean;
             readonly user_added: boolean;
+            /** @description True when the signed-in user added the item. Users cannot report their own items. */
+            readonly added_by_me: boolean;
         };
         Media: {
             readonly id: number;
@@ -1269,6 +1288,8 @@ export interface components {
         NameEnum: "red" | "orange" | "yellow" | "green" | "turquoise" | "blue" | "purple" | "pink" | "brown" | "black" | "white" | "grey";
         /** @description A lookup item as shown on a craft. */
         NamedItem: {
+            /** @description True when the signed-in user added the item. Users cannot report their own items. */
+            readonly added_by_me: boolean;
             readonly id: number;
             readonly name: string;
             readonly description: string;
@@ -1318,58 +1339,90 @@ export interface components {
         };
         PaginatedCraftListList: {
             items: components["schemas"]["CraftList"][];
+            /** @example 1 */
             total: number;
+            /** @example 1 */
             page: number;
+            /** @example 20 */
             pageSize: number;
+            /** @example 1 */
             totalPages: number;
         };
         PaginatedFollowerEntryList: {
             items: components["schemas"]["FollowerEntry"][];
+            /** @example 1 */
             total: number;
+            /** @example 1 */
             page: number;
+            /** @example 20 */
             pageSize: number;
+            /** @example 1 */
             totalPages: number;
         };
         PaginatedFollowingEntryList: {
             items: components["schemas"]["FollowingEntry"][];
+            /** @example 1 */
             total: number;
+            /** @example 1 */
             page: number;
+            /** @example 20 */
             pageSize: number;
+            /** @example 1 */
             totalPages: number;
         };
         PaginatedItemReportReviewList: {
             items: components["schemas"]["ItemReportReview"][];
+            /** @example 1 */
             total: number;
+            /** @example 1 */
             page: number;
+            /** @example 20 */
             pageSize: number;
+            /** @example 1 */
             totalPages: number;
         };
         PaginatedNotificationList: {
             items: components["schemas"]["Notification"][];
+            /** @example 1 */
             total: number;
+            /** @example 1 */
             page: number;
+            /** @example 20 */
             pageSize: number;
+            /** @example 1 */
             totalPages: number;
         };
         PaginatedReportReviewList: {
             items: components["schemas"]["ReportReview"][];
+            /** @example 1 */
             total: number;
+            /** @example 1 */
             page: number;
+            /** @example 20 */
             pageSize: number;
+            /** @example 1 */
             totalPages: number;
         };
         PaginatedStoryList: {
             items: components["schemas"]["Story"][];
+            /** @example 1 */
             total: number;
+            /** @example 1 */
             page: number;
+            /** @example 10 */
             pageSize: number;
+            /** @example 1 */
             totalPages: number;
         };
         PaginatedStoryReportReviewList: {
             items: components["schemas"]["StoryReportReview"][];
+            /** @example 1 */
             total: number;
+            /** @example 1 */
             page: number;
+            /** @example 20 */
             pageSize: number;
+            /** @example 1 */
             totalPages: number;
         };
         PasswordResetConfirmRequest: {
@@ -1608,6 +1661,10 @@ export interface components {
         StoryWriteRequest: {
             text: string;
         };
+        TokenPair: {
+            refresh: string;
+            access: string;
+        };
         TokenRefresh: {
             readonly access: string;
             refresh: string;
@@ -1622,6 +1679,8 @@ export interface components {
             /** @description Typical for the craft type given in the request. */
             readonly typical: boolean;
             readonly user_added: boolean;
+            /** @description True when the signed-in user added the item. Users cannot report their own items. */
+            readonly added_by_me: boolean;
         };
         /**
          * @description * `mm` - mm
@@ -1813,12 +1872,26 @@ export interface operations {
             };
         };
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["TokenPair"];
+                        message: string;
+                    };
+                };
+            };
+            /** @description Wrong email or password */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
             };
         };
     };
@@ -2080,6 +2153,15 @@ export interface operations {
                     };
                 };
             };
+            /** @description A filter is invalid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
         };
     };
     v1_crafts_create: {
@@ -2107,6 +2189,33 @@ export interface operations {
                         data: components["schemas"]["CraftDetail"];
                         message: string;
                     };
+                };
+            };
+            /** @description A field is invalid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The email is not verified */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };
@@ -2222,6 +2331,33 @@ export interface operations {
                     };
                 };
             };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No craft the user may see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The user's earlier report on this craft is still open */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
         };
     };
     v1_crafts_retrieve: {
@@ -2245,6 +2381,15 @@ export interface operations {
                         data: components["schemas"]["CraftDetail"];
                         message: string;
                     };
+                };
+            };
+            /** @description No craft the viewer may see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };
@@ -2409,6 +2554,42 @@ export interface operations {
                         data: components["schemas"]["Story"];
                         message: string;
                     };
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The user is the craft's author */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No craft the viewer may see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The user already shared a story about this craft */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };
@@ -3138,6 +3319,24 @@ export interface operations {
                     };
                 };
             };
+            /** @description The user is not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The report was already reviewed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
         };
     };
     v1_moderation_story_reports_list: {
@@ -3345,6 +3544,15 @@ export interface operations {
                         data: components["schemas"]["PublicProfile"];
                         message: string;
                     };
+                };
+            };
+            /** @description Unknown or deactivated user */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };

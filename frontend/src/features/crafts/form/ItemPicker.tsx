@@ -5,6 +5,7 @@ import { useId, useState } from "react";
 
 import { toApiError } from "@/api/envelope";
 import { Tooltip } from "@/components/Tooltip";
+import { ReportItemButton } from "@/features/moderation/components/ReportDialog";
 
 import { AddItemInline } from "./AddItemInline";
 import type { ChosenItem } from "./schema";
@@ -14,13 +15,15 @@ interface PickableItem {
   name: string;
   description: string;
   typical: boolean;
+  user_added: boolean;
+  added_by_me?: boolean;
 }
 
 interface ItemPickerProps {
   /** The list name, for example "Tools". */
   label: string;
-  /** One item, for example "tool". */
-  noun: string;
+  /** One item, which is also the kind of item that can be reported. */
+  noun: "tool" | "material";
   items: PickableItem[] | undefined;
   value: ChosenItem[];
   onChange: (value: ChosenItem[]) => void;
@@ -60,7 +63,7 @@ export function ItemPicker({
   const typical = craftTypeName ? items.filter((item) => item.typical) : [];
   const match = text.trim() ? items.find((item) => sameName(item.name, text)) : undefined;
   const full = value.length >= max;
-  const descriptionOf = (itemId: number) => items.find((item) => item.id === itemId)?.description;
+  const itemOf = (itemId: number) => items.find((item) => item.id === itemId);
 
   // Suggestions while typing, each with its description: names starting with the text first.
   const needle = text.trim().toLowerCase();
@@ -122,10 +125,11 @@ export function ItemPicker({
         <ul aria-label={`Chosen ${label.toLowerCase()}`} className="flex flex-wrap gap-2">
           {value.map((item) => (
             <li key={item.id}>
-              <Tooltip text={descriptionOf(item.id)}>
+              <Tooltip text={itemOf(item.id)?.description}>
                 {(describedBy) => (
                   <span className="animate-fade-in flex items-center gap-1 rounded-full bg-moss py-1 pl-3 pr-1 text-sm font-medium text-white shadow-sm">
                     {item.name}
+                    <ReportItemButton kind={noun} item={itemOf(item.id)} variant="chip" />
                     <button
                       type="button"
                       className="rounded-full px-2 hover:bg-white/20"
