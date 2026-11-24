@@ -51,9 +51,11 @@ export function PartRows({
       {fields.map((field, index) => {
         const name = rows[index]?.name.trim();
         return (
+          // No entry animation: a kept opacity animation would make each part its own stacking
+          // context, and the next part would then cover this part's suggestion list.
           <fieldset
             key={field.id}
-            className="animate-fade-in space-y-4 rounded-sm border border-stone-200 bg-white p-4"
+            className="space-y-4 rounded-sm border border-stone-200 bg-white p-4"
           >
             <legend className="sr-only">{name || `Part ${index + 1}`}</legend>
             <div className="flex flex-wrap items-end gap-3">
