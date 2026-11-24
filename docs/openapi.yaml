@@ -646,12 +646,14 @@ paths:
                           description: Cloth and objects made from fibres by spinning,
                             weaving, knotting, felting, dyeing or stitching.
                           user_added: false
+                          added_by_me: false
                         craft_type:
                           id: 7
                           name: Kilim
                           description: A flat-woven rug without pile, its pattern
                             made by the coloured weft threads.
                           user_added: false
+                          added_by_me: false
                         culture:
                           id: 29
                           name: Azerbaijani
@@ -659,6 +661,7 @@ paths:
                           description: A Turkic people of the South Caucasus and northwestern
                             Iran, known for carpets, silk and metalwork.
                           user_added: false
+                          added_by_me: false
                         city: Shamakhi
                         country: Azerbaijan
                         latitude: 40.63412
@@ -807,48 +810,57 @@ paths:
                         description: Objects shaped from clay and hardened by firing,
                           from everyday pottery to tiles, porcelain and figurines.
                         user_added: false
+                        added_by_me: false
                       craft_type:
                         id: 2
                         name: Tile
                         description: A flat piece of fired clay, usually glazed and
                           painted, used to cover walls, floors or roofs.
                         user_added: false
+                        added_by_me: false
                       tools:
                       - id: 7
                         name: Brush
                         description: Bristles on a handle, used to paint, glaze or
                           spread liquids.
                         user_added: false
+                        added_by_me: false
                       - id: 2
                         name: Kiln
                         description: An oven that fires clay, glaze or glass at high
                           temperatures.
                         user_added: false
+                        added_by_me: false
                       - id: 8
                         name: Pounce stencil
                         description: A pricked paper pattern; charcoal dust patted
                           through its holes transfers the design to a surface.
                         user_added: false
+                        added_by_me: false
                       materials:
                       - id: 1
                         name: Clay
                         description: Fine earth that is soft when wet and hardens
                           when fired.
                         user_added: false
+                        added_by_me: false
                       - id: 6
                         name: Cobalt oxide
                         description: A mineral pigment that gives a deep blue under
                           glaze.
                         user_added: false
+                        added_by_me: false
                       - id: 3
                         name: Glaze
                         description: A glassy coating fused onto ceramics in the kiln.
                         user_added: false
+                        added_by_me: false
                       - id: 5
                         name: Quartz
                         description: A hard mineral; ground quartz adds silica to
                           clay bodies and glazes.
                         user_added: false
+                        added_by_me: false
                       culture:
                         id: 25
                         name: Turkish
@@ -856,6 +868,7 @@ paths:
                         description: The people of Türkiye, whose crafts include tiles,
                           carpets, kilims, marbling and calligraphy.
                         user_added: false
+                        added_by_me: false
                       address: İznik, Bursa, Türkiye
                       city: İznik
                       country: Türkiye
@@ -1204,48 +1217,57 @@ paths:
                         description: Objects shaped from clay and hardened by firing,
                           from everyday pottery to tiles, porcelain and figurines.
                         user_added: false
+                        added_by_me: false
                       craft_type:
                         id: 2
                         name: Tile
                         description: A flat piece of fired clay, usually glazed and
                           painted, used to cover walls, floors or roofs.
                         user_added: false
+                        added_by_me: false
                       tools:
                       - id: 7
                         name: Brush
                         description: Bristles on a handle, used to paint, glaze or
                           spread liquids.
                         user_added: false
+                        added_by_me: false
                       - id: 2
                         name: Kiln
                         description: An oven that fires clay, glaze or glass at high
                           temperatures.
                         user_added: false
+                        added_by_me: false
                       - id: 8
                         name: Pounce stencil
                         description: A pricked paper pattern; charcoal dust patted
                           through its holes transfers the design to a surface.
                         user_added: false
+                        added_by_me: false
                       materials:
                       - id: 1
                         name: Clay
                         description: Fine earth that is soft when wet and hardens
                           when fired.
                         user_added: false
+                        added_by_me: false
                       - id: 6
                         name: Cobalt oxide
                         description: A mineral pigment that gives a deep blue under
                           glaze.
                         user_added: false
+                        added_by_me: false
                       - id: 3
                         name: Glaze
                         description: A glassy coating fused onto ceramics in the kiln.
                         user_added: false
+                        added_by_me: false
                       - id: 5
                         name: Quartz
                         description: A hard mineral; ground quartz adds silica to
                           clay bodies and glazes.
                         user_added: false
+                        added_by_me: false
                       culture:
                         id: 25
                         name: Turkish
@@ -1253,6 +1275,7 @@ paths:
                         description: The people of Türkiye, whose crafts include tiles,
                           carpets, kilims, marbling and calligraphy.
                         user_added: false
+                        added_by_me: false
                       address: Kütahya, Türkiye
                       city: Kütahya
                       country: Türkiye
@@ -3330,7 +3353,13 @@ components:
         user_added:
           type: boolean
           readOnly: true
+        added_by_me:
+          type: boolean
+          readOnly: true
+          description: True when the signed-in user added the item. Users cannot report
+            their own items.
       required:
+      - added_by_me
       - description
       - icon
       - id
@@ -3717,7 +3746,13 @@ components:
         user_added:
           type: boolean
           readOnly: true
+        added_by_me:
+          type: boolean
+          readOnly: true
+          description: True when the signed-in user added the item. Users cannot report
+            their own items.
       required:
+      - added_by_me
       - category
       - description
       - id
@@ -3810,7 +3845,13 @@ components:
         user_added:
           type: boolean
           readOnly: true
+        added_by_me:
+          type: boolean
+          readOnly: true
+          description: True when the signed-in user added the item. Users cannot report
+            their own items.
       required:
+      - added_by_me
       - description
       - homeland
       - id
@@ -4301,7 +4342,13 @@ components:
         user_added:
           type: boolean
           readOnly: true
+        added_by_me:
+          type: boolean
+          readOnly: true
+          description: True when the signed-in user added the item. Users cannot report
+            their own items.
       required:
+      - added_by_me
       - description
       - id
       - name
@@ -4411,6 +4458,11 @@ components:
       type: object
       description: A lookup item as shown on a craft.
       properties:
+        added_by_me:
+          type: boolean
+          readOnly: true
+          description: True when the signed-in user added the item. Users cannot report
+            their own items.
         id:
           type: integer
           readOnly: true
@@ -4424,6 +4476,7 @@ components:
           type: boolean
           readOnly: true
       required:
+      - added_by_me
       - description
       - id
       - name
@@ -5473,7 +5526,13 @@ components:
         user_added:
           type: boolean
           readOnly: true
+        added_by_me:
+          type: boolean
+          readOnly: true
+          description: True when the signed-in user added the item. Users cannot report
+            their own items.
       required:
+      - added_by_me
       - description
       - id
       - name

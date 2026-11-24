@@ -280,7 +280,10 @@ test("the facts describe their items on hover and focus", async () => {
 describe("reporting items users added", () => {
   const craft = makeCraftDetail({
     author: { id: 50, display_name: "Mehmet" },
-    tools: [tools[1], { id: 98, name: "Spinning wheel", description: "", user_added: true }],
+    tools: [
+      tools[1],
+      { id: 98, name: "Spinning wheel", description: "", user_added: true, added_by_me: false },
+    ],
   });
 
   test("a signed-in user reports a tool another user added", async () => {
@@ -330,5 +333,20 @@ describe("reporting items users added", () => {
     await userEvent.click(screen.getByRole("button", { name: "Send report" }));
 
     expect(await screen.findByText("You cannot report an item you added.")).toBeInTheDocument();
+  });
+
+  test("items you added yourself have no report button", async () => {
+    serveCraft(
+      makeCraftDetail({
+        tools: [
+          { id: 98, name: "Spinning wheel", description: "", user_added: true, added_by_me: true },
+        ],
+      }),
+    );
+    server.use(...signedIn());
+    renderRoute("/crafts/1");
+
+    expect(await screen.findByRole("link", { name: "Spinning wheel" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Report tool/ })).not.toBeInTheDocument();
   });
 });

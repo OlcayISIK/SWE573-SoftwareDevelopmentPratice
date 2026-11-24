@@ -1,4 +1,6 @@
+import { Flag } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { toApiError } from "@/api/envelope";
 import { FormAlert } from "@/components/form/FormAlert";
@@ -113,7 +115,9 @@ function ReportDialog<T extends string>({
     };
   }, [onClose]);
 
-  return (
+  // In a portal, so it is not drawn inside a moved or clipped parent, such as a chip on the
+  // craft form, and its form is not nested in the craft form in the page.
+  return createPortal(
     <div className="fixed inset-0 z-[1600] flex items-center justify-center bg-black/40 p-4">
       <div
         role="dialog"
@@ -141,6 +145,8 @@ function ReportDialog<T extends string>({
             className="mt-4 space-y-4"
             onSubmit={async (event) => {
               event.preventDefault();
+              // React events still bubble out of a portal, so the craft form must not see this.
+              event.stopPropagation();
               if (!reason) {
                 setError("Choose a reason.");
                 return;
@@ -196,7 +202,8 @@ function ReportDialog<T extends string>({
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -233,32 +240,58 @@ export function ReportButton({ craftId, authorId }: { craftId: number; authorId:
 }
 
 /**
- * Reports an item that a user added to one of the lists, such as a tool. Seeded items cannot be
- * reported, so the button only shows for items added by users, and only to signed-in users.
+ * Reports an item that a user added to one of the lists, such as a tool. Seeded items and items
+ * you added yourself cannot be reported, so the button only shows for items added by other users,
+ * and only to signed-in users. "inline" sits next to the item's name, "field" under a field of the
+ * craft form, and "chip" in a chosen item's chip.
  */
 export function ReportItemButton({
   kind,
   item,
+  variant = "inline",
 }: {
   kind: ItemKind;
-  item: { id: number; name: string; user_added: boolean };
+  item: { id: number; name: string; user_added: boolean; added_by_me?: boolean } | undefined;
+  variant?: "inline" | "field" | "chip";
 }) {
   const auth = useAuth();
   const [open, setOpen] = useState(false);
 
-  if (!item.user_added || auth.status !== "authenticated") {
+  if (!item?.user_added || item.added_by_me || auth.status !== "authenticated") {
     return null;
   }
   const kindLabel = ITEM_KIND_LABELS[kind].toLowerCase();
+  const name = `${kindLabel} ${item.name}`;
   return (
     <>
-      <button
-        type="button"
-        className="ml-1 text-xs text-stone-600 underline hover:text-red-800"
-        onClick={() => setOpen(true)}
-      >
-        Report <span className="sr-only">{`${kindLabel} ${item.name}`}</span>
-      </button>
+      {variant === "chip" ? (
+        <button
+          type="button"
+          className="rounded-full p-1 hover:bg-white/20"
+          aria-label={`Report ${name}`}
+          title="Report"
+          onClick={() => setOpen(true)}
+        >
+          <Flag aria-hidden="true" className="h-3 w-3" />
+        </button>
+      ) : variant === "field" ? (
+        <button
+          type="button"
+          className="mt-1 inline-flex items-center gap-1 text-xs text-stone-600 underline hover:text-red-800"
+          onClick={() => setOpen(true)}
+        >
+          <Flag aria-hidden="true" className="h-3 w-3" />
+          Report this {kindLabel} <span className="sr-only">{item.name}</span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          className="ml-1 text-xs text-stone-600 underline hover:text-red-800"
+          onClick={() => setOpen(true)}
+        >
+          Report <span className="sr-only">{name}</span>
+        </button>
+      )}
       {open && (
         <ReportDialog
           title={`Report the ${kindLabel} “${item.name}”`}

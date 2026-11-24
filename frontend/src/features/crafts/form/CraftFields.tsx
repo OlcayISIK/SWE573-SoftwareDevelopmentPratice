@@ -4,6 +4,7 @@ import { Controller, type UseFormReturn } from "react-hook-form";
 import { DescribedSelect } from "@/components/form/DescribedSelect";
 import { TextAreaField } from "@/components/form/TextAreaField";
 import { TextField } from "@/components/form/TextField";
+import { ReportItemButton } from "@/features/moderation/components/ReportDialog";
 
 import { lookupsApi } from "../api";
 import { categoryStyle } from "../categoryStyle";
@@ -31,6 +32,8 @@ interface Option {
   id: number;
   name: string;
   description?: string;
+  user_added: boolean;
+  added_by_me?: boolean;
 }
 
 /** The list, plus the craft's current choice when it is no longer listed (an admin hid it). */
@@ -132,6 +135,7 @@ export function CraftFields({
                 />
               )}
             />
+            <ReportItemButton kind="category" item={chosenCategory} variant="field" />
             <AddItemInline
               noun="category"
               withIcon
@@ -164,6 +168,7 @@ export function CraftFields({
                 />
               )}
             />
+            <ReportItemButton kind="craft_type" item={chosenCraftType} variant="field" />
             <AddItemInline
               noun="craft type"
               disabled={!categoryId}
@@ -204,6 +209,7 @@ export function CraftFields({
               />
             )}
           />
+          <ReportItemButton kind="culture" item={chosenCulture} variant="field" />
           <AddItemInline
             noun="culture"
             withHomeland
