@@ -84,7 +84,7 @@ def _set_colors(craft, colors):
     )
 
 
-def _set_parts(craft, parts):
+def set_parts(craft, parts):
     """Replaces the craft's parts, keeping the order they were given in."""
     craft.parts.all().delete()
     for index, part in enumerate(parts):
@@ -127,7 +127,7 @@ def publish_craft(*, author, data):
     for field, items in related.items():
         getattr(craft, field).set(items)
     _set_colors(craft, colors)
-    _set_parts(craft, parts)
+    set_parts(craft, parts)
     _set_places(craft, places)
     signals.craft_published.send(sender=Craft, craft=craft)
     return craft
@@ -146,7 +146,7 @@ def update_craft(*, craft, actor, data):
         elif field == "colors":
             _set_colors(craft, value)
         elif field == "parts":
-            _set_parts(craft, value)
+            set_parts(craft, value)
         elif field == "date":
             for name, part in value.items():
                 setattr(craft, name, part)

@@ -1065,10 +1065,26 @@
         "Spatula",
         "Polishing charcoal"
       ],
-      "materials": [
-        "Urushi lacquer",
-        "Cypress wood",
-        "Gold powder"
+      "materials": [],
+      "parts": [
+        {
+          "name": "Wooden core",
+          "materials": [
+            "Cypress wood"
+          ]
+        },
+        {
+          "name": "Lacquer coating",
+          "materials": [
+            "Urushi lacquer"
+          ]
+        },
+        {
+          "name": "Decoration",
+          "materials": [
+            "Gold powder"
+          ]
+        }
       ],
       "address": "Wajima, Ishikawa, Japan",
       "city": "Wajima",
@@ -1492,10 +1508,21 @@
         "File",
         "Soldering torch"
       ],
-      "materials": [
-        "Silver",
-        "Turquoise",
-        "Coral"
+      "materials": [],
+      "parts": [
+        {
+          "name": "Setting",
+          "materials": [
+            "Silver"
+          ]
+        },
+        {
+          "name": "Inlaid stones",
+          "materials": [
+            "Turquoise",
+            "Coral"
+          ]
+        }
       ],
       "address": "Zuni Pueblo, New Mexico, United States",
       "city": "Zuni Pueblo",
@@ -1554,9 +1581,20 @@
         "Chasing tools",
         "Stake"
       ],
-      "materials": [
-        "Copper",
-        "Tin"
+      "materials": [],
+      "parts": [
+        {
+          "name": "Vessel",
+          "materials": [
+            "Copper"
+          ]
+        },
+        {
+          "name": "Inner lining",
+          "materials": [
+            "Tin"
+          ]
+        }
       ],
       "address": "Gaziantep, Türkiye",
       "city": "Gaziantep",
@@ -1737,9 +1775,27 @@
         "Stitching needle",
         "Awl"
       ],
-      "materials": [
-        "Deerskin",
-        "Sinew"
+      "materials": [],
+      "parts": [
+        {
+          "name": "Shoe",
+          "materials": [
+            "Deerskin",
+            "Sinew"
+          ]
+        },
+        {
+          "name": "Shoe grass",
+          "materials": [
+            "Grass"
+          ]
+        },
+        {
+          "name": "Shoe bands",
+          "materials": [
+            "Wool"
+          ]
+        }
       ],
       "address": "Jokkmokk, Sweden",
       "city": "Jokkmokk",
@@ -1797,9 +1853,21 @@
         "Knife",
         "Brush"
       ],
-      "materials": [
-        "Rawhide",
-        "Natural pigments"
+      "materials": [],
+      "parts": [
+        {
+          "name": "Case",
+          "materials": [
+            "Rawhide",
+            "Natural pigments"
+          ]
+        },
+        {
+          "name": "Ties",
+          "materials": [
+            "Leather cord"
+          ]
+        }
       ],
       "address": "Pine Ridge, South Dakota, United States",
       "city": "Pine Ridge",

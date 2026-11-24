@@ -4,7 +4,7 @@ import pytest
 from django.core.management import CommandError, call_command
 
 from accounts.models import User
-from crafts.models import Craft, CraftMedia, Tool
+from crafts.models import Craft, CraftMedia, CraftPart, Material, Tool
 from crafts.samples import SAMPLE_DATA, read_samples, sample_email
 
 pytestmark = pytest.mark.django_db
@@ -32,6 +32,9 @@ def test_the_data_file_is_complete():
             assert -90 <= place["latitude"] <= 90 and -180 <= place["longitude"] <= 180
             assert place["address"] and place["city"] and place["country"]
         assert item["photos"], item["name"]
+        part_names = [part["name"].casefold() for part in item.get("parts", [])]
+        assert len(part_names) == len(set(part_names)), item["name"]
+        assert all(part["materials"] for part in item.get("parts", [])), item["name"]
         for photo in item["photos"]:
             assert (SAMPLE_DATA / "photos" / photo["file"]).is_file()
             assert photo["alt_text"]
@@ -92,6 +95,45 @@ def test_samples_in_several_places_get_each_place(api_client):
     assert not any(place["is_origin"] for place in detail["places"])
     kilims = api_client.get("/api/v1/crafts/", {"search": "kilim"}).json()["data"]["items"]
     assert {"Yörük kilim", "Konya kilim", "Shirvan kilim"} <= {item["name"] for item in kilims}
+
+
+def parts_of(detail):
+    return [
+        (part["name"], [material["name"] for material in part["materials"]])
+        for part in detail["parts"]
+    ]
+
+
+def test_samples_made_of_parts_get_their_parts(api_client):
+    call_command("load_sample_crafts")
+    craft = Craft.objects.get(name="Zuni jewelry")
+
+    detail = api_client.get(f"/api/v1/crafts/{craft.id}/").json()["data"]
+
+    assert detail["materials"] == []
+    assert parts_of(detail) == [("Setting", ["Silver"]), ("Inlaid stones", ["Coral", "Turquoise"])]
+    found = api_client.get("/api/v1/crafts/", {"search": "turquoise"}).json()["data"]["items"]
+    assert "Zuni jewelry" in {item["name"] for item in found}
+    assert (
+        CraftPart.objects.filter(craft__in=sample_crafts()).values("craft").distinct().count() == 5
+    )
+
+
+def test_loading_again_gives_older_samples_their_parts():
+    call_command("load_sample_crafts")
+    # As loaded before crafts had parts: the materials on the whole craft, and no parts.
+    craft = Craft.objects.get(name="Gaziantep copperware")
+    craft.parts.all().delete()
+    craft.materials.set(Material.objects.filter(name__in=["Copper", "Tin"]))
+    # A sample that has parts keeps them as they are.
+    kept = Craft.objects.get(name="Zuni jewelry")
+    kept.parts.exclude(name="Setting").delete()
+
+    call_command("load_sample_crafts")
+
+    assert list(craft.materials.all()) == []
+    assert list(craft.parts.values_list("name", flat=True)) == ["Vessel", "Inner lining"]
+    assert list(kept.parts.values_list("name", flat=True)) == ["Setting"]
 
 
 def test_loading_twice_adds_nothing():
