@@ -31,7 +31,7 @@ const SECTIONS: Section[] = [
     id: "section-tools",
     label: "Tools and materials",
     required: false,
-    done: (v) => v.tools.length + v.materials.length > 0,
+    done: (v) => v.tools.length + v.materials.length + v.parts.length > 0,
   },
   {
     id: "section-description",

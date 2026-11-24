@@ -9,7 +9,7 @@ import { loadDraft } from "@/features/crafts/form/useDraft";
 import type { CraftType } from "@/features/crafts/types";
 import { expectNoA11yViolations } from "@/test/axe";
 import { makeCraftDetail, makeUser, signedIn } from "@/test/fixtures";
-import { craftTypes, kutahya } from "@/test/handlers";
+import { craftTypes, kutahya, materials as materialItems } from "@/test/handlers";
 import { API, fail, ok } from "@/test/http";
 import { renderRoute } from "@/test/render";
 import { server } from "@/test/server";
@@ -128,6 +128,7 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
     culture: 51,
     tools: [32, 33],
     materials: [41],
+    parts: [],
     places: [
       {
         address: "Ulu Cami, Kütahya",
@@ -626,6 +627,61 @@ test("drafts from the old form are dropped", async () => {
   expect(localStorage.getItem("ic.craft-draft.v2")).toBeNull();
 });
 
+describe("parts", () => {
+  test("parts made of other materials are sent with their materials", async () => {
+    server.use(...signedIn());
+    const { created } = publishHandlers();
+    renderRoute("/crafts/new");
+    await fillRequiredFields();
+
+    await userEvent.click(screen.getByRole("button", { name: "Add a part" }));
+    await userEvent.type(screen.getByLabelText("Part name"), "Body");
+    const body = screen.getByRole("group", { name: "Body" });
+    await userEvent.click(within(body).getByRole("checkbox", { name: "Clay" }));
+    await userEvent.click(screen.getByRole("button", { name: "Add a part" }));
+    await userEvent.type(screen.getAllByLabelText("Part name")[1], "Strap");
+    const strap = screen.getByRole("group", { name: "Strap" });
+    await userEvent.type(within(strap).getByLabelText("Other materials of strap"), "wool");
+    await userEvent.click(within(strap).getByRole("button", { name: "Add Wool" }));
+    // The materials of the whole craft are kept apart from those of its parts.
+    const whole = screen.getByRole("group", { name: "Materials (optional)" });
+    expect(within(whole).queryByRole("list", { name: "Chosen materials" })).toBeNull();
+
+    await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
+
+    await waitFor(() => expect(created).toHaveLength(1));
+    expect(created[0]).toMatchObject({
+      materials: [],
+      parts: [
+        { name: "Body", materials: [41] },
+        { name: "Strap", materials: [43] },
+      ],
+    });
+  }, 15_000);
+
+  test("a part needs a name and a material, and each part is listed once", async () => {
+    server.use(...signedIn());
+    const { created } = publishHandlers();
+    renderRoute("/crafts/new");
+    await fillRequiredFields();
+
+    await userEvent.click(screen.getByRole("button", { name: "Add a part" }));
+    await userEvent.click(screen.getByRole("button", { name: "Publish craft" }));
+
+    expect(await screen.findByText("Name the part, such as Blade or Handle.")).toBeInTheDocument();
+    expect(screen.getByText("Choose what this part is made of.")).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText("Part name"), "Body");
+    await userEvent.click(screen.getByRole("button", { name: "Add a part" }));
+    await userEvent.type(screen.getAllByLabelText("Part name")[1], "body");
+    expect(await screen.findByText("This part is already listed.")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Remove body" }));
+    expect(screen.queryByText("This part is already listed.")).toBeNull();
+    expect(created).toHaveLength(0);
+  }, 15_000);
+});
+
 describe("places", () => {
   const iznik = {
     latitude: 40.429,
@@ -744,6 +800,31 @@ describe("editing", () => {
         dimensions: [{ type: "height", value: 20, unit: "cm" }],
       },
     });
+  });
+
+  test("the parts of a craft are loaded for editing", async () => {
+    const withParts = makeCraftDetail({
+      parts: [{ id: 5, name: "Body", materials: [materialItems[0]] }],
+    });
+    const patches: unknown[] = [];
+    server.use(
+      ...signedIn(makeUser({ id: 7 })),
+      http.get(`${API}/crafts/1/`, () => ok(withParts)),
+      http.patch(`${API}/crafts/1/`, async ({ request }) => {
+        patches.push(await request.json());
+        return ok(withParts);
+      }),
+    );
+    renderRoute("/crafts/1/edit");
+
+    expect(await screen.findByLabelText("Part name")).toHaveValue("Body");
+    const body = screen.getByRole("group", { name: "Body" });
+    expect(within(body).getByRole("button", { name: "Remove Clay" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Remove Body" }));
+    await userEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => expect(patches).toHaveLength(1));
+    expect(patches[0]).toMatchObject({ parts: [] });
   });
 
   test("a craft type or culture an admin hid stays chosen when editing", async () => {

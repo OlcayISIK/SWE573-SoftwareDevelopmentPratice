@@ -46,7 +46,7 @@ function ItemList({ kind, items }: { kind: "tool" | "material"; items: NamedItem
  * users added can be reported from here.
  */
 export function CraftFacts({ craft }: { craft: CraftDetail }) {
-  const { category, craft_type: craftType, culture, tools, materials } = craft;
+  const { category, craft_type: craftType, culture, tools, materials, parts } = craft;
   const places = craft.places.filter((place) => placeName(place));
 
   return (
@@ -116,6 +116,18 @@ export function CraftFacts({ craft }: { craft: CraftDetail }) {
         {materials.length > 0 && (
           <Fact label="Materials">
             <ItemList kind="material" items={materials} />
+          </Fact>
+        )}
+        {parts.length > 0 && (
+          <Fact label="Parts">
+            <ul className="space-y-2">
+              {parts.map((part) => (
+                <li key={part.id}>
+                  <span className="block text-sm font-medium text-stone-800">{part.name}</span>
+                  <ItemList kind="material" items={part.materials} />
+                </li>
+              ))}
+            </ul>
           </Fact>
         )}
         {places.length > 0 && (

@@ -24,6 +24,7 @@ import { DateFields } from "./DateFields";
 import { DimensionRows } from "./DimensionRows";
 import { ItemPicker } from "./ItemPicker";
 import { LocationPicker } from "./LocationPicker";
+import { PartRows } from "./PartRows";
 import { MAX_MATERIALS, MAX_TOOLS, type CraftFormValues } from "./schema";
 
 const changed = { shouldValidate: true, shouldDirty: true };
@@ -250,6 +251,14 @@ export function CraftFields({
           craftTypeName={craftTypeName}
           max={MAX_MATERIALS}
           error={errors.materials?.message}
+        />
+        <PartRows
+          form={form}
+          materials={materials.data}
+          onCreateMaterial={(name, description) =>
+            addMaterial.mutateAsync([name, craftTypeId ?? undefined, description])
+          }
+          craftTypeName={craftTypeName}
         />
       </fieldset>
 

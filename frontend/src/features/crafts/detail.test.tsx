@@ -5,7 +5,7 @@ import { http, HttpResponse } from "msw";
 import type { CraftDetail } from "@/features/crafts/types";
 import { expectNoA11yViolations } from "@/test/axe";
 import { makeCraftDetail, makeUser, signedIn } from "@/test/fixtures";
-import { tools } from "@/test/handlers";
+import { materials, tools } from "@/test/handlers";
 import { API, fail, ok } from "@/test/http";
 import { renderRoute } from "@/test/render";
 import { server } from "@/test/server";
@@ -84,6 +84,26 @@ test("shows the description, story, characteristics, culture, and location", asy
   expect(within(aside).getByText("Cumhuriyet Caddesi, Kütahya")).toBeInTheDocument();
   expect(await within(aside).findByRole("region", { name: "Map of crafts" })).toBeInTheDocument();
   expect(within(header).getByRole("link", { name: "Ayşe" })).toHaveAttribute("href", "/users/7");
+});
+
+test("parts made of other materials are listed with their materials", async () => {
+  serveCraft(
+    makeCraftDetail({
+      parts: [
+        { id: 1, name: "Body", materials: [materials[0]] },
+        { id: 2, name: "Strap", materials: [materials[2]] },
+      ],
+    }),
+  );
+  renderRoute("/crafts/1");
+
+  const facts = await screen.findByRole("region", { name: "Craft facts" });
+  const parts = within(facts).getByText("Parts").nextElementSibling as HTMLElement;
+  expect(parts).toHaveTextContent(/^Body\s*Clay.*Strap\s*Wool/);
+  expect(within(parts).getByRole("link", { name: "Wool" })).toHaveAttribute(
+    "href",
+    "/crafts?search=Wool",
+  );
 });
 
 test("a craft without a story shows no author story", async () => {

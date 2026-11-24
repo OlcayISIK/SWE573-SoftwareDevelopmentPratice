@@ -10,6 +10,7 @@ from .models import (
     Craft,
     CraftColor,
     CraftMedia,
+    CraftPart,
     CraftPlace,
     CraftStory,
     CraftType,
@@ -72,7 +73,7 @@ def visible_crafts(viewer=None):
     return crafts.filter(status=Craft.Status.PUBLISHED)
 
 
-# Craft fields a search looks in. Tools and materials are searched too, see _matches.
+# Craft fields a search looks in. Tools, materials, and parts are searched too, see _matches.
 SEARCHED_FIELDS = [
     "name",
     "description",
@@ -99,6 +100,9 @@ def _matches(word):
         condition |= Q(**{f"{field}__iregex": pattern})
     for model in (Tool, Material):
         condition |= Exists(model.objects.filter(crafts=OuterRef("pk"), name__iregex=pattern))
+    # A part matches by its own name, such as "handle", or by one of its materials.
+    in_part = Q(name__iregex=pattern) | Q(materials__name__iregex=pattern)
+    condition |= Exists(CraftPart.objects.filter(in_part, craft=OuterRef("pk")))
     in_place = Q()
     for field in SEARCHED_PLACE_FIELDS:
         in_place |= Q(**{f"{field}__iregex": pattern})
@@ -244,7 +248,7 @@ def get_visible_craft(craft_id, viewer=None):
     craft = (
         visible_crafts(viewer)
         .select_related("category", "craft_type", "culture", "author__profile")
-        .prefetch_related("media", "tools", "materials", "colors", "places")
+        .prefetch_related("media", "tools", "materials", "parts__materials", "colors", "places")
         .annotate(story_count=_published_stories())
         .filter(pk=craft_id)
         .first()

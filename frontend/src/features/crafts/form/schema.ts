@@ -13,6 +13,7 @@ import type { CraftDetail } from "../types";
 
 export const MAX_TOOLS = 20;
 export const MAX_MATERIALS = 20;
+export const MAX_PARTS = 10;
 export const MAX_COLORS = 10;
 export const MAX_PLACES = 10;
 
@@ -38,6 +39,14 @@ const coordinate = (limit: number) =>
     );
 
 const chosenItem = z.object({ id: z.number(), name: z.string() });
+
+const part = z.object({
+  name: required("Name the part, such as Blade or Handle.").max(80),
+  materials: z
+    .array(chosenItem)
+    .min(1, "Choose what this part is made of.")
+    .max(MAX_MATERIALS, `Choose at most ${MAX_MATERIALS} materials.`),
+});
 
 const place = z.object({
   address: required("Enter the address of this place.").max(255),
@@ -76,6 +85,25 @@ export const craftFormSchema = z.object({
   culture: required("Choose the culture the craft belongs to."),
   tools: z.array(chosenItem).max(MAX_TOOLS, `Choose at most ${MAX_TOOLS} tools.`),
   materials: z.array(chosenItem).max(MAX_MATERIALS, `Choose at most ${MAX_MATERIALS} materials.`),
+  /** Parts made of their own materials, such as a metal blade and a wooden handle. */
+  parts: z
+    .array(part)
+    .max(MAX_PARTS, `Add at most ${MAX_PARTS} parts.`)
+    .superRefine((rows, context) => {
+      const seen = new Set<string>();
+      rows.forEach((row, index) => {
+        const name = row.name.trim().toLowerCase();
+        if (!name) return;
+        if (seen.has(name)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [index, "name"],
+            message: "This part is already listed.",
+          });
+        }
+        seen.add(name);
+      });
+    }),
   places: z
     .array(place)
     .min(1, "Add the place the craft comes from.")
@@ -181,11 +209,16 @@ export type DimensionRow = CraftFormValues["attributes"]["dimensions"][number];
 export type ChosenItem = z.infer<typeof chosenItem>;
 export type ColorRow = CraftFormValues["colors"][number];
 export type PlaceRow = CraftFormValues["places"][number];
+export type PartRow = CraftFormValues["parts"][number];
 
 const PLACE_FIELDS = Array.from({ length: MAX_PLACES }, (_, index) =>
   (["address", "latitude", "longitude"] as const).map(
     (field) => `places.${index}.${field}` as const,
   ),
+).flat();
+
+const PART_FIELDS = Array.from({ length: MAX_PARTS }, (_, index) =>
+  (["name", "materials"] as const).map((field) => `parts.${index}.${field}` as const),
 ).flat();
 
 /** Every field the form renders, used to place server errors next to the right input. */
@@ -196,6 +229,8 @@ export const CRAFT_FORM_FIELDS: readonly Path<CraftFormValues>[] = [
   "culture",
   "tools",
   "materials",
+  "parts",
+  ...PART_FIELDS,
   "places",
   ...PLACE_FIELDS,
   "description",
@@ -223,6 +258,7 @@ export const emptyCraftForm: CraftFormValues = {
   culture: "",
   tools: [],
   materials: [],
+  parts: [],
   places: [emptyPlace],
   origin: "",
   description: "",
@@ -235,6 +271,8 @@ export const emptyCraftForm: CraftFormValues = {
   },
 };
 
+export const emptyPart: PartRow = { name: "", materials: [] };
+
 export const newDimension: DimensionRow = { type: "height", value: "", unit: "cm" };
 
 export interface CraftPayload {
@@ -244,6 +282,7 @@ export interface CraftPayload {
   culture: number;
   tools: number[];
   materials: number[];
+  parts: { name: string; materials: number[] }[];
   places: {
     address: string;
     city: string;
@@ -292,6 +331,10 @@ export function toPayload(values: CraftFormValues): CraftPayload {
     culture: Number(values.culture),
     tools: values.tools.map((item) => item.id),
     materials: values.materials.map((item) => item.id),
+    parts: values.parts.map((row) => ({
+      name: row.name.trim(),
+      materials: row.materials.map((item) => item.id),
+    })),
     places: values.places.map((row, index) => ({
       address: row.address.trim(),
       city: row.city,
@@ -318,6 +361,7 @@ export function fromCraft(craft: CraftDetail): CraftFormValues {
     culture: craft.culture ? String(craft.culture.id) : "",
     tools: craft.tools.map(chosen),
     materials: craft.materials.map(chosen),
+    parts: craft.parts.map((row) => ({ name: row.name, materials: row.materials.map(chosen) })),
     places: craft.places.map((row) => ({
       address: row.address,
       city: row.city,

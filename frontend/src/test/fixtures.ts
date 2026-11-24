@@ -33,6 +33,7 @@ export function makeCraftDetail(overrides: Partial<CraftDetail> = {}): CraftDeta
     craft_type: craftTypes[0],
     tools: [tools[1]],
     materials: [materials[0]],
+    parts: [],
     culture: cultures[0],
     address: "Cumhuriyet Caddesi, Kütahya",
     city: "Kütahya",

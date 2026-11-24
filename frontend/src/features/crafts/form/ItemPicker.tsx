@@ -33,6 +33,8 @@ interface ItemPickerProps {
   craftTypeName?: string;
   max: number;
   error?: string;
+  /** Marks the list optional in its legend. */
+  optional?: boolean;
 }
 
 const sameName = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
@@ -51,6 +53,7 @@ export function ItemPicker({
   craftTypeName,
   max,
   error,
+  optional = true,
 }: ItemPickerProps) {
   const id = useId();
   const [text, setText] = useState("");
@@ -119,7 +122,10 @@ export function ItemPicker({
 
   return (
     <fieldset className="space-y-3" aria-describedby={error ? `${id}-error` : undefined}>
-      <legend className="font-semibold text-deep-sea">{label} (optional)</legend>
+      <legend className="font-semibold text-deep-sea">
+        {label}
+        {optional && " (optional)"}
+      </legend>
 
       {value.length > 0 && (
         <ul aria-label={`Chosen ${label.toLowerCase()}`} className="flex flex-wrap gap-2">
