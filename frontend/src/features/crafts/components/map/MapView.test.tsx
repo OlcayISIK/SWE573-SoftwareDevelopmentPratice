@@ -48,6 +48,32 @@ test("the real Leaflet map loads the cluster plugin and selects pins", async () 
   expect(onSelect).toHaveBeenCalledWith(1);
 });
 
+test("the selected craft's pin is bigger, with a border, until it is deselected", async () => {
+  const { default: MapView } = await import("./MapView");
+  // The same handler on every render, as on the map page, so the map is not rebuilt.
+  const onSelect = vi.fn();
+  const { rerender } = render(<MapView pins={pins} onSelect={onSelect} />);
+  const pinOf = async (name: string) =>
+    (await screen.findByRole("button", { name })).querySelector(".craft-pin");
+
+  expect(await pinOf("Kütahya Çinisi")).not.toHaveClass("is-selected");
+
+  rerender(<MapView pins={pins} onSelect={onSelect} selectedId={1} />);
+  await waitFor(async () => expect(await pinOf("Kütahya Çinisi")).toHaveClass("is-selected"));
+  expect((await pinOf("Kütahya Çinisi"))?.querySelector("path")).toHaveAttribute(
+    "stroke",
+    "#e5a73a",
+  );
+  expect(await pinOf("Barro negro")).not.toHaveClass("is-selected");
+
+  rerender(<MapView pins={pins} onSelect={onSelect} selectedId={2} />);
+  await waitFor(async () => expect(await pinOf("Barro negro")).toHaveClass("is-selected"));
+  expect(await pinOf("Kütahya Çinisi")).toHaveClass("is-settled");
+
+  rerender(<MapView pins={pins} onSelect={onSelect} selectedId={null} />);
+  await waitFor(async () => expect(await pinOf("Barro negro")).toHaveClass("is-settled"));
+});
+
 test("the world is shown once: no tile is drawn twice", async () => {
   const { default: MapView } = await import("./MapView");
   const { container } = render(<MapView pins={pins} onSelect={() => undefined} />);

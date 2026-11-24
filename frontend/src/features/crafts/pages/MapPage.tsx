@@ -135,6 +135,7 @@ export function MapPage() {
                   key={filters.area ?? "world"}
                   pins={pins.data}
                   onSelect={select}
+                  selectedId={selected}
                   fit={areaCorners(filters.area)}
                 />
               </Suspense>

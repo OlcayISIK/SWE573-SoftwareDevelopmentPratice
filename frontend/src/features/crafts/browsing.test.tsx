@@ -281,7 +281,10 @@ describe("map", () => {
     server.use(http.get(`${API}/crafts/1/`, () => ok(makeCraftDetail())));
     renderRoute("/");
 
-    await userEvent.click(await screen.findByRole("button", { name: "Pin: Kütahya Çinisi" }));
+    const pin = await screen.findByRole("button", { name: "Pin: Kütahya Çinisi" });
+    expect(pin).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(pin);
+    expect(pin).toHaveAttribute("aria-pressed", "true");
 
     const preview = await screen.findByRole("complementary", { name: "Craft preview" });
     expect(await within(preview).findByRole("heading", { name: "Kütahya Çinisi" })).toBeVisible();
@@ -296,6 +299,7 @@ describe("map", () => {
 
     await userEvent.keyboard("{Escape}");
     expect(screen.queryByRole("complementary", { name: "Craft preview" })).not.toBeInTheDocument();
+    expect(pin).toHaveAttribute("aria-pressed", "false");
   });
 
   test("map filters come from the URL", async () => {
