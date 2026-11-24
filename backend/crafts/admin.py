@@ -5,6 +5,7 @@ from .models import (
     Craft,
     CraftColor,
     CraftMedia,
+    CraftPart,
     CraftPlace,
     CraftStory,
     CraftType,
@@ -27,6 +28,12 @@ class CraftPlaceInline(admin.TabularInline):
     model = CraftPlace
     extra = 0
     fields = ["address", "city", "country", "latitude", "longitude", "is_origin", "order"]
+
+
+class CraftPartInline(admin.TabularInline):
+    model = CraftPart
+    extra = 0
+    fields = ["name", "materials", "order"]
 
 
 class CraftColorInline(admin.TabularInline):
@@ -77,7 +84,7 @@ class CraftAdmin(admin.ModelAdmin):
     raw_id_fields = ["author"]
     filter_horizontal = ["tools", "materials"]
     readonly_fields = ["created_at", "updated_at"]
-    inlines = [CraftPlaceInline, CraftColorInline, CraftMediaInline]
+    inlines = [CraftPlaceInline, CraftPartInline, CraftColorInline, CraftMediaInline]
 
     def get_queryset(self, request):
         return Craft.all_objects.select_related("author", "category", "craft_type", "culture")

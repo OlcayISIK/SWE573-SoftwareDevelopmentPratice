@@ -1,7 +1,7 @@
 import pytest
 
 from crafts import signals
-from crafts.models import Category, Craft, CraftType, Culture, Material, Tool
+from crafts.models import Category, Craft, CraftPart, CraftType, Culture, Material, Tool
 from tests.factories import CraftFactory, UserFactory
 from tests.payloads import craft_payload
 
@@ -370,6 +370,9 @@ def test_items_hidden_later_still_show_on_the_craft(api_client, client_for, user
 
 def test_detail_query_count_is_fixed(api_client, django_assert_max_num_queries, payload):
     craft = CraftFactory()
+    for name in ("Blade", "Handle"):
+        part = CraftPart.objects.create(craft=craft, name=name)
+        part.materials.add(*Material.objects.all()[:2])
 
-    with django_assert_max_num_queries(6):
+    with django_assert_max_num_queries(8):
         api_client.get(craft_url(craft))

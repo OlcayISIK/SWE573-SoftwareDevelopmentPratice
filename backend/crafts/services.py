@@ -11,6 +11,7 @@ from .models import (
     Craft,
     CraftColor,
     CraftMedia,
+    CraftPart,
     CraftPlace,
     CraftStory,
     CraftType,
@@ -27,6 +28,7 @@ EDITABLE_FIELDS = {
     "craft_type",
     "tools",
     "materials",
+    "parts",
     "culture",
     "places",
     "description",
@@ -82,6 +84,15 @@ def _set_colors(craft, colors):
     )
 
 
+def _set_parts(craft, parts):
+    """Replaces the craft's parts, keeping the order they were given in."""
+    craft.parts.all().delete()
+    for index, part in enumerate(parts):
+        CraftPart.objects.create(craft=craft, name=part["name"], order=index).materials.set(
+            part["materials"]
+        )
+
+
 PLACE_FIELDS = ("address", "city", "country", "latitude", "longitude")
 
 
@@ -108,6 +119,7 @@ def publish_craft(*, author, data):
     fields = dict(data)
     related = {field: fields.pop(field, []) for field in MANY_TO_MANY_FIELDS}
     colors = fields.pop("colors", [])
+    parts = fields.pop("parts", [])
     places = fields.pop("places")
     # The date arrives as craft fields already, see CraftDateSerializer.
     date = fields.pop("date", {})
@@ -115,6 +127,7 @@ def publish_craft(*, author, data):
     for field, items in related.items():
         getattr(craft, field).set(items)
     _set_colors(craft, colors)
+    _set_parts(craft, parts)
     _set_places(craft, places)
     signals.craft_published.send(sender=Craft, craft=craft)
     return craft
@@ -132,6 +145,8 @@ def update_craft(*, craft, actor, data):
             getattr(craft, field).set(value)
         elif field == "colors":
             _set_colors(craft, value)
+        elif field == "parts":
+            _set_parts(craft, value)
         elif field == "date":
             for name, part in value.items():
                 setattr(craft, name, part)
@@ -351,6 +366,9 @@ def _move_crafts(item, into):
         field = "tools" if isinstance(item, Tool) else "materials"
         for craft in crafts.filter(**{field: item}):
             getattr(craft, field).add(into)
+        if isinstance(item, Material):
+            for part in CraftPart.objects.filter(materials=item):
+                part.materials.add(into)
         into.craft_types.add(*item.craft_types.all())
         return
     field = {Category: "category", CraftType: "craft_type", Culture: "culture"}[type(item)]

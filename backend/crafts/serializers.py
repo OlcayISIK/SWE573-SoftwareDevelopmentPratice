@@ -17,6 +17,7 @@ from .models import (
     Category,
     Craft,
     CraftMedia,
+    CraftPart,
     CraftPlace,
     CraftStory,
     CraftType,
@@ -29,6 +30,7 @@ PHOTO_MAX_BYTES = 5 * MB
 DOCUMENT_MAX_BYTES = 10 * MB
 MAX_TOOLS = 20
 MAX_MATERIALS = 20
+MAX_PARTS = 10
 MAX_COLORS = 10
 MAX_PLACES = 10
 LENGTH_UNITS = ["mm", "cm", "m", "in", "ft"]
@@ -272,6 +274,32 @@ class CraftPlaceSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class PartInputSerializer(StrictSerializer):
+    """A part of the craft made of its own materials."""
+
+    name = serializers.CharField(max_length=80, help_text='The part, such as "Blade" or "Handle".')
+    materials = serializers.PrimaryKeyRelatedField(
+        queryset=_visible(Material),
+        many=True,
+        allow_empty=False,
+        help_text="What this part is made of.",
+    )
+
+    def validate_materials(self, materials):
+        if len(materials) > MAX_MATERIALS:
+            raise serializers.ValidationError(f"Choose at most {MAX_MATERIALS} materials.")
+        return list(dict.fromkeys(materials))
+
+
+class CraftPartSerializer(serializers.ModelSerializer):
+    materials = NamedItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = CraftPart
+        fields = ["id", "name", "materials"]
+        read_only_fields = fields
+
+
 EARLIEST_YEAR = -10000
 
 
@@ -343,6 +371,15 @@ class CraftWriteSerializer(serializers.ModelSerializer):
         queryset=_visible(Material), many=True, required=False
     )
     culture = serializers.PrimaryKeyRelatedField(queryset=_visible(Culture))
+    parts = PartInputSerializer(
+        many=True,
+        required=False,
+        max_length=MAX_PARTS,
+        help_text=(
+            "Parts made of their own materials, such as a metal blade and a wooden handle. "
+            "`materials` stays for what the whole craft is made of."
+        ),
+    )
     places = PlaceInputSerializer(
         many=True,
         min_length=1,
@@ -366,6 +403,7 @@ class CraftWriteSerializer(serializers.ModelSerializer):
             "craft_type",
             "tools",
             "materials",
+            "parts",
             "culture",
             "places",
             "description",
@@ -384,6 +422,12 @@ class CraftWriteSerializer(serializers.ModelSerializer):
         if len(materials) > MAX_MATERIALS:
             raise serializers.ValidationError(f"Choose at most {MAX_MATERIALS} materials.")
         return list(dict.fromkeys(materials))
+
+    def validate_parts(self, parts):
+        names = [part["name"].casefold() for part in parts]
+        if len(names) != len(set(names)):
+            raise serializers.ValidationError("Enter each part once.")
+        return parts
 
     def validate_places(self, places):
         # A partial update skips the defaults of nested fields, so they are filled in here.
@@ -619,6 +663,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
     craft_type = NamedItemSerializer(read_only=True)
     tools = NamedItemSerializer(many=True, read_only=True)
     materials = NamedItemSerializer(many=True, read_only=True)
+    parts = CraftPartSerializer(many=True, read_only=True)
     culture = CultureSerializer(read_only=True, allow_null=True)
     colors = serializers.SlugRelatedField(slug_field="value", many=True, read_only=True)
     author = AuthorSerializer(read_only=True)
@@ -640,6 +685,7 @@ class CraftDetailSerializer(serializers.ModelSerializer):
             "craft_type",
             "tools",
             "materials",
+            "parts",
             "culture",
             "address",
             "city",

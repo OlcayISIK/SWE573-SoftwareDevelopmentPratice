@@ -927,6 +927,7 @@ export interface components {
             readonly craft_type: components["schemas"]["NamedItem"];
             readonly tools: components["schemas"]["NamedItem"][];
             readonly materials: components["schemas"]["NamedItem"][];
+            readonly parts: components["schemas"]["CraftPart"][];
             readonly culture: components["schemas"]["Culture"] | null;
             readonly address: string;
             readonly city: string;
@@ -968,6 +969,11 @@ export interface components {
             readonly author: components["schemas"]["Author"];
             /** Format: date-time */
             readonly created_at: string;
+        };
+        CraftPart: {
+            readonly id: number;
+            readonly name: string;
+            readonly materials: components["schemas"]["NamedItem"][];
         };
         /** @description A pin for one place of a craft; a craft in several places has several pins. */
         CraftPin: {
@@ -1021,6 +1027,8 @@ export interface components {
             craft_type: number;
             tools?: number[];
             materials?: number[];
+            /** @description Parts made of their own materials, such as a metal blade and a wooden handle. `materials` stays for what the whole craft is made of. */
+            parts?: components["schemas"]["PartInputRequest"][];
             culture: number;
             /** @description Where the craft is made or belongs. Mark at most one as the origin. */
             places: components["schemas"]["PlaceInputRequest"][];
@@ -1425,6 +1433,13 @@ export interface components {
             /** @example 1 */
             totalPages: number;
         };
+        /** @description A part of the craft made of its own materials. */
+        PartInputRequest: {
+            /** @description The part, such as "Blade" or "Handle". */
+            name: string;
+            /** @description What this part is made of. */
+            materials: number[];
+        };
         PasswordResetConfirmRequest: {
             uid: string;
             token: string;
@@ -1436,6 +1451,8 @@ export interface components {
             craft_type?: number;
             tools?: number[];
             materials?: number[];
+            /** @description Parts made of their own materials, such as a metal blade and a wooden handle. `materials` stays for what the whole craft is made of. */
+            parts?: components["schemas"]["PartInputRequest"][];
             culture?: number;
             /** @description Where the craft is made or belongs. Mark at most one as the origin. */
             places?: components["schemas"]["PlaceInputRequest"][];

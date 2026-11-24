@@ -173,6 +173,7 @@ CRAFT_CREATED = {
     "craft_type": TILE,
     "tools": TOOLS,
     "materials": MATERIALS,
+    "parts": [],
     "culture": TURKISH,
     **IZNIK,
     "places": [
@@ -206,6 +207,7 @@ CRAFT_DETAIL = {
     "craft_type": TILE,
     "tools": TOOLS,
     "materials": MATERIALS,
+    "parts": [],
     "culture": TURKISH,
     **KUTAHYA,
     "places": [{"id": 1, **KUTAHYA, "is_origin": False}],

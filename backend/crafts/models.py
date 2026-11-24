@@ -291,6 +291,24 @@ class CraftPlace(BaseModel):
         return self.address
 
 
+class CraftPart(BaseModel):
+    """
+    A part of a craft made of its own materials, such as a metal blade and a wooden handle. The
+    craft's own `materials` are those of the whole piece; parts are listed only when they differ.
+    """
+
+    craft = models.ForeignKey(Craft, on_delete=models.CASCADE, related_name="parts")
+    name = models.CharField(max_length=80)
+    materials = models.ManyToManyField(Material, related_name="craft_parts")
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.name
+
+
 class CraftColor(BaseModel):
     """A color of a craft, in the order the author listed them."""
 

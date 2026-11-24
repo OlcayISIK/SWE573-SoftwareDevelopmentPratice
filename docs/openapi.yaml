@@ -861,6 +861,7 @@ paths:
                           clay bodies and glazes.
                         user_added: false
                         added_by_me: false
+                      parts: []
                       culture:
                         id: 25
                         name: Turkish
@@ -1268,6 +1269,7 @@ paths:
                           clay bodies and glazes.
                         user_added: false
                         added_by_me: false
+                      parts: []
                       culture:
                         id: 25
                         name: Turkish
@@ -3494,6 +3496,11 @@ components:
           items:
             $ref: '#/components/schemas/NamedItem'
           readOnly: true
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraftPart'
+          readOnly: true
         culture:
           allOf:
           - $ref: '#/components/schemas/Culture'
@@ -3582,6 +3589,7 @@ components:
       - materials
       - media
       - name
+      - parts
       - places
       - status
       - story
@@ -3655,6 +3663,24 @@ components:
       - longitude
       - name
       - status
+    CraftPart:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        materials:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedItem'
+          readOnly: true
+      required:
+      - id
+      - materials
+      - name
     CraftPin:
       type: object
       description: A pin for one place of a craft; a craft in several places has several
@@ -3793,6 +3819,12 @@ components:
           type: array
           items:
             type: integer
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartInputRequest'
+          description: Parts made of their own materials, such as a metal blade and
+            a wooden handle. `materials` stays for what the whole craft is made of.
         culture:
           type: integer
         places:
@@ -4796,6 +4828,23 @@ components:
         totalPages:
           type: integer
           example: 1
+    PartInputRequest:
+      type: object
+      description: A part of the craft made of its own materials.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: The part, such as "Blade" or "Handle".
+          maxLength: 80
+        materials:
+          type: array
+          items:
+            type: integer
+          description: What this part is made of.
+      required:
+      - materials
+      - name
     PasswordResetConfirmRequest:
       type: object
       properties:
@@ -4833,6 +4882,12 @@ components:
           type: array
           items:
             type: integer
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartInputRequest'
+          description: Parts made of their own materials, such as a metal blade and
+            a wooden handle. `materials` stays for what the whole craft is made of.
         culture:
           type: integer
         places:
