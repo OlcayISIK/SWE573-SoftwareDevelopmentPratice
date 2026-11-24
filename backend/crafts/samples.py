@@ -68,6 +68,13 @@ def _place(item):
     }
 
 
+def _part(item):
+    return {
+        "name": item["name"],
+        "materials": [_lookup(Material, name=name) for name in item["materials"]],
+    }
+
+
 def _craft_fields(item):
     category = _lookup(Category, slug=item["category"])
     return {
@@ -77,6 +84,7 @@ def _craft_fields(item):
         "culture": _lookup(Culture, name=item["culture"]),
         "tools": [_lookup(Tool, name=name) for name in item["tools"]],
         "materials": [_lookup(Material, name=name) for name in item["materials"]],
+        "parts": [_part(part) for part in item.get("parts", [])],
         # A sample in several places lists them; otherwise its own place is the only one.
         "places": [_place(place) for place in item.get("places", [item])],
         "description": item["description"],
@@ -112,6 +120,17 @@ def _restore_photos(craft, photos):
                 media.file.storage.save(media.file.name, File(file))
 
 
+def _fill_in_parts(craft, item):
+    """
+    Gives a sample craft loaded before crafts had parts the parts listed for it, with the
+    materials of the whole craft as the data file has them now. Crafts that have parts are kept.
+    """
+    if not item.get("parts") or craft.parts.exists():
+        return
+    craft.materials.set([_lookup(Material, name=name) for name in item["materials"]])
+    services.set_parts(craft, [_part(part) for part in item["parts"]])
+
+
 @transaction.atomic
 def load_samples():
     """Adds the sample crafts that are not there yet. Returns (added, already there)."""
@@ -125,6 +144,7 @@ def load_samples():
         if craft is not None:
             if not craft.is_deleted:
                 _restore_photos(craft, item["photos"])
+                _fill_in_parts(craft, item)
             existing += 1
             continue
         craft = services.publish_craft(author=author, data=_craft_fields(item))
