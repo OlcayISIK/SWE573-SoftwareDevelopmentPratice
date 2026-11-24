@@ -44,8 +44,14 @@ export function PublicProfilePage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <header className="relative flex flex-wrap items-center gap-6 overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-stone-200 sm:p-8">
-        <div aria-hidden="true" className="bg-contour absolute inset-0 opacity-50" />
-        <div aria-hidden="true" className="woven-band absolute inset-x-0 top-0" />
+        <div
+          aria-hidden="true"
+          className="bg-contour pointer-events-none absolute inset-0 opacity-50"
+        />
+        <div
+          aria-hidden="true"
+          className="woven-band pointer-events-none absolute inset-x-0 top-0"
+        />
         <div className="relative">
           <Avatar src={data.avatar} name={data.display_name} />
         </div>
@@ -67,12 +73,15 @@ export function PublicProfilePage() {
             <FollowSummary userId={data.id} />
           </div>
         </div>
-        <FollowButton userId={data.id} name={data.display_name} />
-        {isMe && (
-          <Link to="/me/settings" className="btn-secondary">
-            Edit profile
-          </Link>
-        )}
+        {/* Positioned, like the blocks above, so the decoration does not cover the buttons. */}
+        <div className="relative flex items-center gap-3">
+          <FollowButton userId={data.id} name={data.display_name} />
+          {isMe && (
+            <Link to="/me/settings" className="btn-secondary">
+              Edit profile
+            </Link>
+          )}
+        </div>
       </header>
       {data.bio && <p className="mt-6 max-w-3xl whitespace-pre-line text-stone-800">{data.bio}</p>}
       <UserCrafts userId={data.id} heading={`Crafts added by ${data.display_name}`} />
