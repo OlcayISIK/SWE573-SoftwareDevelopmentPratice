@@ -555,6 +555,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/following/crafts/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Crafts that people the user follows added in the last three days, newest first. */
+        get: operations["v1_me_following_crafts_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/notifications/": {
         parameters: {
             query?: never;
@@ -3196,6 +3213,34 @@ export interface operations {
                     "application/json": {
                         success: boolean;
                         data: components["schemas"]["PaginatedFollowingEntryList"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_me_following_crafts_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["PaginatedCraftListList"];
                         message: string;
                     };
                 };

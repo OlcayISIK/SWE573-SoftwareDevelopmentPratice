@@ -67,6 +67,17 @@ class MyFollowingView(generics.ListAPIView):
 
 
 @extend_schema(tags=["social"])
+class FollowedNewCraftsView(generics.ListAPIView):
+    """Crafts that people the user follows added in the last three days, newest first."""
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = CraftListSerializer
+
+    def get_queryset(self):
+        return selectors.new_crafts_of_followed(self.request.user)
+
+
+@extend_schema(tags=["social"])
 class MyFollowersView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = FollowerEntrySerializer

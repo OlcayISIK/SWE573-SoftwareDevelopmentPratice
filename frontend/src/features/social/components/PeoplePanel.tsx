@@ -4,7 +4,9 @@ import { useAuth } from "@/features/auth/context";
 import { Avatar } from "@/features/profiles/components/Avatar";
 
 import type { FollowEntry } from "../api";
-import { useMyFollowers, useMyFollowing } from "../queries";
+import { useFollowedNewCrafts, useMyFollowers, useMyFollowing } from "../queries";
+
+import { NewCrafts } from "./NewCrafts";
 
 import { Panel } from "./Panel";
 
@@ -47,6 +49,7 @@ export function PeoplePanel() {
   const signedIn = auth.status === "authenticated";
   const following = useMyFollowing(signedIn);
   const followers = useMyFollowers(signedIn);
+  const newCrafts = useFollowedNewCrafts(signedIn);
 
   if (auth.status === "loading") {
     return null;
@@ -83,6 +86,7 @@ export function PeoplePanel() {
           entries={following.data?.items ?? []}
           empty="You are not following anyone yet. Follow contributors from their profile."
         />
+        <NewCrafts crafts={newCrafts.data?.items ?? []} total={newCrafts.data?.total ?? 0} />
       </Panel>
       <Panel title="Your followers" action={<Count total={followers.data?.total} />}>
         <PeopleList entries={followers.data?.items ?? []} empty="No followers yet." />
