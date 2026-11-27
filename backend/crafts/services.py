@@ -21,6 +21,7 @@ from .models import (
     CraftType,
     Culture,
     Material,
+    PracticeStatusChange,
     Tool,
     unique_names,
 )
@@ -49,6 +50,7 @@ MANY_TO_MANY_FIELDS = ("tools", "materials")
 VERIFY_BEFORE_PUBLISHING = "Verify your email address before publishing crafts."
 NOT_ALLOWED_TO_EDIT = "Only the author or an admin can change this craft."
 ADMIN_ONLY = "Only admins can perform this action."
+SOURCE_REQUIRED = "Give the source the practice status is based on."
 AUTHOR_ONLY = "Only the author can add media to this craft."
 TOO_MANY_MEDIA = f"A craft can have at most {MAX_MEDIA_PER_CRAFT} media items."
 VERIFY_BEFORE_ADDING = "Verify your email address before adding new items."
@@ -185,6 +187,39 @@ def hide_craft(*, craft, actor):
     _ensure_admin(actor)
     craft.status = Craft.Status.HIDDEN
     craft.save(update_fields=["status", "updated_at"])
+    return craft
+
+
+@transaction.atomic
+def set_practice_status(*, craft, actor, practice_status, source, reason):
+    """
+    Sets whether the craft is still practiced, with the source it is based on, and records the
+    change. Only admins set it, directly or by approving a user's proposal.
+    """
+    _ensure_admin(actor)
+    source = source.strip()
+    if practice_status != Craft.PracticeStatus.UNKNOWN and not source:
+        raise ValidationError(SOURCE_REQUIRED, errors={"source": [SOURCE_REQUIRED]})
+    old_status = craft.practice_status
+    PracticeStatusChange.objects.create(
+        craft=craft,
+        changed_by=actor,
+        old_status=old_status,
+        new_status=practice_status,
+        source=source,
+        reason=reason,
+    )
+    craft.practice_status = practice_status
+    craft.practice_status_source = source
+    craft.save(update_fields=["practice_status", "practice_status_source", "updated_at"])
+    if practice_status != old_status:
+        signals.practice_status_changed.send(
+            sender=Craft,
+            craft=craft,
+            actor=actor,
+            old_status=old_status,
+            new_status=practice_status,
+        )
     return craft
 
 

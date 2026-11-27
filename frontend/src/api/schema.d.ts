@@ -237,6 +237,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/crafts/{craft_id}/practice-status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Sets whether the craft is still practiced, with a source and the reason. Admins only. */
+        post: operations["v1_crafts_practice_status_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/crafts/{craft_id}/practice-status/proposals/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Proposes whether the craft is still practiced, with the source it is based on. Admins
+         *     review the proposal; a user has one open proposal per craft.
+         */
+        post: operations["v1_crafts_practice_status_proposals_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/crafts/{craft_id}/report/": {
         parameters: {
             query?: never;
@@ -717,6 +754,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/moderation/status-proposals/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_moderation_status_proposals_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/moderation/status-proposals/{proposal_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_moderation_status_proposals_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/moderation/status-proposals/{proposal_id}/actions/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Approves the proposal, which sets the craft's practice status and source and notifies
+         *     the users who favorited the craft, or rejects it. The proposer is notified either way.
+         */
+        post: operations["v1_moderation_status_proposals_actions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/moderation/story-reports/": {
         parameters: {
             query?: never;
@@ -944,9 +1033,25 @@ export interface components {
             count: number;
         };
         ColorFacet: {
-            name: components["schemas"]["NameEnum"];
+            name: components["schemas"]["ColorFacetNameEnum"];
             count: number;
         };
+        /**
+         * @description * `red` - red
+         *     * `orange` - orange
+         *     * `yellow` - yellow
+         *     * `green` - green
+         *     * `turquoise` - turquoise
+         *     * `blue` - blue
+         *     * `purple` - purple
+         *     * `pink` - pink
+         *     * `brown` - brown
+         *     * `black` - black
+         *     * `white` - white
+         *     * `grey` - grey
+         * @enum {string}
+         */
+        ColorFacetNameEnum: "red" | "orange" | "yellow" | "green" | "turquoise" | "blue" | "purple" | "pink" | "brown" | "black" | "white" | "grey";
         CountryFacet: {
             name: string;
             count: number;
@@ -1019,6 +1124,8 @@ export interface components {
             readonly colors: string[];
             readonly attributes: unknown;
             readonly status: components["schemas"]["CraftStatusEnum"];
+            readonly practice_status: components["schemas"]["PracticeStatusEnum"];
+            readonly practice_status_source: string;
             readonly author: components["schemas"]["Author"];
             /** Format: date-time */
             readonly created_at: string;
@@ -1039,6 +1146,7 @@ export interface components {
             readonly longitude: number;
             readonly cover_photo: components["schemas"]["CoverPhoto"] | null;
             readonly status: components["schemas"]["CraftStatusEnum"];
+            readonly practice_status: components["schemas"]["PracticeStatusEnum"];
             readonly author: components["schemas"]["Author"];
             /** Format: date-time */
             readonly created_at: string;
@@ -1171,6 +1279,7 @@ export interface components {
             cultures: components["schemas"]["CultureFacet"][];
             countries: components["schemas"]["CountryFacet"][];
             colors: components["schemas"]["ColorFacet"][];
+            practice_statuses: components["schemas"]["PracticeStatusFacet"][];
         };
         FavoriteStatus: {
             favorited: boolean;
@@ -1348,22 +1457,6 @@ export interface components {
             alt_text?: string;
             order?: number;
         };
-        /**
-         * @description * `red` - red
-         *     * `orange` - orange
-         *     * `yellow` - yellow
-         *     * `green` - green
-         *     * `turquoise` - turquoise
-         *     * `blue` - blue
-         *     * `purple` - purple
-         *     * `pink` - pink
-         *     * `brown` - brown
-         *     * `black` - black
-         *     * `white` - white
-         *     * `grey` - grey
-         * @enum {string}
-         */
-        NameEnum: "red" | "orange" | "yellow" | "green" | "turquoise" | "blue" | "purple" | "pink" | "brown" | "black" | "white" | "grey";
         /** @description A lookup item as shown on a craft. */
         NamedItem: {
             /** @description True when the signed-in user added the item. Users cannot report their own items. */
@@ -1396,9 +1489,11 @@ export interface components {
          *     * `favorite_updated` - A favorited craft was updated
          *     * `report_resolved` - Your report was reviewed
          *     * `new_story` - Someone shared a story about your craft
+         *     * `practice_status_changed` - A favorited craft's practice status changed
+         *     * `status_proposal_reviewed` - Your practice status proposal was reviewed
          * @enum {string}
          */
-        NotificationTypeEnum: "new_craft_from_followed" | "favorite_updated" | "report_resolved" | "new_story";
+        NotificationTypeEnum: "new_craft_from_followed" | "favorite_updated" | "report_resolved" | "new_story" | "practice_status_changed" | "status_proposal_reviewed";
         OwnProfile: {
             readonly id: number;
             /** Format: email */
@@ -1472,6 +1567,17 @@ export interface components {
         };
         PaginatedReportReviewList: {
             items: components["schemas"]["ReportReview"][];
+            /** @example 1 */
+            total: number;
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            pageSize: number;
+            /** @example 1 */
+            totalPages: number;
+        };
+        PaginatedStatusProposalReviewList: {
+            items: components["schemas"]["StatusProposalReview"][];
             /** @example 1 */
             total: number;
             /** @example 1 */
@@ -1583,6 +1689,42 @@ export interface components {
             /** @default false */
             is_origin: boolean;
         };
+        /**
+         * @description * `unknown` - Unknown
+         *     * `living` - Living
+         *     * `endangered` - Endangered
+         *     * `no_longer_practiced` - No longer practiced
+         * @enum {string}
+         */
+        PracticeStatusEnum: "unknown" | "living" | "endangered" | "no_longer_practiced";
+        PracticeStatusFacet: {
+            name: components["schemas"]["PracticeStatusEnum"];
+            count: number;
+        };
+        PracticeStatusSetRequest: {
+            practice_status: components["schemas"]["PracticeStatusEnum"];
+            /**
+             * @description Required unless the status is unknown.
+             * @default
+             */
+            source: string;
+            reason: string;
+        };
+        ProposedCraft: {
+            readonly id: number;
+            readonly name: string;
+            readonly status: string;
+            readonly is_deleted: boolean;
+            readonly practice_status: components["schemas"]["PracticeStatusEnum"];
+            readonly practice_status_source: string;
+        };
+        /**
+         * @description * `living` - Living
+         *     * `endangered` - Endangered
+         *     * `no_longer_practiced` - No longer practiced
+         * @enum {string}
+         */
+        ProposedPracticeStatusEnum: "living" | "endangered" | "no_longer_practiced";
         PublicProfile: {
             readonly id: number;
             readonly display_name: string;
@@ -1715,6 +1857,62 @@ export interface components {
             /** @description Items the word also finds: by another name, in another language, or as a narrower kind of an item it names. */
             related: components["schemas"]["RelatedItem"][];
         };
+        StatusProposal: {
+            readonly id: number;
+            readonly craft: number;
+            readonly practice_status: components["schemas"]["PracticeStatusEnum"];
+            readonly source: string;
+            readonly note: string;
+            readonly status: components["schemas"]["StatusProposalStatusEnum"];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `approved` - Approve
+         *     * `rejected` - Reject
+         * @enum {string}
+         */
+        StatusProposalActionEnum: "approved" | "rejected";
+        StatusProposalActionRequest: {
+            /**
+             * @description approved sets the craft's practice status and source; rejected leaves them.
+             *
+             *     * `approved` - Approve
+             *     * `rejected` - Reject
+             */
+            action: components["schemas"]["StatusProposalActionEnum"];
+            reason: string;
+        };
+        StatusProposalCreateRequest: {
+            practice_status: components["schemas"]["ProposedPracticeStatusEnum"];
+            /** @description What the status is based on: a citation or a link, such as the UNESCO List of Intangible Cultural Heritage in Need of Urgent Safeguarding. */
+            source: string;
+            /** @default  */
+            note: string;
+        };
+        StatusProposalReview: {
+            readonly id: number;
+            readonly craft: components["schemas"]["ProposedCraft"];
+            readonly proposer: components["schemas"]["Person"];
+            readonly practice_status: components["schemas"]["PracticeStatusEnum"];
+            readonly source: string;
+            readonly note: string;
+            /** @default open */
+            readonly status: components["schemas"]["StatusProposalStatusEnum"];
+            /** Format: date-time */
+            readonly created_at: string;
+            readonly reviewed_by: components["schemas"]["Person"] | null;
+            readonly review_reason: string;
+            /** Format: date-time */
+            readonly reviewed_at: string | null;
+        };
+        /**
+         * @description * `open` - Open
+         *     * `approved` - Approved
+         *     * `rejected` - Rejected
+         * @enum {string}
+         */
+        StatusProposalStatusEnum: "open" | "approved" | "rejected";
         Story: {
             readonly id: number;
             readonly text: string;
@@ -2254,6 +2452,8 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 pageSize?: number;
+                /** @description Whether the craft is still practiced */
+                practice_status?: "endangered" | "living" | "no_longer_practiced" | "unknown";
                 /** @description Text search */
                 search?: string;
             };
@@ -2421,6 +2621,113 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    v1_crafts_practice_status_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                craft_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PracticeStatusSetRequest"];
+                "multipart/form-data": components["schemas"]["PracticeStatusSetRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PracticeStatusSetRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["CraftDetail"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_crafts_practice_status_proposals_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                craft_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatusProposalCreateRequest"];
+                "multipart/form-data": components["schemas"]["StatusProposalCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["StatusProposalCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["StatusProposal"];
+                        message: string;
+                    };
+                };
+            };
+            /** @description A field is invalid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The email is not verified */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description No craft the user may see */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The user's earlier proposal for this craft is still open */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
             };
         };
     };
@@ -2786,6 +3093,8 @@ export interface operations {
                 culture?: number;
                 /** @description Search only the words as typed, not other names of the items they name */
                 exact?: boolean;
+                /** @description Whether the craft is still practiced */
+                practice_status?: "endangered" | "living" | "no_longer_practiced" | "unknown";
                 /** @description Text search */
                 search?: string;
             };
@@ -2828,6 +3137,8 @@ export interface operations {
                 culture?: number;
                 /** @description Search only the words as typed, not other names of the items they name */
                 exact?: boolean;
+                /** @description Whether the craft is still practiced */
+                practice_status?: "endangered" | "living" | "no_longer_practiced" | "unknown";
                 /** @description Text search */
                 search?: string;
             };
@@ -3519,6 +3830,110 @@ export interface operations {
             };
         };
     };
+    v1_moderation_status_proposals_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                pageSize?: number;
+                /** @description Defaults to all, open proposals first */
+                status?: "all" | "approved" | "open" | "rejected";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["PaginatedStatusProposalReviewList"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_moderation_status_proposals_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proposal_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["StatusProposalReview"];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_moderation_status_proposals_actions_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proposal_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatusProposalActionRequest"];
+                "multipart/form-data": components["schemas"]["StatusProposalActionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["StatusProposalActionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["StatusProposalReview"];
+                        message: string;
+                    };
+                };
+            };
+            /** @description The user is not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The proposal was already reviewed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     v1_moderation_story_reports_list: {
         parameters: {
             query?: {
@@ -3758,6 +4173,8 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 pageSize?: number;
+                /** @description Whether the craft is still practiced */
+                practice_status?: "endangered" | "living" | "no_longer_practiced" | "unknown";
                 /** @description Text search */
                 search?: string;
             };

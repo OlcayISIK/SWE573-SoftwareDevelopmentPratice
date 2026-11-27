@@ -22,6 +22,8 @@ STORIES = "/api/v1/crafts/{id}/stories/"
 REPORT = "/api/v1/crafts/{craft_id}/report/"
 REVIEW = "/api/v1/moderation/reports/{report_id}/actions/"
 PROFILE = "/api/v1/users/{user_id}/"
+PROPOSE = "/api/v1/crafts/{craft_id}/practice-status/proposals/"
+REVIEW_PROPOSAL = "/api/v1/moderation/status-proposals/{proposal_id}/actions/"
 
 # Free-form JSON whose keys differ from craft to craft.
 FREE_FORM = {"attributes"}
@@ -73,6 +75,8 @@ DOCUMENTED = {
     (REPORT, "post"): ["201", "401", "404", "409"],
     (REVIEW, "post"): ["200", "403", "409"],
     (PROFILE, "get"): ["200", "404"],
+    (PROPOSE, "post"): ["201", "400", "401", "403", "404", "409"],
+    (REVIEW_PROPOSAL, "post"): ["200", "403", "409"],
 }
 
 
@@ -266,3 +270,56 @@ def test_the_profile_example_and_its_error(api_client, schema):
     assert_same_shape(documented(schema, PROFILE, "get", 200), profile.json())
     assert profile.json()["data"]["email"] is None
     assert (missing.status_code, missing.json()) == (404, documented(schema, PROFILE, "get", 404))
+
+
+def test_the_practice_status_examples_and_their_errors(api_client, client_for, schema):
+    craft = CraftFactory()
+    url = f"{CRAFTS}{craft.pk}/practice-status/proposals/"
+    body = request_example(schema, PROPOSE)
+    proposer = client_for(UserFactory())
+
+    proposed = proposer.post(url, body, format="json")
+    again = proposer.post(url, body, format="json")
+    no_source = client_for(UserFactory()).post(
+        url, {key: value for key, value in body.items() if key != "source"}, format="json"
+    )
+    guest = api_client.post(url, body, format="json")
+    unverified = client_for(UserFactory(is_email_verified=False)).post(url, body, format="json")
+    unknown = proposer.post(f"{CRAFTS}999999/practice-status/proposals/", body, format="json")
+
+    assert proposed.status_code == 201, proposed.json()
+    assert_same_shape(documented(schema, PROPOSE, "post", 201), proposed.json())
+    for status, response in [
+        (409, again),
+        (400, no_source),
+        (401, guest),
+        (403, unverified),
+        (404, unknown),
+    ]:
+        assert (response.status_code, response.json()) == (
+            status,
+            documented(schema, PROPOSE, "post", status),
+        )
+
+    review_url = f"/api/v1/moderation/status-proposals/{proposed.json()['data']['id']}/actions/"
+    review = request_example(schema, REVIEW_PROPOSAL)
+    admin = client_for(AdminFactory())
+    not_admin = client_for(UserFactory()).post(review_url, review, format="json")
+    reviewed = admin.post(review_url, review, format="json")
+    twice = admin.post(review_url, review, format="json")
+
+    assert reviewed.status_code == 200, reviewed.json()
+    assert_same_shape(documented(schema, REVIEW_PROPOSAL, "post", 200), reviewed.json())
+    data = reviewed.json()["data"]
+    assert (data["status"], data["craft"]["practice_status"]) == (
+        "approved",
+        body["practice_status"],
+    )
+    assert (not_admin.status_code, not_admin.json()) == (
+        403,
+        documented(schema, REVIEW_PROPOSAL, "post", 403),
+    )
+    assert (twice.status_code, twice.json()) == (
+        409,
+        documented(schema, REVIEW_PROPOSAL, "post", 409),
+    )

@@ -238,10 +238,13 @@ def _apply_filters(
     culture=None,
     country=None,
     color=None,
+    practice_status=None,
     search=None,
     exact=False,
     area=None,
 ):
+    if practice_status:
+        crafts = crafts.filter(practice_status=practice_status)
     if category:
         crafts = crafts.filter(category__slug=category)
     if craft_type:
@@ -324,6 +327,10 @@ def craft_facets(viewer=None, **filters):
                 name="main_color",
             ),
             key=lambda item: MAIN_COLORS.index(item["name"]),
+        ),
+        "practice_statuses": sorted(
+            counted(found("practice_status"), name="practice_status"),
+            key=lambda item: Craft.PracticeStatus.values.index(item["name"]),
         ),
     }
 

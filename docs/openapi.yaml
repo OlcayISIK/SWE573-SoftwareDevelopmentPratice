@@ -610,6 +610,16 @@ paths:
         schema:
           type: integer
       - in: query
+        name: practice_status
+        schema:
+          type: string
+          enum:
+          - endangered
+          - living
+          - no_longer_practiced
+          - unknown
+        description: Whether the craft is still practiced
+      - in: query
         name: search
         schema:
           type: string
@@ -678,6 +688,7 @@ paths:
                             ground with red and dark blue motifs, with balls of yarn
                             hanging from the weave'
                         status: published
+                        practice_status: unknown
                         author:
                           id: 4
                           display_name: Sample Contributor (Asia)
@@ -925,6 +936,8 @@ paths:
                           value: 25
                         distinguishing_features: Raised tomato-red under a clear glaze
                       status: published
+                      practice_status: unknown
+                      practice_status_source: ''
                       author:
                         id: 7
                         display_name: Ayşe
@@ -1071,6 +1084,197 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/crafts/{craft_id}/practice-status/:
+    post:
+      operationId: v1_crafts_practice_status_create
+      description: Sets whether the craft is still practiced, with a source and the
+        reason. Admins only.
+      parameters:
+      - in: path
+        name: craft_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PracticeStatusSetRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PracticeStatusSetRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PracticeStatusSetRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/CraftDetail'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/crafts/{craft_id}/practice-status/proposals/:
+    post:
+      operationId: v1_crafts_practice_status_proposals_create
+      description: |-
+        Proposes whether the craft is still practiced, with the source it is based on. Admins
+        review the proposal; a user has one open proposal per craft.
+      parameters:
+      - in: path
+        name: craft_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusProposalCreateRequest'
+            examples:
+              ProposeAPracticeStatus:
+                value:
+                  practice_status: endangered
+                  source: 'UNESCO List of Intangible Cultural Heritage in Need of
+                    Urgent Safeguarding: https://ich.unesco.org/en/lists'
+                  note: Only a few workshops still weave in the traditional way.
+                summary: Propose that a craft is endangered, with the source it is
+                  based on
+                description: '`practice_status` is `living`, `endangered`, or `no_longer_practiced`.
+                  The source is required; the note is optional.'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatusProposalCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatusProposalCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StatusProposal'
+                  message:
+                    type: string
+              examples:
+                OpenProposal:
+                  value:
+                    success: true
+                    data:
+                      id: 4
+                      craft: 33
+                      practice_status: endangered
+                      source: 'UNESCO List of Intangible Cultural Heritage in Need
+                        of Urgent Safeguarding: https://ich.unesco.org/en/lists'
+                      note: Only a few workshops still weave in the traditional way.
+                      status: open
+                      created_at: '2026-12-02T09:14:27.380115Z'
+                    message: OK
+                  summary: Open proposal
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                NoSource:
+                  value:
+                    success: false
+                    data: null
+                    message: Validation failed.
+                    errors:
+                      source:
+                      - Give the source the practice status is based on.
+                  summary: A proposal needs a source
+          description: A field is invalid
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                NotSignedIn:
+                  value:
+                    success: false
+                    data: null
+                    message: Authentication credentials were not provided.
+                    errors: {}
+                  summary: Authentication credentials were not provided.
+          description: Not signed in
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                EmailNotVerified:
+                  value:
+                    success: false
+                    data: null
+                    message: Verify your email address before proposing a practice
+                      status.
+                    errors: {}
+                  summary: Verify your email address before proposing a practice status.
+          description: The email is not verified
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                Unknown,Hidden,OrRemovedCraft:
+                  value:
+                    success: false
+                    data: null
+                    message: Craft not found.
+                    errors: {}
+                  summary: Craft not found.
+          description: No craft the user may see
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                AlreadyProposed:
+                  value:
+                    success: false
+                    data: null
+                    message: You have already proposed a practice status for this
+                      craft. It is under review.
+                    errors: {}
+                  summary: One open proposal per user per craft
+          description: The user's earlier proposal for this craft is still open
   /api/v1/crafts/{craft_id}/report/:
     post:
       operationId: v1_crafts_report_create
@@ -1336,6 +1540,9 @@ paths:
                           unit: cm
                           value: 1
                       status: published
+                      practice_status: living
+                      practice_status_source: 'Kütahya Tile Masters Association: member
+                        workshops in Kütahya, 2025'
                       author:
                         id: 1
                         display_name: Sample Contributor (Anatolia)
@@ -1769,6 +1976,16 @@ paths:
         description: Search only the words as typed, not other names of the items
           they name
       - in: query
+        name: practice_status
+        schema:
+          type: string
+          enum:
+          - endangered
+          - living
+          - no_longer_practiced
+          - unknown
+        description: Whether the craft is still practiced
+      - in: query
         name: search
         schema:
           type: string
@@ -1841,6 +2058,16 @@ paths:
           type: boolean
         description: Search only the words as typed, not other names of the items
           they name
+      - in: query
+        name: practice_status
+        schema:
+          type: string
+          enum:
+          - endangered
+          - living
+          - no_longer_practiced
+          - unknown
+        description: Whether the craft is still practiced
       - in: query
         name: search
         schema:
@@ -2831,6 +3058,200 @@ paths:
                     errors: {}
                   summary: This report has already been reviewed.
           description: The report was already reviewed
+  /api/v1/moderation/status-proposals/:
+    get:
+      operationId: v1_moderation_status_proposals_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - all
+          - approved
+          - open
+          - rejected
+        description: Defaults to all, open proposals first
+      tags:
+      - moderation
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedStatusProposalReviewList'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/moderation/status-proposals/{proposal_id}/:
+    get:
+      operationId: v1_moderation_status_proposals_retrieve
+      parameters:
+      - in: path
+        name: proposal_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StatusProposalReview'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/moderation/status-proposals/{proposal_id}/actions/:
+    post:
+      operationId: v1_moderation_status_proposals_actions_create
+      description: |-
+        Approves the proposal, which sets the craft's practice status and source and notifies
+        the users who favorited the craft, or rejects it. The proposer is notified either way.
+      parameters:
+      - in: path
+        name: proposal_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - moderation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusProposalActionRequest'
+            examples:
+              ApproveAProposal:
+                value:
+                  action: approved
+                  reason: The UNESCO list names this craft as in need of urgent safeguarding.
+                summary: Approve a proposal, which sets the craft's practice status
+                  and source
+                description: '`action` is `approved` or `rejected`. Approving notifies
+                  the users who favorited the craft; the proposer is notified either
+                  way.'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatusProposalActionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatusProposalActionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StatusProposalReview'
+                  message:
+                    type: string
+              examples:
+                ApprovedProposal:
+                  value:
+                    success: true
+                    data:
+                      id: 4
+                      craft:
+                        id: 33
+                        name: Shirvan kilim
+                        status: published
+                        is_deleted: false
+                        practice_status: endangered
+                        practice_status_source: 'UNESCO List of Intangible Cultural
+                          Heritage in Need of Urgent Safeguarding: https://ich.unesco.org/en/lists'
+                      proposer:
+                        id: 9
+                        display_name: Mehmet
+                      practice_status: endangered
+                      source: 'UNESCO List of Intangible Cultural Heritage in Need
+                        of Urgent Safeguarding: https://ich.unesco.org/en/lists'
+                      note: Only a few workshops still weave in the traditional way.
+                      status: approved
+                      created_at: '2026-12-02T09:14:27.380115Z'
+                      reviewed_by:
+                        id: 2
+                        display_name: Moderator
+                      review_reason: The UNESCO list names this craft as in need of
+                        urgent safeguarding.
+                      reviewed_at: '2026-12-02T10:41:03.552871Z'
+                    message: OK
+                  summary: The proposal, approved, with who reviewed it and why
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                NotAnAdmin:
+                  value:
+                    success: false
+                    data: null
+                    message: You do not have permission to perform this action.
+                    errors: {}
+                  summary: You do not have permission to perform this action.
+          description: The user is not an admin
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+              examples:
+                AlreadyReviewed:
+                  value:
+                    success: false
+                    data: null
+                    message: This proposal has already been reviewed.
+                    errors: {}
+                  summary: This proposal has already been reviewed.
+          description: The proposal was already reviewed
   /api/v1/moderation/story-reports/:
     get:
       operationId: v1_moderation_story_reports_list
@@ -3206,6 +3627,16 @@ paths:
         schema:
           type: integer
       - in: query
+        name: practice_status
+        schema:
+          type: string
+          enum:
+          - endangered
+          - living
+          - no_longer_practiced
+          - unknown
+        description: Whether the craft is still practiced
+      - in: query
         name: search
         schema:
           type: string
@@ -3565,12 +3996,40 @@ components:
       type: object
       properties:
         name:
-          $ref: '#/components/schemas/NameEnum'
+          $ref: '#/components/schemas/ColorFacetNameEnum'
         count:
           type: integer
       required:
       - count
       - name
+    ColorFacetNameEnum:
+      enum:
+      - red
+      - orange
+      - yellow
+      - green
+      - turquoise
+      - blue
+      - purple
+      - pink
+      - brown
+      - black
+      - white
+      - grey
+      type: string
+      description: |-
+        * `red` - red
+        * `orange` - orange
+        * `yellow` - yellow
+        * `green` - green
+        * `turquoise` - turquoise
+        * `blue` - blue
+        * `purple` - purple
+        * `pink` - pink
+        * `brown` - brown
+        * `black` - black
+        * `white` - white
+        * `grey` - grey
     CountryFacet:
       type: object
       properties:
@@ -3745,6 +4204,13 @@ components:
           allOf:
           - $ref: '#/components/schemas/CraftStatusEnum'
           readOnly: true
+        practice_status:
+          allOf:
+          - $ref: '#/components/schemas/PracticeStatusEnum'
+          readOnly: true
+        practice_status_source:
+          type: string
+          readOnly: true
         author:
           allOf:
           - $ref: '#/components/schemas/Author'
@@ -3778,6 +4244,8 @@ components:
       - name
       - parts
       - places
+      - practice_status
+      - practice_status_source
       - status
       - story
       - story_count
@@ -3828,6 +4296,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/CraftStatusEnum'
           readOnly: true
+        practice_status:
+          allOf:
+          - $ref: '#/components/schemas/PracticeStatusEnum'
+          readOnly: true
         author:
           allOf:
           - $ref: '#/components/schemas/Author'
@@ -3849,6 +4321,7 @@ components:
       - latitude
       - longitude
       - name
+      - practice_status
       - status
     CraftPart:
       type: object
@@ -4185,12 +4658,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ColorFacet'
+        practice_statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/PracticeStatusFacet'
       required:
       - categories
       - colors
       - countries
       - craft_types
       - cultures
+      - practice_statuses
     FavoriteStatus:
       type: object
       properties:
@@ -4651,34 +5129,6 @@ components:
           minimum: 0
       required:
       - media_type
-    NameEnum:
-      enum:
-      - red
-      - orange
-      - yellow
-      - green
-      - turquoise
-      - blue
-      - purple
-      - pink
-      - brown
-      - black
-      - white
-      - grey
-      type: string
-      description: |-
-        * `red` - red
-        * `orange` - orange
-        * `yellow` - yellow
-        * `green` - green
-        * `turquoise` - turquoise
-        * `blue` - blue
-        * `purple` - purple
-        * `pink` - pink
-        * `brown` - brown
-        * `black` - black
-        * `white` - white
-        * `grey` - grey
     NamedItem:
       type: object
       description: A lookup item as shown on a craft.
@@ -4769,12 +5219,16 @@ components:
       - favorite_updated
       - report_resolved
       - new_story
+      - practice_status_changed
+      - status_proposal_reviewed
       type: string
       description: |-
         * `new_craft_from_followed` - New craft from someone you follow
         * `favorite_updated` - A favorited craft was updated
         * `report_resolved` - Your report was reviewed
         * `new_story` - Someone shared a story about your craft
+        * `practice_status_changed` - A favorited craft's practice status changed
+        * `status_proposal_reviewed` - Your practice status proposal was reviewed
     OwnProfile:
       type: object
       properties:
@@ -4959,6 +5413,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReportReview'
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 1
+    PaginatedStatusProposalReviewList:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - pageSize
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusProposalReview'
         total:
           type: integer
           example: 1
@@ -5238,6 +5717,84 @@ components:
       - address
       - latitude
       - longitude
+    PracticeStatusEnum:
+      enum:
+      - unknown
+      - living
+      - endangered
+      - no_longer_practiced
+      type: string
+      description: |-
+        * `unknown` - Unknown
+        * `living` - Living
+        * `endangered` - Endangered
+        * `no_longer_practiced` - No longer practiced
+    PracticeStatusFacet:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/PracticeStatusEnum'
+        count:
+          type: integer
+      required:
+      - count
+      - name
+    PracticeStatusSetRequest:
+      type: object
+      properties:
+        practice_status:
+          $ref: '#/components/schemas/PracticeStatusEnum'
+        source:
+          type: string
+          default: ''
+          description: Required unless the status is unknown.
+          maxLength: 500
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+      required:
+      - practice_status
+      - reason
+    ProposedCraft:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        is_deleted:
+          type: boolean
+          readOnly: true
+        practice_status:
+          allOf:
+          - $ref: '#/components/schemas/PracticeStatusEnum'
+          readOnly: true
+        practice_status_source:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - is_deleted
+      - name
+      - practice_status
+      - practice_status_source
+      - status
+    ProposedPracticeStatusEnum:
+      enum:
+      - living
+      - endangered
+      - no_longer_practiced
+      type: string
+      description: |-
+        * `living` - Living
+        * `endangered` - Endangered
+        * `no_longer_practiced` - No longer practiced
     PublicProfile:
       type: object
       properties:
@@ -5610,6 +6167,153 @@ components:
       required:
       - related
       - word
+    StatusProposal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        craft:
+          type: integer
+          readOnly: true
+        practice_status:
+          allOf:
+          - $ref: '#/components/schemas/PracticeStatusEnum'
+          readOnly: true
+        source:
+          type: string
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusProposalStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - craft
+      - created_at
+      - id
+      - note
+      - practice_status
+      - source
+      - status
+    StatusProposalActionEnum:
+      enum:
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `approved` - Approve
+        * `rejected` - Reject
+    StatusProposalActionRequest:
+      type: object
+      properties:
+        action:
+          allOf:
+          - $ref: '#/components/schemas/StatusProposalActionEnum'
+          description: |-
+            approved sets the craft's practice status and source; rejected leaves them.
+
+            * `approved` - Approve
+            * `rejected` - Reject
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+      required:
+      - action
+      - reason
+    StatusProposalCreateRequest:
+      type: object
+      properties:
+        practice_status:
+          $ref: '#/components/schemas/ProposedPracticeStatusEnum'
+        source:
+          type: string
+          minLength: 1
+          description: 'What the status is based on: a citation or a link, such as
+            the UNESCO List of Intangible Cultural Heritage in Need of Urgent Safeguarding.'
+          maxLength: 500
+        note:
+          type: string
+          default: ''
+          maxLength: 1000
+      required:
+      - practice_status
+      - source
+    StatusProposalReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        craft:
+          allOf:
+          - $ref: '#/components/schemas/ProposedCraft'
+          readOnly: true
+        proposer:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+        practice_status:
+          allOf:
+          - $ref: '#/components/schemas/PracticeStatusEnum'
+          readOnly: true
+        source:
+          type: string
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusProposalStatusEnum'
+          readOnly: true
+          default: open
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        reviewed_by:
+          allOf:
+          - $ref: '#/components/schemas/Person'
+          readOnly: true
+          nullable: true
+        review_reason:
+          type: string
+          readOnly: true
+        reviewed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - craft
+      - created_at
+      - id
+      - note
+      - practice_status
+      - proposer
+      - review_reason
+      - reviewed_at
+      - reviewed_by
+      - source
+      - status
+    StatusProposalStatusEnum:
+      enum:
+      - open
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `open` - Open
+        * `approved` - Approved
+        * `rejected` - Rejected
     Story:
       type: object
       properties:

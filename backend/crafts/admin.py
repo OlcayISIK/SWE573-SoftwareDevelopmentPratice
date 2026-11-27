@@ -15,6 +15,7 @@ from .models import (
     CraftType,
     Culture,
     Material,
+    PracticeStatusChange,
     Tool,
 )
 
@@ -78,6 +79,19 @@ class WikidataLinkFilter(admin.SimpleListFilter):
 WIKIDATA_COLUMNS = ["wikidata_link", "other_names_shown"]
 # Enough names to see at a glance whether the link is the item meant.
 NAMES_SHOWN = 6
+
+
+class PracticeStatusChangeInline(admin.TabularInline):
+    """The record of practice status changes; the status is set in the app."""
+
+    model = PracticeStatusChange
+    extra = 0
+    can_delete = False
+    fields = ["old_status", "new_status", "source", "reason", "changed_by", "created_at"]
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 class LookupItemAdmin(admin.ModelAdmin):
@@ -225,12 +239,19 @@ class CultureAdmin(LookupItemAdmin):
 @admin.register(Craft)
 class CraftAdmin(admin.ModelAdmin):
     list_display = ["name", "author", "category", "craft_type", "culture", "country", "status"]
-    list_filter = ["status", "is_deleted", "category", "culture", "country"]
+    list_filter = ["status", "practice_status", "is_deleted", "category", "culture", "country"]
     search_fields = ["name", "craft_type__name", "address", "author__email"]
     raw_id_fields = ["author"]
     filter_horizontal = ["tools", "materials"]
-    readonly_fields = ["created_at", "updated_at"]
-    inlines = [CraftPlaceInline, CraftPartInline, CraftColorInline, CraftMediaInline]
+    # Changed in the app, so every change is recorded with its source and reason.
+    readonly_fields = ["practice_status", "practice_status_source", "created_at", "updated_at"]
+    inlines = [
+        CraftPlaceInline,
+        CraftPartInline,
+        CraftColorInline,
+        CraftMediaInline,
+        PracticeStatusChangeInline,
+    ]
 
     def get_queryset(self, request):
         return Craft.all_objects.select_related("author", "category", "craft_type", "culture")

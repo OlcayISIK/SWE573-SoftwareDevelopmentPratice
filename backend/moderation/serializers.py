@@ -1,6 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from crafts.models import MAX_SOURCE_LENGTH, Craft
 from crafts.serializers import WikidataIdField, clean_description, clean_lookup_name
 
 from .models import (
@@ -8,6 +9,7 @@ from .models import (
     ItemReviewAction,
     Report,
     ReviewAction,
+    StatusProposal,
     StoryReport,
     StoryReviewAction,
 )
@@ -248,3 +250,97 @@ class StoryReportReviewSerializer(serializers.ModelSerializer):
 class StoryReviewActionCreateSerializer(serializers.Serializer):
     action = serializers.ChoiceField(choices=StoryReviewAction.Action.choices)
     reason = serializers.CharField(max_length=1000)
+
+
+# A status someone can propose; unknown is the absence of one.
+PROPOSABLE_STATUSES = [
+    choice for choice in Craft.PracticeStatus.choices if choice[0] != Craft.PracticeStatus.UNKNOWN
+]
+NO_SOURCE = "Give the source the practice status is based on."
+# An admin approves or rejects a proposal.
+PROPOSAL_ACTIONS = [
+    (StatusProposal.Status.APPROVED.value, "Approve"),
+    (StatusProposal.Status.REJECTED.value, "Reject"),
+]
+
+
+class StatusProposalCreateSerializer(serializers.Serializer):
+    practice_status = serializers.ChoiceField(choices=PROPOSABLE_STATUSES)
+    source = serializers.CharField(
+        max_length=MAX_SOURCE_LENGTH,
+        help_text=(
+            "What the status is based on: a citation or a link, such as the UNESCO List of "
+            "Intangible Cultural Heritage in Need of Urgent Safeguarding."
+        ),
+        error_messages={"blank": NO_SOURCE, "required": NO_SOURCE},
+    )
+    note = serializers.CharField(max_length=1000, required=False, allow_blank=True, default="")
+
+
+class StatusProposalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StatusProposal
+        fields = ["id", "craft", "practice_status", "source", "note", "status", "created_at"]
+        read_only_fields = fields
+
+
+class ProposedCraftSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    status = serializers.CharField(read_only=True)
+    is_deleted = serializers.BooleanField(read_only=True)
+    practice_status = serializers.ChoiceField(choices=Craft.PracticeStatus.choices, read_only=True)
+    practice_status_source = serializers.CharField(read_only=True)
+
+
+class StatusProposalReviewSerializer(serializers.ModelSerializer):
+    craft = ProposedCraftSerializer(read_only=True)
+    proposer = PersonSerializer(read_only=True)
+    reviewed_by = PersonSerializer(read_only=True, allow_null=True)
+
+    class Meta:
+        model = StatusProposal
+        fields = [
+            "id",
+            "craft",
+            "proposer",
+            "practice_status",
+            "source",
+            "note",
+            "status",
+            "created_at",
+            "reviewed_by",
+            "review_reason",
+            "reviewed_at",
+        ]
+        read_only_fields = fields
+
+
+class StatusProposalQueueFilterSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=[*StatusProposal.Status.values, "all"], default="all")
+
+
+class StatusProposalActionSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(
+        choices=PROPOSAL_ACTIONS,
+        help_text="approved sets the craft's practice status and source; rejected leaves them.",
+    )
+    reason = serializers.CharField(max_length=1000)
+
+
+class PracticeStatusSetSerializer(serializers.Serializer):
+    practice_status = serializers.ChoiceField(choices=Craft.PracticeStatus.choices)
+    source = serializers.CharField(
+        max_length=MAX_SOURCE_LENGTH,
+        required=False,
+        allow_blank=True,
+        default="",
+        help_text="Required unless the status is unknown.",
+    )
+    reason = serializers.CharField(max_length=1000)
+
+    def validate(self, data):
+        data["source"] = data["source"].strip()
+        if data["practice_status"] != Craft.PracticeStatus.UNKNOWN and not data["source"]:
+            raise serializers.ValidationError({"source": [NO_SOURCE]})
+        return data

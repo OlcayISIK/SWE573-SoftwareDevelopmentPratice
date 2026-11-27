@@ -138,6 +138,7 @@ REST_FRAMEWORK = {
         "token_refresh": "30/min",
         "password_reset": "5/hour",
         "report": "20/hour",
+        "status_proposal": "10/hour",
         "lookup_add": "30/hour",
         "geocode": "30/min",
         "wikidata": "30/min",
@@ -196,6 +197,10 @@ SPECTACULAR_SETTINGS = {
         "ActionEnum": "moderation.models.ReviewAction.Action",
         "ItemReviewActionEnum": "moderation.models.ItemReviewAction.Action",
         "StoryReviewActionEnum": "moderation.models.StoryReviewAction.Action",
+        "PracticeStatusEnum": "crafts.models.Craft.PracticeStatus",
+        "ProposedPracticeStatusEnum": "moderation.serializers.PROPOSABLE_STATUSES",
+        "StatusProposalStatusEnum": "moderation.models.StatusProposal.Status",
+        "StatusProposalActionEnum": "moderation.serializers.PROPOSAL_ACTIONS",
     },
 }
 
