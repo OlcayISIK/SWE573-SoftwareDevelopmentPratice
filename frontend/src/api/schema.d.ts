@@ -367,6 +367,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/crafts/search-terms/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description What each search word also finds besides crafts that contain it: categories, craft
+         *     types, tools, materials, and cultures it names in another language or other words,
+         *     and their narrower kinds. A search page shows these as "Also matching".
+         */
+        get: operations["v1_crafts_search_terms_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/cultures/": {
         parameters: {
             query?: never;
@@ -817,6 +838,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/wikidata/search/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Finds Wikidata items by name, so a user adding a category, craft type, tool, material, or
+         *     culture can say which one they mean. Returns 503 when Wikidata cannot be reached.
+         */
+        get: operations["v1_wikidata_search_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -838,22 +879,30 @@ export interface components {
         AddCategoryRequest: {
             name: string;
             description?: string;
+            /** @description The Wikidata item the user picked for the new item, from /wikidata/search/. Its names in English and Turkish let searches find the item. */
+            wikidata_id?: string;
             /** @default sparkles */
             icon: components["schemas"]["IconEnum"];
         };
         AddCraftTypeRequest: {
             name: string;
             description?: string;
+            /** @description The Wikidata item the user picked for the new item, from /wikidata/search/. Its names in English and Turkish let searches find the item. */
+            wikidata_id?: string;
             category: number;
         };
         AddCultureRequest: {
             name: string;
             description?: string;
+            /** @description The Wikidata item the user picked for the new item, from /wikidata/search/. Its names in English and Turkish let searches find the item. */
+            wikidata_id?: string;
             homeland?: string;
         };
         AddLinkedItemRequest: {
             name: string;
             description?: string;
+            /** @description The Wikidata item the user picked for the new item, from /wikidata/search/. Its names in English and Turkish let searches find the item. */
+            wikidata_id?: string;
             /** @description Craft type the item is typical for. */
             craft_type?: number;
         };
@@ -900,7 +949,7 @@ export interface components {
          *     negative, and there is no year 0.
          */
         CraftDate: {
-            kind: components["schemas"]["KindEnum"];
+            kind: components["schemas"]["CraftDateKindEnum"];
             year?: number | null;
             /** Format: date */
             day?: string | null;
@@ -908,12 +957,19 @@ export interface components {
             circa: boolean;
         };
         /**
+         * @description * `unknown` - Unknown
+         *     * `year` - Year
+         *     * `day` - Exact date
+         * @enum {string}
+         */
+        CraftDateKindEnum: "unknown" | "year" | "day";
+        /**
          * @description When the craft was made: {"kind": "unknown"}, {"kind": "year", "year": -500, "circa": true}
          *     for about 500 BC, or {"kind": "day", "day": "1923-03-12"}. Years before the common era are
          *     negative, and there is no year 0.
          */
         CraftDateRequest: {
-            kind: components["schemas"]["KindEnum"];
+            kind: components["schemas"]["CraftDateKindEnum"];
             year?: number | null;
             /** Format: date */
             day?: string | null;
@@ -1205,6 +1261,10 @@ export interface components {
             description?: string;
             /** @description Id of the item of the same kind to merge into. Required to merge. */
             merge_into?: number;
+            /** @description The Wikidata item to link, such as Q163446; empty removes the link. */
+            wikidata_id?: string;
+            /** @description Other names searches find the item by, such as "rug" for Carpet. */
+            other_names?: string[];
         };
         /**
          * @description * `edit` - Edit
@@ -1223,13 +1283,6 @@ export interface components {
          * @enum {string}
          */
         ItemTypeEnum: "category" | "craft_type" | "tool" | "material" | "culture";
-        /**
-         * @description * `unknown` - Unknown
-         *     * `year` - Year
-         *     * `day` - Exact date
-         * @enum {string}
-         */
-        KindEnum: "unknown" | "year" | "day";
         LoginRequest: {
             email: string;
             password: string;
@@ -1541,6 +1594,22 @@ export interface components {
             password: string;
             display_name?: string;
         };
+        RelatedItem: {
+            kind: components["schemas"]["RelatedItemKindEnum"];
+            id: number;
+            name: string;
+            /** @description A few of its other names, such as its Turkish name. */
+            names: string[];
+        };
+        /**
+         * @description * `category` - category
+         *     * `craft_type` - craft_type
+         *     * `tool` - tool
+         *     * `material` - material
+         *     * `culture` - culture
+         * @enum {string}
+         */
+        RelatedItemKindEnum: "category" | "craft_type" | "tool" | "material" | "culture";
         Report: {
             readonly id: number;
             readonly craft: number;
@@ -1587,6 +1656,12 @@ export interface components {
             readonly is_hidden: boolean;
             readonly added_by: components["schemas"]["Person"] | null;
             readonly crafts_count: number;
+            /** @description The linked Wikidata item, or empty. */
+            readonly wikidata_id: string;
+            /** @description Names from the linked Wikidata item, in English and Turkish. */
+            readonly wikidata_names: string[];
+            /** @description Names admins added. */
+            readonly other_names: string[];
         };
         ReportedStory: {
             readonly id: number;
@@ -1618,6 +1693,11 @@ export interface components {
          * @enum {string}
          */
         RoleEnum: "user" | "admin";
+        SearchTerm: {
+            word: string;
+            /** @description Items the word also finds: by another name, in another language, or as a narrower kind of an item it names. */
+            related: components["schemas"]["RelatedItem"][];
+        };
         Story: {
             readonly id: number;
             readonly text: string;
@@ -1721,6 +1801,12 @@ export interface components {
         VerifyEmailRequest: {
             uid: string;
             token: string;
+        };
+        WikidataItem: {
+            /** @description The Wikidata item id, such as Q163446. */
+            id: string;
+            label: string;
+            description: string;
         };
     };
     responses: never;
@@ -2145,6 +2231,8 @@ export interface operations {
                 craft_type?: number;
                 /** @description Culture id */
                 culture?: number;
+                /** @description Search only the words as typed, not other names of the items they name */
+                exact?: boolean;
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -2679,6 +2767,8 @@ export interface operations {
                 craft_type?: number;
                 /** @description Culture id */
                 culture?: number;
+                /** @description Search only the words as typed, not other names of the items they name */
+                exact?: boolean;
                 /** @description Text search */
                 search?: string;
             };
@@ -2719,6 +2809,8 @@ export interface operations {
                 craft_type?: number;
                 /** @description Culture id */
                 culture?: number;
+                /** @description Search only the words as typed, not other names of the items they name */
+                exact?: boolean;
                 /** @description Text search */
                 search?: string;
             };
@@ -2736,6 +2828,32 @@ export interface operations {
                     "application/json": {
                         success: boolean;
                         data: components["schemas"]["CraftPin"][];
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    v1_crafts_search_terms_list: {
+        parameters: {
+            query?: {
+                /** @description Text search */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["SearchTerm"][];
                         message: string;
                     };
                 };
@@ -3589,6 +3707,8 @@ export interface operations {
                 craft_type?: number;
                 /** @description Culture id */
                 culture?: number;
+                /** @description Search only the words as typed, not other names of the items they name */
+                exact?: boolean;
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
@@ -3697,6 +3817,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    v1_wikidata_search_list: {
+        parameters: {
+            query: {
+                /** @description The name to look up. */
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                        data: components["schemas"]["WikidataItem"][];
+                        message: string;
+                    };
+                };
             };
         };
     };

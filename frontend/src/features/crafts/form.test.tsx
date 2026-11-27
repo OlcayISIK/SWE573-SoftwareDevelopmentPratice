@@ -344,6 +344,64 @@ test("tools and materials have an add link like the other lists", async () => {
   ]);
 });
 
+test("a new item can be linked to the Wikidata item the user means", async () => {
+  server.use(...signedIn());
+  const bodies: unknown[] = [];
+  const lookups: string[] = [];
+  server.use(
+    http.get(`${API}/wikidata/search/`, ({ request }) => {
+      lookups.push(new URL(request.url).searchParams.get("q")!);
+      return ok([
+        { id: "Q106118708", label: "Kilim", description: "family name" },
+        { id: "Q585358", label: "kilim", description: "flat tapestry-woven carpet or rug" },
+      ]);
+    }),
+    http.post(`${API}/materials/`, async ({ request }) => {
+      bodies.push(await request.json());
+      return ok(
+        { id: 96, name: "Kilim yarn", typical: false, user_added: true, added_by_me: true },
+        { status: 201 },
+      );
+    }),
+  );
+  renderRoute("/crafts/new");
+  await formReady();
+
+  const materials = screen.getByRole("group", { name: "Materials (optional)" });
+  await userEvent.click(within(materials).getByRole("button", { name: "Add a new material" }));
+  await userEvent.type(within(materials).getByLabelText("New material"), "Kilim");
+  const which = await within(materials).findByRole("group", { name: /Which one is it/ });
+  expect(within(which).getByRole("radio", { name: "None of these" })).toBeChecked();
+  expect(within(which).getByRole("link", { name: /Q585358 on Wikidata/ })).toHaveAttribute(
+    "href",
+    "https://www.wikidata.org/wiki/Q585358",
+  );
+  await userEvent.click(within(which).getByRole("radio", { name: /flat tapestry-woven/ }));
+  await userEvent.click(within(materials).getByRole("button", { name: "Add material" }));
+
+  await waitFor(() =>
+    expect(bodies).toEqual([{ name: "Kilim", description: "", wikidata_id: "Q585358" }]),
+  );
+  // The name is looked up once the user stops typing, not for every letter.
+  expect(lookups).toEqual(["Kilim"]);
+});
+
+test("an item is added without a link when Wikidata cannot be reached", async () => {
+  server.use(
+    ...signedIn(),
+    http.get(`${API}/wikidata/search/`, () => fail(503, "Wikidata is not available.")),
+  );
+  renderRoute("/crafts/new");
+  await formReady();
+
+  await userEvent.click(screen.getByRole("button", { name: "Add a new culture" }));
+  await userEvent.type(screen.getByLabelText("New culture"), "Yörük");
+
+  expect(
+    await screen.findByText("Wikidata could not be reached, so it will be added without a link."),
+  ).toBeInTheDocument();
+});
+
 test("the lists show each option's description", async () => {
   server.use(...signedIn());
   renderRoute("/crafts/new");

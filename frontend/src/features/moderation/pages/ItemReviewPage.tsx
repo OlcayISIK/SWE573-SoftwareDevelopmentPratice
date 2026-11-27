@@ -10,6 +10,8 @@ import { TextAreaField } from "@/components/form/TextAreaField";
 import { TextField } from "@/components/form/TextField";
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { PageLoader } from "@/components/PageLoader";
+import { WikidataPicker } from "@/features/crafts/form/WikidataPicker";
+import { wikidataUrl } from "@/features/crafts/wikidata";
 import { toast } from "@/lib/toast";
 
 import {
@@ -27,22 +29,44 @@ const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyl
 
 const crafts = (count: number) => `${count} craft${count === 1 ? "" : "s"}`;
 
+/** Other names typed one per line or separated by commas, each once. */
+function parseNames(text: string) {
+  const names = text
+    .split(/[\n,]/)
+    .map((name) => name.trim().replace(/\s+/g, " "))
+    .filter(Boolean);
+  return names.filter(
+    (name, index) =>
+      names.findIndex((other) => other.toLowerCase() === name.toLowerCase()) === index,
+  );
+}
+
+const sameNames = (a: string[], b: string[]) => a.join("\n") === b.join("\n");
+
 /** What an action changed, as recorded in the review history. */
 function changeSummary(details: unknown) {
   const {
     name,
     description,
     merged_into_name: mergedInto,
+    wikidata_id: wikidataId,
+    other_names: otherNames,
   } = (details ?? {}) as {
     name?: string;
     description?: string;
     merged_into_name?: string;
+    wikidata_id?: string;
+    other_names?: string[];
   };
   if (mergedInto) return `Merged into “${mergedInto}”.`;
   const changes = [
     name && `Renamed to “${name}”.`,
     description !== undefined &&
       (description ? `Description set to “${description}”.` : "Description removed."),
+    wikidataId !== undefined &&
+      (wikidataId ? `Linked to Wikidata ${wikidataId}.` : "Wikidata link removed."),
+    otherNames !== undefined &&
+      (otherNames.length ? `Other names set to ${otherNames.join(", ")}.` : "Other names removed."),
   ].filter(Boolean);
   return changes.length ? changes.join(" ") : null;
 }
@@ -54,10 +78,16 @@ function ReviewForm({ report }: { report: ItemReportReview }) {
   const [action, setAction] = useState<ItemActionType | null>(null);
   const [name, setName] = useState(item?.name ?? "");
   const [description, setDescription] = useState(item?.description ?? "");
+  const [wikidataId, setWikidataId] = useState(item?.wikidata_id ?? "");
+  const [wikidataSearch, setWikidataSearch] = useState(item?.name ?? "");
+  const [otherNames, setOtherNames] = useState((item?.other_names ?? []).join("\n"));
   // Only the fields the admin changed are sent.
+  const names = parseNames(otherNames);
   const edits = {
     ...(name.trim() !== item?.name ? { name: name.trim() } : {}),
     ...(description.trim() !== item?.description ? { description: description.trim() } : {}),
+    ...(wikidataId.trim() !== (item?.wikidata_id ?? "") ? { wikidata_id: wikidataId.trim() } : {}),
+    ...(!sameNames(names, item?.other_names ?? []) ? { other_names: names } : {}),
   };
   const [mergeInto, setMergeInto] = useState("");
   const [reason, setReason] = useState("");
@@ -101,7 +131,7 @@ function ReviewForm({ report }: { report: ItemReportReview }) {
         if (!action) return setError("Choose an action.");
         if (action === "edit" && name.trim().length < 2) return setError("Enter the name.");
         if (action === "edit" && Object.keys(edits).length === 0) {
-          return setError("Change the name or the description.");
+          return setError("Change the name, description, Wikidata link, or other names.");
         }
         if (action === "merge" && !target) return setError("Choose the item to merge into.");
         if (!reason.trim()) return setError("Explain the reason for this decision.");
@@ -142,6 +172,37 @@ function ReviewForm({ report }: { report: ItemReportReview }) {
             value={description}
             onChange={(event) => setDescription(event.target.value)}
           />
+          <TextAreaField
+            label="Other names"
+            hint="One per line, such as rug for Carpet. Searches find the item by these names too."
+            rows={3}
+            value={otherNames}
+            onChange={(event) => setOtherNames(event.target.value)}
+          />
+          <fieldset className="space-y-3 rounded bg-brand-50 p-3">
+            <legend className="font-medium">Wikidata link</legend>
+            <p className="text-sm text-stone-700">
+              Its names in English and Turkish come from the linked Wikidata item.
+            </p>
+            <TextField
+              label="Wikidata item"
+              hint="An id such as Q163446. Leave it empty to remove the link."
+              maxLength={16}
+              value={wikidataId}
+              onChange={(event) => setWikidataId(event.target.value)}
+            />
+            <TextField
+              label="Find on Wikidata"
+              maxLength={80}
+              value={wikidataSearch}
+              onChange={(event) => setWikidataSearch(event.target.value)}
+            />
+            <WikidataPicker
+              name={wikidataSearch}
+              value={wikidataId}
+              onChange={(picked) => picked && setWikidataId(picked)}
+            />
+          </fieldset>
         </>
       )}
       {action === "hide" && (
@@ -235,6 +296,23 @@ export function ItemReviewPage() {
             <dd>{data.item.added_by?.display_name ?? "Unknown"}</dd>
             <dt className="font-medium">Used by</dt>
             <dd>{crafts(data.item.crafts_count)}</dd>
+            <dt className="font-medium">Wikidata</dt>
+            <dd>
+              {data.item.wikidata_id ? (
+                <a
+                  href={wikidataUrl(data.item.wikidata_id)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  {data.item.wikidata_id}
+                </a>
+              ) : (
+                "Not linked"
+              )}
+            </dd>
+            <dt className="font-medium">Other names</dt>
+            <dd>{[...data.item.other_names, ...data.item.wikidata_names].join(", ") || "None"}</dd>
           </>
         )}
         <dt className="font-medium">Reason</dt>

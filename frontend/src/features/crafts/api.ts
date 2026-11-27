@@ -15,7 +15,9 @@ import type {
   Facets,
   Material,
   Place,
+  SearchTerm,
   Tool,
+  WikidataItem,
 } from "./types";
 
 export type NewMedia =
@@ -61,6 +63,9 @@ export const craftsApi = {
   categories: () => api.get<Category[]>("/categories/"),
   facets: ({ page: _page, ...filters }: CraftFilters) =>
     api.get<Facets>("/crafts/facets/", { params: filters }),
+  /** What each search word also finds by other names, for "Also matching". */
+  searchTerms: (search: string) =>
+    api.get<SearchTerm[]>("/crafts/search-terms/", { params: { search } }),
 };
 
 /** Stories other users share about a craft; the craft's author tells theirs in the craft. */
@@ -83,16 +88,48 @@ export const lookupsApi = {
   materials: (craftType?: number) =>
     api.get<Material[]>("/materials/", { params: { craft_type: craftType } }),
   cultures: () => api.get<Culture[]>("/cultures/"),
-  addCategory: (name: string, description = "", icon = "sparkles") =>
-    api.post<Category>("/categories/", { name, description, icon }),
-  addCraftType: (name: string, category: number, description = "") =>
-    api.post<CraftType>("/craft-types/", { name, category, description }),
-  addTool: (name: string, craftType?: number, description = "") =>
-    api.post<Tool>("/tools/", { name, craft_type: craftType, description }),
-  addMaterial: (name: string, craftType?: number, description = "") =>
-    api.post<Material>("/materials/", { name, craft_type: craftType, description }),
-  addCulture: (name: string, homeland: string, description = "") =>
-    api.post<Culture>("/cultures/", { name, homeland, description }),
+  // The Wikidata item the user picked, if any, is linked, so searches find the item by its
+  // other names.
+  addCategory: (name: string, description = "", icon = "sparkles", wikidataId?: string) =>
+    api.post<Category>("/categories/", {
+      name,
+      description,
+      icon,
+      wikidata_id: wikidataId || undefined,
+    }),
+  addCraftType: (name: string, category: number, description = "", wikidataId?: string) =>
+    api.post<CraftType>("/craft-types/", {
+      name,
+      category,
+      description,
+      wikidata_id: wikidataId || undefined,
+    }),
+  addTool: (name: string, craftType?: number, description = "", wikidataId?: string) =>
+    api.post<Tool>("/tools/", {
+      name,
+      craft_type: craftType,
+      description,
+      wikidata_id: wikidataId || undefined,
+    }),
+  addMaterial: (name: string, craftType?: number, description = "", wikidataId?: string) =>
+    api.post<Material>("/materials/", {
+      name,
+      craft_type: craftType,
+      description,
+      wikidata_id: wikidataId || undefined,
+    }),
+  addCulture: (name: string, homeland: string, description = "", wikidataId?: string) =>
+    api.post<Culture>("/cultures/", {
+      name,
+      homeland,
+      description,
+      wikidata_id: wikidataId || undefined,
+    }),
+};
+
+export const wikidataApi = {
+  /** Wikidata items with this name, so a user adding an item can say which one they mean. */
+  search: (name: string) => api.get<WikidataItem[]>("/wikidata/search/", { params: { q: name } }),
 };
 
 export const geocodeApi = {

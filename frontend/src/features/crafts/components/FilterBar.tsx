@@ -9,6 +9,7 @@ import { MAIN_COLORS } from "../mainColors";
 import { useCategories, useCultures, useFacets } from "../queries";
 import type { Category, CraftFilters, Facets } from "../types";
 
+import { AlsoMatching } from "./AlsoMatching";
 import { FacetSelect } from "./FacetSelect";
 
 interface FilterBarProps {
@@ -289,7 +290,8 @@ export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: F
           className="mt-5"
           onSubmit={(event) => {
             event.preventDefault();
-            onChange({ search: search.trim() || undefined });
+            // A new search includes other names again.
+            onChange({ search: search.trim() || undefined, exact: undefined });
           }}
         >
           <label htmlFor={`${id}-search`} className="sr-only">
@@ -357,6 +359,11 @@ export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: F
               </button>
             )}
           </div>
+          <AlsoMatching
+            search={filters.search}
+            exact={Boolean(filters.exact)}
+            onExactChange={(exact) => onChange({ exact: exact || undefined })}
+          />
 
           <div className="mt-4 flex items-center gap-3">
             <fieldset className="min-w-0 flex-1">

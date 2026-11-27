@@ -199,6 +199,15 @@ export const defaultHandlers = [
   ),
   http.get(`${API}/geocode/reverse/`, () => ok(kutahya)),
   http.get(`${API}/crafts/facets/`, () => ok(facets)),
+  http.get(`${API}/crafts/search-terms/`, ({ request }) =>
+    ok(
+      (new URL(request.url).searchParams.get("search") ?? "")
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => ({ word, related: [] })),
+    ),
+  ),
+  http.get(`${API}/wikidata/search/`, () => ok([])),
   http.get(`${API}/crafts/map/`, () => ok([])),
   http.get(`${API}/crafts/`, () => ok(emptyPage())),
   http.get(`${API}/crafts/:id/favorite/`, () => ok({ favorited: false, favorites_count: 0 })),

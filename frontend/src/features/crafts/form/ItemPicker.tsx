@@ -28,7 +28,7 @@ interface ItemPickerProps {
   value: ChosenItem[];
   onChange: (value: ChosenItem[]) => void;
   /** Adds a name that is not in the list yet, and returns the new item. */
-  onCreate: (name: string, description?: string) => Promise<ChosenItem>;
+  onCreate: (name: string, description?: string, wikidataId?: string) => Promise<ChosenItem>;
   /** The chosen craft type, whose typical items are offered first. */
   craftTypeName?: string;
   max: number;
@@ -301,7 +301,9 @@ export function ItemPicker({
       <AddItemInline
         noun={noun}
         disabled={full}
-        onAdd={async (name, _homeland, description) => add(await onCreate(name, description))}
+        onAdd={async (name, _homeland, description, _icon, wikidataId) =>
+          add(await onCreate(name, description, wikidataId))
+        }
       />
 
       {error && (

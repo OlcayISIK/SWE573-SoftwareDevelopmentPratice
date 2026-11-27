@@ -272,6 +272,9 @@ function makeItemReport(overrides: Partial<ItemReportReview> = {}): ItemReportRe
       is_hidden: false,
       added_by: { id: 50, display_name: "Mehmet" },
       crafts_count: 1,
+      wikidata_id: "",
+      wikidata_names: [],
+      other_names: [],
     },
     reporter: { id: 7, display_name: "Ayşe" },
     reason: "duplicate",
@@ -322,7 +325,9 @@ describe("item review", () => {
     renderRoute("/admin/item-reports/8");
 
     expect(await screen.findByText("Mehmet")).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("radio", { name: "Edit the name or description" }));
+    await userEvent.click(
+      screen.getByRole("radio", { name: "Edit the name, description, or other names" }),
+    );
     const name = screen.getByLabelText("Name");
     expect(name).toHaveValue("Rug");
     expect(screen.getByLabelText("Description")).toHaveValue("A rug.");
@@ -336,16 +341,66 @@ describe("item review", () => {
     );
   });
 
+  test("admins link an item to Wikidata and give it other names", async () => {
+    const reviews = serveItemReport(
+      makeItemReport({
+        item: {
+          id: 98,
+          name: "Rug",
+          description: "A rug.",
+          is_hidden: false,
+          added_by: { id: 50, display_name: "Mehmet" },
+          crafts_count: 1,
+          wikidata_id: "",
+          wikidata_names: [],
+          other_names: ["kilim rug"],
+        },
+      }),
+    );
+    server.use(
+      http.get(`${API}/wikidata/search/`, () =>
+        ok([{ id: "Q163446", label: "carpet", description: "textile floor covering" }]),
+      ),
+    );
+    renderRoute("/admin/item-reports/8");
+
+    expect(await screen.findByText("Not linked")).toBeInTheDocument();
+    expect(screen.getByText("kilim rug")).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("radio", { name: "Edit the name, description, or other names" }),
+    );
+    const names = screen.getByLabelText("Other names");
+    expect(names).toHaveValue("kilim rug");
+    await userEvent.type(names, "{enter}halı, Kilim Rug");
+    await userEvent.click(await screen.findByRole("radio", { name: /textile floor covering/ }));
+    expect(screen.getByLabelText("Wikidata item")).toHaveValue("Q163446");
+    await userEvent.type(screen.getByLabelText("Reason"), "Linked.");
+    await userEvent.click(screen.getByRole("button", { name: "Submit review" }));
+
+    await waitFor(() =>
+      expect(reviews).toEqual([
+        {
+          action: "edit",
+          reason: "Linked.",
+          wikidata_id: "Q163446",
+          other_names: ["kilim rug", "halı"],
+        },
+      ]),
+    );
+  });
+
   test("editing the description alone sends the description", async () => {
     const reviews = serveItemReport();
     renderRoute("/admin/item-reports/8");
 
     await userEvent.click(
-      await screen.findByRole("radio", { name: "Edit the name or description" }),
+      await screen.findByRole("radio", { name: "Edit the name, description, or other names" }),
     );
     await userEvent.type(screen.getByLabelText("Reason"), "Unclear.");
     await userEvent.click(screen.getByRole("button", { name: "Submit review" }));
-    expect(await screen.findByText("Change the name or the description.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Change the name, description, Wikidata link, or other names."),
+    ).toBeInTheDocument();
 
     const description = screen.getByLabelText("Description");
     await userEvent.clear(description);

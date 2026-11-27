@@ -6,7 +6,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { craftsApi, lookupsApi, storiesApi, type NewMedia } from "./api";
+import { craftsApi, lookupsApi, storiesApi, wikidataApi, type NewMedia } from "./api";
 import type { CraftFilters } from "./types";
 
 export const craftKeys = {
@@ -21,6 +21,7 @@ export const craftKeys = {
   stories: (id: number) => [...craftKeys.all, "stories", id] as const,
   storyBy: (id: number, author: number) => [...craftKeys.stories(id), "by", author] as const,
   categories: ["reference", "categories"] as const,
+  searchTerms: (search: string) => [...craftKeys.all, "search-terms", search] as const,
 };
 
 export const lookupKeys = {
@@ -30,6 +31,7 @@ export const lookupKeys = {
   tools: (craftType: number | null) => ["reference", "tools", craftType] as const,
   materials: (craftType: number | null) => ["reference", "materials", craftType] as const,
   cultures: ["reference", "cultures"] as const,
+  wikidata: (name: string) => ["wikidata", name.trim().toLowerCase()] as const,
 };
 
 export function useCraftList(filters: CraftFilters) {
@@ -170,6 +172,27 @@ export function useAllCraftTypes(enabled = true) {
     queryFn: () => lookupsApi.craftTypes(),
     enabled,
     staleTime: 5 * 60_000,
+  });
+}
+
+/** What each word of a search also finds by other names, unless the search is exact. */
+export function useSearchTerms(search: string | undefined, exact = false) {
+  return useQuery({
+    queryKey: craftKeys.searchTerms(search ?? ""),
+    queryFn: () => craftsApi.searchTerms(search!),
+    enabled: Boolean(search) && !exact,
+    staleTime: 5 * 60_000,
+  });
+}
+
+/** Wikidata items with a name, for the user adding an item to say which one they mean. */
+export function useWikidataSearch(name: string) {
+  return useQuery({
+    queryKey: lookupKeys.wikidata(name),
+    queryFn: () => wikidataApi.search(name.trim()),
+    enabled: name.trim().length >= 2,
+    staleTime: 60 * 60_000,
+    retry: false,
   });
 }
 

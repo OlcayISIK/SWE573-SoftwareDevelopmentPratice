@@ -5,6 +5,8 @@ import { TextField } from "@/components/form/TextField";
 
 import { CATEGORY_ICONS, type CategoryIcon, DEFAULT_CATEGORY_ICON } from "../categoryStyle";
 
+import { WikidataPicker } from "./WikidataPicker";
+
 interface AddItemInlineProps {
   /** What is added, for example "craft type". */
   noun: string;
@@ -14,7 +16,14 @@ interface AddItemInlineProps {
   withIcon?: boolean;
   disabled?: boolean;
   disabledHint?: string;
-  onAdd: (name: string, homeland: string, description: string, icon: CategoryIcon) => Promise<void>;
+  /** `wikidataId` is the Wikidata item the user picked for it, or "". */
+  onAdd: (
+    name: string,
+    homeland: string,
+    description: string,
+    icon: CategoryIcon,
+    wikidataId: string,
+  ) => Promise<void>;
 }
 
 /**
@@ -34,6 +43,7 @@ export function AddItemInline({
   const [homeland, setHomeland] = useState("");
   const [description, setDescription] = useState("");
   const [icon, setIcon] = useState<CategoryIcon>(DEFAULT_CATEGORY_ICON);
+  const [wikidataId, setWikidataId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const nameInput = useRef<HTMLInputElement>(null);
@@ -65,6 +75,7 @@ export function AddItemInline({
     setHomeland("");
     setDescription("");
     setIcon(DEFAULT_CATEGORY_ICON);
+    setWikidataId("");
     setError(null);
   };
 
@@ -76,7 +87,7 @@ export function AddItemInline({
     setPending(true);
     setError(null);
     try {
-      await onAdd(name.trim(), homeland.trim(), description.trim(), icon);
+      await onAdd(name.trim(), homeland.trim(), description.trim(), icon, wikidataId);
       close();
     } catch (failure) {
       const apiError = toApiError(failure);
@@ -108,6 +119,7 @@ export function AddItemInline({
         onChange={(event) => setName(event.target.value)}
         onKeyDown={submitOnEnter}
       />
+      <WikidataPicker name={name} value={wikidataId} onChange={setWikidataId} />
       {withHomeland && (
         <TextField
           label="Homeland (optional)"
