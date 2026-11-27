@@ -141,6 +141,8 @@ test("publishing a craft with tools, materials, a dimension, a photo and a video
     ],
     description: "Glazed tiles.",
     story: "Made for mosques.",
+    practice_status: "unknown",
+    practice_status_source: "",
     date: { kind: "unknown" },
     colors: ["#1e40af", "#40e0d0"],
     attributes: {

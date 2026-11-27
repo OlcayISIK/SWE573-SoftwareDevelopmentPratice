@@ -15,14 +15,10 @@ export const PRACTICE_STATUS_HINTS: Record<PracticeStatus, string> = {
   no_longer_practiced: "Nobody practices it any more.",
 };
 
-/** The statuses a user can propose; unknown is the absence of one. */
-export const PROPOSABLE_STATUSES: PracticeStatus[] = [
-  "living",
-  "endangered",
-  "no_longer_practiced",
-];
+/** The statuses a source can say; unknown is the absence of one. */
+export const KNOWN_STATUSES: PracticeStatus[] = ["living", "endangered", "no_longer_practiced"];
 
-export const PRACTICE_STATUSES: PracticeStatus[] = ["unknown", ...PROPOSABLE_STATUSES];
+export const PRACTICE_STATUSES: PracticeStatus[] = ["unknown", ...KNOWN_STATUSES];
 
 export function isPracticeStatus(value: string | null | undefined): value is PracticeStatus {
   return PRACTICE_STATUSES.includes(value as PracticeStatus);

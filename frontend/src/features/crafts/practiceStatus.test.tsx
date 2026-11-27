@@ -39,20 +39,32 @@ describe("on the craft page", () => {
     await expectNoA11yViolations(container);
   });
 
-  test("an unknown status shows no badge, and guests are asked to log in to propose", async () => {
+  test("an unknown status shows no badge, and guests are asked to log in to suggest one", async () => {
     serveCraft(makeCraftDetail());
     renderRoute("/crafts/1");
 
     const panel = await screen.findByRole("region", { name: "Is it still practiced?" });
     expect(within(panel).getByText(/Not known yet/)).toBeInTheDocument();
     expect(screen.queryByText("Practice status:")).toBeNull();
-    expect(within(panel).getByRole("link", { name: "Log in to propose a status" })).toHaveAttribute(
+    expect(within(panel).getByRole("link", { name: "Log in to suggest a status" })).toHaveAttribute(
       "href",
       "/login?next=%2Fcrafts%2F1",
     );
   });
 
-  test("a signed-in user proposes a status with a source and a note", async () => {
+  test("the author changes the status in the edit form, not by reporting it", async () => {
+    server.use(...signedIn(makeUser({ id: 7 })));
+    serveCraft(makeCraftDetail({ practice_status: "living" }));
+    renderRoute("/crafts/1");
+
+    const panel = await screen.findByRole("region", { name: "Is it still practiced?" });
+    expect(
+      await within(panel).findByRole("link", { name: "Change it in the edit form" }),
+    ).toHaveAttribute("href", "/crafts/1/edit");
+    expect(within(panel).queryByRole("button", { name: "Report this status" })).toBeNull();
+  });
+
+  test("another user reports a status they think is wrong", async () => {
     const bodies: unknown[] = [];
     server.use(
       ...signedIn(),
@@ -61,53 +73,86 @@ describe("on the craft page", () => {
         return ok({ id: 4, craft: 1, status: "open" }, { status: 201 });
       }),
     );
-    serveCraft(makeCraftDetail());
-    renderRoute("/crafts/1");
+    serveCraft(
+      makeCraftDetail({ practice_status: "living", author: { id: 50, display_name: "Mehmet" } }),
+    );
+    const { container } = renderRoute("/crafts/1");
 
-    await userEvent.click(await screen.findByRole("button", { name: "Propose a status" }));
-    const dialog = screen.getByRole("dialog", { name: "Propose a practice status" });
-    // Unknown cannot be proposed.
-    expect(within(dialog).queryByRole("radio", { name: /Unknown/ })).toBeNull();
-    await userEvent.click(within(dialog).getByRole("button", { name: "Send proposal" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Report this status" }));
+    const dialog = screen.getByRole("dialog", { name: "Report the practice status" });
+    expect(dialog).toHaveTextContent("is marked as living. What should it be?");
+    // The current status is not offered; unknown means not sure.
+    expect(within(dialog).queryByRole("radio", { name: /^Living/ })).toBeNull();
+    expect(
+      within(dialog).getByRole("radio", { name: /Not sure, but this is wrong/ }),
+    ).toBeInTheDocument();
+    await userEvent.click(within(dialog).getByRole("button", { name: "Send report" }));
     expect(within(dialog).getByText("Choose a status.")).toBeInTheDocument();
     expect(within(dialog).getByLabelText("Source")).toHaveAccessibleDescription(
-      /Give the source the practice status is based on/,
+      /Give a source, or a note/,
     );
     expect(bodies).toEqual([]);
+    await expectNoA11yViolations(container);
 
     await userEvent.click(within(dialog).getByRole("radio", { name: /Endangered/ }));
     await userEvent.type(within(dialog).getByLabelText("Source"), UNESCO);
-    await userEvent.type(within(dialog).getByLabelText("Note (optional)"), "Few workshops left.");
-    await userEvent.click(within(dialog).getByRole("button", { name: "Send proposal" }));
+    await userEvent.type(within(dialog).getByLabelText("Note"), "Few workshops left.");
+    await userEvent.click(within(dialog).getByRole("button", { name: "Send report" }));
 
-    expect(await within(dialog).findByRole("status")).toHaveTextContent(/An admin will check/);
+    expect(await within(dialog).findByRole("status")).toHaveTextContent(
+      /An admin will review your report/,
+    );
     expect(bodies).toEqual([
       { practice_status: "endangered", source: UNESCO, note: "Few workshops left." },
     ]);
   });
 
-  test("a second open proposal is explained", async () => {
+  test("a note is enough when the user is not sure", async () => {
+    const bodies: unknown[] = [];
+    server.use(
+      ...signedIn(),
+      http.post(`${API}/crafts/1/practice-status/proposals/`, async ({ request }) => {
+        bodies.push(await request.json());
+        return ok({ id: 4, craft: 1, status: "open" }, { status: 201 });
+      }),
+    );
+    serveCraft(
+      makeCraftDetail({ practice_status: "living", author: { id: 50, display_name: "Mehmet" } }),
+    );
+    renderRoute("/crafts/1");
+
+    await userEvent.click(await screen.findByRole("button", { name: "Report this status" }));
+    const dialog = screen.getByRole("dialog", { name: "Report the practice status" });
+    await userEvent.click(within(dialog).getByRole("radio", { name: /Not sure/ }));
+    await userEvent.type(within(dialog).getByLabelText("Note"), "The last workshop closed.");
+    await userEvent.click(within(dialog).getByRole("button", { name: "Send report" }));
+
+    await within(dialog).findByRole("status");
+    expect(bodies).toEqual([
+      { practice_status: "unknown", source: "", note: "The last workshop closed." },
+    ]);
+  });
+
+  test("a second open report is explained", async () => {
     server.use(
       ...signedIn(),
       http.post(`${API}/crafts/1/practice-status/proposals/`, () =>
         fail(
           409,
-          "You have already proposed a practice status for this craft. It is under review.",
+          "You have already reported the practice status of this craft. It is under review.",
         ),
       ),
     );
-    serveCraft(makeCraftDetail());
+    serveCraft(makeCraftDetail({ author: { id: 50, display_name: "Mehmet" } }));
     renderRoute("/crafts/1");
 
-    await userEvent.click(await screen.findByRole("button", { name: "Propose a status" }));
-    const dialog = screen.getByRole("dialog", { name: "Propose a practice status" });
+    await userEvent.click(await screen.findByRole("button", { name: "Suggest a status" }));
+    const dialog = screen.getByRole("dialog", { name: "Suggest a practice status" });
     await userEvent.click(within(dialog).getByRole("radio", { name: /Living/ }));
     await userEvent.type(within(dialog).getByLabelText("Source"), "Field visit");
-    await userEvent.click(within(dialog).getByRole("button", { name: "Send proposal" }));
+    await userEvent.click(within(dialog).getByRole("button", { name: "Send report" }));
 
-    expect(await within(dialog).findByRole("alert")).toHaveTextContent(
-      /already proposed a practice status/,
-    );
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent(/already reported/);
   });
 
   test("server errors are shown next to their fields", async () => {
@@ -117,14 +162,14 @@ describe("on the craft page", () => {
         fail(400, "Validation failed.", { source: ["Ensure this field has no more than 500."] }),
       ),
     );
-    serveCraft(makeCraftDetail());
+    serveCraft(makeCraftDetail({ author: { id: 50, display_name: "Mehmet" } }));
     renderRoute("/crafts/1");
 
-    await userEvent.click(await screen.findByRole("button", { name: "Propose a status" }));
-    const dialog = screen.getByRole("dialog", { name: "Propose a practice status" });
+    await userEvent.click(await screen.findByRole("button", { name: "Suggest a status" }));
+    const dialog = screen.getByRole("dialog", { name: "Suggest a practice status" });
     await userEvent.click(within(dialog).getByRole("radio", { name: /Living/ }));
     await userEvent.type(within(dialog).getByLabelText("Source"), "x");
-    await userEvent.click(within(dialog).getByRole("button", { name: "Send proposal" }));
+    await userEvent.click(within(dialog).getByRole("button", { name: "Send report" }));
 
     await waitFor(() =>
       expect(within(dialog).getByLabelText("Source")).toHaveAccessibleDescription(
@@ -241,7 +286,7 @@ function makeProposal(overrides: Partial<StatusProposalReview> = {}): StatusProp
 }
 
 describe("the admin queue", () => {
-  test("admins see proposals and approve one with a reason", async () => {
+  test("admins see reported statuses and accept one with a reason", async () => {
     const reviews: unknown[] = [];
     let proposal = makeProposal();
     server.use(
@@ -262,11 +307,12 @@ describe("the admin queue", () => {
     );
     const { container } = renderRoute("/admin/status-proposals");
 
-    expect(await screen.findByRole("link", { name: "Status proposals" })).toHaveAttribute(
+    expect(await screen.findByRole("link", { name: "Reported statuses" })).toHaveAttribute(
       "aria-current",
       "page",
     );
     const row = (await screen.findByRole("link", { name: "Kütahya Çinisi" })).closest("tr")!;
+    expect(within(row).getByText("Unknown")).toBeInTheDocument();
     expect(within(row).getByText("Endangered")).toBeInTheDocument();
     expect(within(row).getByText("Ayşe")).toBeInTheDocument();
     await expectNoA11yViolations(container);
@@ -276,8 +322,8 @@ describe("the admin queue", () => {
       await screen.findByRole("link", { name: "https://ich.unesco.org/en/lists" }),
     ).toBeVisible();
     await userEvent.click(screen.getByRole("button", { name: "Submit review" }));
-    expect(screen.getByRole("alert")).toHaveTextContent("Choose approve or reject.");
-    await userEvent.click(screen.getByRole("radio", { name: /Approve/ }));
+    expect(screen.getByRole("alert")).toHaveTextContent("Choose accept or reject.");
+    await userEvent.click(screen.getByRole("radio", { name: /Accept/ }));
     await userEvent.type(screen.getByLabelText("Reason"), "On the list.");
     await userEvent.click(screen.getByRole("button", { name: "Submit review" }));
 
@@ -300,7 +346,7 @@ describe("notifications", () => {
     } as AppNotification;
   }
 
-  test("say when a favorite's status changed and when a proposal was reviewed", async () => {
+  test("say when a favorite's status changed and when a report was reviewed", async () => {
     server.use(
       ...signedIn(),
       http.get(`${API}/me/notifications/`, () =>
@@ -340,15 +386,69 @@ describe("notifications", () => {
         (_, element) =>
           element?.tagName === "P" &&
           element.textContent ===
-            "New: Your proposal that Uşak Halısı is living was approved, so it is now marked as living.",
+            "New: Your report on the practice status of Uşak Halısı was accepted, so it is now marked as living.",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
         (_, element) =>
           element?.tagName === "P" &&
-          element.textContent === "New: Your proposal that Uşak Halısı is endangered was rejected.",
+          element.textContent ===
+            "New: Your report on the practice status of Uşak Halısı was reviewed, and the status was kept.",
       ),
     ).toBeInTheDocument();
+  });
+});
+
+describe("in the craft form", () => {
+  test("the author chooses the status, with an optional source, without review", async () => {
+    const patches: Record<string, unknown>[] = [];
+    const craft = makeCraftDetail({ practice_status: "living", practice_status_source: "A visit" });
+    server.use(
+      ...signedIn(makeUser({ id: 7 })),
+      http.get(`${API}/crafts/1/`, () => ok(craft)),
+      http.patch(`${API}/crafts/1/`, async ({ request }) => {
+        patches.push((await request.json()) as Record<string, unknown>);
+        return ok(craft);
+      }),
+    );
+    const { router } = renderRoute("/crafts/1/edit");
+
+    const group = await screen.findByRole("group", { name: "Is it still practiced?" });
+    expect(within(group).getByRole("radio", { name: /Living/ })).toBeChecked();
+    const source = within(group).getByLabelText("Source (optional)");
+    expect(source).toHaveValue("A visit");
+    await userEvent.click(within(group).getByRole("radio", { name: /Endangered/ }));
+    await userEvent.clear(source);
+    await userEvent.type(source, UNESCO);
+    await userEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe("/crafts/1"));
+    expect(patches[0]).toMatchObject({
+      practice_status: "endangered",
+      practice_status_source: UNESCO,
+    });
+  });
+
+  test("an unknown status has no source field and sends no source", async () => {
+    const patches: Record<string, unknown>[] = [];
+    const craft = makeCraftDetail({ practice_status: "living", practice_status_source: "A visit" });
+    server.use(
+      ...signedIn(makeUser({ id: 7 })),
+      http.get(`${API}/crafts/1/`, () => ok(craft)),
+      http.patch(`${API}/crafts/1/`, async ({ request }) => {
+        patches.push((await request.json()) as Record<string, unknown>);
+        return ok(craft);
+      }),
+    );
+    renderRoute("/crafts/1/edit");
+
+    const group = await screen.findByRole("group", { name: "Is it still practiced?" });
+    await userEvent.click(within(group).getByRole("radio", { name: /Unknown/ }));
+    expect(within(group).queryByLabelText("Source (optional)")).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => expect(patches).toHaveLength(1));
+    expect(patches[0]).toMatchObject({ practice_status: "unknown", practice_status_source: "" });
   });
 });

@@ -92,7 +92,7 @@ review_errors = {
 }
 
 
-# Proposing a craft's practice status and reviewing the proposal
+# Reporting a craft's practice status as wrong and reviewing the report
 
 PROPOSAL_REQUEST = {
     "practice_status": "endangered",
@@ -134,51 +134,50 @@ PROPOSAL_REVIEWED = {
 
 propose = [
     OpenApiExample(
-        "Propose a practice status",
-        summary="Propose that a craft is endangered, with the source it is based on",
+        "Report a practice status",
+        summary="Report that a craft is endangered, not living, with the source that says so",
         description=(
-            "`practice_status` is `living`, `endangered`, or `no_longer_practiced`. The source "
-            "is required; the note is optional."
+            "`practice_status` is the status the user thinks is right: `living`, `endangered`, "
+            "`no_longer_practiced`, or `unknown` when they are not sure. A source or a note is "
+            "required. The craft's author changes the status in the craft form instead."
         ),
         value=PROPOSAL_REQUEST,
         request_only=True,
     ),
-    OpenApiExample(
-        "Open proposal", value=PROPOSAL_CREATED, response_only=True, status_codes=["201"]
-    ),
+    OpenApiExample("Open report", value=PROPOSAL_CREATED, response_only=True, status_codes=["201"]),
 ]
 proposal_errors = {
     "no_source": error_example(
-        "No source",
+        "No source or note",
         "Validation failed.",
-        {"source": ["Give the source the practice status is based on."]},
-        summary="A proposal needs a source",
+        {"source": ["Give a source, or a note that says why the status is wrong."]},
+        summary="A report needs a source or a note",
     ),
     "unverified": error_example(
-        "Email not verified", "Verify your email address before proposing a practice status."
+        "Email not verified", "Verify your email address before reporting a practice status."
     ),
     "twice": error_example(
-        "Already proposed",
-        "You have already proposed a practice status for this craft. It is under review.",
-        summary="One open proposal per user per craft",
+        "Already reported",
+        "You have already reported the practice status of this craft. It is under review.",
+        summary="One open report per user per craft",
     ),
-    "reviewed": error_example("Already reviewed", "This proposal has already been reviewed."),
+    "reviewed": error_example("Already reviewed", "This report has already been reviewed."),
 }
 
 review_proposal = [
     OpenApiExample(
-        "Approve a proposal",
-        summary="Approve a proposal, which sets the craft's practice status and source",
+        "Accept a report",
+        summary="Accept a report, which sets the craft's practice status and source",
         description=(
             "`action` is `approved` or `rejected`. Approving notifies the users who favorited "
-            "the craft; the proposer is notified either way."
+            "the craft; the reporter is notified either way."
         ),
         value=PROPOSAL_REVIEW_REQUEST,
         request_only=True,
     ),
     OpenApiExample(
-        "Approved proposal",
-        summary="The proposal, approved, with who reviewed it and why",
+        "Accepted report",
+        summary="The report, approved, with who reviewed it and why",
         value=PROPOSAL_REVIEWED,
         response_only=True,
     ),

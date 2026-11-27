@@ -281,7 +281,7 @@ def test_the_practice_status_examples_and_their_errors(api_client, client_for, s
     proposed = proposer.post(url, body, format="json")
     again = proposer.post(url, body, format="json")
     no_source = client_for(UserFactory()).post(
-        url, {key: value for key, value in body.items() if key != "source"}, format="json"
+        url, {"practice_status": body["practice_status"]}, format="json"
     )
     guest = api_client.post(url, body, format="json")
     unverified = client_for(UserFactory(is_email_verified=False)).post(url, body, format="json")

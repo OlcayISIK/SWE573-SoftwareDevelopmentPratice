@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router";
 
 import { useAuth } from "@/features/auth/context";
 import { PracticeStatusDialog } from "@/features/moderation/components/PracticeStatusDialog";
@@ -9,14 +10,17 @@ import type { CraftDetail } from "../../types";
 import { PracticeStatusBadge, SourceText } from "../PracticeStatusBadge";
 
 /**
- * Whether the craft is still practiced, and the source that says so. Signed-in users can
- * propose a status with a source for admins to review; admins can set it directly.
+ * Whether the craft is still practiced, and the source that says so. The author sets it in the
+ * craft form; other users can report it if they think it is wrong, and admins review the report
+ * or set it directly.
  */
 export function PracticeStatusPanel({ craft }: { craft: CraftDetail }) {
   const auth = useAuth();
-  const [dialog, setDialog] = useState<"propose" | "set" | null>(null);
+  const [dialog, setDialog] = useState<"report" | "set" | null>(null);
   const known = craft.practice_status !== "unknown";
   const isAdmin = auth.status === "authenticated" && auth.user.role === "admin";
+  const isAuthor = auth.status === "authenticated" && auth.user.id === craft.author.id;
+  const reportLabel = known ? "Report this status" : "Suggest a status";
 
   return (
     <section
@@ -41,15 +45,24 @@ export function PracticeStatusPanel({ craft }: { craft: CraftDetail }) {
         </div>
       ) : (
         <p className="mt-2 text-sm text-stone-700">
-          Not known yet. If a reliable source says whether it is living, endangered, or no longer
-          practiced, you can propose it.
+          Not known yet. If you know whether it is living, endangered, or no longer practiced, you
+          can suggest it.
         </p>
       )}
       <div className="mt-4 flex flex-wrap gap-2">
-        {auth.status === "guest" && <SignInPrompt label="Log in to propose a status" />}
-        {auth.status === "authenticated" && !isAdmin && (
-          <button type="button" className="btn-secondary" onClick={() => setDialog("propose")}>
-            Propose a status
+        {auth.status === "guest" && (
+          <SignInPrompt
+            label={known ? "Log in to report this status" : "Log in to suggest a status"}
+          />
+        )}
+        {isAuthor && !isAdmin && (
+          <Link to={`/crafts/${craft.id}/edit`} className="btn-secondary">
+            Change it in the edit form
+          </Link>
+        )}
+        {auth.status === "authenticated" && !isAdmin && !isAuthor && (
+          <button type="button" className="btn-secondary" onClick={() => setDialog("report")}>
+            {reportLabel}
           </button>
         )}
         {isAdmin && (

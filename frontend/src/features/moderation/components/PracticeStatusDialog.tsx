@@ -9,7 +9,6 @@ import {
   PRACTICE_STATUS_HINTS,
   PRACTICE_STATUS_LABELS,
   PRACTICE_STATUSES,
-  PROPOSABLE_STATUSES,
   type PracticeStatus,
 } from "@/features/crafts/practiceStatus";
 import { toast } from "@/lib/toast";
@@ -24,14 +23,16 @@ type Errors = Partial<Record<FieldName, string>>;
 
 interface PracticeStatusDialogProps {
   craft: { id: number; name: string; practice_status: string; practice_status_source: string };
-  /** Users propose a status for admins to review; admins set it directly. */
-  mode: "propose" | "set";
+  /** Users report a status they think is wrong, for admins to review; admins set it directly. */
+  mode: "report" | "set";
   onClose: () => void;
 }
 
+const SOURCE_OR_NOTE = "Give a source, or a note that says why the status is wrong.";
+
 /**
- * Proposes or sets whether a craft is still practiced. A status must be based on a source, so
- * the source is required, except for an admin setting it back to unknown.
+ * Reports or sets whether a craft is still practiced. A report says what the status should be,
+ * with a source or a note; an admin sets it with a source, except back to unknown, and a reason.
  */
 export function PracticeStatusDialog({ craft, mode, onClose }: PracticeStatusDialogProps) {
   const titleId = useId();
@@ -43,7 +44,7 @@ export function PracticeStatusDialog({ craft, mode, onClose }: PracticeStatusDia
     setting ? (craft.practice_status as PracticeStatus) : null,
   );
   const [source, setSource] = useState(setting ? craft.practice_status_source : "");
-  // A note for a proposal, the reason for an admin's change.
+  // A note for a report, the reason for an admin's change.
   const [text, setText] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [alert, setAlert] = useState<string | null>(null);
@@ -63,10 +64,14 @@ export function PracticeStatusDialog({ craft, mode, onClose }: PracticeStatusDia
   const validate = (): Errors => {
     const found: Errors = {};
     if (!status) found.practice_status = "Choose a status.";
-    if (!source.trim() && status !== "unknown") {
-      found.source = "Give the source the practice status is based on.";
+    if (setting) {
+      if (!source.trim() && status !== "unknown") {
+        found.source = "Give the source the practice status is based on.";
+      }
+      if (!text.trim()) found.reason = "Explain the reason for this change.";
+    } else if (!source.trim() && !text.trim()) {
+      found.source = SOURCE_OR_NOTE;
     }
-    if (setting && !text.trim()) found.reason = "Explain the reason for this change.";
     return found;
   };
 
@@ -105,8 +110,20 @@ export function PracticeStatusDialog({ craft, mode, onClose }: PracticeStatusDia
     }
   };
 
-  const choices = setting ? PRACTICE_STATUSES : PROPOSABLE_STATUSES;
-  const title = setting ? "Set the practice status" : "Propose a practice status";
+  const known = craft.practice_status !== "unknown";
+  // A report says what the status should be; "unknown" means not sure, but this is wrong.
+  const choices = setting
+    ? PRACTICE_STATUSES
+    : PRACTICE_STATUSES.filter((value) => value !== craft.practice_status);
+  const label = (value: PracticeStatus) =>
+    !setting && value === "unknown" ? "Not sure, but this is wrong" : PRACTICE_STATUS_LABELS[value];
+  const hint = (value: PracticeStatus) =>
+    !setting && value === "unknown" ? "Use the note to say why." : PRACTICE_STATUS_HINTS[value];
+  const title = setting
+    ? "Set the practice status"
+    : known
+      ? "Report the practice status"
+      : "Suggest a practice status";
 
   return createPortal(
     <div className="fixed inset-0 z-[1600] flex items-center justify-center bg-black/40 p-4">
@@ -119,12 +136,18 @@ export function PracticeStatusDialog({ craft, mode, onClose }: PracticeStatusDia
         <h2 id={titleId} className="text-lg font-semibold">
           {title}
         </h2>
-        <p className="mt-1 text-sm text-stone-600">Is “{craft.name}” still practiced?</p>
+        <p className="mt-1 text-sm text-stone-600">
+          {setting || !known
+            ? `Is “${craft.name}” still practiced?`
+            : `“${craft.name}” is marked as ${PRACTICE_STATUS_LABELS[
+                craft.practice_status as PracticeStatus
+              ].toLowerCase()}. What should it be?`}
+        </p>
         {done ? (
           <>
             <p role="status" className="mt-3 text-stone-700">
-              Thank you. An admin will check the source and review your proposal. You will get a
-              notification when it is reviewed.
+              Thank you. An admin will review your report. You will get a notification when it is
+              reviewed.
             </p>
             <div className="mt-6 flex justify-end">
               <button type="button" className="btn-primary" onClick={onClose}>
@@ -147,7 +170,7 @@ export function PracticeStatusDialog({ craft, mode, onClose }: PracticeStatusDia
               className="space-y-2"
               aria-describedby={errors.practice_status ? `${titleId}-status-error` : undefined}
             >
-              <legend className="font-medium">Status</legend>
+              <legend className="font-medium">{setting ? "Status" : "What should it be?"}</legend>
               {choices.map((value, index) => (
                 <label key={value} className="flex items-start gap-3">
                   <input
@@ -160,10 +183,8 @@ export function PracticeStatusDialog({ craft, mode, onClose }: PracticeStatusDia
                     onChange={() => setStatus(value)}
                   />
                   <span>
-                    {PRACTICE_STATUS_LABELS[value]}
-                    <span className="block text-sm text-stone-600">
-                      {PRACTICE_STATUS_HINTS[value]}
-                    </span>
+                    {label(value)}
+                    <span className="block text-sm text-stone-600">{hint(value)}</span>
                   </span>
                 </label>
               ))}
@@ -174,8 +195,12 @@ export function PracticeStatusDialog({ craft, mode, onClose }: PracticeStatusDia
               )}
             </fieldset>
             <TextAreaField
-              label={setting && status === "unknown" ? "Source (optional)" : "Source"}
-              hint="A citation or a link, such as the UNESCO List of Intangible Cultural Heritage in Need of Urgent Safeguarding."
+              label={setting ? (status === "unknown" ? "Source (optional)" : "Source") : "Source"}
+              hint={
+                setting
+                  ? "A citation or a link, such as the UNESCO List of Intangible Cultural Heritage in Need of Urgent Safeguarding."
+                  : "A citation or a link that shows the right status. Give a source, a note, or both."
+              }
               rows={2}
               maxLength={MAX_SOURCE}
               value={source}
@@ -183,7 +208,7 @@ export function PracticeStatusDialog({ craft, mode, onClose }: PracticeStatusDia
               onChange={(event) => setSource(event.target.value)}
             />
             <TextAreaField
-              label={setting ? "Reason" : "Note (optional)"}
+              label={setting ? "Reason" : "Note"}
               hint={setting ? "Recorded with the change." : undefined}
               rows={3}
               maxLength={MAX_TEXT}
@@ -199,7 +224,7 @@ export function PracticeStatusDialog({ craft, mode, onClose }: PracticeStatusDia
                 pending={setting ? set.isPending : propose.isPending}
                 pendingLabel="Sending…"
               >
-                {setting ? "Save status" : "Send proposal"}
+                {setting ? "Save status" : "Send report"}
               </SubmitButton>
             </div>
           </form>

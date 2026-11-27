@@ -28,7 +28,7 @@ export function AdminLayout() {
             Reported stories
           </NavLink>
           <NavLink to="/admin/status-proposals" className={linkClass}>
-            Status proposals
+            Reported statuses
           </NavLink>
         </nav>
       </div>

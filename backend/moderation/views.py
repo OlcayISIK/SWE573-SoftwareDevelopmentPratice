@@ -293,7 +293,7 @@ class ProposePracticeStatusView(APIView):
             ),
             404: error_response("No craft the user may see", CRAFT_NOT_FOUND),
             409: error_response(
-                "The user's earlier proposal for this craft is still open",
+                "The user's earlier report on this craft's status is still open",
                 examples.proposal_errors["twice"],
             ),
         },
@@ -302,8 +302,9 @@ class ProposePracticeStatusView(APIView):
     )
     def post(self, request, craft_id):
         """
-        Proposes whether the craft is still practiced, with the source it is based on. Admins
-        review the proposal; a user has one open proposal per craft.
+        Reports that the craft's practice status is wrong, with the status the user thinks is
+        right and a source or a note. Admins review the report; a user has one open report per
+        craft. The author changes the status of their own craft in the craft form.
         """
         serializer = StatusProposalCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -340,7 +341,7 @@ class SetPracticeStatusView(APIView):
             "status",
             OpenApiTypes.STR,
             enum=["open", "approved", "rejected", "all"],
-            description="Defaults to all, open proposals first",
+            description="Defaults to all, open reports first",
         )
     ],
 )
@@ -372,7 +373,7 @@ class StatusProposalActionView(APIView):
             200: StatusProposalReviewSerializer,
             403: error_response("The user is not an admin", examples.review_errors["not_admin"]),
             409: error_response(
-                "The proposal was already reviewed", examples.proposal_errors["reviewed"]
+                "The report was already reviewed", examples.proposal_errors["reviewed"]
             ),
         },
         examples=examples.review_proposal,
@@ -380,8 +381,9 @@ class StatusProposalActionView(APIView):
     )
     def post(self, request, proposal_id):
         """
-        Approves the proposal, which sets the craft's practice status and source and notifies
-        the users who favorited the craft, or rejects it. The proposer is notified either way.
+        Approves the report, which sets the craft's practice status and source to the reported
+        ones and notifies the users who favorited the craft, or rejects it. The reporter is
+        notified either way.
         """
         serializer = StatusProposalActionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

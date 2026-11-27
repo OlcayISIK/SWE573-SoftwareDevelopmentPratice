@@ -9,6 +9,7 @@ import {
   type DimensionType,
 } from "../attributes";
 import { parseColor, toStoredColor } from "../colors";
+import type { PracticeStatus } from "../practiceStatus";
 import type { CraftDetail } from "../types";
 
 export const MAX_TOOLS = 20;
@@ -127,6 +128,8 @@ export const craftFormSchema = z.object({
   origin: z.string(),
   description: required("Describe the craft."),
   story: z.string(),
+  practice_status: z.enum(["unknown", "living", "endangered", "no_longer_practiced"]),
+  practice_status_source: z.string().max(500, "Keep the source under 500 characters."),
   colors: z
     .array(color)
     .max(MAX_COLORS, `Add at most ${MAX_COLORS} colors.`)
@@ -235,6 +238,8 @@ export const CRAFT_FORM_FIELDS: readonly Path<CraftFormValues>[] = [
   ...PLACE_FIELDS,
   "description",
   "story",
+  "practice_status",
+  "practice_status_source",
   "date",
   "date.year",
   "date.day",
@@ -263,6 +268,8 @@ export const emptyCraftForm: CraftFormValues = {
   origin: "",
   description: "",
   story: "",
+  practice_status: "unknown",
+  practice_status_source: "",
   date: { kind: "unknown", year: "", era: "ad", circa: false, day: "" },
   colors: [],
   attributes: {
@@ -293,6 +300,8 @@ export interface CraftPayload {
   }[];
   description: string;
   story: string;
+  practice_status: PracticeStatus;
+  practice_status_source: string;
   date:
     | { kind: "unknown" }
     | { kind: "year"; year: number; circa: boolean }
@@ -345,6 +354,10 @@ export function toPayload(values: CraftFormValues): CraftPayload {
     })),
     description: values.description.trim(),
     story: values.story.trim(),
+    practice_status: values.practice_status,
+    // An unknown status has nothing to cite.
+    practice_status_source:
+      values.practice_status === "unknown" ? "" : values.practice_status_source.trim(),
     date: toDatePayload(values.date),
     colors: values.colors.map((row) => toStoredColor(parseColor(row.code)!)),
     attributes: payloadAttributes,
@@ -372,6 +385,8 @@ export function fromCraft(craft: CraftDetail): CraftFormValues {
     origin: String(craft.places.findIndex((row) => row.is_origin)).replace("-1", ""),
     description: craft.description,
     story: craft.story,
+    practice_status: craft.practice_status as PracticeStatus,
+    practice_status_source: craft.practice_status_source,
     date: {
       kind: craft.date.kind,
       year: craft.date.year ? String(Math.abs(craft.date.year)) : "",

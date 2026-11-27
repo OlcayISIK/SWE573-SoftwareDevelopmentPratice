@@ -143,6 +143,6 @@ export const practiceStatusApi = {
 };
 
 export const PROPOSAL_ACTION_LABELS: Record<ProposalAction, string> = {
-  approved: "Approve: set the craft's status and source",
+  approved: "Accept: set the craft's status and source to the reported ones",
   rejected: "Reject: leave the craft as it is",
 };
