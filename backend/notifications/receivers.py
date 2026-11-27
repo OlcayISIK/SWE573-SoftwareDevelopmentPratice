@@ -1,8 +1,8 @@
 from django.dispatch import receiver
 
 from crafts.models import Craft
-from crafts.signals import craft_published, craft_updated, story_shared
-from moderation.signals import report_resolved, story_report_resolved
+from crafts.signals import craft_published, craft_updated, practice_status_changed, story_shared
+from moderation.signals import report_resolved, status_proposal_reviewed, story_report_resolved
 from social.selectors import favoriter_ids, follower_ids
 
 from .models import Notification
@@ -71,5 +71,37 @@ def notify_story_reporter(sender, report, admin, action, **kwargs):
             "subject": "story",
             "action": action,
             "report_status": report.status,
+        },
+    )
+
+
+@receiver(practice_status_changed, dispatch_uid="notify_favoriters_of_practice_status")
+def notify_favoriters_of_practice_status(sender, craft, actor, old_status, new_status, **kwargs):
+    if craft.status != Craft.Status.PUBLISHED or craft.is_deleted:
+        return
+    Notification.objects.bulk_create(
+        Notification(
+            recipient_id=recipient_id,
+            type=Notification.Type.PRACTICE_STATUS_CHANGED,
+            craft=craft,
+            actor=actor,
+            data={"old_status": old_status, "practice_status": new_status},
+        )
+        for recipient_id in favoriter_ids(craft.pk)
+        if recipient_id != actor.pk
+    )
+
+
+@receiver(status_proposal_reviewed, dispatch_uid="notify_proposer")
+def notify_proposer(sender, proposal, admin, **kwargs):
+    Notification.objects.create(
+        recipient_id=proposal.proposer_id,
+        type=Notification.Type.STATUS_PROPOSAL_REVIEWED,
+        craft_id=proposal.craft_id,
+        actor=admin,
+        data={
+            "proposal_id": proposal.pk,
+            "decision": proposal.status,
+            "practice_status": proposal.practice_status,
         },
     )

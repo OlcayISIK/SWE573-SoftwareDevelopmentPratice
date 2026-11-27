@@ -90,3 +90,96 @@ review_errors = {
     ),
     "twice": error_example("Already reviewed", "This report has already been reviewed."),
 }
+
+
+# Proposing a craft's practice status and reviewing the proposal
+
+PROPOSAL_REQUEST = {
+    "practice_status": "endangered",
+    "source": (
+        "UNESCO List of Intangible Cultural Heritage in Need of Urgent Safeguarding: "
+        "https://ich.unesco.org/en/lists"
+    ),
+    "note": "Only a few workshops still weave in the traditional way.",
+}
+PROPOSAL_CREATED = {
+    "id": 4,
+    "craft": 33,
+    **PROPOSAL_REQUEST,
+    "status": "open",
+    "created_at": "2026-12-02T09:14:27.380115Z",
+}
+PROPOSAL_REVIEW_REQUEST = {
+    "action": "approved",
+    "reason": "The UNESCO list names this craft as in need of urgent safeguarding.",
+}
+PROPOSAL_REVIEWED = {
+    "id": 4,
+    "craft": {
+        "id": 33,
+        "name": "Shirvan kilim",
+        "status": "published",
+        "is_deleted": False,
+        "practice_status": "endangered",
+        "practice_status_source": PROPOSAL_REQUEST["source"],
+    },
+    "proposer": {"id": 9, "display_name": "Mehmet"},
+    **PROPOSAL_REQUEST,
+    "status": "approved",
+    "created_at": "2026-12-02T09:14:27.380115Z",
+    "reviewed_by": {"id": 2, "display_name": "Moderator"},
+    "review_reason": PROPOSAL_REVIEW_REQUEST["reason"],
+    "reviewed_at": "2026-12-02T10:41:03.552871Z",
+}
+
+propose = [
+    OpenApiExample(
+        "Propose a practice status",
+        summary="Propose that a craft is endangered, with the source it is based on",
+        description=(
+            "`practice_status` is `living`, `endangered`, or `no_longer_practiced`. The source "
+            "is required; the note is optional."
+        ),
+        value=PROPOSAL_REQUEST,
+        request_only=True,
+    ),
+    OpenApiExample(
+        "Open proposal", value=PROPOSAL_CREATED, response_only=True, status_codes=["201"]
+    ),
+]
+proposal_errors = {
+    "no_source": error_example(
+        "No source",
+        "Validation failed.",
+        {"source": ["Give the source the practice status is based on."]},
+        summary="A proposal needs a source",
+    ),
+    "unverified": error_example(
+        "Email not verified", "Verify your email address before proposing a practice status."
+    ),
+    "twice": error_example(
+        "Already proposed",
+        "You have already proposed a practice status for this craft. It is under review.",
+        summary="One open proposal per user per craft",
+    ),
+    "reviewed": error_example("Already reviewed", "This proposal has already been reviewed."),
+}
+
+review_proposal = [
+    OpenApiExample(
+        "Approve a proposal",
+        summary="Approve a proposal, which sets the craft's practice status and source",
+        description=(
+            "`action` is `approved` or `rejected`. Approving notifies the users who favorited "
+            "the craft; the proposer is notified either way."
+        ),
+        value=PROPOSAL_REVIEW_REQUEST,
+        request_only=True,
+    ),
+    OpenApiExample(
+        "Approved proposal",
+        summary="The proposal, approved, with who reviewed it and why",
+        value=PROPOSAL_REVIEWED,
+        response_only=True,
+    ),
+]

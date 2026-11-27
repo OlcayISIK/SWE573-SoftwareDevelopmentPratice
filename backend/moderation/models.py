@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from core.models import BaseModel
+from crafts.models import MAX_SOURCE_LENGTH, Craft
 
 
 class Report(BaseModel):
@@ -126,6 +127,49 @@ class ItemReviewAction(BaseModel):
 
     def __str__(self):
         return f"{self.get_action_display()} on item report {self.report_id}"
+
+
+class StatusProposal(BaseModel):
+    """A user's proposal of a craft's practice status, with its source, for admins to review."""
+
+    class Status(models.TextChoices):
+        OPEN = "open", "Open"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+
+    craft = models.ForeignKey(
+        "crafts.Craft", on_delete=models.PROTECT, related_name="status_proposals"
+    )
+    proposer = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="status_proposals"
+    )
+    practice_status = models.CharField(max_length=20, choices=Craft.PracticeStatus.choices)
+    source = models.TextField(max_length=MAX_SOURCE_LENGTH)
+    note = models.TextField(max_length=1000, blank=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.OPEN)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="reviewed_status_proposals",
+    )
+    review_reason = models.TextField(max_length=1000, blank=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        indexes = [models.Index(fields=["status"], name="status_proposal_status_idx")]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["craft", "proposer"],
+                condition=models.Q(status="open"),
+                name="unique_open_status_proposal_per_user",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.practice_status} proposed for {self.craft_id}"
 
 
 class StoryReport(BaseModel):

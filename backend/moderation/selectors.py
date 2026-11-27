@@ -1,13 +1,14 @@
 from collections import defaultdict
 
-from django.db.models import Count, Q
+from django.db.models import Case, Count, IntegerField, Q, Value, When
 
 from core.exceptions import NotFoundError
 from crafts.models import LOOKUP_MODELS
 
-from .models import ItemReport, Report, StoryReport
+from .models import ItemReport, Report, StatusProposal, StoryReport
 
 REPORT_NOT_FOUND = "Report not found."
+PROPOSAL_NOT_FOUND = "Proposal not found."
 
 
 def _with_details(reports):
@@ -89,3 +90,27 @@ def get_story_report(report_id):
     if report is None:
         raise NotFoundError(REPORT_NOT_FOUND)
     return report
+
+
+def _with_proposal_details(proposals):
+    return proposals.select_related("craft", "proposer__profile", "reviewed_by__profile")
+
+
+def status_proposal_queue(*, status="all"):
+    """Practice status proposals, open ones first, then the newest."""
+    proposals = StatusProposal.objects.all()
+    if status != "all":
+        proposals = proposals.filter(status=status)
+    open_first = Case(
+        When(status=StatusProposal.Status.OPEN, then=Value(0)),
+        default=Value(1),
+        output_field=IntegerField(),
+    )
+    return _with_proposal_details(proposals).order_by(open_first, "-created_at", "-id")
+
+
+def get_status_proposal(proposal_id):
+    proposal = _with_proposal_details(StatusProposal.objects.filter(pk=proposal_id)).first()
+    if proposal is None:
+        raise NotFoundError(PROPOSAL_NOT_FOUND)
+    return proposal

@@ -194,6 +194,8 @@ CRAFT_CREATED = {
         "distinguishing_features": FEATURES,
     },
     "status": "published",
+    "practice_status": "unknown",
+    "practice_status_source": "",
     "author": AUTHOR,
     "created_at": "2026-11-23T10:15:42.518204Z",
     "updated_at": "2026-11-23T10:15:42.518231Z",
@@ -246,6 +248,10 @@ CRAFT_DETAIL = {
         ]
     },
     "status": "published",
+    "practice_status": "living",
+    "practice_status_source": (
+        "Kütahya Tile Masters Association: member workshops in Kütahya, 2025"
+    ),
     "author": {"id": 1, "display_name": "Sample Contributor (Anatolia)"},
     "created_at": "2026-10-24T20:40:06.324421Z",
     "updated_at": "2026-10-24T20:40:06.324439Z",
@@ -283,6 +289,7 @@ CRAFT_LIST_ITEM = {
         ),
     },
     "status": "published",
+    "practice_status": "unknown",
     "author": {"id": 4, "display_name": "Sample Contributor (Asia)"},
     "created_at": "2026-10-24T20:40:10.735951Z",
 }

@@ -8,6 +8,7 @@ from .models import (
     ItemReviewAction,
     Report,
     ReviewAction,
+    StatusProposal,
     StoryReport,
     StoryReviewAction,
 )
@@ -135,3 +136,21 @@ class StoryReportAdmin(admin.ModelAdmin):
     raw_id_fields = ["story", "reporter"]
     readonly_fields = ["status", "created_at", "updated_at"]
     inlines = [StoryReviewActionInline]
+
+
+@admin.register(StatusProposal)
+class StatusProposalAdmin(admin.ModelAdmin):
+    """Practice status proposals are reviewed in the app; here they can be looked up."""
+
+    list_display = ["id", "craft", "practice_status", "proposer", "status", "created_at"]
+    list_filter = ["status", "practice_status"]
+    search_fields = ["craft__name", "proposer__email", "source", "note"]
+    raw_id_fields = ["craft", "proposer", "reviewed_by"]
+    readonly_fields = [
+        "status",
+        "reviewed_by",
+        "review_reason",
+        "reviewed_at",
+        "created_at",
+        "updated_at",
+    ]

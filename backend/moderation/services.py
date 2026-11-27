@@ -1,4 +1,5 @@
 from django.db import IntegrityError, transaction
+from django.utils import timezone
 
 from core.exceptions import ConflictError, NotFoundError, PermissionDeniedError, ValidationError
 from crafts import services as craft_services
@@ -11,10 +12,11 @@ from .models import (
     ItemReviewAction,
     Report,
     ReviewAction,
+    StatusProposal,
     StoryReport,
     StoryReviewAction,
 )
-from .selectors import REPORT_NOT_FOUND
+from .selectors import PROPOSAL_NOT_FOUND, REPORT_NOT_FOUND
 
 ALREADY_REPORTED = "You have already reported this craft. It is under review."
 OWN_CRAFT = "You cannot report your own craft."
@@ -28,6 +30,9 @@ ITEM_ALREADY_REPORTED = "You have already reported this item. It is under review
 ITEM_GONE = "This item no longer exists. Dismiss the report instead."
 OWN_STORY = "You cannot report your own story."
 STORY_ALREADY_REPORTED = "You have already reported this story. It is under review."
+VERIFY_BEFORE_PROPOSING = "Verify your email address before proposing a practice status."
+ALREADY_PROPOSED = "You have already proposed a practice status for this craft. It is under review."
+PROPOSAL_ALREADY_REVIEWED = "This proposal has already been reviewed."
 
 
 def report_craft(*, reporter, craft_id, reason, note=""):
@@ -249,3 +254,60 @@ def review_story_report(*, admin, report_id, action, reason):
             sender=StoryReport, report=closed, admin=admin, action=action
         )
     return report
+
+
+def propose_practice_status(*, proposer, craft_id, practice_status, source, note=""):
+    """A user proposes whether a craft is still practiced, with the source it is based on."""
+    if not proposer.is_email_verified:
+        raise PermissionDeniedError(VERIFY_BEFORE_PROPOSING)
+    craft = get_visible_craft(craft_id, proposer)
+    open_proposals = StatusProposal.objects.filter(
+        craft=craft, proposer=proposer, status=StatusProposal.Status.OPEN
+    )
+    if open_proposals.exists():
+        raise ConflictError(ALREADY_PROPOSED)
+
+    try:
+        with transaction.atomic():
+            return StatusProposal.objects.create(
+                craft=craft,
+                proposer=proposer,
+                practice_status=practice_status,
+                source=source.strip(),
+                note=note,
+            )
+    except IntegrityError as exc:
+        raise ConflictError(ALREADY_PROPOSED) from exc
+
+
+@transaction.atomic
+def review_status_proposal(*, admin, proposal_id, action, reason):
+    """
+    Approves a proposal, which sets the craft's practice status and source, or rejects it.
+    A proposal is reviewed once.
+    """
+    if not admin.is_admin:
+        raise PermissionDeniedError(ADMIN_ONLY)
+    proposal = StatusProposal.objects.select_for_update().filter(pk=proposal_id).first()
+    if proposal is None:
+        raise NotFoundError(PROPOSAL_NOT_FOUND)
+    if proposal.status != StatusProposal.Status.OPEN:
+        raise ConflictError(PROPOSAL_ALREADY_REVIEWED)
+
+    if action == StatusProposal.Status.APPROVED:
+        craft_services.set_practice_status(
+            craft=proposal.craft,
+            actor=admin,
+            practice_status=proposal.practice_status,
+            source=proposal.source,
+            reason=reason,
+        )
+    proposal.status = action
+    proposal.reviewed_by = admin
+    proposal.review_reason = reason
+    proposal.reviewed_at = timezone.now()
+    proposal.save(
+        update_fields=["status", "reviewed_by", "review_reason", "reviewed_at", "updated_at"]
+    )
+    signals.status_proposal_reviewed.send(sender=StatusProposal, proposal=proposal, admin=admin)
+    return proposal

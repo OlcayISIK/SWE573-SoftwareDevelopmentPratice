@@ -5,3 +5,6 @@ report_resolved = Signal()
 
 # Sent inside the review transaction with `report` (a StoryReport), `admin`, and `action`.
 story_report_resolved = Signal()
+
+# Sent inside the review transaction with `proposal` (a StatusProposal) and `admin`.
+status_proposal_reviewed = Signal()

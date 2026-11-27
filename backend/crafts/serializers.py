@@ -573,6 +573,11 @@ class CraftFilterSerializer(serializers.Serializer):
     color = serializers.ChoiceField(
         choices=MAIN_COLORS, required=False, help_text="A main color, such as red."
     )
+    practice_status = serializers.ChoiceField(
+        choices=Craft.PracticeStatus.choices,
+        required=False,
+        help_text="Whether the craft is still practiced.",
+    )
     search = serializers.CharField(required=False, max_length=100)
     area = serializers.CharField(
         required=False,
@@ -623,12 +628,18 @@ class ColorFacetSerializer(serializers.Serializer):
     count = serializers.IntegerField()
 
 
+class PracticeStatusFacetSerializer(serializers.Serializer):
+    name = serializers.ChoiceField(choices=Craft.PracticeStatus.choices)
+    count = serializers.IntegerField()
+
+
 class FacetsSerializer(serializers.Serializer):
     categories = CategoryFacetSerializer(many=True)
     craft_types = CraftTypeFacetSerializer(many=True)
     cultures = CultureFacetSerializer(many=True)
     countries = CountryFacetSerializer(many=True)
     colors = ColorFacetSerializer(many=True)
+    practice_statuses = PracticeStatusFacetSerializer(many=True)
 
 
 class CraftListSerializer(serializers.ModelSerializer):
@@ -654,6 +665,7 @@ class CraftListSerializer(serializers.ModelSerializer):
             "longitude",
             "cover_photo",
             "status",
+            "practice_status",
             "author",
             "created_at",
         ]
@@ -728,6 +740,8 @@ class CraftDetailSerializer(serializers.ModelSerializer):
             "colors",
             "attributes",
             "status",
+            "practice_status",
+            "practice_status_source",
             "author",
             "created_at",
             "updated_at",

@@ -223,6 +223,7 @@ def test_facets_with_no_results_are_empty(api_client):
         "cultures": [],
         "countries": [],
         "colors": [],
+        "practice_statuses": [],
     }
 
 

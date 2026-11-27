@@ -8,8 +8,10 @@ from rest_framework.views import APIView
 from core.exceptions import ValidationError
 from core.permissions import IsAdmin
 from core.schema import error_response
+from crafts import services as craft_services
 from crafts.examples import CRAFT_NOT_FOUND, NOT_SIGNED_IN
-from crafts.serializers import CraftWriteSerializer
+from crafts.selectors import get_visible_craft
+from crafts.serializers import CraftDetailSerializer, CraftWriteSerializer
 
 from . import examples, selectors, services
 from .models import ReviewAction
@@ -18,11 +20,17 @@ from .serializers import (
     ItemReportReviewSerializer,
     ItemReportSerializer,
     ItemReviewActionCreateSerializer,
+    PracticeStatusSetSerializer,
     ReportCreateSerializer,
     ReportReviewSerializer,
     ReportSerializer,
     ReviewActionCreateSerializer,
     ReviewQueueFilterSerializer,
+    StatusProposalActionSerializer,
+    StatusProposalCreateSerializer,
+    StatusProposalQueueFilterSerializer,
+    StatusProposalReviewSerializer,
+    StatusProposalSerializer,
     StoryReportCreateSerializer,
     StoryReportReviewSerializer,
     StoryReportSerializer,
@@ -268,3 +276,117 @@ class StoryReviewActionView(APIView):
             admin=request.user, report_id=report_id, **serializer.validated_data
         )
         return Response(StoryReportReviewSerializer(selectors.get_story_report(report_id)).data)
+
+
+class ProposePracticeStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_scope = "status_proposal"
+
+    @extend_schema(
+        request=StatusProposalCreateSerializer,
+        responses={
+            201: StatusProposalSerializer,
+            400: error_response("A field is invalid", examples.proposal_errors["no_source"]),
+            401: error_response("Not signed in", NOT_SIGNED_IN),
+            403: error_response(
+                "The email is not verified", examples.proposal_errors["unverified"]
+            ),
+            404: error_response("No craft the user may see", CRAFT_NOT_FOUND),
+            409: error_response(
+                "The user's earlier proposal for this craft is still open",
+                examples.proposal_errors["twice"],
+            ),
+        },
+        examples=examples.propose,
+        tags=["moderation"],
+    )
+    def post(self, request, craft_id):
+        """
+        Proposes whether the craft is still practiced, with the source it is based on. Admins
+        review the proposal; a user has one open proposal per craft.
+        """
+        serializer = StatusProposalCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        proposal = services.propose_practice_status(
+            proposer=request.user, craft_id=craft_id, **serializer.validated_data
+        )
+        return Response(StatusProposalSerializer(proposal).data, status=status.HTTP_201_CREATED)
+
+
+class SetPracticeStatusView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    @extend_schema(
+        request=PracticeStatusSetSerializer,
+        responses={200: CraftDetailSerializer},
+        tags=["moderation"],
+    )
+    def post(self, request, craft_id):
+        """Sets whether the craft is still practiced, with a source and the reason. Admins only."""
+        serializer = PracticeStatusSetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        craft = get_visible_craft(craft_id, request.user)
+        craft_services.set_practice_status(
+            craft=craft, actor=request.user, **serializer.validated_data
+        )
+        craft = get_visible_craft(craft_id, request.user)
+        return Response(CraftDetailSerializer(craft, context={"request": request}).data)
+
+
+@extend_schema(
+    tags=["moderation"],
+    parameters=[
+        OpenApiParameter(
+            "status",
+            OpenApiTypes.STR,
+            enum=["open", "approved", "rejected", "all"],
+            description="Defaults to all, open proposals first",
+        )
+    ],
+)
+class StatusProposalQueueView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+    serializer_class = StatusProposalReviewSerializer
+
+    def get_queryset(self):
+        filters = StatusProposalQueueFilterSerializer(data=self.request.query_params)
+        filters.is_valid(raise_exception=True)
+        return selectors.status_proposal_queue(**filters.validated_data)
+
+
+class StatusProposalDetailView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    @extend_schema(responses=StatusProposalReviewSerializer, tags=["moderation"])
+    def get(self, request, proposal_id):
+        proposal = selectors.get_status_proposal(proposal_id)
+        return Response(StatusProposalReviewSerializer(proposal).data)
+
+
+class StatusProposalActionView(APIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    @extend_schema(
+        request=StatusProposalActionSerializer,
+        responses={
+            200: StatusProposalReviewSerializer,
+            403: error_response("The user is not an admin", examples.review_errors["not_admin"]),
+            409: error_response(
+                "The proposal was already reviewed", examples.proposal_errors["reviewed"]
+            ),
+        },
+        examples=examples.review_proposal,
+        tags=["moderation"],
+    )
+    def post(self, request, proposal_id):
+        """
+        Approves the proposal, which sets the craft's practice status and source and notifies
+        the users who favorited the craft, or rejects it. The proposer is notified either way.
+        """
+        serializer = StatusProposalActionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        services.review_status_proposal(
+            admin=request.user, proposal_id=proposal_id, **serializer.validated_data
+        )
+        proposal = selectors.get_status_proposal(proposal_id)
+        return Response(StatusProposalReviewSerializer(proposal).data)

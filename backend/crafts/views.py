@@ -50,6 +50,12 @@ FILTER_PARAMETERS = [
     OpenApiParameter("culture", OpenApiTypes.INT, description="Culture id"),
     OpenApiParameter("country", OpenApiTypes.STR, description="Country of the craft"),
     OpenApiParameter("color", OpenApiTypes.STR, description="Main color, such as red"),
+    OpenApiParameter(
+        "practice_status",
+        OpenApiTypes.STR,
+        enum=["unknown", "living", "endangered", "no_longer_practiced"],
+        description="Whether the craft is still practiced",
+    ),
     OpenApiParameter("search", OpenApiTypes.STR, description="Text search"),
     OpenApiParameter(
         "exact",

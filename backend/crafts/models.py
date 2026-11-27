@@ -180,10 +180,20 @@ LOOKUP_MODELS = {
 }
 
 
+# Long enough for a citation or a link to the source of a practice status.
+MAX_SOURCE_LENGTH = 500
+
+
 class Craft(SoftDeleteModel):
     class Status(models.TextChoices):
         PUBLISHED = "published", "Published"
         HIDDEN = "hidden", "Hidden"
+
+    class PracticeStatus(models.TextChoices):
+        UNKNOWN = "unknown", "Unknown"
+        LIVING = "living", "Living"
+        ENDANGERED = "endangered", "Endangered"
+        NO_LONGER_PRACTICED = "no_longer_practiced", "No longer practiced"
 
     name = models.CharField(max_length=150)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="crafts")
@@ -232,11 +242,18 @@ class Craft(SoftDeleteModel):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="crafts"
     )
+    # Whether the craft is still practiced. A value anyone could set would not be reliable, so it
+    # is based on a source and set by admins, directly or by approving a user's proposal.
+    practice_status = models.CharField(
+        max_length=20, choices=PracticeStatus.choices, default=PracticeStatus.UNKNOWN
+    )
+    practice_status_source = models.TextField(max_length=MAX_SOURCE_LENGTH, blank=True)
 
     class Meta:
         ordering = ["-created_at", "-id"]
         indexes = [
             models.Index(fields=["latitude", "longitude"], name="craft_location_idx"),
+            models.Index(fields=["practice_status"], name="craft_practice_status_idx"),
             models.Index(fields=["status", "is_deleted"], name="craft_visibility_idx"),
         ]
         constraints = [
@@ -261,6 +278,25 @@ class Craft(SoftDeleteModel):
 
     def __str__(self):
         return self.name
+
+
+class PracticeStatusChange(BaseModel):
+    """A change of a craft's practice status, with who made it, the source, and why."""
+
+    craft = models.ForeignKey(Craft, on_delete=models.CASCADE, related_name="status_changes")
+    changed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+"
+    )
+    old_status = models.CharField(max_length=20, choices=Craft.PracticeStatus.choices)
+    new_status = models.CharField(max_length=20, choices=Craft.PracticeStatus.choices)
+    source = models.TextField(max_length=MAX_SOURCE_LENGTH, blank=True)
+    reason = models.TextField(max_length=1000)
+
+    class Meta:
+        ordering = ["created_at", "id"]
+
+    def __str__(self):
+        return f"{self.craft_id}: {self.old_status} to {self.new_status}"
 
 
 MAX_STORY_LENGTH = 5000

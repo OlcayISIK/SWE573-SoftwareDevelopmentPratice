@@ -10,6 +10,14 @@ class Notification(BaseModel):
         FAVORITE_UPDATED = "favorite_updated", "A favorited craft was updated"
         REPORT_RESOLVED = "report_resolved", "Your report was reviewed"
         NEW_STORY = "new_story", "Someone shared a story about your craft"
+        PRACTICE_STATUS_CHANGED = (
+            "practice_status_changed",
+            "A favorited craft's practice status changed",
+        )
+        STATUS_PROPOSAL_REVIEWED = (
+            "status_proposal_reviewed",
+            "Your practice status proposal was reviewed",
+        )
 
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications"
