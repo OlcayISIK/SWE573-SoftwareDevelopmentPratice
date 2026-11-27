@@ -4,7 +4,7 @@ from django.urls import include, path, re_path
 from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from core.views import HealthView
+from core.views import HealthView, StoredFileView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -18,7 +18,9 @@ urlpatterns = [
     path("api/v1/", include("notifications.urls")),
 ]
 
-if settings.DEBUG or settings.SERVE_MEDIA:
+if settings.MEDIA_STORAGE == "database":
+    urlpatterns += [re_path(r"^media/(?P<path>.+)$", StoredFileView.as_view(), name="media")]
+elif settings.DEBUG or settings.SERVE_MEDIA:
     urlpatterns += [
         re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     ]

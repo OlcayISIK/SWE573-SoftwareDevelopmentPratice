@@ -94,8 +94,16 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 SERVE_MEDIA = env.bool("SERVE_MEDIA", default=False)
 
+# Where uploaded files are kept: "filesystem" (MEDIA_ROOT) or "database" (core.storage), for
+# hosting without a persistent disk, where files on the server's disk do not last.
+MEDIA_STORAGE = env("MEDIA_STORAGE", default="filesystem")
+MEDIA_BACKENDS = {
+    "filesystem": "django.core.files.storage.FileSystemStorage",
+    "database": "core.storage.DatabaseStorage",
+}
+
 STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "default": {"BACKEND": MEDIA_BACKENDS[MEDIA_STORAGE]},
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
 
