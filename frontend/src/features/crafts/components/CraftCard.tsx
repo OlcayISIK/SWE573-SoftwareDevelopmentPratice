@@ -5,6 +5,8 @@ import { categoryStyle } from "../categoryStyle";
 import { placeName } from "../place";
 import type { CraftListItem } from "../types";
 
+import { PracticeStatusBadge } from "./PracticeStatusBadge";
+
 export function CraftCard({ craft }: { craft: CraftListItem }) {
   const { icon: Icon, color } = categoryStyle(craft.category.slug, craft.category.icon);
   return (
@@ -51,6 +53,13 @@ export function CraftCard({ craft }: { craft: CraftListItem }) {
           <MapPin aria-hidden="true" className="h-4 w-4 shrink-0" />
           {[craft.culture?.name, placeName(craft)].filter(Boolean).join(" · ")}
         </p>
+        {/* Living crafts are the usual case, so cards point out only the ones at risk or lost. */}
+        {(craft.practice_status === "endangered" ||
+          craft.practice_status === "no_longer_practiced") && (
+          <p className="mt-2">
+            <PracticeStatusBadge status={craft.practice_status} size="sm" />
+          </p>
+        )}
         {craft.status === "hidden" && (
           <p className="mt-2 inline-block w-fit rounded-full bg-stone-200 px-2.5 py-0.5 text-xs font-medium">
             Hidden by a moderator

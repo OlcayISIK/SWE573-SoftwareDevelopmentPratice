@@ -1,6 +1,7 @@
 # Removes everything the end-to-end tests created: users named e2e-...@example.com and their
-# crafts, stories, photos, reports, notifications, and added list items. Runs inside the backend
-# container with `manage.py shell`. The e2e admin, sample crafts, and real accounts stay.
+# crafts, stories, photos, reports, practice status proposals, notifications, and added list
+# items. Runs inside the backend container with `manage.py shell`. The e2e admin, sample crafts,
+# and real accounts stay.
 from django.db import transaction
 from django.db.models import Q
 
@@ -11,6 +12,7 @@ from moderation.models import (
     ItemReviewAction,
     Report,
     ReviewAction,
+    StatusProposal,
     StoryReport,
     StoryReviewAction,
 )
@@ -25,6 +27,7 @@ with transaction.atomic():
     item_reports.delete()
     ReviewAction.objects.filter(report__in=reports).delete()
     reports.delete()
+    StatusProposal.objects.filter(Q(proposer__in=users) | Q(craft__in=crafts)).delete()
     Notification.objects.filter(
         Q(recipient__in=users) | Q(actor__in=users) | Q(craft__in=crafts)
     ).delete()

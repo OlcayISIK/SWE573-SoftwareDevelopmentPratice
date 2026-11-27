@@ -3,10 +3,20 @@ import { Link } from "react-router";
 import type { QueueStatus } from "../api";
 import { STATUS_TABS } from "../hooks/useQueueParams";
 
-export function StatusTabs({ basePath, status }: { basePath: string; status: QueueStatus }) {
+export function StatusTabs<T extends string = QueueStatus>({
+  basePath,
+  status,
+  tabs = STATUS_TABS as [T, string][],
+  label = "Report status",
+}: {
+  basePath: string;
+  status: T;
+  tabs?: [T, string][];
+  label?: string;
+}) {
   return (
-    <nav aria-label="Report status" className="mt-6 flex flex-wrap gap-2">
-      {STATUS_TABS.map(([value, label]) => (
+    <nav aria-label={label} className="mt-6 flex flex-wrap gap-2">
+      {tabs.map(([value, label]) => (
         <Link
           key={value}
           to={value === "open" ? basePath : `${basePath}?status=${value}`}

@@ -6,8 +6,10 @@ import { craftKeys, lookupKeys } from "@/features/crafts/queries";
 import {
   itemModerationApi,
   moderationApi,
+  practiceStatusApi,
   storyModerationApi,
   type ItemKind,
+  type ProposalQueueStatus,
   type QueueStatus,
 } from "./api";
 
@@ -21,6 +23,9 @@ export const moderationKeys = {
   storyQueue: (status: QueueStatus, page: number) =>
     ["moderation", "story-queue", status, page] as const,
   storyDetail: (reportId: number) => ["moderation", "story-report", reportId] as const,
+  proposalQueue: (status: ProposalQueueStatus, page: number) =>
+    ["moderation", "proposal-queue", status, page] as const,
+  proposalDetail: (proposalId: number) => ["moderation", "proposal", proposalId] as const,
 };
 
 export function useReviewQueue(status: QueueStatus, page: number) {
@@ -150,5 +155,56 @@ export function useMergeTargets(kind: ItemKind, enabled: boolean) {
     queryKey: [...lookupKeys.all, "merge-targets", kind],
     queryFn: async () => (await mergeTargets(kind)).map(({ id, name }) => ({ id, name })),
     enabled,
+  });
+}
+
+export function useStatusProposalQueue(status: ProposalQueueStatus, page: number) {
+  return useQuery({
+    queryKey: moderationKeys.proposalQueue(status, page),
+    queryFn: () => practiceStatusApi.queue(status, page),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useStatusProposal(proposalId: number | null) {
+  return useQuery({
+    queryKey: moderationKeys.proposalDetail(proposalId ?? 0),
+    queryFn: () => practiceStatusApi.detail(proposalId as number),
+    enabled: proposalId !== null,
+  });
+}
+
+export function useReviewStatusProposal(proposalId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Parameters<typeof practiceStatusApi.review>[1]) =>
+      practiceStatusApi.review(proposalId, body),
+    onSuccess: (proposal) => {
+      queryClient.setQueryData(moderationKeys.proposalDetail(proposalId), proposal);
+      // An approval changes the craft and the practice status filter.
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: moderationKeys.all }),
+        queryClient.invalidateQueries({ queryKey: craftKeys.all }),
+      ]);
+    },
+  });
+}
+
+export function useProposePracticeStatus(craftId: number) {
+  return useMutation({
+    mutationFn: (body: Parameters<typeof practiceStatusApi.propose>[1]) =>
+      practiceStatusApi.propose(craftId, body),
+  });
+}
+
+export function useSetPracticeStatus(craftId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Parameters<typeof practiceStatusApi.set>[1]) =>
+      practiceStatusApi.set(craftId, body),
+    onSuccess: (craft) => {
+      queryClient.setQueryData(craftKeys.detail(craftId), craft);
+      return queryClient.invalidateQueries({ queryKey: craftKeys.all });
+    },
   });
 }

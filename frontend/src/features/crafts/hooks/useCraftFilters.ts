@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router";
 
+import { isPracticeStatus } from "../practiceStatus";
 import type { CraftFilters } from "../types";
 
 const FILTER_KEYS = [
@@ -9,6 +10,7 @@ const FILTER_KEYS = [
   "culture",
   "country",
   "color",
+  "practice_status",
   "search",
   "exact",
   "place",
@@ -33,6 +35,9 @@ export function useCraftFilters() {
       culture: positiveId(params.get("culture")),
       country: params.get("country") || undefined,
       color: params.get("color") || undefined,
+      practice_status: isPracticeStatus(params.get("practice_status"))
+        ? (params.get("practice_status") as CraftFilters["practice_status"])
+        : undefined,
       place: params.get("place") || undefined,
       area: params.get("area") || undefined,
       search: params.get("search") || undefined,
@@ -75,6 +80,7 @@ export function useCraftFilters() {
     filters.culture ||
     filters.country ||
     filters.color ||
+    filters.practice_status ||
     filters.area ||
     filters.search,
   );

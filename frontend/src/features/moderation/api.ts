@@ -1,5 +1,7 @@
 import { api } from "@/api/client";
 import type { Paginated, Schemas } from "@/api/types";
+import type { PracticeStatus } from "@/features/crafts/practiceStatus";
+import type { CraftDetail } from "@/features/crafts/types";
 
 export type ReportReview = Schemas["ReportReview"];
 export type ReportReason = "inaccurate" | "inappropriate" | "disrespectful";
@@ -115,4 +117,32 @@ export const STORY_ACTION_LABELS: Record<StoryActionType, string> = {
   hide: "Hide the story",
   remove: "Remove the story",
   dismiss: "Dismiss the report",
+};
+
+export type StatusProposalReview = Schemas["StatusProposalReview"];
+export type ProposalQueueStatus = "open" | "approved" | "rejected" | "all";
+export type ProposalAction = "approved" | "rejected";
+
+export const practiceStatusApi = {
+  propose: (
+    craftId: number,
+    body: { practice_status: PracticeStatus; source: string; note: string },
+  ) => api.post<Schemas["StatusProposal"]>(`/crafts/${craftId}/practice-status/proposals/`, body),
+  set: (
+    craftId: number,
+    body: { practice_status: PracticeStatus; source: string; reason: string },
+  ) => api.post<CraftDetail>(`/crafts/${craftId}/practice-status/`, body),
+  queue: (status: ProposalQueueStatus, page: number) =>
+    api.get<Paginated<StatusProposalReview>>("/moderation/status-proposals/", {
+      params: { status, page },
+    }),
+  detail: (proposalId: number) =>
+    api.get<StatusProposalReview>(`/moderation/status-proposals/${proposalId}/`),
+  review: (proposalId: number, body: { action: ProposalAction; reason: string }) =>
+    api.post<StatusProposalReview>(`/moderation/status-proposals/${proposalId}/actions/`, body),
+};
+
+export const PROPOSAL_ACTION_LABELS: Record<ProposalAction, string> = {
+  approved: "Approve: set the craft's status and source",
+  rejected: "Reject: leave the craft as it is",
 };
