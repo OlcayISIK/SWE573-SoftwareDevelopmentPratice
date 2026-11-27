@@ -6,8 +6,10 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
 SIMPLE_JWT = {**SIMPLE_JWT, "SIGNING_KEY": env("JWT_SIGNING_KEY")}  # noqa: F405
 
+# The host has no persistent disk, so uploads are kept in the database unless set otherwise.
+MEDIA_STORAGE = env("MEDIA_STORAGE", default="database")
 STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "default": {"BACKEND": MEDIA_BACKENDS[MEDIA_STORAGE]},  # noqa: F405
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 

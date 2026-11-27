@@ -39,3 +39,18 @@ class SoftDeleteModel(BaseModel):
 
     def hard_delete(self, using=None, keep_parents=False):
         return super().delete(using=using, keep_parents=keep_parents)
+
+
+class StoredFile(models.Model):
+    """
+    An uploaded file kept in the database, for hosting without a persistent disk, where files
+    saved to the server's disk are gone after a redeploy or a restart. See core.storage.
+    """
+
+    name = models.CharField(max_length=255, unique=True)
+    content = models.BinaryField()
+    size = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
