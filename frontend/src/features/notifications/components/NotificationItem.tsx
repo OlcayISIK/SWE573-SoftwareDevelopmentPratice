@@ -89,13 +89,15 @@ function message(notification: AppNotification): ReactNode {
       );
     case "status_proposal_reviewed": {
       const outcome =
-        data.decision === "approved" ? `approved, so it is now marked as ${status}` : "rejected";
+        data.decision === "approved"
+          ? `accepted, so it is now marked as ${status}`
+          : "reviewed, and the status was kept";
       return craftLink ? (
         <>
-          Your proposal that {craftLink} is {status} was {outcome}.
+          Your report on the practice status of {craftLink} was {outcome}.
         </>
       ) : (
-        `Your practice status proposal was ${outcome}.`
+        `Your report on a practice status was ${outcome}.`
       );
     }
     default:

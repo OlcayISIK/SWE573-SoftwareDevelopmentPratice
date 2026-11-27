@@ -35,13 +35,13 @@ function ReviewForm({ proposal }: { proposal: StatusProposalReview }) {
       className="mt-8 space-y-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-stone-200"
       onSubmit={(event) => {
         event.preventDefault();
-        if (!action) return setError("Choose approve or reject.");
+        if (!action) return setError("Choose accept or reject.");
         if (!reason.trim()) return setError("Explain the reason for this decision.");
         setError(null);
         review.mutate(
           { action, reason: reason.trim() },
           {
-            onSuccess: () => toast.success("The proposal has been reviewed."),
+            onSuccess: () => toast.success("The report has been reviewed."),
             onError: (failure) => setError(toApiError(failure).message),
           },
         );
@@ -66,7 +66,7 @@ function ReviewForm({ proposal }: { proposal: StatusProposalReview }) {
       </fieldset>
       <TextAreaField
         label="Reason"
-        hint="Recorded with the decision and shared with the person who proposed it."
+        hint="Recorded with the decision and shared with the person who reported it."
         rows={3}
         value={reason}
         onChange={(event) => setReason(event.target.value)}
@@ -83,13 +83,13 @@ export function StatusProposalReviewPage() {
   const proposal = useStatusProposal(valid ? proposalId : null);
 
   if (!valid || (proposal.isError && toApiError(proposal.error).status === 404)) {
-    return <NotFoundPage title="Proposal not found" message="This proposal does not exist." />;
+    return <NotFoundPage title="Report not found" message="This report does not exist." />;
   }
-  if (proposal.isPending) return <PageLoader label="Loading the proposal" />;
+  if (proposal.isPending) return <PageLoader label="Loading the report" />;
   if (proposal.isError) {
     return (
       <p role="alert" className="mx-auto max-w-4xl px-4 py-12">
-        This proposal could not be loaded.
+        This report could not be loaded.
       </p>
     );
   }
@@ -98,26 +98,30 @@ export function StatusProposalReviewPage() {
   return (
     <section className="mx-auto max-w-4xl px-4 py-8">
       <Link to="/admin/status-proposals" className="text-sm font-medium text-brand-700 underline">
-        Back to status proposals
+        Back to reported statuses
       </Link>
       <h1 className="mt-3 text-3xl font-semibold">
-        “{data.craft.name}” is {statusLabel(data.practice_status).toLowerCase()}?
+        Report on the practice status of “{data.craft.name}”
       </h1>
 
       <dl className="mt-6 grid gap-x-6 gap-y-2 rounded-xl bg-white p-5 shadow-sm ring-1 ring-stone-200 sm:grid-cols-[10rem_1fr]">
-        <dt className="font-medium">Proposed status</dt>
-        <dd>{statusLabel(data.practice_status)}</dd>
+        <dt className="font-medium">Should be</dt>
+        <dd>
+          {data.practice_status === "unknown"
+            ? "Not sure, but the current status is wrong"
+            : statusLabel(data.practice_status)}
+        </dd>
         <dt className="font-medium">Source</dt>
         <dd className="whitespace-pre-line">
-          <SourceText source={data.source} />
+          {data.source ? <SourceText source={data.source} /> : "No source given."}
         </dd>
         <dt className="font-medium">Note</dt>
         <dd className="whitespace-pre-line">{data.note || "No note given."}</dd>
-        <dt className="font-medium">Proposed by</dt>
+        <dt className="font-medium">Reported by</dt>
         <dd>{data.proposer.display_name}</dd>
-        <dt className="font-medium">Proposed</dt>
+        <dt className="font-medium">Reported</dt>
         <dd>{dateFormat.format(new Date(data.created_at))}</dd>
-        <dt className="font-medium">Proposal status</dt>
+        <dt className="font-medium">Report status</dt>
         <dd className="capitalize">{data.status}</dd>
         <dt className="font-medium">Craft</dt>
         <dd>
@@ -126,7 +130,7 @@ export function StatusProposalReviewPage() {
           </Link>{" "}
           ({craftState(data.craft)})
         </dd>
-        <dt className="font-medium">Current status</dt>
+        <dt className="font-medium">Marked as</dt>
         <dd>
           {statusLabel(data.craft.practice_status)}
           {data.craft.practice_status_source && (

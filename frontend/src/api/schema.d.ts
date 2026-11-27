@@ -264,8 +264,9 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * @description Proposes whether the craft is still practiced, with the source it is based on. Admins
-         *     review the proposal; a user has one open proposal per craft.
+         * @description Reports that the craft's practice status is wrong, with the status the user thinks is
+         *     right and a source or a note. Admins review the report; a user has one open report per
+         *     craft. The author changes the status of their own craft in the craft form.
          */
         post: operations["v1_crafts_practice_status_proposals_create"];
         delete?: never;
@@ -796,8 +797,9 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * @description Approves the proposal, which sets the craft's practice status and source and notifies
-         *     the users who favorited the craft, or rejects it. The proposer is notified either way.
+         * @description Approves the report, which sets the craft's practice status and source to the reported
+         *     ones and notifies the users who favorited the craft, or rejects it. The reporter is
+         *     notified either way.
          */
         post: operations["v1_moderation_status_proposals_actions_create"];
         delete?: never;
@@ -1220,6 +1222,17 @@ export interface components {
             /** @description Colors as "#rrggbb", or "#rrggbbaa" when see-through. */
             colors?: string[];
             attributes?: components["schemas"]["CraftAttributesRequest"];
+            /**
+             * @description Whether the craft is still practiced. Other users can report it if they think it is wrong.
+             *
+             *     * `unknown` - Unknown
+             *     * `living` - Living
+             *     * `endangered` - Endangered
+             *     * `no_longer_practiced` - No longer practiced
+             */
+            practice_status?: components["schemas"]["PracticeStatusEnum"];
+            /** @description What the status is based on, such as a citation or a link. */
+            practice_status_source?: string;
         };
         Culture: {
             readonly id: number;
@@ -1639,6 +1652,17 @@ export interface components {
             /** @description Colors as "#rrggbb", or "#rrggbbaa" when see-through. */
             colors?: string[];
             attributes?: components["schemas"]["CraftAttributesRequest"];
+            /**
+             * @description Whether the craft is still practiced. Other users can report it if they think it is wrong.
+             *
+             *     * `unknown` - Unknown
+             *     * `living` - Living
+             *     * `endangered` - Endangered
+             *     * `no_longer_practiced` - No longer practiced
+             */
+            practice_status?: components["schemas"]["PracticeStatusEnum"];
+            /** @description What the status is based on, such as a citation or a link. */
+            practice_status_source?: string;
         };
         PatchedProfileUpdateRequest: {
             display_name?: string;
@@ -1718,13 +1742,6 @@ export interface components {
             readonly practice_status: components["schemas"]["PracticeStatusEnum"];
             readonly practice_status_source: string;
         };
-        /**
-         * @description * `living` - Living
-         *     * `endangered` - Endangered
-         *     * `no_longer_practiced` - No longer practiced
-         * @enum {string}
-         */
-        ProposedPracticeStatusEnum: "living" | "endangered" | "no_longer_practiced";
         PublicProfile: {
             readonly id: number;
             readonly display_name: string;
@@ -1884,8 +1901,19 @@ export interface components {
             reason: string;
         };
         StatusProposalCreateRequest: {
-            practice_status: components["schemas"]["ProposedPracticeStatusEnum"];
-            /** @description What the status is based on: a citation or a link, such as the UNESCO List of Intangible Cultural Heritage in Need of Urgent Safeguarding. */
+            /**
+             * @description The status the user thinks is right; unknown when they are not sure.
+             *
+             *     * `unknown` - Unknown
+             *     * `living` - Living
+             *     * `endangered` - Endangered
+             *     * `no_longer_practiced` - No longer practiced
+             */
+            practice_status: components["schemas"]["PracticeStatusEnum"];
+            /**
+             * @description What the right status is based on: a citation or a link, such as the UNESCO List of Intangible Cultural Heritage in Need of Urgent Safeguarding.
+             * @default
+             */
             source: string;
             /** @default  */
             note: string;
@@ -2720,7 +2748,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description The user's earlier proposal for this craft is still open */
+            /** @description The user's earlier report on this craft's status is still open */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -3837,7 +3865,7 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 pageSize?: number;
-                /** @description Defaults to all, open proposals first */
+                /** @description Defaults to all, open reports first */
                 status?: "all" | "approved" | "open" | "rejected";
             };
             header?: never;
@@ -3923,7 +3951,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description The proposal was already reviewed */
+            /** @description The report was already reviewed */
             409: {
                 headers: {
                     [name: string]: unknown;

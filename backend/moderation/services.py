@@ -30,9 +30,13 @@ ITEM_ALREADY_REPORTED = "You have already reported this item. It is under review
 ITEM_GONE = "This item no longer exists. Dismiss the report instead."
 OWN_STORY = "You cannot report your own story."
 STORY_ALREADY_REPORTED = "You have already reported this story. It is under review."
-VERIFY_BEFORE_PROPOSING = "Verify your email address before proposing a practice status."
-ALREADY_PROPOSED = "You have already proposed a practice status for this craft. It is under review."
-PROPOSAL_ALREADY_REVIEWED = "This proposal has already been reviewed."
+VERIFY_BEFORE_PROPOSING = "Verify your email address before reporting a practice status."
+ALREADY_PROPOSED = (
+    "You have already reported the practice status of this craft. It is under review."
+)
+OWN_CRAFT_STATUS = "Change the practice status of your own craft in its edit form."
+SAME_STATUS = "This is already the craft's practice status."
+PROPOSAL_ALREADY_REVIEWED = "This report has already been reviewed."
 
 
 def report_craft(*, reporter, craft_id, reason, note=""):
@@ -257,10 +261,17 @@ def review_story_report(*, admin, report_id, action, reason):
 
 
 def propose_practice_status(*, proposer, craft_id, practice_status, source, note=""):
-    """A user proposes whether a craft is still practiced, with the source it is based on."""
+    """
+    A user reports that a craft's practice status is wrong, with the status they think is right
+    (unknown when they are not sure) and a source or a note.
+    """
     if not proposer.is_email_verified:
         raise PermissionDeniedError(VERIFY_BEFORE_PROPOSING)
     craft = get_visible_craft(craft_id, proposer)
+    if craft.author_id == proposer.id:
+        raise ValidationError(OWN_CRAFT_STATUS)
+    if practice_status == craft.practice_status:
+        raise ValidationError(SAME_STATUS, errors={"practice_status": [SAME_STATUS]})
     open_proposals = StatusProposal.objects.filter(
         craft=craft, proposer=proposer, status=StatusProposal.Status.OPEN
     )
@@ -283,8 +294,8 @@ def propose_practice_status(*, proposer, craft_id, practice_status, source, note
 @transaction.atomic
 def review_status_proposal(*, admin, proposal_id, action, reason):
     """
-    Approves a proposal, which sets the craft's practice status and source, or rejects it.
-    A proposal is reviewed once.
+    Accepts a report, which sets the craft's practice status and source to the ones reported,
+    or rejects it. A report is reviewed once.
     """
     if not admin.is_admin:
         raise PermissionDeniedError(ADMIN_ONLY)

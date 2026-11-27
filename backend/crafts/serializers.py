@@ -430,7 +430,20 @@ class CraftWriteSerializer(serializers.ModelSerializer):
             "date",
             "colors",
             "attributes",
+            "practice_status",
+            "practice_status_source",
         ]
+        extra_kwargs = {
+            "practice_status": {
+                "help_text": (
+                    "Whether the craft is still practiced. Other users can report it if they "
+                    "think it is wrong."
+                )
+            },
+            "practice_status_source": {
+                "help_text": "What the status is based on, such as a citation or a link."
+            },
+        }
 
     def validate_tools(self, tools):
         if len(tools) > MAX_TOOLS:

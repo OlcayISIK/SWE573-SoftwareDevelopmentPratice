@@ -44,13 +44,14 @@ EDITABLE_FIELDS = {
     "date",
     "colors",
     "attributes",
+    "practice_status",
+    "practice_status_source",
 }
 MANY_TO_MANY_FIELDS = ("tools", "materials")
 
 VERIFY_BEFORE_PUBLISHING = "Verify your email address before publishing crafts."
 NOT_ALLOWED_TO_EDIT = "Only the author or an admin can change this craft."
 ADMIN_ONLY = "Only admins can perform this action."
-SOURCE_REQUIRED = "Give the source the practice status is based on."
 AUTHOR_ONLY = "Only the author can add media to this craft."
 TOO_MANY_MEDIA = f"A craft can have at most {MAX_MEDIA_PER_CRAFT} media items."
 VERIFY_BEFORE_ADDING = "Verify your email address before adding new items."
@@ -133,7 +134,10 @@ def publish_craft(*, author, data):
     places = fields.pop("places")
     # The date arrives as craft fields already, see CraftDateSerializer.
     date = fields.pop("date", {})
+    status = _status_fields(fields)
     craft = Craft.objects.create(author=author, **fields, **date, **_main_place(places))
+    if status.get("practice_status", Craft.PracticeStatus.UNKNOWN) != Craft.PracticeStatus.UNKNOWN:
+        _change_practice_status(craft, author, reason=AUTHOR_SET_STATUS, **status)
     for field, items in related.items():
         getattr(craft, field).set(items)
     _set_colors(craft, colors)
@@ -147,6 +151,16 @@ def publish_craft(*, author, data):
 def update_craft(*, craft, actor, data):
     _ensure_can_edit(craft, actor)
     _ensure_editable(data)
+    data = dict(data)
+    status = _status_fields(data)
+    if status:
+        _change_practice_status(
+            craft,
+            actor,
+            practice_status=status.get("practice_status", craft.practice_status),
+            source=status.get("practice_status_source", craft.practice_status_source),
+            reason=AUTHOR_CHANGED_STATUS,
+        )
     if not data:
         return craft
 
@@ -190,17 +204,41 @@ def hide_craft(*, craft, actor):
     return craft
 
 
+AUTHOR_SET_STATUS = "Set by the author when publishing."
+AUTHOR_CHANGED_STATUS = "Changed in the craft form."
+
+
+def _status_fields(fields):
+    """Takes the practice status fields out of the craft's fields."""
+    return {
+        field: fields.pop(field)
+        for field in ("practice_status", "practice_status_source")
+        if field in fields
+    }
+
+
 @transaction.atomic
 def set_practice_status(*, craft, actor, practice_status, source, reason):
     """
     Sets whether the craft is still practiced, with the source it is based on, and records the
-    change. Only admins set it, directly or by approving a user's proposal.
+    change. Admins set it here, directly or by accepting a user's report; authors set it in the
+    craft form.
     """
     _ensure_admin(actor)
-    source = source.strip()
-    if practice_status != Craft.PracticeStatus.UNKNOWN and not source:
-        raise ValidationError(SOURCE_REQUIRED, errors={"source": [SOURCE_REQUIRED]})
+    return _change_practice_status(
+        craft, actor, practice_status=practice_status, source=source, reason=reason
+    )
+
+
+def _change_practice_status(craft, actor, *, practice_status, source=None, reason, **fields):
+    """Records a change of the practice status and notifies people if the status changed."""
+    if source is None:
+        source = fields.get("practice_status_source", "")
+    # An unknown status has nothing to cite.
+    source = "" if practice_status == Craft.PracticeStatus.UNKNOWN else source.strip()
     old_status = craft.practice_status
+    if (old_status, craft.practice_status_source) == (practice_status, source):
+        return craft
     PracticeStatusChange.objects.create(
         craft=craft,
         changed_by=actor,

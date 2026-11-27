@@ -1133,8 +1133,9 @@ paths:
     post:
       operationId: v1_crafts_practice_status_proposals_create
       description: |-
-        Proposes whether the craft is still practiced, with the source it is based on. Admins
-        review the proposal; a user has one open proposal per craft.
+        Reports that the craft's practice status is wrong, with the status the user thinks is
+        right and a source or a note. Admins review the report; a user has one open report per
+        craft. The author changes the status of their own craft in the craft form.
       parameters:
       - in: path
         name: craft_id
@@ -1149,16 +1150,18 @@ paths:
             schema:
               $ref: '#/components/schemas/StatusProposalCreateRequest'
             examples:
-              ProposeAPracticeStatus:
+              ReportAPracticeStatus:
                 value:
                   practice_status: endangered
                   source: 'UNESCO List of Intangible Cultural Heritage in Need of
                     Urgent Safeguarding: https://ich.unesco.org/en/lists'
                   note: Only a few workshops still weave in the traditional way.
-                summary: Propose that a craft is endangered, with the source it is
-                  based on
-                description: '`practice_status` is `living`, `endangered`, or `no_longer_practiced`.
-                  The source is required; the note is optional.'
+                summary: Report that a craft is endangered, not living, with the source
+                  that says so
+                description: '`practice_status` is the status the user thinks is right:
+                  `living`, `endangered`, `no_longer_practiced`, or `unknown` when
+                  they are not sure. A source or a note is required. The craft''s
+                  author changes the status in the craft form instead.'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/StatusProposalCreateRequest'
@@ -1186,7 +1189,7 @@ paths:
                   message:
                     type: string
               examples:
-                OpenProposal:
+                OpenReport:
                   value:
                     success: true
                     data:
@@ -1199,7 +1202,7 @@ paths:
                       status: open
                       created_at: '2026-12-02T09:14:27.380115Z'
                     message: OK
-                  summary: Open proposal
+                  summary: Open report
           description: ''
         '400':
           content:
@@ -1207,15 +1210,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
               examples:
-                NoSource:
+                NoSourceOrNote:
                   value:
                     success: false
                     data: null
                     message: Validation failed.
                     errors:
                       source:
-                      - Give the source the practice status is based on.
-                  summary: A proposal needs a source
+                      - Give a source, or a note that says why the status is wrong.
+                  summary: A report needs a source or a note
           description: A field is invalid
         '401':
           content:
@@ -1241,10 +1244,10 @@ paths:
                   value:
                     success: false
                     data: null
-                    message: Verify your email address before proposing a practice
+                    message: Verify your email address before reporting a practice
                       status.
                     errors: {}
-                  summary: Verify your email address before proposing a practice status.
+                  summary: Verify your email address before reporting a practice status.
           description: The email is not verified
         '404':
           content:
@@ -1266,15 +1269,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
               examples:
-                AlreadyProposed:
+                AlreadyReported:
                   value:
                     success: false
                     data: null
-                    message: You have already proposed a practice status for this
+                    message: You have already reported the practice status of this
                       craft. It is under review.
                     errors: {}
-                  summary: One open proposal per user per craft
-          description: The user's earlier proposal for this craft is still open
+                  summary: One open report per user per craft
+          description: The user's earlier report on this craft's status is still open
   /api/v1/crafts/{craft_id}/report/:
     post:
       operationId: v1_crafts_report_create
@@ -3083,7 +3086,7 @@ paths:
           - approved
           - open
           - rejected
-        description: Defaults to all, open proposals first
+        description: Defaults to all, open reports first
       tags:
       - moderation
       security:
@@ -3141,8 +3144,9 @@ paths:
     post:
       operationId: v1_moderation_status_proposals_actions_create
       description: |-
-        Approves the proposal, which sets the craft's practice status and source and notifies
-        the users who favorited the craft, or rejects it. The proposer is notified either way.
+        Approves the report, which sets the craft's practice status and source to the reported
+        ones and notifies the users who favorited the craft, or rejects it. The reporter is
+        notified either way.
       parameters:
       - in: path
         name: proposal_id
@@ -3157,14 +3161,14 @@ paths:
             schema:
               $ref: '#/components/schemas/StatusProposalActionRequest'
             examples:
-              ApproveAProposal:
+              AcceptAReport:
                 value:
                   action: approved
                   reason: The UNESCO list names this craft as in need of urgent safeguarding.
-                summary: Approve a proposal, which sets the craft's practice status
-                  and source
+                summary: Accept a report, which sets the craft's practice status and
+                  source
                 description: '`action` is `approved` or `rejected`. Approving notifies
-                  the users who favorited the craft; the proposer is notified either
+                  the users who favorited the craft; the reporter is notified either
                   way.'
           multipart/form-data:
             schema:
@@ -3193,7 +3197,7 @@ paths:
                   message:
                     type: string
               examples:
-                ApprovedProposal:
+                AcceptedReport:
                   value:
                     success: true
                     data:
@@ -3222,7 +3226,7 @@ paths:
                         urgent safeguarding.
                       reviewed_at: '2026-12-02T10:41:03.552871Z'
                     message: OK
-                  summary: The proposal, approved, with who reviewed it and why
+                  summary: The report, approved, with who reviewed it and why
           description: ''
         '403':
           content:
@@ -3248,10 +3252,10 @@ paths:
                   value:
                     success: false
                     data: null
-                    message: This proposal has already been reviewed.
+                    message: This report has already been reviewed.
                     errors: {}
-                  summary: This proposal has already been reviewed.
-          description: The proposal was already reviewed
+                  summary: This report has already been reviewed.
+          description: The report was already reviewed
   /api/v1/moderation/story-reports/:
     get:
       operationId: v1_moderation_story_reports_list
@@ -4512,6 +4516,20 @@ components:
           maxItems: 10
         attributes:
           $ref: '#/components/schemas/CraftAttributesRequest'
+        practice_status:
+          allOf:
+          - $ref: '#/components/schemas/PracticeStatusEnum'
+          description: |-
+            Whether the craft is still practiced. Other users can report it if they think it is wrong.
+
+            * `unknown` - Unknown
+            * `living` - Living
+            * `endangered` - Endangered
+            * `no_longer_practiced` - No longer practiced
+        practice_status_source:
+          type: string
+          description: What the status is based on, such as a citation or a link.
+          maxLength: 500
       required:
       - category
       - craft_type
@@ -5587,6 +5605,20 @@ components:
           maxItems: 10
         attributes:
           $ref: '#/components/schemas/CraftAttributesRequest'
+        practice_status:
+          allOf:
+          - $ref: '#/components/schemas/PracticeStatusEnum'
+          description: |-
+            Whether the craft is still practiced. Other users can report it if they think it is wrong.
+
+            * `unknown` - Unknown
+            * `living` - Living
+            * `endangered` - Endangered
+            * `no_longer_practiced` - No longer practiced
+        practice_status_source:
+          type: string
+          description: What the status is based on, such as a citation or a link.
+          maxLength: 500
     PatchedProfileUpdateRequest:
       type: object
       properties:
@@ -5785,16 +5817,6 @@ components:
       - practice_status
       - practice_status_source
       - status
-    ProposedPracticeStatusEnum:
-      enum:
-      - living
-      - endangered
-      - no_longer_practiced
-      type: string
-      description: |-
-        * `living` - Living
-        * `endangered` - Endangered
-        * `no_longer_practiced` - No longer practiced
     PublicProfile:
       type: object
       properties:
@@ -6232,12 +6254,20 @@ components:
       type: object
       properties:
         practice_status:
-          $ref: '#/components/schemas/ProposedPracticeStatusEnum'
+          allOf:
+          - $ref: '#/components/schemas/PracticeStatusEnum'
+          description: |-
+            The status the user thinks is right; unknown when they are not sure.
+
+            * `unknown` - Unknown
+            * `living` - Living
+            * `endangered` - Endangered
+            * `no_longer_practiced` - No longer practiced
         source:
           type: string
-          minLength: 1
-          description: 'What the status is based on: a citation or a link, such as
-            the UNESCO List of Intangible Cultural Heritage in Need of Urgent Safeguarding.'
+          default: ''
+          description: 'What the right status is based on: a citation or a link, such
+            as the UNESCO List of Intangible Cultural Heritage in Need of Urgent Safeguarding.'
           maxLength: 500
         note:
           type: string
@@ -6245,7 +6275,6 @@ components:
           maxLength: 1000
       required:
       - practice_status
-      - source
     StatusProposalReview:
       type: object
       properties:

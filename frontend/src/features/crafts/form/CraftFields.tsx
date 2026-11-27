@@ -25,6 +25,7 @@ import { DimensionRows } from "./DimensionRows";
 import { ItemPicker } from "./ItemPicker";
 import { LocationPicker } from "./LocationPicker";
 import { PartRows } from "./PartRows";
+import { PracticeStatusFields } from "./PracticeStatusFields";
 import { MAX_MATERIALS, MAX_TOOLS, type CraftFormValues } from "./schema";
 
 const changed = { shouldValidate: true, shouldDirty: true };
@@ -291,6 +292,7 @@ export function CraftFields({
           error={errors.attributes?.distinguishing_features?.message}
           {...register("attributes.distinguishing_features")}
         />
+        <PracticeStatusFields form={form} />
       </fieldset>
     </div>
   );

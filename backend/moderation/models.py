@@ -158,6 +158,7 @@ class StatusProposal(BaseModel):
     reviewed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
+        verbose_name = "practice status report"
         ordering = ["-created_at", "-id"]
         indexes = [models.Index(fields=["status"], name="status_proposal_status_idx")]
         constraints = [
@@ -169,7 +170,7 @@ class StatusProposal(BaseModel):
         ]
 
     def __str__(self):
-        return f"{self.practice_status} proposed for {self.craft_id}"
+        return f"Report on {self.craft}: should be {self.get_practice_status_display().lower()}"
 
 
 class StoryReport(BaseModel):

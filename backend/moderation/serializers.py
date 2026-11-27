@@ -252,11 +252,8 @@ class StoryReviewActionCreateSerializer(serializers.Serializer):
     reason = serializers.CharField(max_length=1000)
 
 
-# A status someone can propose; unknown is the absence of one.
-PROPOSABLE_STATUSES = [
-    choice for choice in Craft.PracticeStatus.choices if choice[0] != Craft.PracticeStatus.UNKNOWN
-]
 NO_SOURCE = "Give the source the practice status is based on."
+SOURCE_OR_NOTE = "Give a source, or a note that says why the status is wrong."
 # An admin approves or rejects a proposal.
 PROPOSAL_ACTIONS = [
     (StatusProposal.Status.APPROVED.value, "Approve"),
@@ -265,16 +262,26 @@ PROPOSAL_ACTIONS = [
 
 
 class StatusProposalCreateSerializer(serializers.Serializer):
-    practice_status = serializers.ChoiceField(choices=PROPOSABLE_STATUSES)
+    practice_status = serializers.ChoiceField(
+        choices=Craft.PracticeStatus.choices,
+        help_text="The status the user thinks is right; unknown when they are not sure.",
+    )
     source = serializers.CharField(
         max_length=MAX_SOURCE_LENGTH,
+        required=False,
+        allow_blank=True,
+        default="",
         help_text=(
-            "What the status is based on: a citation or a link, such as the UNESCO List of "
-            "Intangible Cultural Heritage in Need of Urgent Safeguarding."
+            "What the right status is based on: a citation or a link, such as the UNESCO List "
+            "of Intangible Cultural Heritage in Need of Urgent Safeguarding."
         ),
-        error_messages={"blank": NO_SOURCE, "required": NO_SOURCE},
     )
     note = serializers.CharField(max_length=1000, required=False, allow_blank=True, default="")
+
+    def validate(self, data):
+        if not data["source"] and not data["note"]:
+            raise serializers.ValidationError({"source": [SOURCE_OR_NOTE]})
+        return data
 
 
 class StatusProposalSerializer(serializers.ModelSerializer):

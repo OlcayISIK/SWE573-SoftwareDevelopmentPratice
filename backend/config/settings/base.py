@@ -198,7 +198,6 @@ SPECTACULAR_SETTINGS = {
         "ItemReviewActionEnum": "moderation.models.ItemReviewAction.Action",
         "StoryReviewActionEnum": "moderation.models.StoryReviewAction.Action",
         "PracticeStatusEnum": "crafts.models.Craft.PracticeStatus",
-        "ProposedPracticeStatusEnum": "moderation.serializers.PROPOSABLE_STATUSES",
         "StatusProposalStatusEnum": "moderation.models.StatusProposal.Status",
         "StatusProposalActionEnum": "moderation.serializers.PROPOSAL_ACTIONS",
     },
