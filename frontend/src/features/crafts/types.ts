@@ -13,6 +13,8 @@ export type CraftDetail = Schemas["CraftDetail"];
 export type CraftMedia = Schemas["Media"];
 export type CraftStory = Schemas["Story"];
 export type Facets = Schemas["Facets"];
+export type WikidataItem = Schemas["WikidataItem"];
+export type SearchTerm = Schemas["SearchTerm"];
 
 export interface CraftFilters {
   category?: string;
@@ -22,6 +24,8 @@ export interface CraftFilters {
   /** A main color, such as "red". */
   color?: string;
   search?: string;
+  /** Search only the words as typed, not other names of the items they name. */
+  exact?: boolean;
   /** The place searched near, as the user typed it, such as "Kadıköy". */
   place?: string;
   /** That place's area as "west,south,east,north"; crafts with a place inside it are found. */

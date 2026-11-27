@@ -54,6 +54,9 @@ export const itemModerationApi = {
       name?: string;
       description?: string;
       merge_into?: number;
+      /** The Wikidata item to link, such as Q163446; "" removes the link. */
+      wikidata_id?: string;
+      other_names?: string[];
     },
   ) => api.post<ItemReportReview>(`/moderation/item-reports/${reportId}/actions/`, body),
 };
@@ -73,7 +76,7 @@ export const ITEM_REASON_LABELS: Record<ItemReportReason, string> = {
 };
 
 export const ITEM_ACTION_LABELS: Record<ItemActionType, string> = {
-  edit: "Edit the name or description",
+  edit: "Edit the name, description, or other names",
   hide: "Hide the item",
   merge: "Merge into another item",
   dismiss: "Dismiss the report",

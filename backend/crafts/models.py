@@ -1,14 +1,37 @@
+import unicodedata
 import uuid
 from pathlib import Path
 
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 from django.db.models.functions import Lower
 
 from core.models import BaseModel, SoftDeleteModel
 
 from .colors import MAIN_COLORS
+
+WIKIDATA_ID = r"^Q[1-9][0-9]{0,11}$"
+# Turkish letters that do not lose their mark by Unicode decomposition.
+_FOLDED = str.maketrans({"ı": "i", "İ": "I", "ş": "s", "Ş": "S", "ğ": "g", "Ğ": "G"})
+
+
+def fold(text):
+    """The text without accents and Turkish letters, as typed on a keyboard without them."""
+    decomposed = unicodedata.normalize("NFKD", text.translate(_FOLDED))
+    return "".join(char for char in decomposed if not unicodedata.combining(char))
+
+
+def unique_names(names, skip=""):
+    """The names once each, ignoring case, in their first order, without `skip`."""
+    seen = {skip.casefold()}
+    result = []
+    for name in names:
+        key = name.casefold()
+        if name and key not in seen:
+            seen.add(key)
+            result.append(name)
+    return result
 
 
 class LookupItem(BaseModel):
@@ -28,6 +51,23 @@ class LookupItem(BaseModel):
         blank=True,
         related_name="+",
     )
+    # The Wikidata item the lookup item stands for, such as "Q163446" for carpet. Its names in
+    # other languages let a search for "halı" find carpets.
+    wikidata_id = models.CharField(
+        max_length=16,
+        blank=True,
+        validators=[RegexValidator(WIKIDATA_ID, "Use a Wikidata item id such as Q163446.")],
+    )
+    # Names of the Wikidata item in English and Turkish, refreshed from Wikidata.
+    wikidata_names = models.JSONField(default=list, blank=True)
+    # Wikidata items this one is a kind of, a few steps up, so a search for carpets also
+    # finds kilims.
+    broader = models.JSONField(default=list, blank=True)
+    # Names admins add, such as "rug" for Carpet, and names of duplicates merged into it.
+    other_names = models.JSONField(default=list, blank=True)
+    # Every other name, one per line, also without Turkish letters and accents, so "hali"
+    # finds "halı". Kept in step on save; searches match it.
+    search_names = models.TextField(blank=True, editable=False)
 
     class Meta:
         abstract = True
@@ -39,6 +79,19 @@ class LookupItem(BaseModel):
     @property
     def user_added(self):
         return self.created_by_id is not None
+
+    @property
+    def names(self):
+        """Its other names, without its own name, in the order shown to users."""
+        return unique_names([*self.other_names, *self.wikidata_names], skip=self.name)
+
+    def save(self, *args, **kwargs):
+        names = self.names
+        self.search_names = "\n".join(unique_names([*names, *map(fold, names)]))
+        fields = kwargs.get("update_fields")
+        if fields is not None:
+            kwargs["update_fields"] = {*fields, "search_names"}
+        super().save(*args, **kwargs)
 
 
 def _unique_name(model_name, *fields):

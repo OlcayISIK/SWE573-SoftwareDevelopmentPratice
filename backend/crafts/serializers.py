@@ -14,6 +14,7 @@ from .models import (
     CATEGORY_ICONS,
     DEFAULT_CATEGORY_ICON,
     MAX_STORY_LENGTH,
+    WIKIDATA_ID,
     Category,
     Craft,
     CraftMedia,
@@ -126,9 +127,27 @@ def clean_description(value):
     return " ".join(value.split())
 
 
+class WikidataIdField(serializers.RegexField):
+    def __init__(self, **kwargs):
+        super().__init__(
+            WIKIDATA_ID,
+            max_length=16,
+            error_messages={"invalid": "Use a Wikidata item id such as Q163446."},
+            **kwargs,
+        )
+
+
 class AddItemSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=80)
     description = serializers.CharField(max_length=300, required=False, allow_blank=True)
+    wikidata_id = WikidataIdField(
+        required=False,
+        allow_blank=True,
+        help_text=(
+            "The Wikidata item the user picked for the new item, from /wikidata/search/. Its "
+            "names in English and Turkish let searches find the item."
+        ),
+    )
 
     def validate_name(self, value):
         return clean_lookup_name(value)
@@ -540,6 +559,14 @@ def parse_box(value):
 
 class CraftFilterSerializer(serializers.Serializer):
     category = serializers.SlugField(required=False)
+    exact = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text=(
+            "Search only the words as typed, not the categories, craft types, tools, materials, "
+            "and cultures they name in other words or languages."
+        ),
+    )
     craft_type = serializers.IntegerField(required=False, min_value=1)
     culture = serializers.IntegerField(required=False, min_value=1)
     country = serializers.CharField(required=False, max_length=100)
@@ -725,6 +752,39 @@ class StoryFilterSerializer(serializers.Serializer):
 
 class StoryWriteSerializer(serializers.Serializer):
     text = serializers.CharField(max_length=MAX_STORY_LENGTH)
+
+
+class WikidataSearchSerializer(serializers.Serializer):
+    q = serializers.CharField(min_length=2, max_length=80, help_text="The name to look up.")
+
+
+class WikidataItemSerializer(serializers.Serializer):
+    id = serializers.CharField(help_text="The Wikidata item id, such as Q163446.")
+    label = serializers.CharField()
+    description = serializers.CharField(allow_blank=True)
+
+
+class RelatedItemSerializer(serializers.Serializer):
+    kind = serializers.ChoiceField(
+        choices=["category", "craft_type", "tool", "material", "culture"]
+    )
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    names = serializers.ListField(
+        child=serializers.CharField(),
+        help_text="A few of its other names, such as its Turkish name.",
+    )
+
+
+class SearchTermSerializer(serializers.Serializer):
+    word = serializers.CharField()
+    related = RelatedItemSerializer(
+        many=True,
+        help_text=(
+            "Items the word also finds: by another name, in another language, or as a "
+            "narrower kind of an item it names."
+        ),
+    )
 
 
 class GeocodeSearchSerializer(serializers.Serializer):

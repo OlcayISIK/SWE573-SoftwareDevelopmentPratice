@@ -27,7 +27,11 @@ export function PartRows({
 }: {
   form: UseFormReturn<CraftFormValues>;
   materials: Material[] | undefined;
-  onCreateMaterial: (name: string, description?: string) => Promise<ChosenItem>;
+  onCreateMaterial: (
+    name: string,
+    description?: string,
+    wikidataId?: string,
+  ) => Promise<ChosenItem>;
   craftTypeName?: string;
 }) {
   const {

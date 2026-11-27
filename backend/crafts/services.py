@@ -1,12 +1,16 @@
+import logging
+import time
+
 from django.db import IntegrityError, transaction
 from django.utils.text import slugify
 
 from core.exceptions import ConflictError, PermissionDeniedError, ValidationError
 
-from . import signals
+from . import signals, wikidata
 from .colors import main_color
 from .models import (
     DEFAULT_CATEGORY_ICON,
+    LOOKUP_MODELS,
     Category,
     Craft,
     CraftColor,
@@ -18,7 +22,10 @@ from .models import (
     Culture,
     Material,
     Tool,
+    unique_names,
 )
+
+logger = logging.getLogger(__name__)
 
 MAX_MEDIA_PER_CRAFT = 20
 
@@ -55,6 +62,7 @@ NAME_TAKEN = "{name} already exists. Merge into it instead."
 MERGE_SAME_KIND = "Choose another item of the same kind to merge into."
 MERGE_INTO_VISIBLE = "Choose an item that is not hidden to merge into."
 MERGE_SAME_CATEGORY = "Choose a craft type of the same category to merge into."
+NOT_A_WIKIDATA_ITEM = "No Wikidata item has this id."
 
 
 def _ensure_can_edit(craft, actor):
@@ -255,10 +263,49 @@ def remove_story(*, story, actor):
     story.delete()
 
 
-def _add_lookup(model, *, user, name, scope=None, **extra):
+def link_wikidata(item, wikidata_id):
+    """
+    Links the item to a Wikidata item and stores its names and broader kinds, so searches find
+    the item by its names in other languages. An empty id removes the link.
+
+    Returns what Wikidata says the linked item is (see wikidata.describe), or None when the link
+    was removed.
+    """
+    if not wikidata_id:
+        _store_wikidata(item, "", {"names": [], "broader": []})
+        return None
+    try:
+        found = wikidata.describe(wikidata_id)
+    except LookupError as exc:
+        raise ValidationError(
+            NOT_A_WIKIDATA_ITEM, errors={"wikidata_id": [NOT_A_WIKIDATA_ITEM]}
+        ) from exc
+    _store_wikidata(item, wikidata_id, found)
+    return found
+
+
+def _store_wikidata(item, wikidata_id, found):
+    item.wikidata_id = wikidata_id
+    item.wikidata_names = found["names"]
+    item.broader = found["broader"]
+    item.save(update_fields=["wikidata_id", "wikidata_names", "broader", "updated_at"])
+
+
+def _link_new(item, wikidata_id):
+    """Links an item a user added or picked. It stays usable when Wikidata cannot be reached."""
+    if not wikidata_id or item.wikidata_id:
+        return
+    try:
+        link_wikidata(item, wikidata_id)
+    except (wikidata.WikidataUnavailable, ValidationError) as exc:
+        logger.warning("Could not link %s to %s: %s", item, wikidata_id, exc)
+
+
+def _add_lookup(model, *, user, name, scope=None, wikidata_id="", **extra):
     """
     Adds a lookup item, or returns the existing one with the same name (ignoring case), so
-    "carpet" and "Carpet" stay one item. Returns the item and whether it was created.
+    "carpet" and "Carpet" stay one item. Returns the item and whether it was created. The
+    Wikidata item the user picked is linked when the item has no link yet.
     """
     if not user.is_email_verified:
         raise PermissionDeniedError(VERIFY_BEFORE_ADDING)
@@ -268,14 +315,17 @@ def _add_lookup(model, *, user, name, scope=None, **extra):
         try:
             with transaction.atomic():
                 item = model.objects.create(name=name, created_by=user, **scope, **extra)
-            return item, True
         except IntegrityError:
             # Someone added the same name at the same moment.
             existing = model.objects.filter(name__iexact=name, **scope).first()
             if existing is None:
                 raise
+        else:
+            _link_new(item, wikidata_id)
+            return item, True
     if existing.is_hidden:
         raise ConflictError(REMOVED_BY_ADMIN.format(name=existing.name))
+    _link_new(existing, wikidata_id)
     return existing, False
 
 
@@ -287,9 +337,9 @@ def _unique_slug(name):
     return slug
 
 
-def add_category(*, user, name, description="", icon=DEFAULT_CATEGORY_ICON):
+def add_category(*, user, name, description="", icon=DEFAULT_CATEGORY_ICON, wikidata_id=""):
     if Category.objects.filter(name__iexact=name).exists():
-        return _add_lookup(Category, user=user, name=name)
+        return _add_lookup(Category, user=user, name=name, wikidata_id=wikidata_id)
     return _add_lookup(
         Category,
         user=user,
@@ -297,17 +347,25 @@ def add_category(*, user, name, description="", icon=DEFAULT_CATEGORY_ICON):
         slug=_unique_slug(name),
         description=description,
         icon=icon,
+        wikidata_id=wikidata_id,
     )
 
 
-def add_craft_type(*, user, name, category, description=""):
+def add_craft_type(*, user, name, category, description="", wikidata_id=""):
     return _add_lookup(
-        CraftType, user=user, name=name, scope={"category": category}, description=description
+        CraftType,
+        user=user,
+        name=name,
+        scope={"category": category},
+        description=description,
+        wikidata_id=wikidata_id,
     )
 
 
-def _add_linked(model, *, user, name, craft_type=None, description=""):
-    item, created = _add_lookup(model, user=user, name=name, description=description)
+def _add_linked(model, *, user, name, craft_type=None, description="", wikidata_id=""):
+    item, created = _add_lookup(
+        model, user=user, name=name, description=description, wikidata_id=wikidata_id
+    )
     if craft_type is not None:
         # The user picked it for this craft type, so suggest it there from now on.
         item.craft_types.add(craft_type)
@@ -315,18 +373,37 @@ def _add_linked(model, *, user, name, craft_type=None, description=""):
     return item, created
 
 
-def add_tool(*, user, name, craft_type=None, description=""):
-    return _add_linked(Tool, user=user, name=name, craft_type=craft_type, description=description)
-
-
-def add_material(*, user, name, craft_type=None, description=""):
+def add_tool(*, user, name, craft_type=None, description="", wikidata_id=""):
     return _add_linked(
-        Material, user=user, name=name, craft_type=craft_type, description=description
+        Tool,
+        user=user,
+        name=name,
+        craft_type=craft_type,
+        description=description,
+        wikidata_id=wikidata_id,
     )
 
 
-def add_culture(*, user, name, homeland="", description=""):
-    return _add_lookup(Culture, user=user, name=name, homeland=homeland, description=description)
+def add_material(*, user, name, craft_type=None, description="", wikidata_id=""):
+    return _add_linked(
+        Material,
+        user=user,
+        name=name,
+        craft_type=craft_type,
+        description=description,
+        wikidata_id=wikidata_id,
+    )
+
+
+def add_culture(*, user, name, homeland="", description="", wikidata_id=""):
+    return _add_lookup(
+        Culture,
+        user=user,
+        name=name,
+        homeland=homeland,
+        description=description,
+        wikidata_id=wikidata_id,
+    )
 
 
 def _same_name(item, name):
@@ -337,8 +414,11 @@ def _same_name(item, name):
 
 
 @transaction.atomic
-def edit_lookup(*, item, actor, name=None, description=None):
-    """Changes the item's name, its description, or both. None leaves a field as it is."""
+def edit_lookup(*, item, actor, name=None, description=None, wikidata_id=None, other_names=None):
+    """
+    Changes the item's name, description, Wikidata link, or other names. None leaves a field as
+    it is; an empty Wikidata id removes the link.
+    """
     _ensure_admin(actor)
     if name is not None:
         taken = _same_name(item, name)
@@ -347,7 +427,11 @@ def edit_lookup(*, item, actor, name=None, description=None):
         item.name = name
     if description is not None:
         item.description = description
-    item.save(update_fields=["name", "description", "updated_at"])
+    if other_names is not None:
+        item.other_names = unique_names(other_names, skip=item.name)
+    item.save(update_fields=["name", "description", "other_names", "updated_at"])
+    if wikidata_id is not None and wikidata_id != item.wikidata_id:
+        link_wikidata(item, wikidata_id)
     return item
 
 
@@ -386,6 +470,9 @@ def _merge(item, into):
             else:
                 _merge(craft_type, twin)
     _move_crafts(item, into)
+    # The duplicate's names still find its crafts, now through the item it was merged into.
+    into.other_names = unique_names([*into.other_names, item.name, *item.other_names], into.name)
+    into.save(update_fields=["other_names", "updated_at"])
     item.delete()
 
 
@@ -404,3 +491,59 @@ def merge_lookup(*, item, into, actor):
         raise ValidationError(MERGE_SAME_CATEGORY, errors={"merge_into": [MERGE_SAME_CATEGORY]})
     _merge(item, into)
     return into
+
+
+# Items are refreshed this many at a time; Wikidata failing affects only that many.
+REFRESH_BATCH = 50
+# The admin panel stops starting new batches after this many seconds, so the page answers
+# before the web server's time limit.
+ADMIN_REFRESH_SECONDS = 15
+
+
+def _refresh(items, seconds=None):
+    """
+    Fetches the names and broader kinds of the linked items again, those refreshed longest ago
+    first. Items Wikidata does not answer for keep the names they have, and the others are still
+    refreshed. With `seconds`, no new batch is started after that long.
+
+    Returns (refreshed, kept, not reached).
+    """
+    items = sorted((item for item in items if item.wikidata_id), key=lambda item: item.updated_at)
+    deadline = None if seconds is None else time.monotonic() + seconds
+    parents = {}
+    refreshed = kept = 0
+    for start in range(0, len(items), REFRESH_BATCH):
+        if deadline is not None and time.monotonic() > deadline:
+            return refreshed, kept, len(items) - start
+        batch = items[start : start + REFRESH_BATCH]
+        try:
+            found = wikidata.describe_many((item.wikidata_id for item in batch), parents)
+        except wikidata.WikidataUnavailable as exc:
+            logger.warning("Kept the names of %s items: %s", len(batch), exc)
+            kept += len(batch)
+            continue
+        for item in batch:
+            if item.wikidata_id not in found:
+                logger.warning("%s is linked to %s, which is gone", item, item.wikidata_id)
+                kept += 1
+                continue
+            _store_wikidata(item, item.wikidata_id, found[item.wikidata_id])
+            refreshed += 1
+    return refreshed, kept, 0
+
+
+def refresh_wikidata_names():
+    """Refreshes the names of every linked item, as the refresh_wikidata_names command does."""
+    items = [
+        item for model in LOOKUP_MODELS.values() for item in model.objects.exclude(wikidata_id="")
+    ]
+    return _refresh(items)
+
+
+def refresh_names_of(*, items, actor):
+    """
+    Refreshes the names of the chosen items for an admin, within the admin panel's time. Returns
+    (refreshed, kept, not reached); running it again goes on with the items not reached.
+    """
+    _ensure_admin(actor)
+    return _refresh(items, seconds=ADMIN_REFRESH_SECONDS)

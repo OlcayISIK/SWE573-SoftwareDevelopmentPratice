@@ -11,7 +11,7 @@ from core.pagination import StandardPagination
 from core.permissions import IsAuthorOrAdmin
 from core.schema import error_response
 
-from . import examples, geocoding, selectors, services
+from . import examples, geocoding, selectors, services, wikidata
 from .serializers import (
     AddCategorySerializer,
     AddCraftTypeSerializer,
@@ -35,10 +35,13 @@ from .serializers import (
     MediaSerializer,
     MediaUploadSerializer,
     PlaceSerializer,
+    SearchTermSerializer,
     StoryFilterSerializer,
     StorySerializer,
     StoryWriteSerializer,
     ToolSerializer,
+    WikidataItemSerializer,
+    WikidataSearchSerializer,
 )
 
 FILTER_PARAMETERS = [
@@ -48,6 +51,11 @@ FILTER_PARAMETERS = [
     OpenApiParameter("country", OpenApiTypes.STR, description="Country of the craft"),
     OpenApiParameter("color", OpenApiTypes.STR, description="Main color, such as red"),
     OpenApiParameter("search", OpenApiTypes.STR, description="Text search"),
+    OpenApiParameter(
+        "exact",
+        OpenApiTypes.BOOL,
+        description="Search only the words as typed, not other names of the items they name",
+    ),
     OpenApiParameter(
         "area", OpenApiTypes.STR, description="Crafts with a place in west,south,east,north"
     ),
@@ -214,6 +222,22 @@ class CraftViewSet(viewsets.GenericViewSet):
         pins = selectors.map_pins(request.user, **_filters(request, MapFilterSerializer))
         return Response(CraftPinSerializer(pins, many=True).data)
 
+    @extend_schema(
+        parameters=[OpenApiParameter("search", OpenApiTypes.STR, description="Text search")],
+        responses=SearchTermSerializer(many=True),
+    )
+    @action(detail=False, methods=["get"], url_path="search-terms", pagination_class=None)
+    def search_terms(self, request):
+        """
+        What each search word also finds besides crafts that contain it: categories, craft
+        types, tools, materials, and cultures it names in another language or other words,
+        and their narrower kinds. A search page shows these as "Also matching".
+        """
+        search = request.query_params.get("search", "")
+        words = search.split()[: selectors.MAX_SEARCH_WORDS]
+        terms = [{"word": word, "related": selectors.list_related_items(word)} for word in words]
+        return Response(SearchTermSerializer(terms, many=True).data)
+
     @extend_schema(parameters=FILTER_PARAMETERS, responses=FacetsSerializer)
     @action(detail=False, methods=["get"], url_path="facets", pagination_class=None)
     def facets(self, request):
@@ -351,6 +375,24 @@ class UserCraftsView(generics.ListAPIView):
         return selectors.browse_crafts(
             self.request.user, author_id=author.id, **_filters(self.request)
         )
+
+
+@extend_schema(tags=["reference data"])
+class WikidataSearchView(APIView):
+    """
+    Finds Wikidata items by name, so a user adding a category, craft type, tool, material, or
+    culture can say which one they mean. Returns 503 when Wikidata cannot be reached.
+    """
+
+    permission_classes = [IsAuthenticated]
+    throttle_scope = "wikidata"
+
+    @extend_schema(
+        parameters=[WikidataSearchSerializer], responses=WikidataItemSerializer(many=True)
+    )
+    def get(self, request):
+        params = _filters(request, WikidataSearchSerializer)
+        return Response(WikidataItemSerializer(wikidata.search(params["q"]), many=True).data)
 
 
 class GeocodeView(APIView):

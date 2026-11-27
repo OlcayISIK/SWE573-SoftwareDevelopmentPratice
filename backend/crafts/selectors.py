@@ -1,11 +1,16 @@
+import logging
 import re
+from functools import reduce
+from operator import or_
 
+from django.db import transaction
 from django.db.models import Count, Exists, OuterRef, Prefetch, Q, Value
 
 from core.exceptions import NotFoundError
 
 from .colors import MAIN_COLORS
 from .models import (
+    LOOKUP_MODELS,
     Category,
     Craft,
     CraftColor,
@@ -18,6 +23,8 @@ from .models import (
     Material,
     Tool,
 )
+
+logger = logging.getLogger(__name__)
 
 CRAFT_NOT_FOUND = "Craft not found."
 MEDIA_NOT_FOUND = "Media not found."
@@ -89,13 +96,117 @@ SEARCHED_PLACE_FIELDS = ["address", "city", "country"]
 MAX_SEARCH_WORDS = 6
 
 
-def _matches(word):
+def _word_pattern(word):
+    """`\\m` is the start of a word in PostgreSQL regular expressions."""
+    return r"\m" + re.escape(word)
+
+
+# At most this many Wikidata items found by a word have their narrower kinds searched too.
+MAX_BROADER = 20
+
+
+def related_items(word):
+    """
+    Lookup items a search word finds other than by their own name: by another name, such as
+    "halı" (Turkish) or "rug" for Carpet, or as a narrower kind of an item the word finds, such
+    as Kilim for Carpet. Returns {kind: [items]}, with kinds as in LOOKUP_MODELS.
+
+    Other names only widen a search, so if they cannot be looked up, for example because the
+    names were never stored, the search goes on without them instead of failing.
+    """
+    try:
+        # A savepoint, so a failed query does not break the rest of the request's queries.
+        with transaction.atomic():
+            return _find_related(word)
+    except Exception:
+        logger.exception("Searching %r without other names, which could not be looked up", word)
+        return {}
+
+
+def _find_related(word):
+    pattern = _word_pattern(word)
+    # Python's regular expressions have no \m; this is the same start of a word.
+    own_name = re.compile(r"(?<!\w)" + re.escape(word), re.IGNORECASE)
+    named = {
+        kind: list(model.objects.filter(Q(name__iregex=pattern) | Q(search_names__iregex=pattern)))
+        for kind, model in LOOKUP_MODELS.items()
+    }
+    wikidata_ids = list(
+        dict.fromkeys(
+            item.wikidata_id for items in named.values() for item in items if item.wikidata_id
+        )
+    )[:MAX_BROADER]
+    related = {}
+    for kind, model in LOOKUP_MODELS.items():
+        items = [item for item in named[kind] if not own_name.search(item.name)]
+        if wikidata_ids:
+            narrower = model.objects.filter(
+                reduce(or_, (Q(broader__contains=[wikidata_id]) for wikidata_id in wikidata_ids))
+            ).exclude(pk__in=[item.pk for item in named[kind]])
+            items += list(narrower)
+        if items:
+            related[kind] = items
+    return related
+
+
+# The "Also matching" list shows at most this many items per word, and this many other names
+# of each.
+MAX_RELATED_SHOWN = 8
+MAX_NAMES_SHOWN = 3
+
+
+def list_related_items(word):
+    """The visible items related_items finds, as {kind, id, name, names} for the search page."""
+    rows = [
+        {"kind": kind, "id": item.pk, "name": item.name, "names": item.names[:MAX_NAMES_SHOWN]}
+        for kind, items in related_items(word).items()
+        for item in items
+        if not item.is_hidden
+    ]
+    return rows[:MAX_RELATED_SHOWN]
+
+
+def _related_condition(related):
+    """Crafts that use one of the related items, as related_items returns them."""
+    ids = {kind: [item.pk for item in items] for kind, items in related.items()}
+    condition = Q()
+    for kind, field in (
+        ("category", "category_id"),
+        ("craft_type", "craft_type_id"),
+        ("culture", "culture_id"),
+    ):
+        if ids.get(kind):
+            condition |= Q(**{f"{field}__in": ids[kind]})
+    if ids.get("tool"):
+        tools = Craft.tools.through.objects.filter(craft_id=OuterRef("pk"), tool_id__in=ids["tool"])
+        condition |= Exists(tools)
+    if ids.get("material"):
+        materials = Craft.materials.through.objects.filter(
+            craft_id=OuterRef("pk"), material_id__in=ids["material"]
+        )
+        in_parts = CraftPart.objects.filter(craft=OuterRef("pk"), materials__in=ids["material"])
+        condition |= Exists(materials) | Exists(in_parts)
+    return condition
+
+
+def prepare_search(search, exact=False):
+    """
+    The search words, each with the lookup items it finds by other names, unless `exact`.
+    Prepared once, so the list, the map, and the facets do not look them up again.
+    """
+    if not search or isinstance(search, list):
+        return search or []
+    words = search.split()[:MAX_SEARCH_WORDS]
+    return [(word, {} if exact else related_items(word)) for word in words]
+
+
+def _matches(word, related=None):
     """
     Crafts where some searched field has a word starting with `word`, so "tile" finds tiles
-    but not textiles. `\\m` is the start of a word in PostgreSQL regular expressions.
+    but not textiles, or that use a lookup item the word finds by another name.
     """
-    pattern = r"\m" + re.escape(word)
-    condition = Q()
+    pattern = _word_pattern(word)
+    condition = _related_condition(related) if related else Q()
     for field in SEARCHED_FIELDS:
         condition |= Q(**{f"{field}__iregex": pattern})
     for model in (Tool, Material):
@@ -128,6 +239,7 @@ def _apply_filters(
     country=None,
     color=None,
     search=None,
+    exact=False,
     area=None,
 ):
     if category:
@@ -151,10 +263,9 @@ def _apply_filters(
         crafts = crafts.filter(
             Exists(CraftColor.objects.filter(craft=OuterRef("pk"), main_color=color))
         )
-    if search:
-        # Every word must match, so adding words narrows the results.
-        for word in search.split()[:MAX_SEARCH_WORDS]:
-            crafts = crafts.filter(_matches(word))
+    # Every word must match, so adding words narrows the results.
+    for word, related in prepare_search(search, exact):
+        crafts = crafts.filter(_matches(word, related))
     return crafts
 
 
@@ -164,6 +275,7 @@ def craft_facets(viewer=None, **filters):
     a filter list only offers values that lead to crafts. A list ignores its own filter, so
     another value in the same list can still be picked.
     """
+    filters["search"] = prepare_search(filters.get("search"), filters.pop("exact", False))
 
     def found(without):
         others = {key: value for key, value in filters.items() if key != without}

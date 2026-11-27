@@ -10,6 +10,7 @@ const FILTER_KEYS = [
   "country",
   "color",
   "search",
+  "exact",
   "place",
   "area",
   "page",
@@ -35,6 +36,7 @@ export function useCraftFilters() {
       place: params.get("place") || undefined,
       area: params.get("area") || undefined,
       search: params.get("search") || undefined,
+      exact: params.get("exact") === "true" || undefined,
       page: Number.isInteger(page) && page > 1 ? page : undefined,
     };
   }, [params]);

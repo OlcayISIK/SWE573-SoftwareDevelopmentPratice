@@ -81,6 +81,8 @@ export function CraftFields({
   const addCulture = useAddLookup(lookupsApi.addCulture);
   const addTool = useAddLookup(lookupsApi.addTool);
   const addMaterial = useAddLookup(lookupsApi.addMaterial);
+  const addMaterialFor = (name: string, description?: string, wikidataId?: string) =>
+    addMaterial.mutateAsync([name, craftTypeId ?? undefined, description, wikidataId]);
 
   // A craft type belongs to one category, so a new category clears it.
   const previousCategory = useRef(category);
@@ -140,8 +142,8 @@ export function CraftFields({
             <AddItemInline
               noun="category"
               withIcon
-              onAdd={async (name, _homeland, description, icon) => {
-                const added = await addCategory.mutateAsync([name, description, icon]);
+              onAdd={async (name, _homeland, description, icon, wikidataId) => {
+                const added = await addCategory.mutateAsync([name, description, icon, wikidataId]);
                 setValue("category", String(added.id), changed);
               }}
             />
@@ -174,11 +176,12 @@ export function CraftFields({
               noun="craft type"
               disabled={!categoryId}
               disabledHint="Choose a category to add a craft type to it."
-              onAdd={async (name, _homeland, description) => {
+              onAdd={async (name, _homeland, description, _icon, wikidataId) => {
                 const added = await addCraftType.mutateAsync([
                   name,
                   categoryId as number,
                   description,
+                  wikidataId,
                 ]);
                 setValue("craft_type", String(added.id), changed);
               }}
@@ -214,8 +217,8 @@ export function CraftFields({
           <AddItemInline
             noun="culture"
             withHomeland
-            onAdd={async (name, homeland, description) => {
-              const added = await addCulture.mutateAsync([name, homeland, description]);
+            onAdd={async (name, homeland, description, _icon, wikidataId) => {
+              const added = await addCulture.mutateAsync([name, homeland, description, wikidataId]);
               setValue("culture", String(added.id), changed);
             }}
           />
@@ -232,8 +235,8 @@ export function CraftFields({
           items={tools.data}
           value={watch("tools")}
           onChange={(value) => setValue("tools", value, changed)}
-          onCreate={(name, description) =>
-            addTool.mutateAsync([name, craftTypeId ?? undefined, description])
+          onCreate={(name, description, wikidataId) =>
+            addTool.mutateAsync([name, craftTypeId ?? undefined, description, wikidataId])
           }
           craftTypeName={craftTypeName}
           max={MAX_TOOLS}
@@ -245,9 +248,7 @@ export function CraftFields({
           items={materials.data}
           value={watch("materials")}
           onChange={(value) => setValue("materials", value, changed)}
-          onCreate={(name, description) =>
-            addMaterial.mutateAsync([name, craftTypeId ?? undefined, description])
-          }
+          onCreate={addMaterialFor}
           craftTypeName={craftTypeName}
           max={MAX_MATERIALS}
           error={errors.materials?.message}
@@ -255,9 +256,7 @@ export function CraftFields({
         <PartRows
           form={form}
           materials={materials.data}
-          onCreateMaterial={(name, description) =>
-            addMaterial.mutateAsync([name, craftTypeId ?? undefined, description])
-          }
+          onCreateMaterial={addMaterialFor}
           craftTypeName={craftTypeName}
         />
       </fieldset>

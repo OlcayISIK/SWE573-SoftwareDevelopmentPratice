@@ -4,7 +4,7 @@ import { http } from "msw";
 
 import { expectNoA11yViolations } from "@/test/axe";
 import { makeCraftDetail, makeCraftListItem } from "@/test/fixtures";
-import { API, ok } from "@/test/http";
+import { API, fail, ok } from "@/test/http";
 import { renderRoute } from "@/test/render";
 import { server } from "@/test/server";
 
@@ -56,6 +56,50 @@ describe("craft list", () => {
     );
     const last = calls.at(-1)!;
     expect([last.get("category"), last.get("search")]).toEqual(["ceramics", "çini"]);
+  });
+
+  test("a search says what else it finds by other names, and can be made exact", async () => {
+    const calls = recordRequests("/crafts/", () => page([makeCraftListItem()]));
+    server.use(
+      http.get(`${API}/crafts/search-terms/`, () =>
+        ok([
+          {
+            word: "rug",
+            related: [
+              { kind: "craft_type", id: 23, name: "Carpet", names: ["rug", "halı"] },
+              { kind: "craft_type", id: 24, name: "Kilim", names: ["rug", "kylym"] },
+            ],
+          },
+        ]),
+      ),
+    );
+    const { router } = renderRoute("/crafts?search=rug");
+
+    const line = await screen.findByText(/Also matching/);
+    expect(line).toHaveTextContent("Also matching: Carpet (rug, halı), Kilim (rug, kylym)");
+    await userEvent.click(screen.getByRole("button", { name: "Search only “rug”" }));
+
+    await waitFor(() => expect(router.state.location.search).toBe("?search=rug&exact=true"));
+    await waitFor(() => expect(calls.at(-1)!.get("exact")).toBe("true"));
+    expect(screen.getByText(/Showing only crafts that contain “rug”/)).toBeInTheDocument();
+    expect(screen.queryByText(/Also matching/)).toBeNull();
+
+    // A new search includes other names again.
+    const search = screen.getByLabelText("Search");
+    await userEvent.clear(search);
+    await userEvent.type(search, "halı");
+    await userEvent.click(screen.getByRole("button", { name: "Search" }));
+    await waitFor(() => expect(router.state.location.search).toBe("?search=hal%C4%B1"));
+  });
+
+  test("results still show when other names cannot be looked up", async () => {
+    recordRequests("/crafts/", () => page([makeCraftListItem()]));
+    server.use(http.get(`${API}/crafts/search-terms/`, () => fail(500, "Something went wrong.")));
+    renderRoute("/crafts?search=hal%C4%B1");
+
+    expect(await screen.findByRole("link", { name: "Kütahya Çinisi" })).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText(/Also matching/)).toBeNull());
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   test("craft type, culture, and country filters are sent to the API", async () => {

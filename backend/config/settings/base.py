@@ -140,6 +140,7 @@ REST_FRAMEWORK = {
         "report": "20/hour",
         "lookup_add": "30/hour",
         "geocode": "30/min",
+        "wikidata": "30/min",
     },
 }
 
@@ -167,6 +168,9 @@ GEOCODER_USER_AGENT = env(
     "GEOCODER_USER_AGENT",
     default="IndigenousCrafts/1.0 (+https://github.com/OlcayISIK/SWE573-SoftwareDevelopmentPratice)",
 )
+# Names of lookup items in other languages; see crafts/wikidata.py.
+WIKIDATA_URL = env("WIKIDATA_URL", default="https://www.wikidata.org/w/api.php")
+WIKIDATA_USER_AGENT = env("WIKIDATA_USER_AGENT", default=GEOCODER_USER_AGENT)
 
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = env("EMAIL_HOST", default="localhost")

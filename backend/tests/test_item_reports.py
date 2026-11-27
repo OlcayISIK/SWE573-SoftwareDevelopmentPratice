@@ -162,6 +162,9 @@ def test_queue_shows_the_item_and_who_added_it(admin_client, adder, rug, open_re
         "is_hidden": False,
         "added_by": {"id": adder.id, "display_name": adder.profile.display_name},
         "crafts_count": 1,
+        "wikidata_id": "",
+        "wikidata_names": [],
+        "other_names": [],
     }
 
 
