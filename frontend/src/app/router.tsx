@@ -138,6 +138,20 @@ export const routes: RouteObject[] = [
                         Component: m.StoryReviewPage,
                       })),
                   },
+                  {
+                    path: "status-proposals",
+                    lazy: () =>
+                      import("@/features/moderation/pages/StatusProposalQueuePage").then((m) => ({
+                        Component: m.StatusProposalQueuePage,
+                      })),
+                  },
+                  {
+                    path: "status-proposals/:id",
+                    lazy: () =>
+                      import("@/features/moderation/pages/StatusProposalReviewPage").then((m) => ({
+                        Component: m.StatusProposalReviewPage,
+                      })),
+                  },
                 ],
               },
             ],

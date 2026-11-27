@@ -170,6 +170,10 @@ export const facets = {
     { name: "red", count: 1 },
     { name: "blue", count: 2 },
   ],
+  practice_statuses: [
+    { name: "unknown", count: 2 },
+    { name: "endangered", count: 1 },
+  ],
 };
 
 export function emptyPage() {

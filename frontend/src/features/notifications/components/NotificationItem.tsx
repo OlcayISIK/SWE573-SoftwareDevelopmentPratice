@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
+import { PRACTICE_STATUS_LABELS, type PracticeStatus } from "@/features/crafts/practiceStatus";
+
 import type { AppNotification } from "../api";
 
 const REVIEW_OUTCOMES: Record<string, string> = {
@@ -26,7 +28,13 @@ function message(notification: AppNotification): ReactNode {
       {craft.name}
     </Link>
   ) : null;
-  const data = (notification.data ?? {}) as { action?: string; subject?: string };
+  const data = (notification.data ?? {}) as {
+    action?: string;
+    subject?: string;
+    decision?: string;
+    practice_status?: PracticeStatus;
+  };
+  const status = PRACTICE_STATUS_LABELS[data.practice_status ?? "unknown"]?.toLowerCase();
 
   switch (notification.type) {
     case "new_craft_from_followed":
@@ -71,6 +79,25 @@ function message(notification: AppNotification): ReactNode {
       ) : (
         `${actor} shared a story about a craft that is no longer available.`
       );
+    case "practice_status_changed":
+      return craftLink ? (
+        <>
+          {craftLink}, one of your favorites, is now marked as {status}.
+        </>
+      ) : (
+        `A craft you favorited is now marked as ${status}.`
+      );
+    case "status_proposal_reviewed": {
+      const outcome =
+        data.decision === "approved" ? `approved, so it is now marked as ${status}` : "rejected";
+      return craftLink ? (
+        <>
+          Your proposal that {craftLink} is {status} was {outcome}.
+        </>
+      ) : (
+        `Your practice status proposal was ${outcome}.`
+      );
+    }
     default:
       return "You have a new notification.";
   }

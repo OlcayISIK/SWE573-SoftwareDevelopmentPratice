@@ -16,9 +16,11 @@ import { categoryStyle } from "../categoryStyle";
 import { AttributeList } from "../components/detail/AttributeList";
 import { CraftFacts } from "../components/detail/CraftFacts";
 import { PhotoGallery } from "../components/detail/PhotoGallery";
+import { PracticeStatusPanel } from "../components/detail/PracticeStatusPanel";
 import { RichText } from "../components/detail/RichText";
 import { Stories } from "../components/detail/Stories";
 import { Documents, Videos } from "../components/detail/VideosAndDocuments";
+import { PracticeStatusBadge } from "../components/PracticeStatusBadge";
 import { placeName } from "../place";
 import { useCraft, useDeleteCraft } from "../queries";
 import type { CraftDetail } from "../types";
@@ -131,6 +133,11 @@ export function CraftDetailPage() {
               </span>
             </p>
             <h1 className="mt-3 text-4xl font-semibold leading-tight sm:text-5xl">{data.name}</h1>
+            {data.practice_status !== "unknown" && (
+              <p className="mt-3">
+                <PracticeStatusBadge status={data.practice_status} />
+              </p>
+            )}
             <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-stone-700">
               {data.culture && (
                 <span className="inline-flex items-center gap-1.5">
@@ -187,6 +194,7 @@ export function CraftDetailPage() {
           className="space-y-6 lg:sticky lg:top-24 lg:self-start"
         >
           <CraftFacts craft={data} />
+          <PracticeStatusPanel craft={data} />
           <section className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-stone-200">
             <h2 className="px-5 pt-4 text-lg font-semibold">
               {data.places.length > 1 ? "Places" : "Location"}

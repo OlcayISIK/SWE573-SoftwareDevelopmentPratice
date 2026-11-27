@@ -6,6 +6,7 @@ import { toApiError } from "@/api/envelope";
 import { geocodeApi } from "../api";
 import { categoryStyle } from "../categoryStyle";
 import { MAIN_COLORS } from "../mainColors";
+import { isPracticeStatus, PRACTICE_STATUS_LABELS, type PracticeStatus } from "../practiceStatus";
 import { useCategories, useCultures, useFacets } from "../queries";
 import type { Category, CraftFilters, Facets } from "../types";
 
@@ -254,9 +255,13 @@ export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: F
   const facets = useFacets(filters).data;
   const craftTypes = craftTypeOptions(facets, categories.data);
   const [search, setSearch] = useState(filters.search ?? "");
-  const moreFilters = [filters.craft_type, filters.culture, filters.country, filters.color].filter(
-    (value) => value !== undefined,
-  ).length;
+  const moreFilters = [
+    filters.craft_type,
+    filters.culture,
+    filters.country,
+    filters.color,
+    filters.practice_status,
+  ].filter((value) => value !== undefined).length;
   const [open, setOpen] = useState(moreFilters > 0);
 
   useEffect(() => setSearch(filters.search ?? ""), [filters.search]);
@@ -428,6 +433,23 @@ export function FilterBar({ filters, onChange, onClear, hasFilters, heading }: F
                 count: item.count,
               }))}
               onChange={(country) => onChange({ country })}
+            />
+            <FacetSelect
+              id={`${id}-practice-status`}
+              label="Still practiced?"
+              allLabel="Any practice status"
+              value={filters.practice_status}
+              options={(facets?.practice_statuses ?? []).map((item) => ({
+                value: item.name,
+                label: PRACTICE_STATUS_LABELS[item.name as PracticeStatus],
+                count: item.count,
+              }))}
+              chosenLabel={
+                filters.practice_status && PRACTICE_STATUS_LABELS[filters.practice_status]
+              }
+              onChange={(value) =>
+                onChange({ practice_status: isPracticeStatus(value) ? value : undefined })
+              }
             />
             <ColorFilter
               name={`${id}-color`}

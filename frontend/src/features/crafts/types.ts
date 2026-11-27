@@ -1,4 +1,5 @@
 import type { Schemas } from "@/api/types";
+import type { PracticeStatus } from "./practiceStatus";
 
 export type Category = Schemas["Category"];
 export type CraftType = Schemas["CraftType"];
@@ -23,6 +24,8 @@ export interface CraftFilters {
   country?: string;
   /** A main color, such as "red". */
   color?: string;
+  /** Whether the craft is still practiced, such as "endangered". */
+  practice_status?: PracticeStatus;
   search?: string;
   /** Search only the words as typed, not other names of the items they name. */
   exact?: boolean;
