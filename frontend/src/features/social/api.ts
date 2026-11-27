@@ -14,6 +14,7 @@ export const socialApi = {
     api.get<Paginated<CraftListItem>>("/me/favorites/", { params: { page } }),
   myFollowing: (page = 1) =>
     api.get<Paginated<FollowEntry>>("/me/following/", { params: { page } }),
+  followedNewCrafts: () => api.get<Paginated<CraftListItem>>("/me/following/crafts/"),
   myFollowers: (page = 1) =>
     api.get<Paginated<FollowEntry>>("/me/followers/", { params: { page } }),
   followStatus: (userId: number) => api.get<FollowStatus>(`/users/${userId}/follow/`),

@@ -1,8 +1,15 @@
-from django.db.models import OuterRef, Subquery
+from datetime import timedelta
 
+from django.db.models import OuterRef, Subquery
+from django.utils import timezone
+
+from crafts.models import Craft
 from crafts.selectors import browse_crafts
 
 from .models import Favorite, Follow
+
+# Crafts added this recently by people the user follows are shown as new.
+NEW_CRAFT_DAYS = 3
 
 
 def favorite_status(viewer, craft):
@@ -41,6 +48,20 @@ def following_of(user):
         Follow.objects.filter(follower=user, following__is_active=True)
         .select_related("following__profile")
         .order_by("-created_at", "-id")
+    )
+
+
+def new_crafts_of_followed(user):
+    """
+    Published crafts that people the user follows added in the last few days, newest first.
+    Deactivated accounts are left out.
+    """
+    since = timezone.now() - timedelta(days=NEW_CRAFT_DAYS)
+    followed = Follow.objects.filter(follower=user, following__is_active=True).values(
+        "following_id"
+    )
+    return browse_crafts(user).filter(
+        author_id__in=followed, status=Craft.Status.PUBLISHED, created_at__gte=since
     )
 
 

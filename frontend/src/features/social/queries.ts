@@ -17,6 +17,8 @@ export const socialKeys = {
   allMyFavorites: ["social", "my-favorites"] as const,
   follow: (userId: number) => ["social", "follow", userId] as const,
   myFollowing: ["social", "my-following"] as const,
+  // Under myFollowing, so following someone new refreshes their new crafts too.
+  followedNewCrafts: ["social", "my-following", "new-crafts"] as const,
   myFollowers: ["social", "my-followers"] as const,
 };
 
@@ -95,6 +97,14 @@ export function useMyFollowing(enabled = true) {
   return useQuery({
     queryKey: socialKeys.myFollowing,
     queryFn: () => socialApi.myFollowing(),
+    enabled,
+  });
+}
+
+export function useFollowedNewCrafts(enabled = true) {
+  return useQuery({
+    queryKey: socialKeys.followedNewCrafts,
+    queryFn: () => socialApi.followedNewCrafts(),
     enabled,
   });
 }

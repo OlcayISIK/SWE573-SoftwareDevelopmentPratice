@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 import pytest
+from django.utils import timezone
 
 from crafts.models import Craft
 from social.models import Favorite, Follow
@@ -190,3 +193,48 @@ def test_follow_lists_leave_out_deactivated_accounts(client_for, user):
 def test_follow_lists_require_login(api_client):
     assert api_client.get(MY_FOLLOWING_URL).status_code == 401
     assert api_client.get(MY_FOLLOWERS_URL).status_code == 401
+    assert api_client.get(NEW_CRAFTS_URL).status_code == 401
+
+
+NEW_CRAFTS_URL = "/api/v1/me/following/crafts/"
+
+
+def added(author, name, days_ago, **fields):
+    craft = CraftFactory(author=author, name=name, **fields)
+    Craft.all_objects.filter(pk=craft.pk).update(
+        created_at=timezone.now() - timedelta(days=days_ago)
+    )
+    return craft
+
+
+def test_new_crafts_of_people_i_follow_are_listed_newest_first(client_for, user):
+    followed, stranger = UserFactory(), UserFactory()
+    client = client_for(user)
+    client.post(follow_url(followed))
+    added(followed, "Older kilim", days_ago=2)
+    added(followed, "New pot", days_ago=0)
+    added(followed, "Last week's rug", days_ago=4)
+    added(stranger, "Not followed", days_ago=0)
+    added(user, "My own", days_ago=0)
+
+    data = client.get(NEW_CRAFTS_URL).json()["data"]
+
+    assert data["total"] == 2
+    assert [item["name"] for item in data["items"]] == ["New pot", "Older kilim"]
+    assert data["items"][0]["author"]["id"] == followed.id
+
+
+def test_new_crafts_leave_out_hidden_removed_and_deactivated(client_for, user):
+    followed, gone = UserFactory(), UserFactory()
+    client = client_for(user)
+    client.post(follow_url(followed))
+    client.post(follow_url(gone))
+    added(followed, "Hidden", days_ago=0, status=Craft.Status.HIDDEN)
+    removed = added(followed, "Removed", days_ago=0)
+    removed.is_deleted = True
+    removed.save()
+    added(gone, "From a closed account", days_ago=0)
+    gone.is_active = False
+    gone.save()
+
+    assert client.get(NEW_CRAFTS_URL).json()["data"]["total"] == 0

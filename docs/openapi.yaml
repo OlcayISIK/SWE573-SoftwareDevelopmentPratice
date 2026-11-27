@@ -2372,6 +2372,46 @@ paths:
                   message:
                     type: string
           description: ''
+  /api/v1/me/following/crafts/:
+    get:
+      operationId: v1_me_following_crafts_list
+      description: Crafts that people the user follows added in the last three days,
+        newest first.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: pageSize
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - social
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/PaginatedCraftListList'
+                  message:
+                    type: string
+          description: ''
   /api/v1/me/notifications/:
     get:
       operationId: v1_me_notifications_list

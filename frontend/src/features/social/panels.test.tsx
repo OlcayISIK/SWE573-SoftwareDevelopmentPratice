@@ -69,3 +69,69 @@ test("empty panels explain how to fill them", async () => {
   expect(screen.getByText("No followers yet.")).toBeInTheDocument();
   expect(await screen.findByText(/No favorites yet/)).toBeInTheDocument();
 });
+
+const daysAgo = (days: number) => new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+test("new crafts of people the user follows are shown with who added them and when", async () => {
+  server.use(
+    ...signedIn(),
+    http.get(`${API}/me/following/`, () => ok(page([person(50, "Mehmet")]))),
+    http.get(`${API}/me/following/crafts/`, () =>
+      ok(
+        page([
+          makeCraftListItem({
+            id: 8,
+            name: "Uşak carpet",
+            author: { id: 50, display_name: "Mehmet" },
+            created_at: daysAgo(0),
+          }),
+          makeCraftListItem({
+            id: 9,
+            name: "Copper tray",
+            author: { id: 50, display_name: "Mehmet" },
+            created_at: daysAgo(2),
+          }),
+        ]),
+      ),
+    ),
+  );
+  renderRoute("/");
+
+  const following = await screen.findByRole("region", { name: "People you follow" });
+  const list = await within(following).findByRole("list", { name: "New in the last 3 days" });
+  const links = within(list).getAllByRole("link");
+  expect(links[0]).toHaveAttribute("href", "/crafts/8");
+  expect(links[0]).toHaveTextContent("Uşak carpet");
+  expect(links[0]).toHaveTextContent("Mehmet · today");
+  expect(links[1]).toHaveTextContent("Mehmet · 2 days ago");
+});
+
+test("many new crafts are shown as titles only", async () => {
+  const crafts = Array.from({ length: 10 }, (_, index) =>
+    makeCraftListItem({ id: 100 + index, name: `Craft ${index + 1}`, created_at: daysAgo(1) }),
+  );
+  server.use(
+    ...signedIn(),
+    http.get(`${API}/me/following/`, () => ok(page([person(50, "Mehmet")]))),
+    http.get(`${API}/me/following/crafts/`, () => ok(page(crafts))),
+  );
+  renderRoute("/");
+
+  const list = await screen.findByRole("list", { name: "New in the last 3 days" });
+  const links = within(list).getAllByRole("link");
+  expect(links).toHaveLength(8);
+  expect(links[0]).toHaveTextContent(/^Craft 1$/);
+  expect(within(list).queryByText(/yesterday/)).toBeNull();
+  expect(screen.getByText("and 2 more")).toBeInTheDocument();
+});
+
+test("nothing new is shown when followed people added no crafts lately", async () => {
+  server.use(
+    ...signedIn(),
+    http.get(`${API}/me/following/`, () => ok(page([person(50, "Mehmet")]))),
+  );
+  renderRoute("/");
+
+  expect(await screen.findByRole("link", { name: /Mehmet/ })).toBeInTheDocument();
+  expect(screen.queryByText("New in the last 3 days")).toBeNull();
+});
