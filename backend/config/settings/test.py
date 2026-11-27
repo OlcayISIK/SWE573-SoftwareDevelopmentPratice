@@ -11,3 +11,4 @@ STATIC_ROOT = tempfile.mkdtemp(prefix="ic-test-static-")
 AUTO_VERIFY_EMAIL = False
 # Tests never call the real address lookup service.
 GEOCODER_URL = "http://geocoder.invalid"
+WIKIDATA_URL = "http://wikidata.invalid/w/api.php"

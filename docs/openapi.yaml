@@ -591,6 +591,12 @@ paths:
         schema:
           type: integer
         description: Culture id
+      - in: query
+        name: exact
+        schema:
+          type: boolean
+        description: Search only the words as typed, not other names of the items
+          they name
       - name: page
         required: false
         in: query
@@ -1757,6 +1763,12 @@ paths:
           type: integer
         description: Culture id
       - in: query
+        name: exact
+        schema:
+          type: boolean
+        description: Search only the words as typed, not other names of the items
+          they name
+      - in: query
         name: search
         schema:
           type: string
@@ -1824,6 +1836,12 @@ paths:
           type: integer
         description: Culture id
       - in: query
+        name: exact
+        schema:
+          type: boolean
+        description: Search only the words as typed, not other names of the items
+          they name
+      - in: query
         name: search
         schema:
           type: string
@@ -1850,6 +1868,44 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/CraftPin'
+                  message:
+                    type: string
+          description: ''
+  /api/v1/crafts/search-terms/:
+    get:
+      operationId: v1_crafts_search_terms_list
+      description: |-
+        What each search word also finds besides crafts that contain it: categories, craft
+        types, tools, materials, and cultures it names in another language or other words,
+        and their narrower kinds. A search page shows these as "Also matching".
+      parameters:
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Text search
+      tags:
+      - crafts
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SearchTerm'
                   message:
                     type: string
           description: ''
@@ -3091,6 +3147,12 @@ paths:
         schema:
           type: integer
         description: Culture id
+      - in: query
+        name: exact
+        schema:
+          type: boolean
+        description: Search only the words as typed, not other names of the items
+          they name
       - name: page
         required: false
         in: query
@@ -3230,6 +3292,45 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/wikidata/search/:
+    get:
+      operationId: v1_wikidata_search_list
+      description: |-
+        Finds Wikidata items by name, so a user adding a category, craft type, tool, material, or
+        culture can say which one they mean. Returns 503 when Wikidata cannot be reached.
+      parameters:
+      - in: query
+        name: q
+        schema:
+          type: string
+          minLength: 2
+          maxLength: 80
+        description: The name to look up.
+        required: true
+      tags:
+      - reference data
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - data
+                - message
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WikidataItem'
+                  message:
+                    type: string
+          description: ''
 components:
   schemas:
     Account:
@@ -3269,6 +3370,15 @@ components:
         description:
           type: string
           maxLength: 300
+        wikidata_id:
+          description: The Wikidata item the user picked for the new item, from /wikidata/search/.
+            Its names in English and Turkish let searches find the item.
+          oneOf:
+          - type: string
+            maxLength: 16
+            pattern: ^Q[1-9][0-9]{0,11}$
+          - type: string
+            maxLength: 0
         icon:
           allOf:
           - $ref: '#/components/schemas/IconEnum'
@@ -3285,6 +3395,15 @@ components:
         description:
           type: string
           maxLength: 300
+        wikidata_id:
+          description: The Wikidata item the user picked for the new item, from /wikidata/search/.
+            Its names in English and Turkish let searches find the item.
+          oneOf:
+          - type: string
+            maxLength: 16
+            pattern: ^Q[1-9][0-9]{0,11}$
+          - type: string
+            maxLength: 0
         category:
           type: integer
       required:
@@ -3300,6 +3419,15 @@ components:
         description:
           type: string
           maxLength: 300
+        wikidata_id:
+          description: The Wikidata item the user picked for the new item, from /wikidata/search/.
+            Its names in English and Turkish let searches find the item.
+          oneOf:
+          - type: string
+            maxLength: 16
+            pattern: ^Q[1-9][0-9]{0,11}$
+          - type: string
+            maxLength: 0
         homeland:
           type: string
           maxLength: 120
@@ -3315,6 +3443,15 @@ components:
         description:
           type: string
           maxLength: 300
+        wikidata_id:
+          description: The Wikidata item the user picked for the new item, from /wikidata/search/.
+            Its names in English and Turkish let searches find the item.
+          oneOf:
+          - type: string
+            maxLength: 16
+            pattern: ^Q[1-9][0-9]{0,11}$
+          - type: string
+            maxLength: 0
         craft_type:
           type: integer
           description: Craft type the item is typical for.
@@ -3433,7 +3570,7 @@ components:
         negative, and there is no year 0.
       properties:
         kind:
-          $ref: '#/components/schemas/KindEnum'
+          $ref: '#/components/schemas/CraftDateKindEnum'
         year:
           type: integer
           minimum: -10000
@@ -3447,6 +3584,16 @@ components:
           default: false
       required:
       - kind
+    CraftDateKindEnum:
+      enum:
+      - unknown
+      - year
+      - day
+      type: string
+      description: |-
+        * `unknown` - Unknown
+        * `year` - Year
+        * `day` - Exact date
     CraftDateRequest:
       type: object
       description: |-
@@ -3455,7 +3602,7 @@ components:
         negative, and there is no year 0.
       properties:
         kind:
-          $ref: '#/components/schemas/KindEnum'
+          $ref: '#/components/schemas/CraftDateKindEnum'
         year:
           type: integer
           minimum: -10000
@@ -4286,6 +4433,22 @@ components:
           minimum: 1
           description: Id of the item of the same kind to merge into. Required to
             merge.
+        wikidata_id:
+          description: The Wikidata item to link, such as Q163446; empty removes the
+            link.
+          oneOf:
+          - type: string
+            maxLength: 16
+            pattern: ^Q[1-9][0-9]{0,11}$
+          - type: string
+            maxLength: 0
+        other_names:
+          type: array
+          items:
+            type: string
+            maxLength: 80
+          description: Other names searches find the item by, such as "rug" for Carpet.
+          maxItems: 20
       required:
       - action
       - reason
@@ -4315,16 +4478,6 @@ components:
         * `tool` - Tool
         * `material` - Material
         * `culture` - Culture
-    KindEnum:
-      enum:
-      - unknown
-      - year
-      - day
-      type: string
-      description: |-
-        * `unknown` - Unknown
-        * `year` - Year
-        * `day` - Exact date
     LoginRequest:
       type: object
       properties:
@@ -5120,6 +5273,39 @@ components:
       required:
       - email
       - password
+    RelatedItem:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/RelatedItemKindEnum'
+        id:
+          type: integer
+        name:
+          type: string
+        names:
+          type: array
+          items:
+            type: string
+          description: A few of its other names, such as its Turkish name.
+      required:
+      - id
+      - kind
+      - name
+      - names
+    RelatedItemKindEnum:
+      enum:
+      - category
+      - craft_type
+      - tool
+      - material
+      - culture
+      type: string
+      description: |-
+        * `category` - category
+        * `craft_type` - craft_type
+        * `tool` - tool
+        * `material` - material
+        * `culture` - culture
     Report:
       type: object
       properties:
@@ -5263,6 +5449,22 @@ components:
         crafts_count:
           type: integer
           readOnly: true
+        wikidata_id:
+          type: string
+          readOnly: true
+          description: The linked Wikidata item, or empty.
+        wikidata_names:
+          type: array
+          items:
+            type: string
+          readOnly: true
+          description: Names from the linked Wikidata item, in English and Turkish.
+        other_names:
+          type: array
+          items:
+            type: string
+          readOnly: true
+          description: Names admins added.
       required:
       - added_by
       - crafts_count
@@ -5270,6 +5472,9 @@ components:
       - id
       - is_hidden
       - name
+      - other_names
+      - wikidata_id
+      - wikidata_names
     ReportedStory:
       type: object
       properties:
@@ -5351,6 +5556,20 @@ components:
       description: |-
         * `user` - Registered user
         * `admin` - Admin
+    SearchTerm:
+      type: object
+      properties:
+        word:
+          type: string
+        related:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelatedItem'
+          description: 'Items the word also finds: by another name, in another language,
+            or as a narrower kind of an item it names.'
+      required:
+      - related
+      - word
     Story:
       type: object
       properties:
@@ -5640,6 +5859,20 @@ components:
       required:
       - token
       - uid
+    WikidataItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The Wikidata item id, such as Q163446.
+        label:
+          type: string
+        description:
+          type: string
+      required:
+      - description
+      - id
+      - label
   securitySchemes:
     jwtAuth:
       type: http

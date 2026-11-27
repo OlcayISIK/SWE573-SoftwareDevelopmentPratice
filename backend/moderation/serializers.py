@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from crafts.serializers import clean_description, clean_lookup_name
+from crafts.serializers import WikidataIdField, clean_description, clean_lookup_name
 
 from .models import (
     ItemReport,
@@ -103,6 +103,17 @@ class ReportedItemSerializer(serializers.Serializer):
     is_hidden = serializers.BooleanField(read_only=True)
     added_by = PersonSerializer(source="created_by", read_only=True, allow_null=True)
     crafts_count = serializers.IntegerField(read_only=True)
+    wikidata_id = serializers.CharField(
+        read_only=True, help_text="The linked Wikidata item, or empty."
+    )
+    wikidata_names = serializers.ListField(
+        child=serializers.CharField(),
+        read_only=True,
+        help_text="Names from the linked Wikidata item, in English and Turkish.",
+    )
+    other_names = serializers.ListField(
+        child=serializers.CharField(), read_only=True, help_text="Names admins added."
+    )
 
 
 class ItemReviewActionSerializer(serializers.ModelSerializer):
@@ -156,6 +167,20 @@ class ItemReviewActionCreateSerializer(serializers.Serializer):
         required=False,
         help_text="Id of the item of the same kind to merge into. Required to merge.",
     )
+    wikidata_id = WikidataIdField(
+        required=False,
+        allow_blank=True,
+        help_text="The Wikidata item to link, such as Q163446; empty removes the link.",
+    )
+    other_names = serializers.ListField(
+        child=serializers.CharField(max_length=80, allow_blank=True),
+        required=False,
+        max_length=20,
+        help_text='Other names searches find the item by, such as "rug" for Carpet.',
+    )
+
+    def validate_other_names(self, names):
+        return [" ".join(name.split()) for name in names if name.strip()]
 
     def validate_name(self, value):
         return clean_lookup_name(value)
@@ -165,7 +190,8 @@ class ItemReviewActionCreateSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         action = attrs["action"]
-        if action == ItemReviewAction.Action.EDIT and not {"name", "description"} & set(attrs):
+        edits = {"name", "description", "wikidata_id", "other_names"}
+        if action == ItemReviewAction.Action.EDIT and not edits & set(attrs):
             raise serializers.ValidationError({"name": ["Enter a new name or description."]})
         if action == ItemReviewAction.Action.MERGE and "merge_into" not in attrs:
             raise serializers.ValidationError({"merge_into": ["Choose the item to merge into."]})

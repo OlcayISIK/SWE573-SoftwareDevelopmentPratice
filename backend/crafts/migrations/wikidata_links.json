@@ -1,0 +1,3616 @@
+{
+  "category": {
+    "Basketry": {
+      "wikidata_id": "Q373017",
+      "wikidata_names": [
+        "basketry",
+        "Sepet dokuma",
+        "basket weaving",
+        "basketweaving",
+        "basketwork",
+        "basket making"
+      ],
+      "broader": [
+        "Q1081013",
+        "Q320809",
+        "Q6671777"
+      ],
+      "other_names": []
+    },
+    "Ceramics": {
+      "wikidata_id": "Q13464614",
+      "wikidata_names": [
+        "ceramic art",
+        "ceramic ware",
+        "ceramics"
+      ],
+      "broader": [
+        "Q838948",
+        "Q1078913",
+        "Q17537576",
+        "Q2424752",
+        "Q2342494",
+        "Q115923123",
+        "Q8205328",
+        "Q16686448",
+        "Q36649",
+        "Q15621286",
+        "Q141524128",
+        "Q488383",
+        "Q1485500",
+        "Q369594",
+        "Q223557",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q141756664",
+        "Q735"
+      ],
+      "other_names": []
+    },
+    "Glass": {
+      "wikidata_id": "Q11469",
+      "wikidata_names": [
+        "glass",
+        "cam"
+      ],
+      "broader": [
+        "Q103382",
+        "Q11438",
+        "Q214609",
+        "Q206615",
+        "Q895901",
+        "Q35758",
+        "Q1704572",
+        "Q141158787",
+        "Q2424752",
+        "Q16110223",
+        "Q141900709",
+        "Q28732711",
+        "Q223557",
+        "Q141438977",
+        "Q141445732",
+        "Q142212661",
+        "Q488383"
+      ],
+      "other_names": []
+    },
+    "Jewelry": {
+      "wikidata_id": "Q2142903",
+      "wikidata_names": [
+        "jewelry",
+        "jewel",
+        "jewellery",
+        "piece of jewelry"
+      ],
+      "broader": [
+        "Q1065579",
+        "Q2467478",
+        "Q6149036",
+        "Q11460",
+        "Q362200",
+        "Q337060",
+        "Q8205328",
+        "Q2424752",
+        "Q838948",
+        "Q386724",
+        "Q113518695",
+        "Q115797493",
+        "Q39546",
+        "Q117670709",
+        "Q223557",
+        "Q16686448",
+        "Q136490012",
+        "Q141756646",
+        "Q488383",
+        "Q17537576",
+        "Q2342494",
+        "Q115923123"
+      ],
+      "other_names": []
+    },
+    "Lacquerware": {
+      "wikidata_id": "Q368972",
+      "wikidata_names": [
+        "lacquerware"
+      ],
+      "broader": [
+        "Q4502142",
+        "Q1836700",
+        "Q838948",
+        "Q110910970",
+        "Q2342494",
+        "Q2424752",
+        "Q8205328",
+        "Q1485500",
+        "Q17537576",
+        "Q115923123",
+        "Q16686448",
+        "Q386724",
+        "Q488383",
+        "Q223557",
+        "Q136490012",
+        "Q141756646",
+        "Q28877",
+        "Q337060",
+        "Q61964280"
+      ],
+      "other_names": []
+    },
+    "Leatherwork": {
+      "wikidata_id": "Q1186844",
+      "wikidata_names": [
+        "leather crafting",
+        "dericilik",
+        "leatherworking"
+      ],
+      "broader": [
+        "Q53178539",
+        "Q739302",
+        "Q3249551",
+        "Q8187769",
+        "Q11398090"
+      ],
+      "other_names": []
+    },
+    "Metalwork": {
+      "wikidata_id": "Q953045",
+      "wikidata_names": [
+        "metalworking",
+        "metal işçiliği",
+        "metalwork"
+      ],
+      "broader": [
+        "Q104637425",
+        "Q627436",
+        "Q8187769",
+        "Q141344358",
+        "Q141433605",
+        "Q141435481",
+        "Q1047113",
+        "Q451967",
+        "Q125506646",
+        "Q141336142",
+        "Q104637332",
+        "Q141751569",
+        "Q141433316",
+        "Q141435619",
+        "Q105948247",
+        "Q26256810",
+        "Q21040055",
+        "Q24902509",
+        "Q1150070",
+        "Q52948"
+      ],
+      "other_names": []
+    },
+    "Musical Instruments": {
+      "wikidata_id": "Q34379",
+      "wikidata_names": [
+        "musical instrument",
+        "müzik aleti",
+        "music instrument",
+        "instrument",
+        "instrument in music",
+        "instrument (music)",
+        "enstrüman",
+        "çalgı"
+      ],
+      "broader": [
+        "Q267228",
+        "Q56146933",
+        "Q39546",
+        "Q220659",
+        "Q8205328",
+        "Q1183543",
+        "Q15190726",
+        "Q10273457",
+        "Q123691918",
+        "Q1485500",
+        "Q1791627",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q113122303",
+        "Q3406743",
+        "Q2424752",
+        "Q99527517",
+        "Q61961344",
+        "Q141523012",
+        "Q12774177",
+        "Q28877",
+        "Q337060",
+        "Q61964280",
+        "Q4406616",
+        "Q53617407",
+        "Q12352399",
+        "Q488383",
+        "Q141756664",
+        "Q141148364",
+        "Q141186854",
+        "Q142207488",
+        "Q141501601"
+      ],
+      "other_names": []
+    },
+    "Stone Carving": {
+      "wikidata_id": "Q255848",
+      "wikidata_names": [
+        "stone carving",
+        "stonecarving"
+      ],
+      "broader": [
+        "Q19794820",
+        "Q13039303",
+        "Q56298726",
+        "Q3249551",
+        "Q877729",
+        "Q8187769",
+        "Q91052267",
+        "Q67518978",
+        "Q1190554",
+        "Q141182775",
+        "Q141257229",
+        "Q2207288",
+        "Q210272",
+        "Q2424752",
+        "Q57260825",
+        "Q838948"
+      ],
+      "other_names": []
+    },
+    "Textiles": {
+      "wikidata_id": "Q28823",
+      "wikidata_names": [
+        "textile",
+        "tekstil",
+        "textiles",
+        "textile material",
+        "fabric",
+        "dokuma bezi",
+        "tekstil kumaşı",
+        "dokumacılık",
+        "otel tekstili"
+      ],
+      "broader": [
+        "Q214609",
+        "Q8205328",
+        "Q28877",
+        "Q2424752",
+        "Q141158787",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q53617407",
+        "Q488383",
+        "Q141905832",
+        "Q141438977",
+        "Q141445732",
+        "Q142212661",
+        "Q4406616",
+        "Q12352399",
+        "Q141756664",
+        "Q141148364",
+        "Q141186854",
+        "Q142207488",
+        "Q141501601",
+        "Q53617489",
+        "Q141159271",
+        "Q141751599",
+        "Q142208511"
+      ],
+      "other_names": []
+    },
+    "Woodwork": {
+      "wikidata_id": "Q816871",
+      "wikidata_names": [
+        "woodworking",
+        "ahşap işçiliği"
+      ],
+      "broader": [
+        "Q739302",
+        "Q268378",
+        "Q2207288",
+        "Q3249551",
+        "Q8187769",
+        "Q11398090",
+        "Q627436",
+        "Q67518978",
+        "Q1190554",
+        "Q141182775",
+        "Q141257229",
+        "Q451967",
+        "Q125506646",
+        "Q52948",
+        "Q1047113"
+      ],
+      "other_names": []
+    }
+  },
+  "craft_type": {
+    "Bags and pouches": {
+      "wikidata_id": "Q1323314",
+      "wikidata_names": [
+        "bag",
+        "Çanta",
+        "sack"
+      ],
+      "broader": [
+        "Q987767",
+        "Q1183543",
+        "Q9158768",
+        "Q123691907",
+        "Q135899982",
+        "Q8205328",
+        "Q113122303",
+        "Q3406743",
+        "Q6671777",
+        "Q4406616",
+        "Q488383",
+        "Q7048977",
+        "Q223557"
+      ],
+      "other_names": []
+    },
+    "Batik": {
+      "wikidata_id": "Q635427",
+      "wikidata_names": [
+        "batik",
+        "Javanese fabric",
+        "Javanese dyeing technique",
+        "Javanese heritage cloth",
+        "bathik",
+        "royal Javanese cloth"
+      ],
+      "broader": [
+        "Q5135573",
+        "Q28823",
+        "Q11629",
+        "Q214609",
+        "Q8205328",
+        "Q28877",
+        "Q2424752",
+        "Q1914636",
+        "Q36649",
+        "Q141158787",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q53617407",
+        "Q488383",
+        "Q141905832",
+        "Q3249551",
+        "Q141187917",
+        "Q142238051",
+        "Q735",
+        "Q838948"
+      ],
+      "other_names": []
+    },
+    "Beaded jewelry": {
+      "wikidata_id": "Q63871053",
+      "wikidata_names": [
+        "beadwork",
+        "beadworks",
+        "bead-work"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Block printing": {
+      "wikidata_id": "Q1261053",
+      "wikidata_names": [
+        "woodblock printing",
+        "Ahşap baskı"
+      ],
+      "broader": [
+        "Q271588",
+        "Q11177771",
+        "Q911059",
+        "Q3249551",
+        "Q56055944",
+        "Q2695280",
+        "Q1914636",
+        "Q67518978",
+        "Q1190554",
+        "Q141182775",
+        "Q141257229",
+        "Q96251598",
+        "Q47728"
+      ],
+      "other_names": []
+    },
+    "Blown glass": {
+      "wikidata_id": "Q12185286",
+      "wikidata_names": [
+        "glass blowing",
+        "cam üfleme",
+        "manual production of mouth-blown hollow and flat glass"
+      ],
+      "broader": [
+        "Q23817612",
+        "Q24175362",
+        "Q2695280",
+        "Q53178539",
+        "Q1651044",
+        "Q1799072",
+        "Q1914636",
+        "Q739302",
+        "Q10843872"
+      ],
+      "other_names": []
+    },
+    "Bookbinding": {
+      "wikidata_id": "Q240471",
+      "wikidata_names": [
+        "bookbinding",
+        "ciltleme",
+        "book binding",
+        "bibliopegy",
+        "binding of books",
+        "binding",
+        "cilt zanaatı",
+        "kitap ciltleme",
+        "cilt sanatı",
+        "ciltçilik"
+      ],
+      "broader": [
+        "Q1914636",
+        "Q3249551",
+        "Q141187917",
+        "Q142238051",
+        "Q67518978",
+        "Q1190554",
+        "Q141182775",
+        "Q141257229",
+        "Q141204674",
+        "Q141905635"
+      ],
+      "other_names": []
+    },
+    "Calligraphy": {
+      "wikidata_id": "Q12681",
+      "wikidata_names": [
+        "calligraphy",
+        "hat sanatı"
+      ],
+      "broader": [
+        "Q36649",
+        "Q37260",
+        "Q735",
+        "Q838948",
+        "Q340169",
+        "Q17537576",
+        "Q2424752",
+        "Q2342494",
+        "Q115923123",
+        "Q8205328",
+        "Q16686448",
+        "Q141152439"
+      ],
+      "other_names": []
+    },
+    "Carpet": {
+      "wikidata_id": "Q163446",
+      "wikidata_names": [
+        "carpet",
+        "halı"
+      ],
+      "broader": [
+        "Q47011175",
+        "Q104602244",
+        "Q31808206",
+        "Q99483882",
+        "Q2424752",
+        "Q11631761",
+        "Q391414",
+        "Q488383"
+      ],
+      "other_names": [
+        "rug"
+      ]
+    },
+    "Carving": {
+      "wikidata_id": "Q97570030",
+      "wikidata_names": [
+        "carving"
+      ],
+      "broader": [
+        "Q860861",
+        "Q8205328",
+        "Q4502142",
+        "Q17537576",
+        "Q35459920",
+        "Q350268",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q838948",
+        "Q110910970",
+        "Q2342494",
+        "Q15621286",
+        "Q141524128",
+        "Q123410745",
+        "Q3370053",
+        "Q45025858"
+      ],
+      "other_names": []
+    },
+    "Coiled basket": {
+      "wikidata_id": "Q109865135",
+      "wikidata_names": [
+        "coiled basketry",
+        "coiling",
+        "sewn basketry"
+      ],
+      "broader": [
+        "Q373017",
+        "Q1081013",
+        "Q320809"
+      ],
+      "other_names": []
+    },
+    "Copperware": {
+      "wikidata_id": "Q140773538",
+      "wikidata_names": [
+        "copper cookware",
+        "copperware",
+        "copper pan",
+        "copper pot",
+        "copper bowl"
+      ],
+      "broader": [
+        "Q1521410",
+        "Q26037047",
+        "Q39546",
+        "Q10273457",
+        "Q2424752"
+      ],
+      "other_names": []
+    },
+    "Drum": {
+      "wikidata_id": "Q11404",
+      "wikidata_names": [
+        "drum",
+        "trampet",
+        "caisse",
+        "cassa",
+        "tamburo",
+        "wankara"
+      ],
+      "broader": [
+        "Q19588483",
+        "Q34379",
+        "Q212892",
+        "Q133163",
+        "Q267228",
+        "Q56146933",
+        "Q39546",
+        "Q220659",
+        "Q8205328",
+        "Q1661583",
+        "Q1183543",
+        "Q15190726",
+        "Q10273457",
+        "Q123691918",
+        "Q1485500",
+        "Q1791627",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646"
+      ],
+      "other_names": []
+    },
+    "Embroidery": {
+      "wikidata_id": "Q18281",
+      "wikidata_names": [
+        "embroidery",
+        "nakış",
+        "embroidering",
+        "art of embroidery"
+      ],
+      "broader": [
+        "Q1817291",
+        "Q877729",
+        "Q53178539",
+        "Q3485549",
+        "Q10988986",
+        "Q2207288",
+        "Q210272",
+        "Q2424752",
+        "Q57260825",
+        "Q8187769",
+        "Q838948",
+        "Q739302",
+        "Q268378",
+        "Q207241",
+        "Q627436",
+        "Q2434238",
+        "Q488383",
+        "Q28640",
+        "Q451967",
+        "Q125506646",
+        "Q17537576",
+        "Q2342494",
+        "Q115923123",
+        "Q8205328",
+        "Q16686448"
+      ],
+      "other_names": []
+    },
+    "Felt": {
+      "wikidata_id": "Q189964",
+      "wikidata_names": [
+        "felt",
+        "Keçe"
+      ],
+      "broader": [
+        "Q28823",
+        "Q214609",
+        "Q8205328",
+        "Q28877",
+        "Q2424752",
+        "Q141158787",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q53617407",
+        "Q488383",
+        "Q141905832"
+      ],
+      "other_names": []
+    },
+    "Figurine": {
+      "wikidata_id": "Q1066288",
+      "wikidata_names": [
+        "figurine",
+        "Figürin",
+        "statuette",
+        "staction figure",
+        "inaction figure",
+        "Heykelcik"
+      ],
+      "broader": [
+        "Q179700",
+        "Q860861",
+        "Q29527347",
+        "Q8205328",
+        "Q220659",
+        "Q4502142",
+        "Q17537576",
+        "Q35459920",
+        "Q350268",
+        "Q1272626",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q1791627"
+      ],
+      "other_names": []
+    },
+    "Filigree": {
+      "wikidata_id": "Q1001313",
+      "wikidata_names": [
+        "filigree",
+        "Telkârî"
+      ],
+      "broader": [
+        "Q953045",
+        "Q2695280",
+        "Q6189617",
+        "Q104637425",
+        "Q627436",
+        "Q8187769",
+        "Q1799072",
+        "Q1914636",
+        "Q82604",
+        "Q268592",
+        "Q47728",
+        "Q141344358",
+        "Q141433605",
+        "Q141435481",
+        "Q1047113",
+        "Q451967",
+        "Q125506646",
+        "Q12774177",
+        "Q141439861",
+        "Q3249551",
+        "Q141187917",
+        "Q142238051",
+        "Q104637332",
+        "Q1519454",
+        "Q16887380",
+        "Q184872",
+        "Q12737077"
+      ],
+      "other_names": []
+    },
+    "Flute": {
+      "wikidata_id": "Q11405",
+      "wikidata_names": [
+        "flute",
+        "flüt",
+        "edge-blown aerophones",
+        "transverse flute"
+      ],
+      "broader": [
+        "Q173453",
+        "Q181247",
+        "Q659216",
+        "Q34379"
+      ],
+      "other_names": []
+    },
+    "Footwear": {
+      "wikidata_id": "Q161928",
+      "wikidata_names": [
+        "footwear",
+        "ayak giyimi"
+      ],
+      "broader": [
+        "Q1065579",
+        "Q115797493",
+        "Q14524031",
+        "Q3172759",
+        "Q11460",
+        "Q220659",
+        "Q362200",
+        "Q2424752",
+        "Q1333024",
+        "Q9053464",
+        "Q386724",
+        "Q8205328",
+        "Q113518695",
+        "Q39546",
+        "Q1791627",
+        "Q223557",
+        "Q117670709",
+        "Q488383",
+        "Q10273457",
+        "Q16686448",
+        "Q136490012",
+        "Q141756646",
+        "Q118870638",
+        "Q123691918",
+        "Q1485500",
+        "Q4406616",
+        "Q53617407",
+        "Q12352399"
+      ],
+      "other_names": []
+    },
+    "Forged ironwork": {
+      "wikidata_id": "Q860451",
+      "wikidata_names": [
+        "wrought iron",
+        "Dövme demir",
+        "ferforje"
+      ],
+      "broader": [
+        "Q907347",
+        "Q37756",
+        "Q65122087",
+        "Q5447188",
+        "Q1924900",
+        "Q11426"
+      ],
+      "other_names": []
+    },
+    "Furniture": {
+      "wikidata_id": "Q14745",
+      "wikidata_names": [
+        "furniture",
+        "mobilya"
+      ],
+      "broader": [
+        "Q11631761",
+        "Q10273457",
+        "Q17537576",
+        "Q8205328",
+        "Q99527517",
+        "Q2424752",
+        "Q61961344",
+        "Q141523012",
+        "Q15621286",
+        "Q141524128",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646"
+      ],
+      "other_names": []
+    },
+    "Glass beads": {
+      "wikidata_id": "Q1435588",
+      "wikidata_names": [
+        "glass bead"
+      ],
+      "broader": [
+        "Q1053956",
+        "Q1922981",
+        "Q838948",
+        "Q214609",
+        "Q15303351",
+        "Q22809652",
+        "Q17537576",
+        "Q2424752",
+        "Q2342494",
+        "Q115923123",
+        "Q8205328",
+        "Q16686448",
+        "Q141158787",
+        "Q115923192",
+        "Q1836700"
+      ],
+      "other_names": []
+    },
+    "Greenstone carving": {
+      "wikidata_id": "Q110073053",
+      "wikidata_names": [
+        "carved pounamu",
+        "pounamu",
+        "greenstone carving"
+      ],
+      "broader": [
+        "Q2142903",
+        "Q1153484",
+        "Q1065579",
+        "Q2467478",
+        "Q6149036",
+        "Q735",
+        "Q4461766",
+        "Q11460",
+        "Q362200",
+        "Q337060",
+        "Q8205328",
+        "Q2424752",
+        "Q838948",
+        "Q17537576",
+        "Q11042",
+        "Q82821"
+      ],
+      "other_names": []
+    },
+    "Handmade paper": {
+      "wikidata_id": "Q65769963",
+      "wikidata_names": [
+        "handmade paper",
+        "hand-made paper"
+      ],
+      "broader": [
+        "Q11472",
+        "Q3406743",
+        "Q2424752",
+        "Q26902962",
+        "Q1836700"
+      ],
+      "other_names": []
+    },
+    "Handwoven cloth": {
+      "wikidata_id": "Q192296",
+      "wikidata_names": [
+        "weaving",
+        "dokumacılık",
+        "Weaving of textiles",
+        "weaving industry",
+        "textile weaving"
+      ],
+      "broader": [
+        "Q7708485",
+        "Q10988986",
+        "Q53178539",
+        "Q3249551",
+        "Q1914636",
+        "Q207241",
+        "Q739302",
+        "Q67518978",
+        "Q1190554",
+        "Q141182775",
+        "Q141257229",
+        "Q141187917",
+        "Q142238051",
+        "Q631931",
+        "Q735",
+        "Q8187769",
+        "Q11398090"
+      ],
+      "other_names": []
+    },
+    "Ikat": {
+      "wikidata_id": "Q140101",
+      "wikidata_names": [
+        "Ikat"
+      ],
+      "broader": [
+        "Q634816",
+        "Q28823",
+        "Q5135573",
+        "Q192296",
+        "Q10988986",
+        "Q1164991",
+        "Q6783437",
+        "Q214609",
+        "Q8205328",
+        "Q28877",
+        "Q2424752",
+        "Q7708485",
+        "Q53178539",
+        "Q207241",
+        "Q2022532",
+        "Q187939",
+        "Q141158787",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q53617407",
+        "Q488383",
+        "Q141905832",
+        "Q3249551",
+        "Q1914636",
+        "Q739302"
+      ],
+      "other_names": []
+    },
+    "Illumination": {
+      "wikidata_id": "Q8362",
+      "wikidata_names": [
+        "manuscript illumination",
+        "Minyatür",
+        "miniature painting",
+        "miniature",
+        "illumination",
+        "illuminated miniature"
+      ],
+      "broader": [
+        "Q3305213",
+        "Q93184",
+        "Q178659",
+        "Q116691808",
+        "Q110304307",
+        "Q8205328",
+        "Q838948",
+        "Q115940838",
+        "Q478798",
+        "Q4502142",
+        "Q6575414",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q17537576",
+        "Q2424752",
+        "Q2342494",
+        "Q115923123",
+        "Q118870638",
+        "Q110910970",
+        "Q111907565"
+      ],
+      "other_names": []
+    },
+    "Kilim": {
+      "wikidata_id": "Q585358",
+      "wikidata_names": [
+        "kilim",
+        "kylym",
+        "gilim"
+      ],
+      "broader": [
+        "Q1251541",
+        "Q54915266",
+        "Q104602244",
+        "Q163446",
+        "Q47011175",
+        "Q2424752"
+      ],
+      "other_names": [
+        "rug",
+        "flatweave"
+      ]
+    },
+    "Lace": {
+      "wikidata_id": "Q231250",
+      "wikidata_names": [
+        "lace",
+        "dantel",
+        "lacework"
+      ],
+      "broader": [
+        "Q28823",
+        "Q22075301",
+        "Q214609",
+        "Q8205328",
+        "Q28877",
+        "Q2424752",
+        "Q4502142",
+        "Q110619173",
+        "Q877729",
+        "Q141158787",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q53617407",
+        "Q488383",
+        "Q141905832",
+        "Q838948",
+        "Q110910970",
+        "Q2342494",
+        "Q1836700",
+        "Q2207288",
+        "Q210272",
+        "Q57260825",
+        "Q8187769"
+      ],
+      "other_names": []
+    },
+    "Long-necked lute": {
+      "wikidata_id": "Q136229737",
+      "wikidata_names": [
+        "long-necked lute"
+      ],
+      "broader": [
+        "Q55724833",
+        "Q30038759",
+        "Q1808578"
+      ],
+      "other_names": []
+    },
+    "Lost-wax casting": {
+      "wikidata_id": "Q765814",
+      "wikidata_names": [
+        "lost-wax casting",
+        "kayıp mum tekniği",
+        "cire-perdue process",
+        "investment casting",
+        "lost-wax process",
+        "precision casting",
+        "lost wax",
+        "yitik mum yöntemi"
+      ],
+      "broader": [
+        "Q496098",
+        "Q1651044",
+        "Q1363994",
+        "Q1408288",
+        "Q10843872",
+        "Q1408286"
+      ],
+      "other_names": []
+    },
+    "Marquetry": {
+      "wikidata_id": "Q1049923",
+      "wikidata_names": [
+        "marquetry",
+        "marküteri",
+        "Marqueterie",
+        "marketri"
+      ],
+      "broader": [
+        "Q3249551",
+        "Q67518978",
+        "Q1190554",
+        "Q141182775",
+        "Q141257229",
+        "Q136433660",
+        "Q141222791",
+        "Q141750035",
+        "Q141751599",
+        "Q6502323",
+        "Q141183644",
+        "Q141817795"
+      ],
+      "other_names": []
+    },
+    "Mask": {
+      "wikidata_id": "Q161524",
+      "wikidata_names": [
+        "mask",
+        "Maske",
+        "art mask",
+        "cultural mask",
+        "costume mask"
+      ],
+      "broader": [
+        "Q11460",
+        "Q8205328",
+        "Q838948",
+        "Q220659",
+        "Q386724",
+        "Q2424752",
+        "Q113518695",
+        "Q115797493",
+        "Q39546",
+        "Q223557",
+        "Q16686448",
+        "Q136490012",
+        "Q141756646",
+        "Q17537576",
+        "Q2342494",
+        "Q115923123",
+        "Q1791627",
+        "Q488383",
+        "Q118870638",
+        "Q10273457",
+        "Q123691918",
+        "Q1485500",
+        "Q4406616",
+        "Q53617407",
+        "Q12352399",
+        "Q141756664",
+        "Q141148364",
+        "Q141186854",
+        "Q142207488",
+        "Q141501601",
+        "Q15621286",
+        "Q141524128",
+        "Q369594"
+      ],
+      "other_names": []
+    },
+    "Miniature painting": {
+      "wikidata_id": "Q282129",
+      "wikidata_names": [
+        "miniature",
+        "minyatür",
+        "limning",
+        "miniature portrait",
+        "miniature painting"
+      ],
+      "broader": [
+        "Q3305213",
+        "Q6575414",
+        "Q116691808",
+        "Q110304307",
+        "Q8205328",
+        "Q838948",
+        "Q4502142",
+        "Q111907565",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q17537576",
+        "Q2424752",
+        "Q2342494",
+        "Q115923123",
+        "Q110910970",
+        "Q11784425"
+      ],
+      "other_names": []
+    },
+    "Mosaic glass": {
+      "wikidata_id": "Q748940",
+      "wikidata_names": [
+        "millefiori"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Paper marbling": {
+      "wikidata_id": "Q614541",
+      "wikidata_names": [
+        "paper marbling",
+        "ebrî/ebrû",
+        "marbling",
+        "abrī paper",
+        "ebru sanatı"
+      ],
+      "broader": [
+        "Q3480260",
+        "Q11629",
+        "Q11472",
+        "Q5438401",
+        "Q1914636",
+        "Q36649",
+        "Q3406743",
+        "Q1663879",
+        "Q1231896",
+        "Q45045",
+        "Q3249551",
+        "Q141187917",
+        "Q142238051",
+        "Q735",
+        "Q838948",
+        "Q2424752",
+        "Q26902962",
+        "Q1836700"
+      ],
+      "other_names": []
+    },
+    "Plaited basket": {
+      "wikidata_id": "Q109865300",
+      "wikidata_names": [
+        "plaiting",
+        "plaiting basketry"
+      ],
+      "broader": [
+        "Q373017",
+        "Q1081013",
+        "Q320809"
+      ],
+      "other_names": []
+    },
+    "Porcelain": {
+      "wikidata_id": "Q130693",
+      "wikidata_names": [
+        "porcelain",
+        "porselen",
+        "china",
+        "fine china"
+      ],
+      "broader": [
+        "Q125274801",
+        "Q45621",
+        "Q11438",
+        "Q2424752",
+        "Q214609",
+        "Q35758",
+        "Q1704572",
+        "Q141158787",
+        "Q488383"
+      ],
+      "other_names": []
+    },
+    "Pottery": {
+      "wikidata_id": "Q11642",
+      "wikidata_names": [
+        "pottery",
+        "çömlekçilik",
+        "ceramics"
+      ],
+      "broader": [
+        "Q53178539",
+        "Q1078913",
+        "Q739302",
+        "Q36649",
+        "Q3249551",
+        "Q8187769",
+        "Q11398090",
+        "Q735",
+        "Q838948"
+      ],
+      "other_names": []
+    },
+    "Rattle": {
+      "wikidata_id": "Q2132068",
+      "wikidata_names": [
+        "rattle",
+        "çıngırak"
+      ],
+      "broader": [
+        "Q7047745",
+        "Q34379",
+        "Q6025130",
+        "Q1295894",
+        "Q267228",
+        "Q56146933",
+        "Q39546",
+        "Q220659",
+        "Q8205328",
+        "Q5280486",
+        "Q1661583",
+        "Q1183543",
+        "Q15190726",
+        "Q10273457",
+        "Q123691918",
+        "Q1485500",
+        "Q1791627",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q12639",
+        "Q133163"
+      ],
+      "other_names": []
+    },
+    "Saddlery": {
+      "wikidata_id": "Q47518092",
+      "wikidata_names": [
+        "saddlemaking",
+        "saddlery"
+      ],
+      "broader": [
+        "Q2207288",
+        "Q627436",
+        "Q1047113",
+        "Q451967"
+      ],
+      "other_names": []
+    },
+    "Shell jewelry": {
+      "wikidata_id": "Q7493716",
+      "wikidata_names": [
+        "Shell jewelry"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Silverware": {
+      "wikidata_id": "Q1683099",
+      "wikidata_names": [
+        "household silver",
+        "the silver",
+        "the plate",
+        "silverware",
+        "silver service",
+        "family silver"
+      ],
+      "broader": [
+        "Q369594",
+        "Q11646939",
+        "Q2184715",
+        "Q59679273",
+        "Q29052015",
+        "Q28877",
+        "Q2424752",
+        "Q10273457",
+        "Q223557"
+      ],
+      "other_names": []
+    },
+    "Stained glass": {
+      "wikidata_id": "Q1473346",
+      "wikidata_names": [
+        "stained glass",
+        "vitray",
+        "colored glass",
+        "vitraux",
+        "stained glasss",
+        "vitray nedir"
+      ],
+      "broader": [
+        "Q838948",
+        "Q17537576",
+        "Q2424752",
+        "Q2342494",
+        "Q115923123",
+        "Q8205328",
+        "Q16686448",
+        "Q15621286",
+        "Q141524128",
+        "Q488383",
+        "Q1485500",
+        "Q369594",
+        "Q223557",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q141756664"
+      ],
+      "other_names": []
+    },
+    "Stoneware": {
+      "wikidata_id": "Q830894",
+      "wikidata_names": [
+        "stoneware"
+      ],
+      "broader": [
+        "Q1316689",
+        "Q125275163",
+        "Q45621",
+        "Q11438",
+        "Q2424752",
+        "Q214609",
+        "Q35758",
+        "Q1704572",
+        "Q141158787",
+        "Q488383"
+      ],
+      "other_names": []
+    },
+    "Tapestry": {
+      "wikidata_id": "Q184296",
+      "wikidata_names": [
+        "tapestry",
+        "kanaviçe",
+        "gobelin",
+        "hanging",
+        "woven tapestry"
+      ],
+      "broader": [
+        "Q22075301",
+        "Q28823",
+        "Q110304307",
+        "Q4502142",
+        "Q8205328",
+        "Q110619173",
+        "Q877729",
+        "Q214609",
+        "Q28877",
+        "Q2424752",
+        "Q838948",
+        "Q110910970",
+        "Q2342494",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q1836700",
+        "Q2207288",
+        "Q210272",
+        "Q57260825",
+        "Q8187769",
+        "Q141158787",
+        "Q53617407",
+        "Q488383",
+        "Q141905832"
+      ],
+      "other_names": []
+    },
+    "Tile": {
+      "wikidata_id": "Q468402",
+      "wikidata_names": [
+        "tile",
+        "karo"
+      ],
+      "broader": [
+        "Q206615",
+        "Q391414",
+        "Q1836700",
+        "Q214609",
+        "Q16110223",
+        "Q55412936",
+        "Q19603939",
+        "Q3955017",
+        "Q2424752",
+        "Q8205328",
+        "Q1485500",
+        "Q141158787",
+        "Q88392887",
+        "Q1310239",
+        "Q618123",
+        "Q488383",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q28877",
+        "Q337060",
+        "Q61964280"
+      ],
+      "other_names": []
+    },
+    "Tooled leather": {
+      "wikidata_id": "Q6510458",
+      "wikidata_names": [
+        "Leather carving"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Totem pole": {
+      "wikidata_id": "Q83809",
+      "wikidata_names": [
+        "totem pole",
+        "Totem direği"
+      ],
+      "broader": [
+        "Q2180428",
+        "Q179700",
+        "Q60734095",
+        "Q337907",
+        "Q811979",
+        "Q1058733",
+        "Q391414",
+        "Q860861",
+        "Q29527347",
+        "Q8205328",
+        "Q220659",
+        "Q838948",
+        "Q13039303",
+        "Q816871",
+        "Q3249551",
+        "Q11908691",
+        "Q811430",
+        "Q386724",
+        "Q134301417",
+        "Q64830866",
+        "Q55412936",
+        "Q19603939",
+        "Q3955017",
+        "Q4502142",
+        "Q17537576",
+        "Q35459920",
+        "Q350268",
+        "Q1272626",
+        "Q223557",
+        "Q16686448",
+        "Q136490012",
+        "Q141756646",
+        "Q1791627",
+        "Q2424752",
+        "Q2342494",
+        "Q115923123",
+        "Q877729",
+        "Q739302",
+        "Q268378",
+        "Q2207288",
+        "Q67518978",
+        "Q1190554",
+        "Q141182775",
+        "Q141257229"
+      ],
+      "other_names": []
+    },
+    "Twined basket": {
+      "wikidata_id": "Q109865404",
+      "wikidata_names": [
+        "twined basketry",
+        "twining",
+        "twined",
+        "twining basketry"
+      ],
+      "broader": [
+        "Q373017",
+        "Q1081013",
+        "Q320809"
+      ],
+      "other_names": []
+    },
+    "Urushi lacquerware": {
+      "wikidata_id": "Q2142516",
+      "wikidata_names": [
+        "Japanese lacquerware",
+        "Japon lakesi"
+      ],
+      "broader": [
+        "Q368972",
+        "Q11381412",
+        "Q4502142",
+        "Q1836700",
+        "Q8205328",
+        "Q838948",
+        "Q110910970",
+        "Q2342494",
+        "Q2424752",
+        "Q1485500",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646"
+      ],
+      "other_names": []
+    },
+    "Wicker basket": {
+      "wikidata_id": "Q109867852",
+      "wikidata_names": [
+        "wicker basketry",
+        "wicker weaving"
+      ],
+      "broader": [
+        "Q373017",
+        "Q1081013",
+        "Q320809"
+      ],
+      "other_names": []
+    },
+    "Woodturning": {
+      "wikidata_id": "Q278156",
+      "wikidata_names": [
+        "woodturning",
+        "turnery",
+        "wood turning"
+      ],
+      "broader": [
+        "Q816871",
+        "Q739302",
+        "Q268378",
+        "Q2207288",
+        "Q3249551",
+        "Q8187769",
+        "Q11398090",
+        "Q627436"
+      ],
+      "other_names": []
+    }
+  },
+  "material": {
+    "Alabaster": {
+      "wikidata_id": "Q143447",
+      "wikidata_names": [
+        "alabaster",
+        "alabastron",
+        "albatr"
+      ],
+      "broader": [
+        "Q82658",
+        "Q3777686",
+        "Q764802",
+        "Q30135771",
+        "Q3092395",
+        "Q7946",
+        "Q462174",
+        "Q4427704",
+        "Q64995433"
+      ],
+      "other_names": []
+    },
+    "Alpaca wool": {
+      "wikidata_id": "Q2839384",
+      "wikidata_names": [
+        "alpaca fiber",
+        "Alpaka lifi",
+        "alpaca wool",
+        "alpaca",
+        "alpaca fibre",
+        "alpaca fleece"
+      ],
+      "broader": [
+        "Q64175838",
+        "Q42329",
+        "Q874142",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Animal glue": {
+      "wikidata_id": "Q1552509",
+      "wikidata_names": [
+        "animal glue"
+      ],
+      "broader": [
+        "Q500548",
+        "Q3300034",
+        "Q629103",
+        "Q863583",
+        "Q131790",
+        "Q15303351",
+        "Q141445883",
+        "Q2424752",
+        "Q79529",
+        "Q1726215",
+        "Q214609",
+        "Q115923192",
+        "Q141445908",
+        "Q488383"
+      ],
+      "other_names": []
+    },
+    "Bamboo": {
+      "wikidata_id": "Q27891820",
+      "wikidata_names": [
+        "bamboo",
+        "bamboo wood",
+        "bamboo cane",
+        "bamboo timber"
+      ],
+      "broader": [
+        "Q3300024",
+        "Q206615",
+        "Q2451477",
+        "Q214609",
+        "Q16110223",
+        "Q16686022"
+      ],
+      "other_names": []
+    },
+    "Basalt": {
+      "wikidata_id": "Q43338",
+      "wikidata_names": [
+        "basalt",
+        "bazalt"
+      ],
+      "broader": [
+        "Q108689",
+        "Q810208",
+        "Q42045",
+        "Q141280201",
+        "Q8063",
+        "Q141223674"
+      ],
+      "other_names": []
+    },
+    "Beeswax": {
+      "wikidata_id": "Q143739",
+      "wikidata_names": [
+        "beeswax",
+        "Balmumu",
+        "cera alba",
+        "cera flava"
+      ],
+      "broader": [
+        "Q629103",
+        "Q189567",
+        "Q124695",
+        "Q141445883",
+        "Q2424752",
+        "Q350176",
+        "Q25403900",
+        "Q79529",
+        "Q214609",
+        "Q141445908",
+        "Q488383",
+        "Q10683158",
+        "Q10675206",
+        "Q2095",
+        "Q43460564",
+        "Q141158787"
+      ],
+      "other_names": []
+    },
+    "Bone": {
+      "wikidata_id": "Q265868",
+      "wikidata_names": [
+        "bone",
+        "Kemik doku",
+        "bones",
+        "bone organ",
+        "bone and bones"
+      ],
+      "broader": [
+        "Q24060765",
+        "Q629103",
+        "Q66545297",
+        "Q112826975",
+        "Q142281080",
+        "Q712378",
+        "Q25570959",
+        "Q141445883",
+        "Q2424752",
+        "Q66545295",
+        "Q4406616",
+        "Q4915356",
+        "Q181790",
+        "Q4936952",
+        "Q55568967",
+        "Q141445908",
+        "Q488383",
+        "Q141681465",
+        "Q10683158",
+        "Q2451477",
+        "Q214609",
+        "Q16829513",
+        "Q17853087",
+        "Q811367"
+      ],
+      "other_names": []
+    },
+    "Boxwood": {
+      "wikidata_id": "Q851751",
+      "wikidata_names": [
+        "boxwood",
+        "box wood",
+        "box"
+      ],
+      "broader": [
+        "Q2266509",
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Brass": {
+      "wikidata_id": "Q39782",
+      "wikidata_names": [
+        "brass",
+        "Pirinç",
+        "copper-zinc alloy",
+        "zinc-copper alloy",
+        "CuZn",
+        "ZnCu"
+      ],
+      "broader": [
+        "Q518350",
+        "Q21685333",
+        "Q37756",
+        "Q15303351",
+        "Q5447188",
+        "Q1924900",
+        "Q214609",
+        "Q115923192"
+      ],
+      "other_names": []
+    },
+    "Bronze": {
+      "wikidata_id": "Q34095",
+      "wikidata_names": [
+        "bronze",
+        "bronz",
+        "tunç"
+      ],
+      "broader": [
+        "Q518350",
+        "Q21685333",
+        "Q37756",
+        "Q15303351",
+        "Q5447188",
+        "Q1924900",
+        "Q214609",
+        "Q115923192"
+      ],
+      "other_names": []
+    },
+    "Cedar bark": {
+      "wikidata_id": "Q109925508",
+      "wikidata_names": [
+        "cedar bark"
+      ],
+      "broader": [
+        "Q28969364",
+        "Q184453",
+        "Q28969293",
+        "Q332076",
+        "Q10683158",
+        "Q2451477",
+        "Q2707831"
+      ],
+      "other_names": []
+    },
+    "Cedar wood": {
+      "wikidata_id": "Q5056949",
+      "wikidata_names": [
+        "cedar wood (generic)",
+        "cedar",
+        "cedarwood"
+      ],
+      "broader": [
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080",
+        "Q27062218",
+        "Q4936952",
+        "Q289472",
+        "Q28969293",
+        "Q188460",
+        "Q337060",
+        "Q28877",
+        "Q4915356",
+        "Q181790"
+      ],
+      "other_names": []
+    },
+    "Charcoal": {
+      "wikidata_id": "Q177463",
+      "wikidata_names": [
+        "charcoal",
+        "mangal kömürü",
+        "Mangal kömür",
+        "Odun kömürü"
+      ],
+      "broader": [
+        "Q1408429",
+        "Q11567121",
+        "Q42501",
+        "Q21073024",
+        "Q79529",
+        "Q5376832",
+        "Q11438",
+        "Q1115533"
+      ],
+      "other_names": []
+    },
+    "Chia seed oil": {
+      "wikidata_id": "Q1071708",
+      "wikidata_names": [
+        "chia oil",
+        "chia seed oil"
+      ],
+      "broader": [
+        "Q7445643",
+        "Q55813929",
+        "Q4739805",
+        "Q2549301",
+        "Q427457",
+        "Q25403900",
+        "Q11870297",
+        "Q42501",
+        "Q42962",
+        "Q37931493",
+        "Q145205"
+      ],
+      "other_names": []
+    },
+    "Clay": {
+      "wikidata_id": "Q42302",
+      "wikidata_names": [
+        "clay",
+        "kil",
+        "baked clay",
+        "potter's clay"
+      ],
+      "broader": [
+        "Q34669510",
+        "Q21685333",
+        "Q612133",
+        "Q214609",
+        "Q15303351",
+        "Q82480",
+        "Q12372938",
+        "Q141158787",
+        "Q2424752",
+        "Q115923192",
+        "Q8063",
+        "Q12136486"
+      ],
+      "other_names": []
+    },
+    "Cobalt oxide": {
+      "wikidata_id": "Q110909731",
+      "wikidata_names": [
+        "cobalt oxide",
+        "cobalt oxides"
+      ],
+      "broader": [
+        "Q50690",
+        "Q22137050",
+        "Q5156940",
+        "Q11173",
+        "Q76272846",
+        "Q43460564",
+        "Q2393187",
+        "Q578779"
+      ],
+      "other_names": []
+    },
+    "Copper": {
+      "wikidata_id": "Q753",
+      "wikidata_names": [
+        "copper",
+        "bakır",
+        "Tatum-T"
+      ],
+      "broader": [
+        "Q12140",
+        "Q11426",
+        "Q214503",
+        "Q8386",
+        "Q12034612",
+        "Q34669510",
+        "Q1924900",
+        "Q141759579",
+        "Q409205",
+        "Q117134033",
+        "Q2424752",
+        "Q214609",
+        "Q141759574"
+      ],
+      "other_names": []
+    },
+    "Coral": {
+      "wikidata_id": "Q171446",
+      "wikidata_names": [
+        "coral",
+        "koral",
+        "corall"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Cotton": {
+      "wikidata_id": "Q11457",
+      "wikidata_names": [
+        "cotton",
+        "pamuk",
+        "cotton fiber",
+        "cotton fibre"
+      ],
+      "broader": [
+        "Q20026824",
+        "Q1192049",
+        "Q161",
+        "Q189109",
+        "Q28969364",
+        "Q2451477",
+        "Q10282072",
+        "Q10683158",
+        "Q1138571",
+        "Q672506",
+        "Q28969293"
+      ],
+      "other_names": []
+    },
+    "Cowhide": {
+      "wikidata_id": "Q12492880",
+      "wikidata_names": [
+        "cowhide",
+        "cow hide"
+      ],
+      "broader": [
+        "Q1074",
+        "Q24060765",
+        "Q629103",
+        "Q112826975",
+        "Q3355930",
+        "Q712378",
+        "Q25570959",
+        "Q141445883",
+        "Q2424752",
+        "Q4406616"
+      ],
+      "other_names": []
+    },
+    "Cypress wood": {
+      "wikidata_id": "Q28942717",
+      "wikidata_names": [
+        "cypress wood"
+      ],
+      "broader": [
+        "Q252108",
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Deerskin": {
+      "wikidata_id": "Q29559979",
+      "wikidata_names": [
+        "deer skin",
+        "deerskin"
+      ],
+      "broader": [
+        "Q3291230",
+        "Q286",
+        "Q1074",
+        "Q629103",
+        "Q31808206",
+        "Q5135573",
+        "Q24060765",
+        "Q112826975",
+        "Q3355930",
+        "Q141445883",
+        "Q2424752",
+        "Q11631761",
+        "Q214609"
+      ],
+      "other_names": []
+    },
+    "Ebony": {
+      "wikidata_id": "Q156005",
+      "wikidata_names": [
+        "ebony",
+        "abanoz"
+      ],
+      "broader": [
+        "Q2266509",
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Feldspar": {
+      "wikidata_id": "Q170258",
+      "wikidata_names": [
+        "feldspar",
+        "Feldspat",
+        "feldspars",
+        "feldspar mineral group",
+        "felspar",
+        "Feldispat"
+      ],
+      "broader": [
+        "Q1277475",
+        "Q178977",
+        "Q7946"
+      ],
+      "other_names": []
+    },
+    "Gemstones": {
+      "wikidata_id": "Q83437",
+      "wikidata_names": [
+        "gemstone",
+        "değerli taş",
+        "gem",
+        "jewel",
+        "fine gem",
+        "precious stone",
+        "semiprecious stone",
+        "kıymetli taş",
+        "yarı değerli taş",
+        "değerli taşlar"
+      ],
+      "broader": [
+        "Q7946",
+        "Q141222936",
+        "Q10683158",
+        "Q79529",
+        "Q12037703",
+        "Q214609",
+        "Q25496233",
+        "Q141222862",
+        "Q11438",
+        "Q142293609",
+        "Q141158787",
+        "Q43460564",
+        "Q2424752"
+      ],
+      "other_names": []
+    },
+    "Glass beads": {
+      "wikidata_id": "Q1435588",
+      "wikidata_names": [
+        "glass bead"
+      ],
+      "broader": [
+        "Q1053956",
+        "Q1922981",
+        "Q838948",
+        "Q214609",
+        "Q15303351",
+        "Q22809652",
+        "Q17537576",
+        "Q2424752",
+        "Q2342494",
+        "Q115923123",
+        "Q8205328",
+        "Q16686448",
+        "Q141158787",
+        "Q115923192",
+        "Q1836700"
+      ],
+      "other_names": []
+    },
+    "Glaze": {
+      "wikidata_id": "Q335404",
+      "wikidata_names": [
+        "ceramic glaze",
+        "Çini",
+        "glaze",
+        "Çini sanatı"
+      ],
+      "broader": [
+        "Q1431523",
+        "Q1570182",
+        "Q23497981",
+        "Q214609",
+        "Q10683158"
+      ],
+      "other_names": []
+    },
+    "Goat hair": {
+      "wikidata_id": "Q29416902",
+      "wikidata_names": [
+        "goat hair",
+        "Goat wool"
+      ],
+      "broader": [
+        "Q28472",
+        "Q42329",
+        "Q865663",
+        "Q1239288",
+        "Q112826975",
+        "Q874142",
+        "Q142281080",
+        "Q50379874",
+        "Q66568545",
+        "Q1074",
+        "Q4406616",
+        "Q1192049",
+        "Q8054",
+        "Q10282072",
+        "Q4915356",
+        "Q181790"
+      ],
+      "other_names": []
+    },
+    "Goatskin": {
+      "wikidata_id": "Q198779",
+      "wikidata_names": [
+        "goatskin",
+        "goat fur",
+        "goat skin"
+      ],
+      "broader": [
+        "Q1074",
+        "Q24060765",
+        "Q629103",
+        "Q112826975",
+        "Q3355930",
+        "Q712378",
+        "Q25570959",
+        "Q141445883",
+        "Q2424752",
+        "Q4406616"
+      ],
+      "other_names": []
+    },
+    "Gold": {
+      "wikidata_id": "Q897",
+      "wikidata_names": [
+        "gold",
+        "altın"
+      ],
+      "broader": [
+        "Q585302",
+        "Q214503",
+        "Q11646938",
+        "Q11344",
+        "Q11426"
+      ],
+      "other_names": []
+    },
+    "Gold leaf": {
+      "wikidata_id": "Q929186",
+      "wikidata_names": [
+        "gold leaf",
+        "altın varak",
+        "gold ground"
+      ],
+      "broader": [
+        "Q11074667",
+        "Q15303351",
+        "Q251473",
+        "Q214609",
+        "Q115923192",
+        "Q2424752",
+        "Q141158787"
+      ],
+      "other_names": []
+    },
+    "Gold powder": {
+      "wikidata_id": "Q91114496",
+      "wikidata_names": [
+        "gold powder"
+      ],
+      "broader": [
+        "Q16938243",
+        "Q2908004",
+        "Q1155083"
+      ],
+      "other_names": []
+    },
+    "Gourd": {
+      "wikidata_id": "Q5339237",
+      "wikidata_names": [
+        "gourd",
+        "kabak",
+        "squash",
+        "squash (plant)"
+      ],
+      "broader": [
+        "Q11004",
+        "Q1470762",
+        "Q1364",
+        "Q1086824",
+        "Q107122728",
+        "Q25403900",
+        "Q46019061",
+        "Q24060707",
+        "Q148515",
+        "Q9323487",
+        "Q107122793",
+        "Q107126067",
+        "Q10675206",
+        "Q2095",
+        "Q951964",
+        "Q712378",
+        "Q20011319",
+        "Q21087275"
+      ],
+      "other_names": []
+    },
+    "Gum arabic": {
+      "wikidata_id": "Q535814",
+      "wikidata_names": [
+        "gum arabic",
+        "Arap zamkı",
+        "gum acacia",
+        "Senegal gum",
+        "gum sudani"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Gum tragacanth": {
+      "wikidata_id": "Q423901",
+      "wikidata_names": [
+        "tragacanth",
+        "Kitre",
+        "gum tragacanth",
+        "gum dragon",
+        "Shiraz gum"
+      ],
+      "broader": [
+        "Q37810563",
+        "Q500548",
+        "Q37931493",
+        "Q863583",
+        "Q131790"
+      ],
+      "other_names": []
+    },
+    "Handmade paper": {
+      "wikidata_id": "Q65769963",
+      "wikidata_names": [
+        "handmade paper",
+        "hand-made paper"
+      ],
+      "broader": [
+        "Q11472",
+        "Q3406743",
+        "Q2424752",
+        "Q26902962",
+        "Q1836700"
+      ],
+      "other_names": []
+    },
+    "Harakeke (New Zealand flax)": {
+      "wikidata_id": "Q607380",
+      "wikidata_names": [
+        "Phormium tenax",
+        "New Zealand flax",
+        "New Zealand hemp",
+        "harakeke"
+      ],
+      "broader": [
+        "Q11992872",
+        "Q756",
+        "Q7239"
+      ],
+      "other_names": []
+    },
+    "Hardwood": {
+      "wikidata_id": "Q2266509",
+      "wikidata_names": [
+        "hardwood"
+      ],
+      "broader": [
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080",
+        "Q27062218",
+        "Q4936952",
+        "Q289472",
+        "Q28969293",
+        "Q188460",
+        "Q337060",
+        "Q28877",
+        "Q4915356",
+        "Q181790"
+      ],
+      "other_names": []
+    },
+    "Hazel": {
+      "wikidata_id": "Q124969",
+      "wikidata_names": [
+        "Corylus avellana",
+        "Adi fındık",
+        "hazel",
+        "common hazel"
+      ],
+      "broader": [
+        "Q11992872",
+        "Q756",
+        "Q7239"
+      ],
+      "other_names": []
+    },
+    "Hemp": {
+      "wikidata_id": "Q13414920",
+      "wikidata_names": [
+        "hemp fiber",
+        "hemp fibre",
+        "canapa",
+        "sambe",
+        "hemp yarn"
+      ],
+      "broader": [
+        "Q20026824",
+        "Q1269339",
+        "Q1192049",
+        "Q161",
+        "Q189109",
+        "Q28969364",
+        "Q2451477",
+        "Q10282072",
+        "Q10683158",
+        "Q1138571",
+        "Q672506",
+        "Q28969293"
+      ],
+      "other_names": []
+    },
+    "Indigo": {
+      "wikidata_id": "Q2984397",
+      "wikidata_names": [
+        "indigo dye"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Iron": {
+      "wikidata_id": "Q677",
+      "wikidata_names": [
+        "iron",
+        "demir"
+      ],
+      "broader": [
+        "Q12140",
+        "Q3333419",
+        "Q214503",
+        "Q8386",
+        "Q12034612",
+        "Q407595",
+        "Q409205",
+        "Q117134033",
+        "Q2424752",
+        "Q7458208",
+        "Q206229",
+        "Q542929"
+      ],
+      "other_names": []
+    },
+    "Juniper wood": {
+      "wikidata_id": "Q110773168",
+      "wikidata_names": [
+        "juniper wood"
+      ],
+      "broader": [
+        "Q252108",
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Kaolin": {
+      "wikidata_id": "Q908663",
+      "wikidata_names": [
+        "kaolin",
+        "porcelain clay",
+        "china clay",
+        "kaolinite clay",
+        "paper clay",
+        "lithomarge",
+        "lithomarga",
+        "kao-lin",
+        "gaoling",
+        "kao-ling",
+        "gaolingtu",
+        "gaoling tu",
+        "kao-ling tu",
+        "kao-ling-t'u",
+        "kao-ling-tu",
+        "brick clay",
+        "kaolen"
+      ],
+      "broader": [
+        "Q42302",
+        "Q169336",
+        "Q12140",
+        "Q1932127",
+        "Q34669510",
+        "Q21685333",
+        "Q612133",
+        "Q79529",
+        "Q1704572",
+        "Q8386",
+        "Q12034612",
+        "Q6931872",
+        "Q660019",
+        "Q214609",
+        "Q15303351",
+        "Q82480",
+        "Q12372938",
+        "Q43460564",
+        "Q10683158",
+        "Q28732711",
+        "Q409205",
+        "Q117134033",
+        "Q2424752",
+        "Q7514925"
+      ],
+      "other_names": []
+    },
+    "Kozo (paper mulberry)": {
+      "wikidata_id": "Q389185",
+      "wikidata_names": [
+        "Broussonetia papyrifera",
+        "paper mulberry",
+        "kağıt dutu"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Lead came": {
+      "wikidata_id": "Q17006787",
+      "wikidata_names": [
+        "Came glasswork"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Lime": {
+      "wikidata_id": "Q185006",
+      "wikidata_names": [
+        "calcium oxide",
+        "kalsiyum oksit",
+        "caustic lime",
+        "quicklime",
+        "calx",
+        "calcium monoxide",
+        "limestone",
+        "burned lime",
+        "burnt lime",
+        "lime",
+        "pebble lime",
+        "quick lime",
+        "unslaked lime",
+        "sönmemiş kireç"
+      ],
+      "broader": [
+        "Q73265743",
+        "Q12548019",
+        "Q50690",
+        "Q190065",
+        "Q11173",
+        "Q5156940",
+        "Q3361209",
+        "Q43460564",
+        "Q2393187",
+        "Q578779"
+      ],
+      "other_names": []
+    },
+    "Lime wood": {
+      "wikidata_id": "Q575018",
+      "wikidata_names": [
+        "limewood",
+        "lime wood",
+        "linden",
+        "basswood",
+        "Tilia (wood)",
+        "Tilia"
+      ],
+      "broader": [
+        "Q2266509",
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Limestone": {
+      "wikidata_id": "Q23757",
+      "wikidata_names": [
+        "limestone",
+        "Kireç taşı",
+        "Kalkstein"
+      ],
+      "broader": [
+        "Q141313672",
+        "Q141313796",
+        "Q141313624",
+        "Q777913",
+        "Q141313540",
+        "Q82480"
+      ],
+      "other_names": []
+    },
+    "Linen": {
+      "wikidata_id": "Q1426327",
+      "wikidata_names": [
+        "linen"
+      ],
+      "broader": [
+        "Q28823",
+        "Q214609",
+        "Q8205328",
+        "Q28877",
+        "Q2424752",
+        "Q141158787",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q53617407",
+        "Q488383",
+        "Q141905832"
+      ],
+      "other_names": []
+    },
+    "Linseed oil": {
+      "wikidata_id": "Q818405",
+      "wikidata_names": [
+        "linseed oil",
+        "Keten yağı",
+        "flaxseed oil",
+        "linseed",
+        "keten tohumu yağı"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Madder": {
+      "wikidata_id": "Q163641",
+      "wikidata_names": [
+        "Rubia tinctorum",
+        "Kökboya bitkisi",
+        "madder",
+        "Rubia tincorum",
+        "Kökboya",
+        "Kızılkök"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Mahogany": {
+      "wikidata_id": "Q239788",
+      "wikidata_names": [
+        "mahogany wood",
+        "Maun",
+        "mahogany"
+      ],
+      "broader": [
+        "Q2266509",
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Marble": {
+      "wikidata_id": "Q40861",
+      "wikidata_names": [
+        "marble",
+        "mermer",
+        "recrystallized limestone"
+      ],
+      "broader": [
+        "Q47069",
+        "Q777913",
+        "Q141223581",
+        "Q82480",
+        "Q141313540",
+        "Q141223527",
+        "Q8063",
+        "Q12136486"
+      ],
+      "other_names": []
+    },
+    "Meerschaum": {
+      "wikidata_id": "Q2739455",
+      "wikidata_names": [
+        "meerschaum",
+        "lületaşı",
+        "beyazaltın"
+      ],
+      "broader": [
+        "Q414096",
+        "Q3777814",
+        "Q414065",
+        "Q429681",
+        "Q3777770"
+      ],
+      "other_names": []
+    },
+    "Metal oxides": {
+      "wikidata_id": "Q1795231",
+      "wikidata_names": [
+        "metal oxide",
+        "metallic oxide",
+        "metal oxides"
+      ],
+      "broader": [
+        "Q50690",
+        "Q5156940",
+        "Q11173",
+        "Q76272846"
+      ],
+      "other_names": []
+    },
+    "Metallic thread": {
+      "wikidata_id": "Q3510770",
+      "wikidata_names": [
+        "metallic thread",
+        "metal thread",
+        "metallic fiber",
+        "metal fiber"
+      ],
+      "broader": [
+        "Q1391831",
+        "Q49007",
+        "Q28823",
+        "Q111726451",
+        "Q214609",
+        "Q8205328",
+        "Q28877",
+        "Q2424752"
+      ],
+      "other_names": []
+    },
+    "Mordant": {
+      "wikidata_id": "Q5857145",
+      "wikidata_names": [
+        "mordant",
+        "mordan"
+      ],
+      "broader": [
+        "Q46976206",
+        "Q79529",
+        "Q214609",
+        "Q43460564",
+        "Q10683158",
+        "Q141158787",
+        "Q2424752",
+        "Q28555911",
+        "Q142293609"
+      ],
+      "other_names": []
+    },
+    "Mother of pearl": {
+      "wikidata_id": "Q215865",
+      "wikidata_names": [
+        "nacre",
+        "arusek",
+        "mother of pearl",
+        "mother-of-pearl",
+        "pearl shell",
+        "nacreous"
+      ],
+      "broader": [
+        "Q15303351",
+        "Q181790",
+        "Q28969293",
+        "Q214609",
+        "Q115923192",
+        "Q16829513",
+        "Q17853087",
+        "Q811367",
+        "Q10683158",
+        "Q2451477",
+        "Q141158787",
+        "Q2424752",
+        "Q35120",
+        "Q99527517",
+        "Q2995644",
+        "Q337060",
+        "Q1454986",
+        "Q142293609",
+        "Q16686022"
+      ],
+      "other_names": []
+    },
+    "Mulberry wood": {
+      "wikidata_id": "Q110807092",
+      "wikidata_names": [
+        "mulberry wood"
+      ],
+      "broader": [
+        "Q2266509",
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Natural dyes": {
+      "wikidata_id": "Q899955",
+      "wikidata_names": [
+        "natural dye",
+        "Kök boya",
+        "natural dyestuff"
+      ],
+      "broader": [
+        "Q189720",
+        "Q911922",
+        "Q214609",
+        "Q79529",
+        "Q141158787",
+        "Q2424752",
+        "Q43460564",
+        "Q10683158"
+      ],
+      "other_names": []
+    },
+    "Natural pigments": {
+      "wikidata_id": "Q161179",
+      "wikidata_names": [
+        "pigment",
+        "pigmentasyon"
+      ],
+      "broader": [
+        "Q911922",
+        "Q79529",
+        "Q214609",
+        "Q43460564",
+        "Q10683158",
+        "Q141158787",
+        "Q2424752"
+      ],
+      "other_names": []
+    },
+    "Oak wood": {
+      "wikidata_id": "Q2075708",
+      "wikidata_names": [
+        "oakwood",
+        "oak wood",
+        "oak"
+      ],
+      "broader": [
+        "Q2266509",
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Ox gall": {
+      "wikidata_id": "Q1786320",
+      "wikidata_names": [
+        "ox gall"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Pandanus": {
+      "wikidata_id": "Q471914",
+      "wikidata_names": [
+        "Pandanus",
+        "screwpalm",
+        "pandan",
+        "screwpine"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Paraffin wax": {
+      "wikidata_id": "Q177540",
+      "wikidata_names": [
+        "paraffin wax",
+        "Parafin",
+        "petroleum wax",
+        "paraffin",
+        "Parafin mumu",
+        "Parafinler"
+      ],
+      "broader": [
+        "Q169336",
+        "Q16999976",
+        "Q124695",
+        "Q79529",
+        "Q1704572",
+        "Q5447188",
+        "Q214609",
+        "Q43460564",
+        "Q10683158",
+        "Q28732711",
+        "Q141679808",
+        "Q12882296",
+        "Q141158787",
+        "Q2424752"
+      ],
+      "other_names": []
+    },
+    "Pine needles": {
+      "wikidata_id": "Q59672484",
+      "wikidata_names": [
+        "pine needle",
+        "pine needles",
+        "pine leaf",
+        "pine leaves"
+      ],
+      "broader": [
+        "Q1192354",
+        "Q33971",
+        "Q24060707"
+      ],
+      "other_names": []
+    },
+    "Pounamu (nephrite jade)": {
+      "wikidata_id": "Q1279509",
+      "wikidata_names": [
+        "pounamu",
+        "greenstone",
+        "nephrite jade",
+        "New Zealand greenstone"
+      ],
+      "broader": [
+        "Q16887380",
+        "Q28813620",
+        "Q99527517"
+      ],
+      "other_names": []
+    },
+    "Quartz": {
+      "wikidata_id": "Q43010",
+      "wikidata_names": [
+        "quartz",
+        "kuvars",
+        "α-Quarz",
+        "Çakmak taşı",
+        "Kuartz",
+        "Çakmaktaşı",
+        "Kuvarz"
+      ],
+      "broader": [
+        "Q12550001",
+        "Q1277475",
+        "Q178977",
+        "Q7946"
+      ],
+      "other_names": []
+    },
+    "Raffia": {
+      "wikidata_id": "Q14251138",
+      "wikidata_names": [
+        "raffia",
+        "rafia",
+        "raphia"
+      ],
+      "broader": [
+        "Q20026824",
+        "Q1192049",
+        "Q161",
+        "Q189109",
+        "Q28969364",
+        "Q2451477",
+        "Q10282072",
+        "Q10683158",
+        "Q1138571",
+        "Q672506",
+        "Q28969293"
+      ],
+      "other_names": []
+    },
+    "Rattan": {
+      "wikidata_id": "Q323021",
+      "wikidata_names": [
+        "rattan"
+      ],
+      "broader": [
+        "Q28969364",
+        "Q28969293",
+        "Q10683158",
+        "Q2451477"
+      ],
+      "other_names": []
+    },
+    "Reed": {
+      "wikidata_id": "Q28557",
+      "wikidata_names": [
+        "Phragmites australis",
+        "Kamış",
+        "common reed",
+        "Phragmites communis"
+      ],
+      "broader": [
+        "Q190903",
+        "Q192154",
+        "Q756",
+        "Q36458"
+      ],
+      "other_names": []
+    },
+    "Rush": {
+      "wikidata_id": "Q158480",
+      "wikidata_names": [
+        "Juncus"
+      ],
+      "broader": [],
+      "other_names": []
+    },
+    "Seed beads": {
+      "wikidata_id": "Q7445626",
+      "wikidata_names": [
+        "seed bead",
+        "rocaille beads"
+      ],
+      "broader": [
+        "Q1053956",
+        "Q838948",
+        "Q214609",
+        "Q15303351",
+        "Q17537576",
+        "Q2424752",
+        "Q2342494",
+        "Q115923123",
+        "Q8205328",
+        "Q16686448",
+        "Q141158787",
+        "Q115923192"
+      ],
+      "other_names": []
+    },
+    "Seeds": {
+      "wikidata_id": "Q40763",
+      "wikidata_names": [
+        "seed",
+        "Tohum",
+        "seeds",
+        "çekirdek"
+      ],
+      "broader": [
+        "Q20011319",
+        "Q2095",
+        "Q55568967",
+        "Q4936952",
+        "Q1194058",
+        "Q214609",
+        "Q118451828",
+        "Q6671777",
+        "Q16686022",
+        "Q27043948",
+        "Q141403488",
+        "Q1681365",
+        "Q141158787",
+        "Q2424752",
+        "Q1422299"
+      ],
+      "other_names": []
+    },
+    "Sheepskin": {
+      "wikidata_id": "Q1083901",
+      "wikidata_names": [
+        "sheepskin",
+        "Post",
+        "Pösteki"
+      ],
+      "broader": [
+        "Q286",
+        "Q197204",
+        "Q5135573",
+        "Q629103",
+        "Q1074",
+        "Q28472",
+        "Q214609",
+        "Q141445883",
+        "Q2424752",
+        "Q24060765",
+        "Q112826975",
+        "Q3355930",
+        "Q865663",
+        "Q1239288"
+      ],
+      "other_names": []
+    },
+    "Shell": {
+      "wikidata_id": "Q213096",
+      "wikidata_names": [
+        "seashell",
+        "denizkabuğu",
+        "sea shell",
+        "shell",
+        "animal shell",
+        "seashells",
+        "deniz kabuğu",
+        "denizkabukları"
+      ],
+      "broader": [
+        "Q629103",
+        "Q191944",
+        "Q130471637",
+        "Q141445883",
+        "Q2424752",
+        "Q7881",
+        "Q4936952",
+        "Q141445908",
+        "Q488383",
+        "Q112826975",
+        "Q27043941",
+        "Q55568967",
+        "Q27043948",
+        "Q141403488"
+      ],
+      "other_names": []
+    },
+    "Silica sand": {
+      "wikidata_id": "Q1169854",
+      "wikidata_names": [
+        "quartz sand",
+        "silica sand"
+      ],
+      "broader": [
+        "Q3300024",
+        "Q34679",
+        "Q9348377",
+        "Q206615",
+        "Q2451477",
+        "Q1155083",
+        "Q12372934",
+        "Q2259909",
+        "Q12131439",
+        "Q2719350",
+        "Q214609",
+        "Q16110223",
+        "Q16686022",
+        "Q1704572",
+        "Q180184",
+        "Q12372938",
+        "Q1359395",
+        "Q1550712",
+        "Q889659",
+        "Q45621"
+      ],
+      "other_names": []
+    },
+    "Silk": {
+      "wikidata_id": "Q37681",
+      "wikidata_names": [
+        "silk",
+        "İpek",
+        "silk fiber"
+      ],
+      "broader": [
+        "Q47507412",
+        "Q1192049",
+        "Q28823",
+        "Q142281080",
+        "Q161",
+        "Q2451477",
+        "Q10282072",
+        "Q214609",
+        "Q8205328",
+        "Q28877",
+        "Q2424752",
+        "Q4915356",
+        "Q181790",
+        "Q10683158",
+        "Q16686022",
+        "Q141158787",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q53617407",
+        "Q488383",
+        "Q141905832",
+        "Q16829513",
+        "Q17853087",
+        "Q811367"
+      ],
+      "other_names": []
+    },
+    "Silver": {
+      "wikidata_id": "Q1090",
+      "wikidata_names": [
+        "silver",
+        "gümüş"
+      ],
+      "broader": [
+        "Q585302",
+        "Q271449",
+        "Q214503",
+        "Q11646938",
+        "Q11426",
+        "Q11344",
+        "Q34669510",
+        "Q1924900",
+        "Q141759579"
+      ],
+      "other_names": []
+    },
+    "Sinew": {
+      "wikidata_id": "Q232358",
+      "wikidata_names": [
+        "tendon",
+        "tendons",
+        "sinew"
+      ],
+      "broader": [
+        "Q5259309",
+        "Q62122079",
+        "Q112826975",
+        "Q66317996",
+        "Q3216202",
+        "Q66511544",
+        "Q27162596",
+        "Q4406616",
+        "Q25615",
+        "Q4936952",
+        "Q27062218",
+        "Q488383",
+        "Q141681465"
+      ],
+      "other_names": []
+    },
+    "Soap": {
+      "wikidata_id": "Q34396",
+      "wikidata_names": [
+        "soap",
+        "sabun",
+        "soaps"
+      ],
+      "broader": [
+        "Q12370",
+        "Q334637",
+        "Q174211",
+        "Q2366155",
+        "Q12037703",
+        "Q1069267",
+        "Q191154",
+        "Q1974312",
+        "Q2901852",
+        "Q11173",
+        "Q79529",
+        "Q2424752",
+        "Q3564138"
+      ],
+      "other_names": []
+    },
+    "Soapstone": {
+      "wikidata_id": "Q707896",
+      "wikidata_names": [
+        "soapstone",
+        "sabuntaşı",
+        "steatite",
+        "soaprock",
+        "soapstone silicate",
+        "massive talc"
+      ],
+      "broader": [
+        "Q3300024",
+        "Q47069",
+        "Q42045",
+        "Q134583",
+        "Q206615",
+        "Q2451477",
+        "Q141223581",
+        "Q8063",
+        "Q141223674",
+        "Q3777524",
+        "Q429681",
+        "Q214609",
+        "Q16110223",
+        "Q16686022",
+        "Q141223527",
+        "Q141223449",
+        "Q178977"
+      ],
+      "other_names": []
+    },
+    "Soda ash": {
+      "wikidata_id": "Q190227",
+      "wikidata_names": [
+        "sodium carbonate",
+        "sodyum karbonat",
+        "disodium carbonate",
+        "washing soda",
+        "soda",
+        "anhydrous sodium carbonate",
+        "soda ash",
+        "carbonic acid, disodium salt",
+        "sodium carbonate, anhydrous",
+        "sodium carbonate anhydrous",
+        "sodium salt of carbonic acid",
+        "çamaşır sodası"
+      ],
+      "broader": [
+        "Q56810798",
+        "Q1508568",
+        "Q181699",
+        "Q12370",
+        "Q12555933",
+        "Q11173",
+        "Q2366155",
+        "Q12037703"
+      ],
+      "other_names": []
+    },
+    "Solder": {
+      "wikidata_id": "Q866612",
+      "wikidata_names": [
+        "solder"
+      ],
+      "broader": [
+        "Q16829513",
+        "Q24568869",
+        "Q9346089",
+        "Q214609",
+        "Q2053097",
+        "Q37756",
+        "Q141158787",
+        "Q2424752",
+        "Q26717101",
+        "Q5447188",
+        "Q1924900"
+      ],
+      "other_names": []
+    },
+    "Spruce root": {
+      "wikidata_id": "Q109875108",
+      "wikidata_names": [
+        "spruce root"
+      ],
+      "broader": [
+        "Q109925469",
+        "Q28969364",
+        "Q15303351",
+        "Q28969293",
+        "Q214609",
+        "Q115923192"
+      ],
+      "other_names": []
+    },
+    "Spruce wood": {
+      "wikidata_id": "Q2046308",
+      "wikidata_names": [
+        "spruce",
+        "spruce wood",
+        "spruce lumber",
+        "Picea wood",
+        "solid spruce"
+      ],
+      "broader": [
+        "Q252108",
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Sweetgrass": {
+      "wikidata_id": "Q109937882",
+      "wikidata_names": [
+        "sweetgrass",
+        "sweet-grass",
+        "sweet grass",
+        "scented grass",
+        "scented grasses"
+      ],
+      "broader": [
+        "Q66429760",
+        "Q15303351",
+        "Q28969364",
+        "Q214609",
+        "Q115923192",
+        "Q28969293",
+        "Q141158787",
+        "Q2424752"
+      ],
+      "other_names": []
+    },
+    "Thread": {
+      "wikidata_id": "Q1391831",
+      "wikidata_names": [
+        "thread",
+        "dikiş ipliği"
+      ],
+      "broader": [
+        "Q49007",
+        "Q28823",
+        "Q111726451",
+        "Q214609",
+        "Q8205328",
+        "Q28877",
+        "Q2424752",
+        "Q113519195",
+        "Q141158787",
+        "Q223557",
+        "Q16686448",
+        "Q386724",
+        "Q136490012",
+        "Q141756646",
+        "Q53617407",
+        "Q488383",
+        "Q141905832"
+      ],
+      "other_names": []
+    },
+    "Tin": {
+      "wikidata_id": "Q1096",
+      "wikidata_names": [
+        "tin",
+        "kalay"
+      ],
+      "broader": [
+        "Q244982",
+        "Q214483"
+      ],
+      "other_names": []
+    },
+    "Turquoise": {
+      "wikidata_id": "Q165254",
+      "wikidata_names": [
+        "turquoise",
+        "turkuaz",
+        "chalchit"
+      ],
+      "broader": [
+        "Q3777846",
+        "Q3092395",
+        "Q7946",
+        "Q141222936",
+        "Q10683158",
+        "Q79529",
+        "Q12037703",
+        "Q214609"
+      ],
+      "other_names": []
+    },
+    "Urushi lacquer": {
+      "wikidata_id": "Q104224503",
+      "wikidata_names": [
+        "Toxicodendron vernicifluum resin",
+        "lacquer",
+        "Toxicodendron vernicifluum lacquer",
+        "Chinese lacquer",
+        "urushi lacquer",
+        "urushi resin",
+        "true lacquer"
+      ],
+      "broader": [
+        "Q37933789",
+        "Q11236878",
+        "Q145205",
+        "Q37931493",
+        "Q19388114",
+        "Q76626",
+        "Q3300034",
+        "Q214609",
+        "Q81683",
+        "Q34669510",
+        "Q131790",
+        "Q1726215",
+        "Q11173",
+        "Q863583",
+        "Q16686022",
+        "Q289472",
+        "Q12334861",
+        "Q244680",
+        "Q15303351",
+        "Q141158787",
+        "Q2424752",
+        "Q1570182"
+      ],
+      "other_names": []
+    },
+    "Vegetable-tanned leather": {
+      "wikidata_id": "Q10713629",
+      "wikidata_names": [
+        "vegetable tanning"
+      ],
+      "broader": [
+        "Q211578",
+        "Q3632343",
+        "Q2207288",
+        "Q12773274",
+        "Q1408286",
+        "Q627436",
+        "Q7406919",
+        "Q1914636",
+        "Q1043452"
+      ],
+      "other_names": []
+    },
+    "Walnut wood": {
+      "wikidata_id": "Q2288038",
+      "wikidata_names": [
+        "walnut wood",
+        "walnut"
+      ],
+      "broader": [
+        "Q2266509",
+        "Q287",
+        "Q40397",
+        "Q1138571",
+        "Q28969364",
+        "Q317088",
+        "Q142281080"
+      ],
+      "other_names": []
+    },
+    "Willow": {
+      "wikidata_id": "Q36050",
+      "wikidata_names": [
+        "Salix",
+        "Söğüt",
+        "willow",
+        "sallow",
+        "osier"
+      ],
+      "broader": [
+        "Q10884",
+        "Q757163",
+        "Q756"
+      ],
+      "other_names": []
+    },
+    "Wood ash": {
+      "wikidata_id": "Q3480332",
+      "wikidata_names": [
+        "wood ash",
+        "Odun külü"
+      ],
+      "broader": [
+        "Q2083902",
+        "Q152079",
+        "Q28969364",
+        "Q1128255",
+        "Q169336",
+        "Q903495",
+        "Q214609",
+        "Q28969293"
+      ],
+      "other_names": []
+    },
+    "Wool": {
+      "wikidata_id": "Q42329",
+      "wikidata_names": [
+        "wool",
+        "Yün"
+      ],
+      "broader": [
+        "Q874142",
+        "Q142281080",
+        "Q1192049",
+        "Q8054",
+        "Q10282072",
+        "Q4915356",
+        "Q181790",
+        "Q161",
+        "Q2451477",
+        "Q422649",
+        "Q424689",
+        "Q3084232",
+        "Q66560214",
+        "Q10683158",
+        "Q214609",
+        "Q16829513",
+        "Q17853087",
+        "Q811367"
+      ],
+      "other_names": []
+    },
+    "Yucca": {
+      "wikidata_id": "Q156317",
+      "wikidata_names": [
+        "Yucca"
+      ],
+      "broader": [],
+      "other_names": []
+    }
+  }
+}
